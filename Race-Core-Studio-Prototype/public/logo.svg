@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <!-- Outer red border -->
+  <rect width="80" height="80" rx="16" fill="#dc2626"/>
+  <!-- Inner dark background -->
+  <rect x="4" y="4" width="72" height="72" rx="13" fill="#0a0a0a"/>
+  <!-- Checkered flag top -->
+  <rect x="16" y="12" width="10" height="10" fill="#dc2626"/>
+  <rect x="26" y="12" width="10" height="10" fill="white" opacity="0.85"/>
+  <rect x="36" y="12" width="10" height="10" fill="#dc2626"/>
+  <rect x="46" y="12" width="10" height="10" fill="white" opacity="0.85"/>
+  <rect x="56" y="12" width="8" height="10" fill="#dc2626"/>
+  <rect x="16" y="22" width="10" height="10" fill="white" opacity="0.85"/>
+  <rect x="26" y="22" width="10" height="10" fill="#dc2626"/>
+  <rect x="36" y="22" width="10" height="10" fill="white" opacity="0.85"/>
+  <rect x="46" y="22" width="10" height="10" fill="#dc2626"/>
+  <rect x="56" y="22" width="8" height="10" fill="white" opacity="0.85"/>
+  <!-- Flag pole -->
+  <rect x="14" y="11" width="3" height="32" rx="1.5" fill="white" opacity="0.9"/>
+  <!-- Divider line -->
+  <rect x="14" y="47" width="52" height="1.5" fill="#dc2626" opacity="0.5"/>
+  <!-- Brand text -->
+  <text x="40" y="62" font-family="Arial Black, Impact, sans-serif" font-size="10" font-weight="900" fill="#dc2626" text-anchor="middle" letter-spacing="1">RACE</text>
+  <text x="40" y="74" font-family="Arial Black, Impact, sans-serif" font-size="10" font-weight="900" fill="white" text-anchor="middle" letter-spacing="1">CORE</text>
+</svg>
