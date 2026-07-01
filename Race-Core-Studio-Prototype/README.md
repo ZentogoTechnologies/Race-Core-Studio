@@ -24,7 +24,7 @@ Abre tu navegador en `http://localhost:5173`
 
 ---
 
-## 📁 Estructura del proyecto
+## 📁 Estructura del prototipo
 
 ```
 race-core-studio/
