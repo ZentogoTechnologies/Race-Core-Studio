@@ -1,4 +1,4 @@
-# 🏁 Racing CasparCG Control System
+# 🏁 Race Core Studio
 
 Sistema avanzado de control para gestionar overlays de carreras y eventos deportivos en tiempo real.
 
