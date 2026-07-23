@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Social Media Intro</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/social_media.css">
+
+</head>
+
+<body>
+
+<div class="social-media" id="socialMedia">
+
+    <div class="logo-box">
+
+        <img
+            id="logo"
+            src="../img/logoap.png"
+            alt="logo">
+
+    </div>
+
+    <div
+        class="info-panel"
+        id="infoPanelSocialMedia">
+
+        <div
+            class="event-title"
+            id="title">
+
+            FOLLOW US
+
+        </div>
+
+        <div class="social-list">
+
+            <div class="social-row">
+
+    <img
+        class="social-icon"
+        src="https://fontawesome.com/icons/brands/solid/instagram"
+        alt="Instagram">
+
+    <span
+        class="social-value"
+        id="instagram">
+
+        @AUTODROMOPANAMA
+
+    </span>
+
+</div>
+
+<div class="social-row">
+
+    <i style="font-size:24px" class="fa">&#xf167;</i>
+
+
+    <span
+        class="social-value"
+        id="youtube">
+
+        AUTODROMO PANAMA
+
+    </span>
+
+</div>
+
+<div class="social-row">
+
+    <img
+        class="social-icon"
+        src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png"
+        alt="Website">
+
+    <span
+        class="social-value"
+        id="website">
+
+        AUTODROMOPANAMA.COM
+
+    </span>
+
+</div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function update(data){
+
+    if(data.instagram !== undefined){
+
+        document.getElementById("instagram")
+            .textContent = data.instagram;
+
+    }
+
+    if(data.youtube !== undefined){
+
+        document.getElementById("youtube")
+            .textContent = data.youtube;
+
+    }
+
+    if(data.website !== undefined){
+
+        document.getElementById("website")
+            .textContent = data.website;
+
+    }
+
+    if(data.logo !== undefined){
+
+        document.getElementById("logo")
+            .src = data.logo;
+
+    }
+
+}
+
+function play(){
+
+    const socialMedia =
+        document.getElementById("socialMedia");
+
+    const panel =
+        socialMedia.querySelector(".info-panel");
+
+    socialMedia.style.animation =
+        "slideUp .5s ease forwards";
+
+    setTimeout(()=>{
+
+        panel.style.animation =
+            "expandPanel .6s ease forwards";
+
+    },500);
+
+}
+
+function stop(){
+
+    const socialMedia =
+        document.getElementById("socialMedia");
+
+    const panel =
+        socialMedia.querySelector(".info-panel");
+
+    panel.style.animation =
+        "collapsePanel .5s ease forwards";
+
+    setTimeout(()=>{
+
+        socialMedia.style.animation =
+            "slideDown .5s ease forwards";
+
+    },500);
+
+}
+
+</script>
+
+</body>
+
+</html>

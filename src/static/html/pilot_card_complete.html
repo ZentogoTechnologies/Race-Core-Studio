@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilot Card Complete</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pilot_card_complete.css">
+</head>
+<body>
+
+    <div class="pilot-card" id="pilotCard">
+
+        <div class="pilot-left">
+
+            <img
+                id="brandLogo"
+                class="pilot-brand-logo"
+                src="../img/team_logo.png">
+
+        </div>
+
+        <div
+            class="pilot-content"
+            id="pilotContent">
+
+            <div class="pilot-header">
+
+                <div
+                    id="pilotName"
+                    class="pilot-name">
+
+                    Jimmy Llibre
+
+                </div>
+
+            </div>
+
+            <div class="pilot-body">
+
+                <div class="pilot-photo-container">
+
+                    <div
+                        id="bigNumber"
+                        class="pilot-big-number">
+
+                        43
+
+                    </div>
+
+                    <img
+                        id="pilotPhoto"
+                        class="pilot-photo"
+                        src="../img/pilot.png">
+
+                </div>
+
+                <div class="pilot-info">
+
+                    <div class="info-card">
+
+                        <div class="info-label">
+                            Número de carro
+                        </div>
+
+                        <div
+                            id="carNumber"
+                            class="car-number">
+
+                            #43
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-card">
+
+                        <div class="info-label">
+                            Categoría
+                        </div>
+
+                        <div
+                            id="catNumber"
+                            class="info-value">
+
+                            V8
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-card">
+
+                        <div class="info-label">
+                            Vehículo
+                        </div>
+
+                        <div
+                            id="carBrand"
+                            class="info-value">
+
+                            Lexus V8
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-card">
+
+                        <div class="info-label">
+                            Equipo
+                        </div>
+
+                        <div
+                            id="teamName"
+                            class="info-value">
+
+                            Gazoo Racing Rep. Dom
+
+                        </div>
+
+                    </div>
+
+                       <div class="info-card">
+
+                        <div class="info-label">
+                            Pais
+                        </div>
+
+                        <div
+                            id="catNumber"
+                            class="info-value">
+
+                            RD
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+   <script>
+
+    function update(data) {
+
+        if(data.pilot_name !== undefined) {
+            document.getElementById("pilotName").textContent =
+                data.pilot_name;
+        }
+
+        if(data.car_number !== undefined) {
+
+            document.getElementById("carNumber").textContent =
+                "#" + data.car_number;
+
+            document.getElementById("bigNumber").textContent =
+                data.car_number;
+        }
+
+        if(data.car_brand !== undefined) {
+            document.getElementById("carBrand").textContent =
+                data.car_brand;
+        }
+
+        if(data.team_name !== undefined) {
+            document.getElementById("teamName").textContent =
+                data.team_name;
+        }
+
+        if(data.brand_logo !== undefined) {
+            document.getElementById("brandLogo").src =
+                data.brand_logo;
+        }
+
+        if(data.pilot_photo !== undefined) {
+            document.getElementById("pilotPhoto").src =
+                data.pilot_photo;
+        }
+    }
+
+    window.onload = function(){
+
+        document.getElementById("pilotCard").style.opacity = "1";
+
+        document.getElementById("pilotCard").style.transform =
+            "translate(-50%, -50%)";
+
+        document.getElementById("pilotContent").style.transform =
+            "none";
+    };
+
+</script>
+
+</body>
+
+</html>
+

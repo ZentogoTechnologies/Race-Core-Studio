@@ -1,0 +1,244 @@
+@charset "UTF-8";
+/* ==================================================
+   CONTENEDOR PRINCIPAL
+================================================== */
+
+.pilot-short{
+    position:absolute;
+
+    left:50%;
+    bottom:40px;
+
+    transform:translateX(-50%) translateY(250px);
+
+    display:flex;
+    align-items:center;
+}
+
+/* ==================================================
+   PANEL DE MARCA / LOGO
+================================================== */
+
+.brand-panel{
+    width:150px;
+    height:170px;
+
+    flex-shrink:0;
+
+    background:#1d1d1d;
+    border-left:10px solid #ff0000;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    z-index:10;
+    border-radius:10px 0 0 10px;
+}
+
+.brand-logo{
+    max-width:130px;
+    max-height:90px;
+    object-fit:contain;
+}
+
+.brand-panel img{
+    max-width:100px;
+    max-height:100px;
+}
+
+/* ==================================================
+   PANEL PRINCIPAL
+================================================== */
+
+.pilot-panel{
+    width:0;
+    height:170px;
+
+    overflow:hidden;
+    white-space:nowrap;
+
+    display:flex;
+
+    flex-shrink: 0;
+}
+
+/* ==================================================
+   CONTENIDO (Ajustado)
+================================================== */
+
+.content-section{
+    /* Se cambió a min-width y max-width para congelar el tamaño real */
+    width:600px;
+    min-width:600px;
+    max-width:600px;
+
+    padding:20px 35px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    background:url("../img/fondo.jpg") center/cover no-repeat;
+}
+
+/* ==================================================
+   FOTO (Ajustado)
+================================================== */
+
+.photo-section{
+    /* Se cambió a min-width y max-width para congelar la sección de la foto */
+    width:150px;
+    min-width:150px;
+    max-width:150px;
+
+    flex-shrink:0;
+
+    position:relative;
+    overflow:visible;
+
+    background:#000;
+    z-index:2;
+    border-radius:0 10px 10px 0;
+}
+
+.background-number{
+    position:absolute;
+
+    top:-15px;
+    left:-60px;
+
+    font-size:120px;
+    font-weight:900;
+
+    color:transparent;
+    opacity:.7;
+
+    -webkit-text-stroke:2px rgba(255,0,0,.4);
+
+    z-index:1;
+    pointer-events:none;
+}
+
+.pilot-photo{
+    position:absolute;
+
+    bottom:0;
+    /* Bajamos el porcentaje para que la foto no se salga del nuevo espacio corto */
+    left:50%; 
+
+    height:100%;
+
+    transform:translateX(-50%);
+
+    clip-path: inset(0 0 0 0);
+    z-index:2;
+}
+
+/* ==================================================
+   TEXTO PRINCIPAL
+================================================== */
+
+.pilot-name{
+    font-family:"Impact","Arial Black",sans-serif;
+    font-size:46px;
+    font-weight:400;
+    letter-spacing: 1px;
+    text-transform:uppercase;
+
+    color:#fff;
+
+    margin-bottom:5px;
+}
+
+.car-number{
+    font-family:"Impact","Arial Black",sans-serif;
+    font-size:40px;
+    font-weight:400;
+    line-height:1;
+
+    color:#ff0000;
+
+    margin-bottom:10px;
+}
+
+/* ==================================================
+   INFORMACIÓN
+================================================== */
+
+.info-row{
+    display:flex;
+    gap:40px;
+}
+
+.info-block{
+    display:flex;
+    flex-direction:column;
+}
+
+.label{
+    margin-bottom:4px;
+
+    font-family:"Impact","Arial Black",sans-serif;
+    font-size:12px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing: 1px;
+    color:#bdbdbd;
+}
+
+.value{
+    font-family:"Impact","Arial Black",sans-serif;
+    font-size:18px;
+    font-weight:bold;
+    letter-spacing: 1px;
+    color:#fff;
+}
+
+/* ==================================================
+   ANIMACIONES
+================================================== */
+
+@keyframes slideUp{
+    from{
+        transform:translateX(-50%) translateY(250px);
+        opacity:0;
+    }
+
+    to{
+        transform:translateX(-50%) translateY(0);
+        opacity:1;
+    }
+}
+
+@keyframes slideDown{
+    from{
+        transform:translateX(-50%) translateY(0);
+        opacity:1;
+    }
+
+    to{
+        transform:translateX(-50%) translateY(250px);
+        opacity:0;
+    }
+}
+
+@keyframes expandPanel{
+    from{
+        width:0;
+    }
+
+    to{
+        width: 850px;
+    }
+}
+
+@keyframes collapsePanel{
+    from{
+        width: 850px;
+    }
+
+    to{
+        width:0;
+    }
+}

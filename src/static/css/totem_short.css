@@ -1,0 +1,431 @@
+@charset "UTF-8";
+
+.leaderboard{
+
+    width:560px;
+
+    overflow:hidden;
+
+    border-radius:10px;
+
+    background:#030507;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.35);
+
+    opacity:0;
+
+    transform:
+        translateY(100px);
+}
+
+/* ===================================
+   HEADER
+=================================== */
+
+.lb-header{
+
+    height:100px;
+
+    display:flex;
+
+    background:#000;
+}
+
+/* ===================================
+   LOGO
+=================================== */
+
+.lb-logo{
+
+    width:170px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    position:relative;
+
+    background:
+        linear-gradient(
+            180deg,
+            #070b11,
+            #11151c
+        );
+}
+
+.lb-logo::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    top:0;
+    bottom:0;
+
+    width:7px;
+
+    background:#ff0000;
+}
+
+.lb-logo img{
+
+    width:100px;
+}
+
+/* ===================================
+   INFO
+=================================== */
+
+.lb-info{
+
+    flex:1;
+
+    padding:15px 25px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #000,
+            #060606 50%,
+            #160000
+        );
+}
+
+.lb-info::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        url("../img/fondo.jpg")
+        center center /
+        cover no-repeat;
+
+    opacity:.35;
+}
+
+/* ===================================
+   TITULO
+=================================== */
+
+.lb-heat{
+
+    position:relative;
+
+    z-index:2;
+
+    color:white;
+
+    font-size:42px;
+
+    font-weight:900;
+}
+
+/* ===================================
+   TIMER
+=================================== */
+
+.lb-timer{
+
+    position:relative;
+
+    z-index:2;
+
+    margin-top:5px;
+
+    display:flex;
+
+    gap:10px;
+}
+
+.lb-timer span:first-child{
+
+    color:#ff1111;
+
+    font-size:18px;
+
+    font-weight:700;
+}
+
+.lb-timer span:last-child{
+
+    color:white;
+
+    font-size:24px;
+
+    font-weight:700;
+}
+
+/* ===================================
+   FILAS
+=================================== */
+
+.lb-row{
+
+    height:70px;
+
+    display:grid;
+
+    grid-template-columns:
+        55px
+        2px
+        70px
+        1fr
+        110px;
+
+    align-items:center;
+
+    border-top:
+        1px solid rgba(
+            255,255,255,.08
+        );
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(18,22,30,.95),
+            rgba(0,0,0,.95)
+        );
+}
+
+/* ===================================
+   LIDER
+=================================== */
+
+.lb-row.leader{
+
+    background:
+        linear-gradient(
+            90deg,
+            #493300,
+            #b68700,
+            #dca400
+        );
+}
+
+/* ===================================
+   POSICION
+=================================== */
+
+.lb-pos{
+
+    text-align:center;
+
+    font-size:32px;
+
+    font-weight:900;
+}
+
+.pos-1{
+    color:#ff0000;
+}
+
+.pos-2,
+.pos-4,
+.pos-5,
+.pos-6,
+.pos-7,
+.pos-8,
+.pos-9,
+.pos-10{
+    color:#c8c8c8;
+}
+
+.pos-3{
+    color:#ff9a00;
+}
+
+/* ===================================
+   SEPARADOR
+=================================== */
+
+.lb-separator{
+
+    width:2px;
+
+    height:40px;
+
+    background:#ff0015;
+}
+
+/* ===================================
+   NUMERO
+=================================== */
+
+.lb-number{
+
+    text-align:center;
+
+    color:white;
+
+    font-size:28px;
+
+    font-weight:900;
+}
+
+/* ===================================
+   NOMBRE
+=================================== */
+
+.lb-name{
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    padding-left:12px;
+}
+
+/* ===================================
+   GAP
+=================================== */
+
+.lb-gap{
+
+    text-align:right;
+
+    padding-right:15px;
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    font-family:monospace;
+}
+
+/* ===================================
+   BRILLO
+=================================== */
+
+.leader{
+
+    position:relative;
+}
+
+.leader::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.08),
+            transparent
+        );
+
+    animation:
+        shine 4s linear infinite;
+}
+
+@keyframes shine{
+
+    from{
+        transform:translateX(-100%);
+    }
+
+    to{
+        transform:translateX(100%);
+    }
+}
+
+/* ==================================================
+   ANIMACIONES
+================================================== */
+
+@keyframes slideUp{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(120px)
+            scale(.95);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+}
+
+@keyframes slideDown{
+
+    from{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(120px)
+            scale(.95);
+    }
+}
+
+@keyframes expandPanel{
+
+    from{
+
+        width:0;
+        opacity:0;
+    }
+
+    to{
+
+        width:800px;
+        opacity:1;
+    }
+}
+
+@keyframes collapsePanel{
+
+    from{
+
+        width:800px;
+        opacity:1;
+    }
+
+    to{
+
+        width:0;
+        opacity:0;
+    }
+}

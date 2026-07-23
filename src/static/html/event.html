@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Event Intro</title>
+<link rel="stylesheet" href="../css/global.css">
+<link rel="stylesheet" href="../css/event.css">
+
+</head>
+
+<body>
+
+<div class="overlay" id="overlay">
+
+    <div class="logo-box">
+        <img id="logo"
+             src="../img/logoap.png"
+             alt="logo">
+    </div>
+
+    <div class="info-panel">
+
+        <div class="event-title"
+             id="title">
+            AUTODROMO PANAMA
+        </div>
+
+        <div class="event-subtitle"
+             id="subtitle">
+            #DRAGTIME
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function update(data){
+
+    if(data.title !== undefined){
+        document.getElementById("title").textContent =
+            data.title.toUpperCase();
+    }
+
+    if(data.subtitle !== undefined){
+        document.getElementById("subtitle").textContent =
+            data.subtitle;
+    }
+
+    if(data.logo !== undefined){
+        document.getElementById("logo").src =
+            data.logo;
+    }
+}
+
+function play() {
+
+    const overlay =
+        document.getElementById("overlay");
+
+    const panel =
+        overlay.querySelector(".info-panel");
+
+    overlay.style.animation =
+        "slideUp .5s ease forwards";
+
+    setTimeout(() => {
+
+        panel.style.animation =
+            "expandPanel .6s ease forwards";
+
+    },500);
+}
+
+function stop() {
+
+    const overlay =
+        document.getElementById("overlay");
+
+    const panel =
+        overlay.querySelector(".info-panel");
+
+    panel.style.animation =
+        "collapsePanel .5s ease forwards";
+
+    setTimeout(() => {
+
+        overlay.style.animation =
+            "slideDown .5s ease forwards";
+
+    },500);
+}
+
+</script>
+
+</body>
+</html>
