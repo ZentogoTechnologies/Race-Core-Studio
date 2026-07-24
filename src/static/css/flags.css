@@ -1,0 +1,105 @@
+@charset "UTF-8";
+
+/* ===================================
+   FLAG PANELS
+=================================== */
+
+.lb-info-red,
+.lb-info-green,
+.lb-info-checkered,
+.lb-info-yellow{
+
+    flex:1;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:0;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+/* Elimina el fondo del CSS original */
+
+.lb-info-red::before,
+.lb-info-green::before,
+.lb-info-checkered::before,
+.lb-info-yellow::before{
+
+    display:none;
+}
+
+/* ===================================
+   COLORES
+=================================== */
+
+.lb-info-red{
+    background:#D50000;
+}
+
+.lb-info-green{
+    background:#009B3A;
+}
+
+.lb-info-yellow{
+    background:#e8be03;
+}
+
+.lb-info-checkered{
+
+  background:
+    linear-gradient(45deg,#000 25%,transparent 25%) 0 0/40px 40px,
+    linear-gradient(-45deg,#000 25%,transparent 25%) 0 20px/40px 40px,
+    linear-gradient(45deg,transparent 75%,#000 75%) 20px -20px/40px 40px,
+    linear-gradient(-45deg,transparent 75%,#000 75%) -20px 0/40px 40px,
+    #FFFFFF;
+}      
+
+/* ===================================
+   TEXTO
+=================================== */
+
+.lb-heat.flag{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+    text-transform:uppercase;
+
+    z-index:2;
+}
+
+.lb-heat.flag .status-title{
+
+    color:#FFFFFF;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    margin-bottom:8px;
+}
+
+.lb-heat.flag .status-value{
+
+    color:#FFFFFF;
+
+    font-size:34px;
+
+    font-weight:900;
+
+    line-height:1;
+
+    letter-spacing:1px;
+}
