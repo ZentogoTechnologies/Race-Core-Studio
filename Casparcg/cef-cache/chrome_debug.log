@@ -1,0 +1,2 @@
+[12384:17240:0727/163931.036:WARNING:chrome\browser\signin\account_consistency_mode_manager.cc:74] Desktop Identity Consistency cannot be enabled as no OAuth client ID and client secret have been configured.
+[12384:17240:0727/163931.064:WARNING:chrome\browser\extensions\external_registry_loader_win.cc:236] Error observing HKLM: Acceso denegado. (0x5)

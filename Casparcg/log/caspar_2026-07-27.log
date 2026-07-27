@@ -1,0 +1,69 @@
+[2026-07-27 16:39:30.236] [info]    ############################################################################
+[2026-07-27 16:39:30.236] [info]    CasparCG Server is distributed by the Swedish Broadcasting Corporation (SVT)
+[2026-07-27 16:39:30.236] [info]    under the GNU General Public License GPLv3 or higher.
+[2026-07-27 16:39:30.236] [info]    Please see LICENSE.TXT for details.
+[2026-07-27 16:39:30.236] [info]    http://www.casparcg.com/
+[2026-07-27 16:39:30.236] [info]    ############################################################################
+[2026-07-27 16:39:30.236] [info]    Starting CasparCG Video and Graphics Playout Server 2.5.0 69e8ad5 Stable
+[2026-07-27 16:39:30.240] [info]    "C:/Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\casparcg.config":
+[2026-07-27 16:39:30.240] [info]    -----------------------------------------
+[2026-07-27 16:39:30.240] [info]    <?xml version="1.0" encoding="utf-8"?>
+[2026-07-27 16:39:30.240] [info]    <configuration>
+[2026-07-27 16:39:30.240] [info]       <paths>
+[2026-07-27 16:39:30.240] [info]          <media-path>media/</media-path>
+[2026-07-27 16:39:30.240] [info]          <log-path disable="false">log/</log-path>
+[2026-07-27 16:39:30.240] [info]          <data-path>data/</data-path>
+[2026-07-27 16:39:30.240] [info]          <template-path>template/</template-path>
+[2026-07-27 16:39:30.240] [info]       </paths>
+[2026-07-27 16:39:30.240] [info]       <lock-clear-phrase>secret</lock-clear-phrase>
+[2026-07-27 16:39:30.240] [info]       <channels>
+[2026-07-27 16:39:30.240] [info]          <channel>
+[2026-07-27 16:39:30.240] [info]             <video-mode>1080p6000</video-mode>
+[2026-07-27 16:39:30.240] [info]             <consumers>
+[2026-07-27 16:39:30.240] [info]                <screen/>
+[2026-07-27 16:39:30.240] [info]                <system-audio/>
+[2026-07-27 16:39:30.240] [info]             </consumers>
+[2026-07-27 16:39:30.240] [info]          </channel>
+[2026-07-27 16:39:30.240] [info]       </channels>
+[2026-07-27 16:39:30.240] [info]       <controllers>
+[2026-07-27 16:39:30.240] [info]          <tcp>
+[2026-07-27 16:39:30.240] [info]             <port>5250</port>
+[2026-07-27 16:39:30.240] [info]             <protocol>AMCP</protocol>
+[2026-07-27 16:39:30.240] [info]          </tcp>
+[2026-07-27 16:39:30.240] [info]       </controllers>
+[2026-07-27 16:39:30.240] [info]       <amcp>
+[2026-07-27 16:39:30.240] [info]          <media-server>
+[2026-07-27 16:39:30.240] [info]             <host>localhost</host>
+[2026-07-27 16:39:30.240] [info]             <port>8000</port>
+[2026-07-27 16:39:30.240] [info]          </media-server>
+[2026-07-27 16:39:30.240] [info]       </amcp>
+[2026-07-27 16:39:30.240] [info]    </configuration>
+[2026-07-27 16:39:30.240] [info]    -----------------------------------------
+[2026-07-27 16:39:30.240] [info]    Initialized video modes.
+[2026-07-27 16:39:30.698] [info]    Initializing OpenGL Device (sfml).
+[2026-07-27 16:39:30.699] [info]    Initializing OpenGL Device.
+[2026-07-27 16:39:30.703] [info]    Initialized OpenGL 4.5.0 NVIDIA 596.08 NVIDIA Corporation
+[2026-07-27 16:39:30.918] [info]    Initialized OpenGL Accelerated GPU Image Mixer for channel 1
+[2026-07-27 16:39:30.919] [info]    video_channel[1|1080p6000] Successfully Initialized.
+[2026-07-27 16:39:30.919] [info]    Initialized channels.
+[2026-07-27 16:39:30.919] [info]    Initialized command repository.
+[2026-07-27 16:39:30.919] [info]    Initialized image module.
+[2026-07-27 16:39:30.919] [info]    Initialized ffmpeg module.
+[2026-07-27 16:39:30.919] [info]    Initialized oal module.
+[2026-07-27 16:39:30.924] [info]    Initialized decklink module.
+[2026-07-27 16:39:30.924] [info]    Initialized screen module.
+[2026-07-27 16:39:30.924] [info]    Initialized newtek module.
+[2026-07-27 16:39:30.924] [info]    Initialized artnet module.
+[2026-07-27 16:39:30.925] [info]    [html] Using CEF cache path: C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg/cef-cache
+[2026-07-27 16:39:31.058] [info]    Initialized html module.
+[2026-07-27 16:39:31.058] [info]    Flash support is disabled
+[2026-07-27 16:39:31.058] [info]    Initialized flash module.
+[2026-07-27 16:39:31.060] [info]    Initialized bluefish module.
+[2026-07-27 16:39:31.060] [info]    Initialized modules.
+[2026-07-27 16:39:31.060] [info]    Screen consumer [1|1080p6000] Using frame copied to host for rendering.
+[2026-07-27 16:39:31.062] [info]    Screen consumer [1|1080p6000] Initialized.
+[2026-07-27 16:39:31.109] [info]    oal[1|1080p6000] Initialized.
+[2026-07-27 16:39:31.109] [info]    Initialized startup producers.
+[2026-07-27 16:39:31.109] [info]    Initialized controllers.
+[2026-07-27 16:39:31.110] [info]    Initialized osc.
+[2026-07-27 16:41:05.473] [info]    Screen consumer [1|1080p6000] Uninitialized.
