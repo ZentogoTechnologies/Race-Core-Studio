@@ -1,2 +1,254 @@
-[12384:17240:0727/163931.036:WARNING:chrome\browser\signin\account_consistency_mode_manager.cc:74] Desktop Identity Consistency cannot be enabled as no OAuth client ID and client secret have been configured.
-[12384:17240:0727/163931.064:WARNING:chrome\browser\extensions\external_registry_loader_win.cc:236] Error observing HKLM: Acceso denegado. (0x5)
+[5888:20848:0808/135951.908:WARNING:chrome\browser\signin\account_consistency_mode_manager.cc:74] Desktop Identity Consistency cannot be enabled as no OAuth client ID and client secret have been configured.
+[5888:20848:0808/135951.946:WARNING:chrome\browser\extensions\external_registry_loader_win.cc:236] Error observing HKLM: Acceso denegado. (0x5)
+[5888:3364:0808/140256.178:ERROR:components\media_router\common\providers\cast\certificate\cast_crl.cc:444] CRL - Verification failed.
+[5888:3364:0808/140303.768:ERROR:google_apis\gcm\engine\registration_request.cc:292] Registration response error message: DEPRECATED_ENDPOINT
+[23664:10112:0808/140318.807:ERROR:services\on_device_model\ml\gpu_blocklist.cc:123] Unable to get gpu adapter
+[23664:12012:0808/140318.816:ERROR:services\on_device_model\ml\gpu_blocklist.cc:123] Unable to get gpu adapter
+[5888:3364:0808/140324.998:ERROR:google_apis\gcm\engine\registration_request.cc:292] Registration response error message: DEPRECATED_ENDPOINT
+[5888:3364:0808/140414.996:ERROR:google_apis\gcm\engine\connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -105
+[5888:3364:0808/140415.059:ERROR:google_apis\gcm\engine\connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -105
+[5888:3364:0808/140426.172:ERROR:components\media_router\common\providers\cast\certificate\cast_crl.cc:444] CRL - Verification failed.
+[5888:3364:0808/140427.140:ERROR:google_apis\gcm\engine\registration_request.cc:292] Registration response error message: DEPRECATED_ENDPOINT
+[5888:3364:0808/140443.836:ERROR:google_apis\gcm\engine\connection_factory_impl.cc:434] Failed to connect to MCS endpoint with error -118
+[5888:3364:0808/140522.017:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/140523.017:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/140524.018:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=21})
+[5888:3364:0808/140526.019:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:24600:0808/140527.173:VERBOSE1:components\update_client\background_downloader_win.cc:477] Starting BITS download for: http://edgedl.me.gvt1.com/edgedl/release2/chrome_component/acdrf5r26eq5ckoeiy3ulauagglq_723/lmelglejhemejginpboagddgdfbepgmp_723_all_ZZ_ac6ppasszgvpisgdfmolfy2dsdpq.crx3
+[5888:3364:0808/140529.021:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/140531.022:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:3364:0808/140535.024:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=25})
+[5888:3364:0808/140537.025:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:3364:0808/140543.030:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/140547.033:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:26148:0808/140551.215:VERBOSE1:components\update_client\unpacker.cc:70] Verifying component: C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\component_crx_cache\c6d56a925105fe7ea9806bb9f959ee7e4e8fc7d63fc119d213dbc32d0bcfaa15
+[5888:26148:0808/140551.219:VERBOSE1:components\update_client\unpacker.cc:100] Unpacking in: C:\Users\JESUSF~1\AppData\Local\Temp\chrome_Unpacker_BeginUnzipping5888_1445564683
+[5888:26148:0808/140551.286:VERBOSE1:components\component_updater\component_installer.cc:166] Install: version=723 current version=0.0.0.0
+[5888:26148:0808/140551.286:VERBOSE1:components\component_updater\component_installer.cc:185] unpack_path=C:\Users\JESUSF~1\AppData\Local\Temp\chrome_Unpacker_BeginUnzipping5888_1445564683 install_path=C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\OptimizationHints\723
+[5888:20848:0808/140551.286:VERBOSE1:components\component_updater\component_installer.cc:601] Component ready, version 723 in C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\OptimizationHints\723
+[25088:8:0808/140551.288:VERBOSE1:net\base\network_delegate.cc:37] NetworkDelegate::NotifyBeforeURLRequest: https://update.googleapis.com/service/update2/json
+[25088:8:0808/140551.364:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140551.365:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:128] TlsClient: SSL_do_handshake returned when entering early data. After retry, rv=-1, SSL_in_early_data=1
+[25088:8:0808/140551.461:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140551.462:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[5888:20848:0808/140551.543:VERBOSE1:components\update_client\request_sender.cc:188] Request completed from url: https://update.googleapis.com/service/update2/json
+[5888:3364:0808/140559.040:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/140600.040:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:3364:0808/140602.041:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=21})
+[5888:3364:0808/140603.042:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/140604.042:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/140605.042:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/140606.043:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/140607.044:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=16})
+[5888:3364:0808/140612.049:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/140613.050:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[25088:8:0808/140613.337:VERBOSE1:net\base\network_delegate.cc:37] NetworkDelegate::NotifyBeforeURLRequest: https://android.clients.google.com/c2dm/register3
+[25088:8:0808/140613.411:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140613.412:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:128] TlsClient: SSL_do_handshake returned when entering early data. After retry, rv=-1, SSL_in_early_data=1
+[25088:8:0808/140613.482:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140613.483:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140613.483:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140613.484:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[5888:3364:0808/140613.591:ERROR:google_apis\gcm\engine\registration_request.cc:292] Registration response error message: DEPRECATED_ENDPOINT
+[5888:3364:0808/140613.591:VERBOSE1:google_apis\gcm\engine\registration_request.cc:256] Delaying GCM registration of app: com.google.android.gms, for 169981 milliseconds.
+[5888:3364:0808/140615.050:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/140619.053:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/140620.054:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/140621.054:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/140623.057:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/140629.063:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/140630.063:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/140633.066:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=21})
+[5888:3364:0808/140638.069:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:3364:0808/140650.077:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/140653.080:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:3364:0808/140656.082:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=25})
+[5888:3364:0808/140657.083:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/140718.096:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=27})
+[5888:3364:0808/140723.101:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/140728.103:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=25})
+[5888:3364:0808/140734.108:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/140739.111:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=27})
+[5888:3364:0808/140746.116:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/140751.118:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=25})
+[5888:3364:0808/140755.120:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/140757.121:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=27})
+[5888:24600:0808/140833.039:VERBOSE1:components\update_client\background_downloader_win.cc:477] Starting BITS download for: http://edgedl.me.gvt1.com/edgedl/release2/chrome_component/almxfnyg25yhugusmtq6atp444_2026.8.3.1/kiabhabjdbkjdpjbpigfodbdjmbglcoo_2026.08.03.01_all_adu3xhpyqeasuy6q6ntx4mq5k2va.crx3
+[5888:26148:0808/140837.052:VERBOSE1:components\update_client\unpacker.cc:70] Verifying component: C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\component_crx_cache\ae38058ef6659ce0b8058d3b8f7542f635910015fe40ccfc1e98d2464c383f32
+[5888:26148:0808/140837.052:VERBOSE1:components\update_client\unpacker.cc:100] Unpacking in: C:\Users\JESUSF~1\AppData\Local\Temp\chrome_Unpacker_BeginUnzipping5888_1935025182
+[5888:26148:0808/140839.039:VERBOSE1:components\component_updater\component_installer.cc:166] Install: version=2026.8.3.1 current version=0.0.0.0
+[5888:26148:0808/140839.039:VERBOSE1:components\component_updater\component_installer.cc:185] unpack_path=C:\Users\JESUSF~1\AppData\Local\Temp\chrome_Unpacker_BeginUnzipping5888_1935025182 install_path=C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\TrustTokenKeyCommitments\2026.8.3.1
+[5888:20848:0808/140839.041:VERBOSE1:components\component_updater\component_installer.cc:601] Component ready, version 2026.8.3.1 in C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\TrustTokenKeyCommitments\2026.8.3.1
+[5888:20848:0808/140839.041:VERBOSE1:components\component_updater\installer_policies\trust_token_key_commitments_component_installer_policy.cc:109] Component ready, version 2026.8.3.1 in C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\TrustTokenKeyCommitments\2026.8.3.1
+[5888:24600:0808/140839.041:VERBOSE1:components\component_updater\installer_policies\trust_token_key_commitments_component_installer_policy.cc:46] Reading trust token key commitments from file: C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\TrustTokenKeyCommitments\2026.8.3.1\keys.json
+[25088:8:0808/140839.042:VERBOSE1:net\base\network_delegate.cc:37] NetworkDelegate::NotifyBeforeURLRequest: https://update.googleapis.com/service/update2/json
+[25088:8:0808/140839.046:VERBOSE1:services\network\trust_tokens\trust_token_key_commitment_parser.cc:241] Successfully parsed 7 issuers' Trust Tokens key commitments.
+[25088:8:0808/140839.111:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140839.111:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:128] TlsClient: SSL_do_handshake returned when entering early data. After retry, rv=-1, SSL_in_early_data=1
+[25088:8:0808/140839.204:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140839.204:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[5888:20848:0808/140839.311:VERBOSE1:components\update_client\request_sender.cc:188] Request completed from url: https://update.googleapis.com/service/update2/json
+[25088:8:0808/140903.575:VERBOSE1:net\base\network_delegate.cc:37] NetworkDelegate::NotifyBeforeURLRequest: https://android.clients.google.com/c2dm/register3
+[25088:8:0808/140903.655:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140903.655:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:128] TlsClient: SSL_do_handshake returned when entering early data. After retry, rv=-1, SSL_in_early_data=1
+[25088:8:0808/140903.778:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140903.784:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140903.784:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140903.784:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/140903.784:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[5888:3364:0808/140904.008:ERROR:google_apis\gcm\engine\registration_request.cc:292] Registration response error message: DEPRECATED_ENDPOINT
+[5888:3364:0808/140904.008:VERBOSE1:google_apis\gcm\engine\registration_request.cc:256] Delaying GCM registration of app: com.google.android.gms, for 446022 milliseconds.
+[5888:3364:0808/140914.174:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=28})
+[5888:3364:0808/140920.178:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=27})
+[5888:3364:0808/140930.183:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/140936.187:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=27})
+[5888:3364:0808/141043.230:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/141047.232:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:3364:0808/141048.233:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/141050.234:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:3364:0808/141057.242:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/141058.243:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:3364:0808/141059.244:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=25})
+[5888:3364:0808/141101.246:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/141108.251:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=25})
+[5888:3364:0808/141112.253:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/141114.256:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:3364:0808/141115.256:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/141117.257:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141118.258:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141119.258:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141121.261:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=16})
+[5888:3364:0808/141124.261:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:24600:0808/141127.149:VERBOSE1:components\update_client\background_downloader_win.cc:477] Starting BITS download for: http://edgedl.me.gvt1.com/edgedl/diffgen-puffin/gcmjkmgdlgnkkcocmoeiminaijmmjnii/6ca5bdb9f3e2cd83b7e359729bc6c33c4fe975ec499861d969b3e080320849ff
+[5888:3364:0808/141131.265:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:26148:0808/141132.683:VERBOSE1:components\update_client\unpacker.cc:70] Verifying component: C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\component_crx_cache\733776833212346a1018b95197c61bed2d107fbb7790a985ef692780e02f31cb
+[5888:26148:0808/141132.706:VERBOSE1:components\update_client\unpacker.cc:100] Unpacking in: C:\Users\JESUSF~1\AppData\Local\Temp\chrome_Unpacker_BeginUnzipping5888_1473472487
+[5888:26148:0808/141132.876:VERBOSE1:components\component_updater\component_installer.cc:166] Install: version=9.70.0 current version=0.0.0.0
+[5888:26148:0808/141132.878:VERBOSE1:components\component_updater\component_installer.cc:185] unpack_path=C:\Users\JESUSF~1\AppData\Local\Temp\chrome_Unpacker_BeginUnzipping5888_1473472487 install_path=C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\Subresource Filter\Unindexed Rules\9.70.0
+[5888:20848:0808/141132.881:VERBOSE1:components\component_updater\component_installer.cc:601] Component ready, version 9.70.0 in C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\Subresource Filter\Unindexed Rules\9.70.0
+[25088:8:0808/141132.884:VERBOSE1:net\base\network_delegate.cc:37] NetworkDelegate::NotifyBeforeURLRequest: https://update.googleapis.com/service/update2/json
+[25088:8:0808/141132.983:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/141132.985:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:128] TlsClient: SSL_do_handshake returned when entering early data. After retry, rv=-1, SSL_in_early_data=1
+[25088:8:0808/141133.066:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[25088:8:0808/141133.068:VERBOSE1:net\third_party\quiche\src\quiche\quic\core\tls_handshaker.cc:107] TlsClient: Continuing handshake
+[5888:20848:0808/141133.163:VERBOSE1:components\update_client\request_sender.cc:188] Request completed from url: https://update.googleapis.com/service/update2/json
+[5888:3364:0808/141134.268:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141135.267:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141136.268:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141137.269:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141139.269:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141144.273:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[25088:8:0808/141145.008:VERBOSE1:net\base\logging_network_change_observer.cc:81] Observed a change to the network IP addresses IP_ADDRESS_CHANGE_NORMAL
+[25088:8:0808/141146.080:VERBOSE1:net\base\logging_network_change_observer.cc:92] Observed a change to network connectivity state CONNECTION_UNKNOWN
+[25088:8:0808/141146.582:VERBOSE1:net\base\logging_network_change_observer.cc:105] Observed a network change to state CONNECTION_NONE
+[25088:8:0808/141146.582:VERBOSE1:net\base\logging_network_change_observer.cc:105] Observed a network change to state CONNECTION_UNKNOWN
+[25088:8:0808/141147.040:VERBOSE1:net\proxy_resolution\configured_proxy_resolution_service.cc:1151] Failed configuring with PAC script, falling-back to manual proxy servers.
+[25088:8:0808/141147.040:VERBOSE1:net\proxy_resolution\configured_proxy_resolution_service.cc:1151] Failed configuring with PAC script, falling-back to manual proxy servers.
+[25088:8:0808/141147.046:VERBOSE1:net\proxy_resolution\configured_proxy_resolution_service.cc:1151] Failed configuring with PAC script, falling-back to manual proxy servers.
+[5888:3364:0808/141147.275:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141148.276:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141149.658:VERBOSE1:net\dns\mdns_client_impl.cc:204] Sockets ready:12
+[5888:20848:0808/141149.659:VERBOSE1:chrome\browser\local_discovery\service_discovery_device_lister.cc:54] OnServiceUpdated: service_type: _googlecast._tcp.local, service_name: , update: 3
+[5888:20848:0808/141149.659:VERBOSE1:chrome\browser\local_discovery\service_discovery_device_lister.cc:42] DiscoverNewDevices: service_type: _googlecast._tcp.local
+[5888:20848:0808/141149.659:VERBOSE1:chrome\browser\local_discovery\service_discovery_device_lister.cc:42] DiscoverNewDevices: service_type: _googlecast._tcp.local
+[5888:20848:0808/141150.018:VERBOSE1:chrome\browser\local_discovery\service_discovery_device_lister.cc:54] OnServiceUpdated: service_type: _googlecast._tcp.local, service_name: Google-Home-Mini-52e83b71d3c279322d519d9739374cf3._googlecast._tcp.local, update: 0
+[5888:20848:0808/141150.018:VERBOSE1:chrome\browser\local_discovery\service_discovery_device_lister.cc:82] Adding resolver for service_name: Google-Home-Mini-52e83b71d3c279322d519d9739374cf3._googlecast._tcp.local
+[5888:20848:0808/141150.018:VERBOSE1:chrome\browser\local_discovery\service_discovery_device_lister.cc:98] OnResolveComplete: service_type: _googlecast._tcp.local, service_name: Google-Home-Mini-52e83b71d3c279322d519d9739374cf3._googlecast._tcp.local, status: 0
+[5888:3364:0808/141150.278:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141152.949:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:628] [192.168.0.182:8009, auth=SSL_VERIFIED] Close ReadyState = ReadyState::OPEN
+[5888:3364:0808/141152.950:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:230] [192.168.0.182:8009, auth=SSL_VERIFIED] Connect readyState = ReadyState::NONE
+[5888:3364:0808/141152.950:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:390] [192.168.0.182:8009, auth=SSL_VERIFIED] DoTcpConnect
+[5888:3364:0808/141152.976:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:404] [192.168.0.182:8009, auth=SSL_VERIFIED] DoTcpConnectComplete: 0
+[5888:3364:0808/141152.976:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:421] [192.168.0.182:8009, auth=SSL_VERIFIED] DoSslConnect
+[5888:3364:0808/141153.075:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:444] [192.168.0.182:8009, auth=SSL_VERIFIED] DoSslConnectComplete: 0
+[5888:3364:0808/141153.075:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:475] [192.168.0.182:8009, auth=SSL_VERIFIED] DoAuthChallengeSend
+[5888:3364:0808/141153.075:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:480] [192.168.0.182:8009, auth=SSL_VERIFIED] Sending challenge: {source_id: sender-0, destination_id: receiver-0, namespace: urn:x-cast:com.google.cast.tp.deviceauth, payload_binary: (22 bytes)}
+[5888:3364:0808/141153.078:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:491] [192.168.0.182:8009, auth=SSL_VERIFIED] DoAuthChallengeSendComplete: 0
+[5888:3364:0808/141153.104:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:537] [192.168.0.182:8009, auth=SSL_VERIFIED] DoAuthChallengeReplyComplete: 0
+[5888:3364:0808/141153.105:VERBOSE1:components\media_router\common\providers\cast\channel\cast_auth_util.cc:80] Auth message: {response: {signature: (256 bytes), certificate: (979 bytes)}}
+[5888:3364:0808/141153.107:ERROR:components\media_router\common\providers\cast\certificate\cast_crl.cc:444] CRL - Verification failed.
+[5888:3364:0808/141153.107:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:187] 
+[5888:3364:0808/141153.107:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:556] [192.168.0.182:8009, auth=SSL_VERIFIED] Auth challenge verification succeeded
+[5888:3364:0808/141153.107:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:587] DoConnectCallback (error_state = ChannelError::NONE)
+[5888:3364:0808/141153.107:VERBOSE1:components\media_router\common\providers\cast\channel\cast_message_handler.cc:465] Creating VC for channel: 4, source: sender-84188, dest: receiver-0
+[5888:3364:0808/141153.107:VERBOSE1:components\media_router\common\providers\cast\channel\cast_message_handler.cc:443] SendCastMessageToSocket: channel_id: 4, message: {source_id: sender-84188, destination_id: receiver-0, namespace: urn:x-cast:com.google.cast.receiver, payload_utf8: {"requestId":3,"type":"GET_STATUS"}}
+[5888:3364:0808/141153.281:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=16})
+[5888:3364:0808/141156.284:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=15})
+[5888:3364:0808/141203.287:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=16})
+[5888:3364:0808/141204.288:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141206.289:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141208.291:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141209.291:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/141211.292:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141213.293:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141215.294:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141216.295:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=16})
+[5888:3364:0808/141218.297:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=15})
+[5888:3364:0808/141219.297:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=14})
+[5888:3364:0808/141222.298:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=13})
+[5888:3364:0808/141225.302:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=12})
+[5888:3364:0808/141227.302:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=11})
+[5888:3364:0808/141230.304:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=10})
+[5888:3364:0808/141231.303:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=11})
+[5888:3364:0808/141232.305:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=10})
+[5888:3364:0808/141237.308:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=11})
+[5888:3364:0808/141238.308:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=12})
+[5888:3364:0808/141240.310:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=13})
+[5888:3364:0808/141241.311:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=14})
+[5888:3364:0808/141242.311:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=15})
+[5888:3364:0808/141243.312:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141244.312:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141245.313:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/141246.314:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:3364:0808/141247.315:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/141249.317:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:3364:0808/141250.318:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=25})
+[5888:3364:0808/141251.318:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=26})
+[5888:3364:0808/141258.326:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=24})
+[5888:3364:0808/141300.328:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/141301.328:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:3364:0808/141302.329:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/141304.330:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141305.331:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141307.333:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141312.336:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141317.339:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=19})
+[5888:3364:0808/141320.341:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/141324.343:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=21})
+[5888:3364:0808/141326.345:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/141330.349:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=21})
+[5888:3364:0808/141332.350:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=22})
+[5888:3364:0808/141335.351:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=23})
+[5888:3364:0808/141339.354:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=21})
+[5888:3364:0808/141340.356:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=20})
+[5888:3364:0808/141341.359:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=18})
+[5888:3364:0808/141342.358:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=17})
+[5888:3364:0808/141343.358:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=16})
+[5888:3364:0808/141344.359:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=14})
+[5888:3364:0808/141345.359:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=13})
+[5888:3364:0808/141346.360:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=12})
+[5888:3364:0808/141346.979:ERROR:google_apis\gcm\engine\connection_factory_impl.cc:483] ConnectionHandler failed with net error: -2
+[5888:3364:0808/141346.981:VERBOSE1:components\media_router\common\providers\cast\channel\cast_transport.cc:339] [192.168.0.182:8009, auth=SSL_VERIFIED] Read error, peer closed the socket.
+[5888:3364:0808/141346.981:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:628] [192.168.0.182:8009, auth=SSL_VERIFIED] Close ReadyState = ReadyState::OPEN
+[5888:3364:0808/141346.983:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:230] [192.168.0.182:8009, auth=SSL_VERIFIED] Connect readyState = ReadyState::NONE
+[5888:3364:0808/141346.983:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:390] [192.168.0.182:8009, auth=SSL_VERIFIED] DoTcpConnect
+[5888:20848:0808/141346.987:ERROR:content\browser\network_service_instance_impl.cc:613] Network service crashed, restarting service.
+[5888:3364:0808/141347.332:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:404] [192.168.0.182:8009, auth=SSL_VERIFIED] DoTcpConnectComplete: 0
+[5888:3364:0808/141347.333:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:421] [192.168.0.182:8009, auth=SSL_VERIFIED] DoSslConnect
+[5888:3364:0808/141347.361:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=10})
+[5888:3364:0808/141347.387:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:444] [192.168.0.182:8009, auth=SSL_VERIFIED] DoSslConnectComplete: 0
+[5888:3364:0808/141347.387:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:475] [192.168.0.182:8009, auth=SSL_VERIFIED] DoAuthChallengeSend
+[5888:3364:0808/141347.387:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:480] [192.168.0.182:8009, auth=SSL_VERIFIED] Sending challenge: {source_id: sender-0, destination_id: receiver-0, namespace: urn:x-cast:com.google.cast.tp.deviceauth, payload_binary: (22 bytes)}
+[5888:3364:0808/141347.388:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:491] [192.168.0.182:8009, auth=SSL_VERIFIED] DoAuthChallengeSendComplete: 0
+[5888:3364:0808/141347.403:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:537] [192.168.0.182:8009, auth=SSL_VERIFIED] DoAuthChallengeReplyComplete: 0
+[5888:3364:0808/141347.403:VERBOSE1:components\media_router\common\providers\cast\channel\cast_auth_util.cc:80] Auth message: {response: {signature: (256 bytes), certificate: (979 bytes)}}
+[5888:3364:0808/141347.403:ERROR:components\media_router\common\providers\cast\certificate\cast_crl.cc:444] CRL - Verification failed.
+[5888:3364:0808/141347.405:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:187] 
+[5888:3364:0808/141347.405:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:556] [192.168.0.182:8009, auth=SSL_VERIFIED] Auth challenge verification succeeded
+[5888:3364:0808/141347.405:VERBOSE1:components\media_router\common\providers\cast\channel\cast_socket.cc:587] DoConnectCallback (error_state = ChannelError::NONE)
+[5888:3364:0808/141347.405:VERBOSE1:components\media_router\common\providers\cast\channel\cast_message_handler.cc:465] Creating VC for channel: 5, source: sender-84188, dest: receiver-0
+[5888:3364:0808/141347.405:VERBOSE1:components\media_router\common\providers\cast\channel\cast_message_handler.cc:443] SendCastMessageToSocket: channel_id: 5, message: {source_id: sender-84188, destination_id: receiver-0, namespace: urn:x-cast:com.google.cast.receiver, payload_utf8: {"requestId":4,"type":"GET_STATUS"}}
+[5888:3364:0808/141348.362:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=11})
+[5888:3364:0808/141351.364:VERBOSE1:content\browser\renderer_host\media\media_stream_manager.cc:1555] MSPL::OnSpeedLimitChange({this=0x6874001a88d8}, {new_limit=12})
+[5888:20848:0808/141352.140:ERROR:content\browser\gpu\gpu_process_host.cc:999] GPU process exited unexpectedly: exit_code=-1073741510
+[5888:20848:0808/141352.141:WARNING:content\browser\gpu\gpu_process_host.cc:1441] The GPU process has crashed 1 time(s)

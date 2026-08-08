@@ -1,2 +1,3 @@
-2026/07/27-16:39:31.127 7fb8 Creating DB C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\Default\Local Storage\leveldb since it was missing.
-2026/07/27-16:39:31.143 7fb8 Reusing MANIFEST C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\Default\Local Storage\leveldb/MANIFEST-000001
+2026/08/08-13:59:52.006 2f5c Reusing MANIFEST C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\Default\Local Storage\leveldb/MANIFEST-000001
+2026/08/08-13:59:52.021 2f5c Recovering log #3
+2026/08/08-13:59:52.025 2f5c Reusing old log C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\cef-cache\Default\Local Storage\leveldb/000003.log 
