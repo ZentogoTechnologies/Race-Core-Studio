@@ -1,0 +1,84 @@
+[2026-08-09 15:22:48.426] [info]    ############################################################################
+[2026-08-09 15:22:48.428] [info]    CasparCG Server is distributed by the Swedish Broadcasting Corporation (SVT)
+[2026-08-09 15:22:48.428] [info]    under the GNU General Public License GPLv3 or higher.
+[2026-08-09 15:22:48.428] [info]    Please see LICENSE.TXT for details.
+[2026-08-09 15:22:48.428] [info]    http://www.casparcg.com/
+[2026-08-09 15:22:48.428] [info]    ############################################################################
+[2026-08-09 15:22:48.428] [info]    Starting CasparCG Video and Graphics Playout Server 2.5.0 69e8ad5 Stable
+[2026-08-09 15:22:48.431] [info]    "C:/Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\casparcg.config":
+[2026-08-09 15:22:48.431] [info]    -----------------------------------------
+[2026-08-09 15:22:48.431] [info]    <?xml version="1.0" encoding="utf-8"?>
+[2026-08-09 15:22:48.431] [info]    <configuration>
+[2026-08-09 15:22:48.431] [info]       <paths>
+[2026-08-09 15:22:48.431] [info]          <media-path>media/</media-path>
+[2026-08-09 15:22:48.431] [info]          <log-path disable="false">log/</log-path>
+[2026-08-09 15:22:48.431] [info]          <data-path>data/</data-path>
+[2026-08-09 15:22:48.431] [info]          <template-path>template/</template-path>
+[2026-08-09 15:22:48.431] [info]       </paths>
+[2026-08-09 15:22:48.431] [info]       <lock-clear-phrase>secret</lock-clear-phrase>
+[2026-08-09 15:22:48.431] [info]       <channels>
+[2026-08-09 15:22:48.431] [info]          <channel>
+[2026-08-09 15:22:48.431] [info]             <video-mode>1080p6000</video-mode>
+[2026-08-09 15:22:48.431] [info]             <consumers>
+[2026-08-09 15:22:48.431] [info]                <screen/>
+[2026-08-09 15:22:48.431] [info]                <system-audio/>
+[2026-08-09 15:22:48.431] [info]             </consumers>
+[2026-08-09 15:22:48.431] [info]          </channel>
+[2026-08-09 15:22:48.431] [info]       </channels>
+[2026-08-09 15:22:48.431] [info]       <controllers>
+[2026-08-09 15:22:48.431] [info]          <tcp>
+[2026-08-09 15:22:48.431] [info]             <port>5250</port>
+[2026-08-09 15:22:48.431] [info]             <protocol>AMCP</protocol>
+[2026-08-09 15:22:48.431] [info]          </tcp>
+[2026-08-09 15:22:48.431] [info]       </controllers>
+[2026-08-09 15:22:48.431] [info]       <amcp>
+[2026-08-09 15:22:48.431] [info]          <media-server>
+[2026-08-09 15:22:48.431] [info]             <host>localhost</host>
+[2026-08-09 15:22:48.431] [info]             <port>8000</port>
+[2026-08-09 15:22:48.431] [info]          </media-server>
+[2026-08-09 15:22:48.431] [info]       </amcp>
+[2026-08-09 15:22:48.431] [info]    </configuration>
+[2026-08-09 15:22:48.431] [info]    -----------------------------------------
+[2026-08-09 15:22:48.431] [info]    Initialized video modes.
+[2026-08-09 15:22:48.994] [info]    Initializing OpenGL Device (sfml).
+[2026-08-09 15:22:48.994] [info]    Initializing OpenGL Device.
+[2026-08-09 15:22:49.000] [info]    Initialized OpenGL 4.5.0 NVIDIA 596.08 NVIDIA Corporation
+[2026-08-09 15:22:49.046] [info]    Initialized OpenGL Accelerated GPU Image Mixer for channel 1
+[2026-08-09 15:22:49.049] [info]    video_channel[1|1080p6000] Successfully Initialized.
+[2026-08-09 15:22:49.049] [info]    Initialized channels.
+[2026-08-09 15:22:49.050] [info]    Initialized command repository.
+[2026-08-09 15:22:49.050] [info]    Initialized image module.
+[2026-08-09 15:22:49.050] [info]    Initialized ffmpeg module.
+[2026-08-09 15:22:49.051] [info]    Initialized oal module.
+[2026-08-09 15:22:49.058] [info]    Initialized decklink module.
+[2026-08-09 15:22:49.059] [info]    Initialized screen module.
+[2026-08-09 15:22:49.062] [info]    Initialized newtek module.
+[2026-08-09 15:22:49.064] [info]    Initialized artnet module.
+[2026-08-09 15:22:49.064] [info]    [html] Using CEF cache path: C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg/cef-cache
+[2026-08-09 15:22:49.545] [info]    Initialized html module.
+[2026-08-09 15:22:49.545] [info]    Flash support is disabled
+[2026-08-09 15:22:49.545] [info]    Initialized flash module.
+[2026-08-09 15:22:49.548] [info]    Initialized bluefish module.
+[2026-08-09 15:22:49.548] [info]    Initialized modules.
+[2026-08-09 15:22:49.548] [info]    Screen consumer [1|1080p6000] Using frame copied to host for rendering.
+[2026-08-09 15:22:49.549] [info]    Screen consumer [1|1080p6000] Initialized.
+[2026-08-09 15:22:50.223] [info]    oal[1|1080p6000] Initialized.
+[2026-08-09 15:22:50.224] [info]    Initialized startup producers.
+[2026-08-09 15:22:50.225] [info]    Initialized controllers.
+[2026-08-09 15:22:50.225] [info]    Initialized osc.
+[2026-08-09 15:28:56.535] [info]    Received message from Console: CG 1-10 ADD 1 "html/blue_background" 1\r\n
+[2026-08-09 15:28:56.778] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/blue_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: update is not defined
+[2026-08-09 15:28:56.781] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/blue_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: play is not defined
+[2026-08-09 15:29:14.214] [info]    Received message from Console: CG 1-10 ADD 1 "html/green_background" 1\r\n
+[2026-08-09 15:29:14.243] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/green_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: update is not defined
+[2026-08-09 15:29:14.243] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/green_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: play is not defined
+[2026-08-09 15:29:42.222] [info]    Received message from Console: CG 1-10 ADD 1 "html/no_background" 1\r\n
+[2026-08-09 15:29:42.246] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/no_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: update is not defined
+[2026-08-09 15:29:42.246] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/no_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: play is not defined
+[2026-08-09 15:29:46.269] [info]    Received message from Console: CG 1-10 ADD 1 "html/red_background" 1\r\n
+[2026-08-09 15:29:46.293] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/red_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: update is not defined
+[2026-08-09 15:29:46.293] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/red_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: play is not defined
+[2026-08-09 15:29:50.053] [info]    Received message from Console: CG 1-10 ADD 1 "html/yellow_background" 1\r\n
+[2026-08-09 15:29:50.075] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/yellow_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: update is not defined
+[2026-08-09 15:29:50.075] [error]   html[file://C:\Users\Jesus Fernandez\Desktop\Race-Core-Studio\Casparcg\template/html/yellow_background.html] 1920 1080 60.000000 Log: Uncaught ReferenceError: play is not defined
+[2026-08-09 15:35:56.206] [info]    Screen consumer [1|1080p6000] Uninitialized.
