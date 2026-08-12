@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Menu, X, Home, Users, Car, LogOut, Calendar, Tag } from 'lucide-react'
+import { Menu, X, Home, Users, Car, LogOut, Calendar, Tag, BarChart3 } from 'lucide-react'
 import NavItem        from '../components/layout/NavItem'
 import HomeModule     from '../pages/Home'
 import EventosModule  from '../pages/Eventos'
 import CategoriasModule from '../pages/Categorias'
 import PilotosModule  from '../pages/Pilotos'
 import VehiculosModule from '../pages/Vehiculos'
+import GraficosModule from '../pages/Graficos'
 
 export default function MainLayout({ onLogout }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -40,6 +41,8 @@ export default function MainLayout({ onLogout }) {
             pilotos={pilotos}
           />
         )
+      case 'graficos':
+        return <GraficosModule />
       default:
         return <HomeModule stats={{ p: 0, v: 0, c: 0, e: 0 }} allData={{ eventos, categorias, pilotos, vehiculos }} />
     }
@@ -48,7 +51,7 @@ export default function MainLayout({ onLogout }) {
   const headerTitles = {
     home: 'Panel Principal', eventos: 'Gestión de Eventos',
     categorias: 'Gestión de Categorías', pilotos: 'Directorio de Pilotos',
-    vehiculos: 'Directorio de Vehículos',
+    vehiculos: 'Directorio de Vehículos', graficos: 'Gráficos',
   }
 
   return (
@@ -71,6 +74,7 @@ export default function MainLayout({ onLogout }) {
           <NavItem icon={<Tag />}      label="Categorías" isActive={activeModule === 'categorias'} onClick={() => setActiveModule('categorias')} isOpen={isSidebarOpen} />
           <NavItem icon={<Users />}    label="Pilotos"    isActive={activeModule === 'pilotos'}    onClick={() => setActiveModule('pilotos')}    isOpen={isSidebarOpen} />
           <NavItem icon={<Car />}      label="Vehículos"  isActive={activeModule === 'vehiculos'}  onClick={() => setActiveModule('vehiculos')}  isOpen={isSidebarOpen} />
+          <NavItem icon={<BarChart3 />} label="Gráficos"  isActive={activeModule === 'graficos'}   onClick={() => setActiveModule('graficos')}   isOpen={isSidebarOpen} />
         </nav>
         <div className="p-4 border-t border-neutral-800">
           <button onClick={onLogout} className={`w-full flex items-center ${isSidebarOpen ? 'justify-start px-4' : 'justify-center'} py-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors gap-3`}>
