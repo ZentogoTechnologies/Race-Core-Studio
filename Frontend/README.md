@@ -1,8 +1,8 @@
-# Race Core Studio - Prototype 🏎️
+# Race Core Studio 🏎️
 
-Prototipo de Sistema de gestión para eventos de automovilismo. Soporta modos: **Drag** y **Circuito**.
+Sistema de gestión para eventos de automovilismo deportivo. Soporta modos **Drag Racing** y **Circuito**.
 
-## 🚀 Cómo ejecutar 
+## 🚀 Cómo ejecutar en VS Code
 
 ### Prerequisitos
 - Node.js v18 o superior  
@@ -24,7 +24,7 @@ Abre tu navegador en `http://localhost:5173`
 
 ---
 
-## 📁 Estructura del prototipo
+## 📁 Estructura del proyecto
 
 ```
 race-core-studio/
