@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Leaderboard</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/totem_names.css">
+</head>
+<body>
+
+<div class="leaderboard" id="leaderboard">
+
+    <!-- HEADER -->
+    <div class="lb-header">
+
+        <div class="lb-logo">
+            <img src="../img/logoap.png" alt="Autódromo Panamá">
+        </div>
+
+        <div class="lb-info">
+
+            <div class="lb-heat" id="heatName">
+                HEAT 1
+            </div>
+
+            <div class="lb-timer">
+                <span>TIME</span>
+                <span id="raceTimer">00:01:51</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TABLA -->
+    <div class="lb-body" id="leaderboardBody">
+
+    </div>
+
+</div>
+
+<script>
+
+const standings = [
+
+    {
+        pos:1,
+        name:"D. CARBALLEDA",
+        number:"570"
+    },
+
+    {
+        pos:2,
+        name:"L. RAMIREZ",
+        number:"33"
+    },
+
+    {
+        pos:3,
+        name:"A. RAMOS",
+        number:"69"
+    },
+
+    {
+        pos:4,
+        name:"J. CARLOS LEROUX",
+        number:"42"
+    },
+
+    {
+        pos:5,
+        name:"M. SOLIS",
+        number:"16"
+    },
+
+    {
+        pos:6,
+        name:"M. BARCENAS",
+        number:"12"
+    },
+
+    {
+        pos:7,
+        name:"G. ORTEGA",
+        number:"51"
+    },
+
+    {
+        pos:8,
+        name:"S. GUERRA",
+        number:"24"
+    },
+
+    {
+        pos:9,
+        name:"L. FROST",
+        number:"41"
+    },
+
+    {
+        pos:10,
+        name:"G. ALESSANDRIA",
+        number:"48"
+    }
+
+];
+
+const container = document.getElementById("leaderboardBody");
+
+function createLeaderboard(){
+
+    container.innerHTML = "";
+
+    standings.forEach((driver,index)=>{
+
+        const row = document.createElement("div");
+
+        row.className =
+            index === 0
+            ? "lb-row leader"
+            : "lb-row";
+
+        row.innerHTML = `
+
+            <div class="lb-pos pos-${driver.pos}">
+                ${driver.pos}
+            </div>
+
+            <div class="lb-separator"></div>
+
+            <div class="lb-name">
+                ${driver.name}
+            </div>
+
+            <div class="lb-number">
+                ${driver.number}
+            </div>
+
+        `;
+
+        container.appendChild(row);
+
+    });
+
+}
+
+createLeaderboard();
+
+function play(){
+
+    const widget =
+        document.getElementById(
+            "leaderboard"
+        );
+
+    widget.style.animation =
+        "slideUp .5s ease forwards";
+
+    setTimeout(() => {
+
+        widget.style.animation =
+            "expandPanel .6s ease forwards";
+
+    },500);
+}
+
+function stop(){
+
+    const widget =
+        document.getElementById(
+            "leaderboard"
+        );
+
+    widget.style.animation =
+        "collapsePanel .5s ease forwards";
+
+    setTimeout(() => {
+
+        widget.style.animation =
+            "slideDown .5s ease forwards";
+
+    },500);
+}
+
+window.onload = function(){
+
+    createLeaderboard();
+
+    play();
+};
+</script>
+
+</body>
+</html>

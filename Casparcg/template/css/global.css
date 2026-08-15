@@ -1,0 +1,93 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   1. RESET GENERAL
+   ========================================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Impact","Arial",sans-serif !important;
+}
+
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:transparent;
+}
+
+/* ==========================================================================
+   2. CONTENEDORES PRINCIPALES
+   ========================================================================== */
+
+.overlay,
+.climate-short,
+.social-media
+{
+    position:absolute;
+    left:50%;
+    bottom:40px;
+    z-index:1;
+
+    display:flex;
+    align-items:center;
+
+    opacity:0;
+    transform:translateX(-50%) translateY(250px) scale(1.25);
+}
+
+/* ==========================================================================
+   3. PANELES IZQUIERDOS
+   ========================================================================== */
+
+.logo-box,
+.icon-panel,
+.weather-panel{
+    position:relative;
+    z-index:2;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    width:170px;
+    height:150px;
+
+    background:#1d1d1d;
+    border-left:10px solid red;
+    border-radius:10px 0 0 10px;
+}
+
+/* ==========================================================================
+   4. LOGO
+   ========================================================================== */
+
+.logo-box img, .weather-icon img{
+    max-width:200px;
+    max-height:120px;
+}
+
+/* ==========================================================================
+   5. PANELES DERECHOS
+   ========================================================================== */
+
+.info-panel,
+#infoPanelSocialMedia,
+.weather-panel{
+    width:0;
+    height:150px;
+
+    padding-left:0;
+
+    overflow:hidden;
+    white-space:nowrap;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    background:url("../img/fondo.jpg") center center / cover no-repeat;
+    border-radius:0 10px 10px 0;
+}

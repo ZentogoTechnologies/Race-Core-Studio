@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Narrador</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/narrator.css">
+</head>
+
+<body>
+
+    <div class="narrator" id="narrator">
+
+        <!-- LOGO -->
+        <div class="narrator-logo">
+            <img
+                id="logo"
+                src="../img/logoap.png"
+                alt="Logo"
+            >
+        </div>
+
+        <!-- INFORMACIÓN -->
+        <div class="narrator-info">
+
+            <!-- NOMBRE -->
+            <div
+                class="narrator-name"
+                id="name">
+                NARRADOR
+            </div>
+
+            <!-- TEXTO -->
+            <div
+                class="narrator-text"
+                id="text">
+                Bienvenidos a la carrera.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function update(data) {
+
+            if (data.name !== undefined) {
+                document.getElementById("name").textContent =
+                    data.name.toUpperCase();
+            }
+
+            if (data.text !== undefined) {
+                document.getElementById("text").textContent =
+                    data.text;
+            }
+
+            if (data.logo !== undefined) {
+                document.getElementById("logo").src =
+                    data.logo;
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>

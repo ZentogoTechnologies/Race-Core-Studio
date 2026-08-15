@@ -1,0 +1,212 @@
+@charset "UTF-8";
+
+/* ==================================================
+   CONTENEDOR
+================================================== */
+
+
+
+/* ==================================================
+   PANEL INFORMACIÓN
+================================================== */
+
+.weather-panel{
+
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    border-left:0px;
+    border-radius:0 12px 12px 0;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.4);
+}
+
+/* ==================================================
+   CONTENIDO
+================================================== */
+
+.content-section{
+
+    width:800px;
+
+    padding:20px 35px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+/* ==================================================
+   FILA SUPERIOR
+================================================== */
+
+.top-row{
+
+    display:flex;
+    align-items:center;
+
+    gap:30px;
+
+    margin-bottom:15px;
+}
+
+/* ==================================================
+   TEMPERATURA
+================================================== */
+
+.temperature{
+
+    font-size:72px;
+    font-weight:700;
+
+    line-height:1;
+
+    color:#ffffff;
+}
+
+/* ==================================================
+   UBICACIÓN
+================================================== */
+
+.location-info{
+
+    display:flex;
+    flex-direction:column;
+}
+
+.city-name{
+
+    font-size:38px;
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    color:#ffffff;
+}
+
+.description{
+
+    font-size:20px;
+
+    text-transform:uppercase;
+
+    color:#d0d0d0;
+}
+
+/* ==================================================
+   INFORMACIÓN
+================================================== */
+
+.info-row{
+
+    display:flex;
+
+    gap:50px;
+}
+
+.info-block{
+
+    display:flex;
+    flex-direction:column;
+}
+
+.label{
+
+    font-size:12px;
+
+    text-transform:uppercase;
+
+    color:#bcbcbc;
+
+    margin-bottom:3px;
+}
+
+.value{
+
+    font-size:22px;
+    font-weight:bold;
+
+    color:#ffffff;
+}
+
+/* ==================================================
+   ANIMACIONES
+================================================== */
+
+@keyframes slideUp{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(120px)
+            scale(.95);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+}
+
+@keyframes slideDown{
+
+    from{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(120px)
+            scale(.95);
+    }
+}
+
+@keyframes expandPanel{
+
+    from{
+
+        width:0;
+        opacity:0;
+    }
+
+    to{
+
+        width:800px;
+        opacity:1;
+    }
+}
+
+@keyframes collapsePanel{
+
+    from{
+
+        width:800px;
+        opacity:1;
+    }
+
+    to{
+
+        width:0;
+        opacity:0;
+    }
+}

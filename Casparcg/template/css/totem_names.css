@@ -1,0 +1,457 @@
+@charset "UTF-8";
+
+/* ===================================
+   PANEL
+=================================== */
+
+.leaderboard{
+    margin: 20px;
+    width:150px;
+
+    overflow:hidden;
+
+    border-radius:10px;
+
+    background:#030507;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.35);
+}
+
+/* ===================================
+   HEADER
+=================================== */
+
+.lb-header{
+
+    height:50px;
+
+    display:flex;
+
+    background:#000;
+}
+
+/* ===================================
+   LOGO
+=================================== */
+
+.lb-logo{
+
+    width:170px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        linear-gradient(
+            180deg,
+            #070b11,
+            #11151c
+        );
+
+    border-right:1px solid rgba(255,255,255,.08);
+
+    position:relative;
+}
+
+.lb-logo::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+    top:0;
+    bottom:0;
+
+    width:7px;
+
+    background:#ff0000;
+}
+
+.lb-logo img{
+
+    width:100px;
+}
+
+/* ===================================
+   INFO
+=================================== */
+
+.lb-info{
+
+    flex:1;
+
+    padding:20px 25px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #000000,
+            #060606 50%,
+            #160000 100%
+        );
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+/* ===================================
+   LINEAS ROJAS
+=================================== */
+
+.lb-info::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:url("../img/fondo.jpg") center center / cover no-repeat;
+    margin-left: 70px;
+    opacity:.9;
+}
+
+/* ===================================
+   TITULO
+=================================== */
+
+.lb-heat{
+
+    position:relative;
+
+    z-index:2;
+
+    color:white;
+
+    font-size:28px;
+
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    line-height:1;
+}
+
+/* ===================================
+   TIMER
+=================================== */
+
+.lb-timer{
+
+    position:relative;
+
+    z-index:2;
+
+    margin-top:6px;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.lb-timer span:first-child{
+
+    color:#ff1111;
+
+    font-size:22px;
+
+    font-weight:700;
+}
+
+.lb-timer span:last-child{
+
+    color:white;
+
+    font-size:28px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+}
+
+/* ===================================
+   FILAS
+=================================== */
+
+.lb-row{
+
+    height:75px;
+
+    display:grid;
+
+    grid-template-columns:
+        80px
+        20px
+        1fr
+        80px;
+
+    align-items:center;
+
+    border-top:
+        1px solid rgba(255,255,255,.12);
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(18,22,30,.95),
+            rgba(0,0,0,.95)
+        );
+}
+
+/* ===================================
+   PRIMER LUGAR
+=================================== */
+
+.lb-row.leader{
+
+    background:
+        linear-gradient(
+            90deg,
+            #352400,
+            #c99500,
+            #dca400
+        );
+}
+
+/* ===================================
+   POSICION
+=================================== */
+
+.lb-pos{
+
+    text-align:center;
+
+    font-size:38px;
+
+    font-weight:900;
+}
+
+.pos-1{
+
+    color:#ff0400;
+}
+
+.pos-2,
+.pos-4,
+.pos-5,
+.pos-6,
+.pos-7,
+.pos-8,
+.pos-9,
+.pos-10{
+
+    color:#c8c8c8;
+}
+
+.pos-3{
+
+    color:#ff8f1f;
+}
+
+/* ===================================
+   LINEA ROJA
+=================================== */
+
+.lb-separator{
+
+    width:2px;
+    height:45px;
+
+    background:#ff0015;
+}
+
+/* ===================================
+   NOMBRE
+=================================== */
+
+.lb-name{
+
+    padding-left:12px;
+
+    color:white;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    line-height:1.1;
+}
+
+/* ===================================
+   NUMERO
+=================================== */
+
+.lb-number{
+
+    text-align:center;
+
+    color:white;
+
+    font-size:38px;
+
+    font-weight:900;
+}
+
+/* ===================================
+   EFECTO BRILLO
+=================================== */
+
+.leader{
+
+    position:relative;
+}
+
+.leader::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.08),
+            transparent
+        );
+
+    animation:shine 4s linear infinite;
+}
+
+@keyframes shine{
+
+    from{
+        transform:translateX(-100%);
+    }
+
+    to{
+        transform:translateX(100%);
+    }
+}
+/* ===================================
+   PANEL
+=================================== */
+
+.leaderboard{
+    width:420px;
+}
+
+/* ===================================
+   HEADER
+=================================== */
+
+.lb-header{
+    height:100px;
+}
+
+/* ===================================
+   LOGO
+=================================== */
+
+.lb-logo{
+    width:170px;
+}
+
+.lb-logo::before{
+    width:7px;
+}
+
+.lb-logo img{
+    width:100px;
+}
+
+/* ===================================
+   INFO
+=================================== */
+
+.lb-info{
+    padding:20px 25px;
+}
+
+/* ===================================
+   TITULO
+=================================== */
+
+.lb-heat{
+    font-size:58px;
+    letter-spacing:1px;
+}
+
+/* ===================================
+   TIMER
+=================================== */
+
+.lb-timer{
+    margin-top:6px;
+    gap:12px;
+}
+
+.lb-timer span:first-child{
+    font-size:22px;
+}
+
+.lb-timer span:last-child{
+    font-size:28px;
+    letter-spacing:1px;
+}
+
+/* ===================================
+   FILAS
+=================================== */
+
+.lb-row{
+
+    height:75px;
+
+    grid-template-columns:
+        80px
+        20px
+        1fr
+        80px;
+}
+
+/* ===================================
+   POSICION
+=================================== */
+
+.lb-pos{
+    font-size:38px;
+}
+
+/* ===================================
+   LINEA ROJA
+=================================== */
+
+.lb-separator{
+    width:2px;
+    height:45px;
+}
+
+/* ===================================
+   NOMBRE
+=================================== */
+
+.lb-name{
+    padding-left:12px;
+    font-size:22px;
+}
+
+/* ===================================
+   NUMERO
+=================================== */
+
+.lb-number{
+    font-size:38px;
+}

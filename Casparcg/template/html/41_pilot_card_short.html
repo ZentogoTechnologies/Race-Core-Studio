@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pilot Card Short</title>
+
+    <link rel="stylesheet" href="../css/pilot_card_short.css">
+</head>
+
+<body>
+
+    <div class="pilot-short" id="pilotShort">
+
+        <div class="brand-panel">
+
+            <img
+                id="brandLogo"
+                class="brand-logo"
+                src="../img/team_logo.png">
+
+        </div>
+
+        <div class="pilot-panel" id="pilotPanel">
+
+        <div class="content-section">
+
+                <div
+                    class="pilot-name"
+                    id="pilotName">
+
+                    JIMMY LLIBRE
+
+                </div>
+
+                <div
+                    class="car-number"
+                    id="carNumber">
+
+                    #43
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            CATEGORÍA
+                        </div>
+
+                        <div
+                            class="value"
+                            id="category">
+
+                            V8
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            VEHÍCULO
+                        </div>
+
+                        <div
+                            class="value"
+                            id="vehicle">
+
+                            Lexus V8
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            EQUIPO
+                        </div>
+
+                        <div
+                            class="value"
+                            id="team">
+
+                            Gazoo Racing
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            PAÍS
+                        </div>
+
+                        <div
+                            class="value"
+                            id="country">
+
+                            RD
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="photo-section">
+
+                <div
+                    class="background-number"
+                    id="backgroundNumber">
+
+                    43
+
+                </div>
+
+                <img
+                    id="pilotPhoto"
+                    class="pilot-photo"
+                    src="../img/pilot.png">
+
+            </div>
+
+        </div>
+
+    </div>
+
+<script>
+
+function update(data){
+
+    if(data.pilot_name !== undefined)
+        document.getElementById("pilotName").textContent =
+            data.pilot_name;
+
+    if(data.car_number !== undefined){
+
+        document.getElementById("carNumber").textContent =
+            "#" + data.car_number;
+
+        document.getElementById("backgroundNumber").textContent =
+            data.car_number;
+    }
+
+    if(data.category !== undefined)
+        document.getElementById("category").textContent =
+            data.category;
+
+    if(data.vehicle !== undefined)
+        document.getElementById("vehicle").textContent =
+            data.vehicle;
+
+    if(data.team !== undefined)
+        document.getElementById("team").textContent =
+            data.team;
+
+    if(data.country !== undefined)
+        document.getElementById("country").textContent =
+            data.country;
+
+    if(data.brand_logo !== undefined)
+        document.getElementById("brandLogo").src =
+            data.brand_logo;
+
+    if(data.pilot_photo !== undefined)
+        document.getElementById("pilotPhoto").src =
+            data.pilot_photo;
+}
+
+function play(){
+
+    const overlay =
+        document.getElementById("pilotShort");
+
+    const panel =
+        document.getElementById("pilotPanel");
+
+    overlay.style.animation =
+        "slideUp .45s ease forwards";
+
+    setTimeout(() => {
+
+        panel.style.animation =
+            "expandPanel .4s ease forwards";
+
+    },450);
+}
+
+function stop(){
+
+    const overlay =
+        document.getElementById("pilotShort");
+
+    const panel =
+        document.getElementById("pilotPanel");
+
+    panel.style.animation =
+        "collapsePanel .35s ease forwards";
+
+    setTimeout(() => {
+
+        overlay.style.animation =
+            "slideDown .45s ease forwards";
+
+    },350);
+}
+
+/* SOLO PRUEBA */
+
+window.onload = function(){
+
+    update({
+        pilot_name:"JIMMY LLIBRE",
+        car_number:"43",
+        category:"V8",
+        vehicle:"Lexus V8",
+        team:"Gazoo Racing Rep. Dom",
+        country:"RD"
+    });
+
+    play();
+
+};
+
+</script>
+
+</body>
+</html>
