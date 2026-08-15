@@ -9,7 +9,7 @@ class SubCategoryEmbedded(BaseModel): # BaseModel porque va dentro
 class Category(Document):
     category_id: int
     category_name: str
-    discipline: str # "circuito" o "drag"
+    discipline: str # "circuit" o "drag"
     sub_categories: List[SubCategoryEmbedded] = [] # Embebido con id + nombre
     description: Optional[str] = None
 

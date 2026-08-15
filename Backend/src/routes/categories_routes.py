@@ -8,7 +8,7 @@ service = CategoryService()
 
 @categories.get("/", tags=["Categories"], response_model=list[CategoryResponse])
 async def get_categories(
-    discipline: Optional[str] = Query(None, description="Filtrar por disciplina: circuit o drag")
+    discipline: Optional[str] = Query(None, description="Filter by discipline: circuit o drag")
 ):
     """
     Obtiene todas las categorías. Puedes filtrar por disciplina

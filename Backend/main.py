@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 from config import settings
+from docs import tags_metadata
 
 # Models
 from src.models.categories_model import Category
@@ -30,7 +31,8 @@ app = FastAPI(
     title="Race Core Studio",
     description="Software de Gestión de Pilotos, Categorías, Vehículos, Eventos y Gráficos",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    openapi_tags=tags_metadata
 )
 
 app.add_middleware(
