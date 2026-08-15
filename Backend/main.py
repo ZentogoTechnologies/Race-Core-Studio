@@ -1,40 +1,46 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from docs import tags_metadata
+from contextlib import asynccontextmanager
+from motor.motor_asyncio import AsyncIOMotorClient
+from beanie import init_beanie
+from config import settings
 
-# --- NUEVAS IMPORTACIONES PARA LA BASE DE DATOS ---
-from src.models import pilot_model  # Es vital importar el modelo para que SQLAlchemy lo vea
+# Models
+from src.models.categories_model import Category
+from src.models.pilots_model import Pilot
+from src.models.vehicles_model import Vehicle
 
-from src.routes.login import login
+# Routes
+from src.routes.categories import categories
 from src.routes.pilots import pilots
 from src.routes.vehicles import vehicles
-from src.routes.categories import categories
-from src.routes.events import events
-from src.routes.users import users
 
-# --- LÍNEA MÁGICA PARA MATERIALIZAR LAS TABLAS EN HOSTGATOR ---
-# Esta instrucción viaja a la nube y crea la tabla si no existe
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    client = AsyncIOMotorClient(settings.MONGO_URI)
+    await init_beanie(
+        database=client[settings.DB_NAME],
+        document_models=[Category, Pilot, Vehicle]
+    )
+    print("✅ Conectado a MongoDB")
+    yield
+    client.close()
 
 app = FastAPI(
-    title="Zentogo Racing Graphics",
-    description="Rest API Racing Graphics - ZENTOGO",
+    title="Race Core Studio",
+    description="Software de Gestión de Pilotos, Categorías, Vehículos, Eventos y Gráficos",
     version="1.0.0",
-    openapi_tags=tags_metadata
+    lifespan=lifespan
 )
 
-# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción, especifica los dominios permitidos
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Registrar rutas
-app.include_router(login, tags=["Login"])
-app.include_router(pilots, tags=["Pilots"])
-app.include_router(vehicles, tags=["Vehicles"])
-app.include_router(categories, tags=["Categories"])
-app.include_router(events, tags=["Events"])
-app.include_router(users, tags=["Users"])
+app.include_router(categories, prefix="/api/v1/categories", tags=["Categories"])
+app.include_router(pilots, prefix="/api/v1/pilots", tags=["Pilots"])
+app.include_router(vehicles, prefix="/api/v1/vehicles", tags=["Vehicles"])

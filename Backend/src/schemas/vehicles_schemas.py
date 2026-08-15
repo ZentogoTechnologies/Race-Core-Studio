@@ -1,0 +1,47 @@
+from pydantic import BaseModel, Field, validator
+from typing import Optional, List
+
+class VehicleCreate(BaseModel):
+    vehicle_id: int
+    number: int
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    color: Optional[str] = None
+
+    pilot_ids: List[int] = [] # Recibimos hasta 2 IDs. En service validamos max 2
+    category_id: int
+    sub_category_id: Optional[int] = None
+
+    @validator('pilot_ids')
+    def max_two_pilots(cls, v):
+        if len(v) > 2:
+            raise ValueError('Un vehículo no puede tener más de 2 pilotos')
+        return v
+
+class VehicleUpdate(BaseModel):
+    number: Optional[int] = None
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    color: Optional[str] = None
+    pilot_ids: Optional[List[int]] = None
+    category_id: Optional[int] = None
+    sub_category_id: Optional[int] = None
+
+class VehicleResponse(BaseModel):
+    id: str = Field(alias="_id")
+    vehicle_id: int
+    number: int
+    brand: Optional[str] = None
+    model: Optional[str] = None
+    color: Optional[str] = None
+
+    pilots: List[dict] = [] # [{"pilot_id": 1, "name": "Juan", "team_brand": "Zentogo"}]
+    category_id: int
+    category_name: Optional[str] = None
+    sub_category_id: Optional[int] = None
+    sub_category_name: Optional[str] = None
+
+    is_active: bool
+
+    class Config:
+        populate_by_name = True
