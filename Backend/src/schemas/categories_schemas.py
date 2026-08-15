@@ -28,3 +28,4 @@ class CategoryResponse(BaseModel):
 
     class Config:
         populate_by_name = True # para que acepte _id y lo mapee a id
+        from_attributes = True # <- AGREGA ESTO. Permite convertir dicts a BaseModel
