@@ -11,9 +11,9 @@ from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
 
 # Routes
-from src.routes.categories import categories
-from src.routes.pilots import pilots
-from src.routes.vehicles import vehicles
+from src.routes.categories_routes import categories
+from src.routes.pilots_routes import pilots
+from src.routes.vehicles_routes import vehicles
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

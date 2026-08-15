@@ -1,0 +1,103 @@
+[{
+  "_id": {
+    "$oid": "6a80077e989732b6737e7e19"
+  },
+  "category_id": 1,
+  "category_name": "TCR",
+  "discipline": "circuito",
+  "description": "",
+  "sub_categories": []
+},
+{
+  "_id": {
+    "$oid": "6a80077e989732b6737e7e1a"
+  },
+  "category_id": 2,
+  "category_name": "GT Challenge",
+  "discipline": "circuito",
+  "description": "GT Challenge",
+  "sub_categories": []
+},
+{
+  "_id": {
+    "$oid": "6a80077e989732b6737e7e1b"
+  },
+  "category_id": 3,
+  "category_name": "Street Legal",
+  "discipline": "circuito",
+  "description": "",
+  "sub_categories": [
+    {
+      "sub_category_id": 1,
+      "sub_category_name": "Street Legal A"
+    },
+    {
+      "sub_category_id": 2,
+      "sub_category_name": "Street Legal B"
+    },
+    {
+      "sub_category_id": 3,
+      "sub_category_name": "Street Legal C"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a80077e989732b6737e7e1c"
+  },
+  "category_id": 4,
+  "category_name": "Super Turismo",
+  "discipline": "circuito",
+  "description": "Super Turismo",
+  "sub_categories": [
+    {
+      "sub_category_id": 1,
+      "sub_category_name": "Super Turismo 1"
+    },
+    {
+      "sub_category_id": 2,
+      "sub_category_name": "Super Turismo 2"
+    },
+    {
+      "sub_category_id": 3,
+      "sub_category_name": "Super Turismo 3"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a80077e989732b6737e7e1d"
+  },
+  "category_id": 5,
+  "category_name": "Gran Turismo",
+  "discipline": "circuito",
+  "description": "Gran Turismo",
+  "sub_categories": [
+    {
+      "sub_category_id": 1,
+      "sub_category_name": "Gran Turismo 1"
+    },
+    {
+      "sub_category_id": 2,
+      "sub_category_name": "Gran Turismo 2"
+    },
+    {
+      "sub_category_id": 3,
+      "sub_category_name": "Gran Turismo 3"
+    },
+    {
+      "sub_category_id": 4,
+      "sub_category_name": "Gran Turismo 4"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6a80077e989732b6737e7e1e"
+  },
+  "category_id": 6,
+  "category_name": "Mono Marca",
+  "discipline": "circuito",
+  "description": "Mono Marca",
+  "sub_categories": []
+}]

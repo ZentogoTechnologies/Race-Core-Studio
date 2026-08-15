@@ -8,7 +8,7 @@ service = CategoryService()
 
 @categories.get("/", tags=["Categories"], response_model=list[CategoryResponse])
 async def get_categories(
-    discipline: Optional[str] = Query(None, description="Filtrar por disciplina: circuito o drag")
+    discipline: Optional[str] = Query(None, description="Filtrar por disciplina: circuit o drag")
 ):
     """
     Obtiene todas las categorías. Puedes filtrar por disciplina
@@ -29,7 +29,7 @@ async def get_category_by_id(category_id: str):
     """
     category = await service.get_category_by_id(category_id)
     if not category:
-        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+        raise HTTPException(status_code=404, detail="Category Not Found!")
     return category
 
 @categories.put("/{category_id}", tags=["Categories"], response_model=CategoryResponse)
@@ -39,7 +39,7 @@ async def update_category(category_id: str, data: CategoryUpdate):
     """
     category = await service.update_category(category_id, data)
     if not category:
-        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+        raise HTTPException(status_code=404, detail="Category Not Found!")
     return category
 
 @categories.delete("/{category_id}", tags=["Categories"])
@@ -49,5 +49,5 @@ async def delete_category(category_id: str):
     """
     deleted = await service.delete_category(category_id)
     if not deleted:
-        raise HTTPException(status_code=404, detail="Categoría no encontrada")
-    return {"message": "Categoría eliminada"}
+        raise HTTPException(status_code=404, detail="Category Not Found!")
+    return {"message": "Category deleted"}
