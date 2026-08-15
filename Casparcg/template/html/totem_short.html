@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Timing Tower</title>
+
+    <link rel="stylesheet" href="../css/totem_names.css">
+
+</head>
+
+<body>
+
+<div class="leaderboard">
+
+    <div class="lb-header">
+
+        <div class="lb-logo">
+
+            <img
+                src="../img/logoap.png"
+                alt="Autódromo Panamá">
+
+        </div>
+
+        <div class="lb-info">
+
+            <div
+                class="lb-heat"
+                id="heatName">
+
+                HEAT 1
+
+            </div>
+
+            <div class="lb-timer">
+
+                <span>TIME</span>
+
+                <span id="raceTimer">
+
+                    01:51.234
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div
+        class="lb-body"
+        id="leaderboardBody">
+
+    </div>
+
+</div>
+
+<script>
+
+const standings = [
+
+    {
+        pos:1,
+        name:"DANIEL CARBALLEDA",
+        number:"570",
+        gap:"01:51.234"
+    },
+
+    {
+        pos:2,
+        name:"LUIS RAMIREZ",
+        number:"33",
+        gap:"+0.842"
+    },
+
+    {
+        pos:3,
+        name:"ALBERTO RAMOS",
+        number:"69",
+        gap:"+1.126"
+    },
+
+    {
+        pos:4,
+        name:"JUAN CARLOS LEROUX",
+        number:"42",
+        gap:"+0.517"
+    },
+
+    {
+        pos:5,
+        name:"MARIO SOLIS",
+        number:"16",
+        gap:"+2.841"
+    },
+
+    {
+        pos:6,
+        name:"MARIO BARCENAS",
+        number:"12",
+        gap:"+0.231"
+    },
+
+    {
+        pos:7,
+        name:"GERARDO ORTEGA",
+        number:"51",
+        gap:"+0.653"
+    },
+
+    {
+        pos:8,
+        name:"SERGIO GUERRA",
+        number:"24",
+        gap:"+1.017"
+    },
+
+    {
+        pos:9,
+        name:"LUIS FROST",
+        number:"41",
+        gap:"+0.774"
+    },
+
+    {
+        pos:10,
+        name:"GABRIEL ALESSANDRIA",
+        number:"48",
+        gap:"+1.204"
+    }
+
+];
+
+const container =
+    document.getElementById(
+        "leaderboardBody"
+    );
+
+function shortName(fullName){
+
+    const parts =
+        fullName
+        .replace("/", " ")
+        .trim()
+        .split(/\s+/);
+
+    const firstInitial =
+        parts[0][0];
+
+    const surname =
+        parts[parts.length - 1]
+        .substring(0,3)
+        .toUpperCase();
+
+    return `${firstInitial}.${surname}`;
+}
+
+function createLeaderboard(){
+
+    container.innerHTML = "";
+
+    standings.forEach(
+        (driver,index)=>{
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+        row.className =
+            index === 0
+            ? "lb-row leader"
+            : "lb-row";
+
+        row.innerHTML = `
+
+            <div class="lb-pos pos-${driver.pos}">
+                ${driver.pos}
+            </div>
+
+            <div class="lb-separator"></div>
+
+            <div class="lb-number">
+                ${driver.number}
+            </div>
+
+            <div class="lb-name">
+                ${shortName(driver.name)}
+            </div>
+
+            <div class="lb-gap">
+                ${driver.gap}
+            </div>
+
+        `;
+
+        container.appendChild(
+            row
+        );
+
+    });
+
+}
+
+createLeaderboard();
+function play(){
+
+    const widget =
+        document.getElementById("climateShort");
+
+    const panel =
+        document.getElementById("weatherPanel");
+
+    widget.style.animation =
+        "slideUp .5s ease forwards";
+
+    setTimeout(() => {
+
+        panel.style.animation =
+            "expandPanel .6s ease forwards";
+
+    },500);
+}
+
+function stop(){
+
+    const widget =
+        document.getElementById("climateShort");
+
+    const panel =
+        document.getElementById("weatherPanel");
+
+    panel.style.animation =
+        "collapsePanel .5s ease forwards";
+
+    setTimeout(() => {
+
+        widget.style.animation =
+            "slideDown .5s ease forwards";
+
+    },500);
+}
+
+window.onload = function(){
+
+    update({
+
+        temperature:32,
+        feels_like:35,
+        humidity:78,
+        wind_speed:15,
+
+        city:"Santo Domingo",
+        country:"RD",
+
+        description:"Parcialmente nublado",
+
+        current_date:"05 JUN 2026",
+
+        icon:"02d"
+    });
+
+    play();
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Weather Short</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/weather.css">
+
+</head>
+
+<body>
+
+    <div
+        class="climate-short"
+        id="climateShort">
+
+        <!-- PANEL ICONO -->
+
+        <div class="icon-panel">
+
+            <img
+                id="weatherIcon"
+                class="weather-icon"
+                src="https://openweathermap.org/img/wn/02d@2x.png"
+                alt="Weather Icon">
+
+        </div>
+
+        <!-- PANEL INFORMACIÓN -->
+
+        <div
+            class="weather-panel"
+            id="weatherPanel">
+
+            <div class="content-section">
+
+                <div class="top-row">
+
+                    <div
+                        class="temperature"
+                        id="temperature">
+
+                        32°C
+
+                    </div>
+
+                    <div class="location-info">
+
+                        <div
+                            class="city-name"
+                            id="city_name">
+
+                            SANTO DOMINGO, RD
+
+                        </div>
+
+                        <div
+                            class="description"
+                            id="description">
+
+                            PARCIALMENTE NUBLADO
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="info-row">
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            SENSACIÓN
+                        </div>
+
+                        <div
+                            class="value"
+                            id="track_temp">
+
+                            35°C
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            HUMEDAD
+                        </div>
+
+                        <div
+                            class="value"
+                            id="humidity">
+
+                            78%
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            VIENTO
+                        </div>
+
+                        <div
+                            class="value"
+                            id="wind_speed">
+
+                            15 km/h
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-block">
+
+                        <div class="label">
+                            FECHA
+                        </div>
+
+                        <div
+                            class="value"
+                            id="currentDate">
+
+                            05 JUN 2026
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<script>
+
+function update(data){
+
+    if(data.temperature !== undefined)
+        document.getElementById("temperature").textContent =
+            data.temperature + "°C";
+
+    if(data.feels_like !== undefined)
+        document.getElementById("track_temp").textContent =
+            data.feels_like + "°C";
+
+    if(data.humidity !== undefined)
+        document.getElementById("humidity").textContent =
+            data.humidity + "%";
+
+    if(data.wind_speed !== undefined)
+        document.getElementById("wind_speed").textContent =
+            data.wind_speed + " km/h";
+
+    if(data.description !== undefined)
+        document.getElementById("description").textContent =
+            data.description.toUpperCase();
+
+    if(data.city !== undefined){
+
+        let cityText = data.city;
+
+        if(data.country !== undefined)
+            cityText += ", " + data.country;
+
+        document.getElementById("city_name").textContent =
+            cityText.toUpperCase();
+    }
+
+    if(data.current_date !== undefined)
+        document.getElementById("currentDate").textContent =
+            data.current_date.toUpperCase();
+
+    if(data.icon !== undefined)
+        document.getElementById("weatherIcon").src =
+            "https://openweathermap.org/img/wn/" +
+            data.icon +
+            "@2x.png";
+}
+
+function play(){
+
+    const widget =
+        document.getElementById("climateShort");
+
+    const panel =
+        document.getElementById("weatherPanel");
+
+    widget.style.animation =
+        "slideUp .5s ease forwards";
+
+    setTimeout(() => {
+
+        panel.style.animation =
+            "expandPanel .6s ease forwards";
+
+    },500);
+}
+
+function stop(){
+
+    const widget =
+        document.getElementById("climateShort");
+
+    const panel =
+        document.getElementById("weatherPanel");
+
+    panel.style.animation =
+        "collapsePanel .5s ease forwards";
+
+    setTimeout(() => {
+
+        widget.style.animation =
+            "slideDown .5s ease forwards";
+
+    },500);
+}
+
+window.onload = function(){
+
+    update({
+
+        temperature:32,
+        feels_like:35,
+        humidity:78,
+        wind_speed:15,
+
+        city:"Ciudad de Panama",
+        country:"PTY",
+
+        description:"Parcialmente nublado",
+
+        current_date:"08 JUN 2026",
+
+        icon:"02d"
+    });
+
+    play();
+};
+
+</script>
+
+</body>
+</html>
