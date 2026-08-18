@@ -21,6 +21,7 @@
 
     <div class="grid-header">
 
+        <!-- LOGO -->
         <div class="grid-logo">
 
             <img
@@ -31,6 +32,7 @@
         </div>
 
 
+        <!-- TITULOS -->
         <div class="grid-header-info">
 
             <div
@@ -52,290 +54,61 @@
 
     <!-- ==============================================================
          GRID
+         
+         JavaScript genera aquí las posiciones.
+         Siempre se muestran 2 pilotos a la vez.
     ============================================================== -->
 
     <div
         class="grid-list"
         id="grid-list">
-
-
-        <!-- ==========================================================
-             FILA 1
-        ========================================================== -->
-
-        <div class="grid-row">
-
-            <div class="driver-card">
-
-                <div class="position">
-                    1
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto1.png"
-                        alt="Piloto 1">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 1
-                    </div>
-
-                    <div class="driver-number">
-                        #01
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="driver-card">
-
-                <div class="position">
-                    2
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto2.png"
-                        alt="Piloto 2">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 2
-                    </div>
-
-                    <div class="driver-number">
-                        #02
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ==========================================================
-             FILA 2
-        ========================================================== -->
-
-        <div class="grid-row">
-
-            <div class="driver-card">
-
-                <div class="position">
-                    3
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto3.png"
-                        alt="Piloto 3">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 3
-                    </div>
-
-                    <div class="driver-number">
-                        #03
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="driver-card">
-
-                <div class="position">
-                    4
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto4.png"
-                        alt="Piloto 4">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 4
-                    </div>
-
-                    <div class="driver-number">
-                        #04
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ==========================================================
-             FILA 3
-        ========================================================== -->
-
-        <div class="grid-row">
-
-            <div class="driver-card">
-
-                <div class="position">
-                    5
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto5.png"
-                        alt="Piloto 5">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 5
-                    </div>
-
-                    <div class="driver-number">
-                        #05
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="driver-card">
-
-                <div class="position">
-                    6
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto6.png"
-                        alt="Piloto 6">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 6
-                    </div>
-
-                    <div class="driver-number">
-                        #06
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ==========================================================
-             FILA 4
-        ========================================================== -->
-
-        <div class="grid-row">
-
-            <div class="driver-card">
-
-                <div class="position">
-                    7
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto7.png"
-                        alt="Piloto 7">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 7
-                    </div>
-
-                    <div class="driver-number">
-                        #07
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="driver-card">
-
-                <div class="position">
-                    8
-                </div>
-
-                <div class="driver-photo">
-
-                    <img
-                        src="../img/piloto8.png"
-                        alt="Piloto 8">
-
-                </div>
-
-                <div class="driver-info">
-
-                    <div class="driver-name">
-                        PILOTO 8
-                    </div>
-
-                    <div class="driver-number">
-                        #08
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
     </div>
+
 
 </div>
 
 
 <script>
 
+
+/* ==========================================================================
+   VARIABLES
+========================================================================== */
+
+
+/*
+ * Todos los pilotos.
+ */
+let drivers = [];
+
+
+/*
+ * Pareja que se está mostrando actualmente.
+ *
+ * 0 = posiciones 1 y 2
+ * 1 = posiciones 3 y 4
+ * 2 = posiciones 5 y 6
+ */
+let currentPage = 0;
+
+
+/*
+ * Intervalo del carrusel.
+ */
+let carouselInterval = null;
+
+
+
+/* ==========================================================================
+   UPDATE
+========================================================================== */
+
 function update(data) {
 
 
-    /* ==============================================================
+    /* ======================================================================
        TITULO
-    ============================================================== */
+    ====================================================================== */
 
     if(data.title !== undefined){
 
@@ -345,9 +118,9 @@ function update(data) {
     }
 
 
-    /* ==============================================================
+    /* ======================================================================
        SUBTITULO
-    ============================================================== */
+    ====================================================================== */
 
     if(data.subtitle !== undefined){
 
@@ -357,9 +130,9 @@ function update(data) {
     }
 
 
-    /* ==============================================================
+    /* ======================================================================
        LOGO
-    ============================================================== */
+    ====================================================================== */
 
     if(data.logo !== undefined){
 
@@ -369,90 +142,371 @@ function update(data) {
     }
 
 
-    /* ==============================================================
+    /* ======================================================================
        PILOTOS
-    ============================================================== */
+    ====================================================================== */
 
     if(data.drivers !== undefined){
 
-        const grid =
-            document.getElementById("grid-list");
-
-        grid.innerHTML = "";
+        /*
+         * Guardamos la data.
+         */
+        drivers = data.drivers;
 
 
         /*
-         * Se crean dos pilotos por fila.
+         * Empezamos desde la primera pareja.
          */
-
-        for(let i = 0; i < data.drivers.length; i += 2){
-
-            const row =
-                document.createElement("div");
-
-            row.className =
-                "grid-row";
+        currentPage = 0;
 
 
-            for(let j = i; j < i + 2; j++){
-
-                const driver =
-                    data.drivers[j];
-
-
-                if(!driver){
-                    continue;
-                }
-
-
-                const card =
-                    document.createElement("div");
-
-                card.className =
-                    "driver-card";
-
-
-                card.innerHTML = `
-
-                    <div class="position">
-                        ${driver.position}
-                    </div>
-
-                    <div class="driver-photo">
-
-                        <img
-                            src="${driver.photo}"
-                            alt="${driver.name}">
-
-                    </div>
-
-                    <div class="driver-info">
-
-                        <div class="driver-name">
-                            ${driver.name}
-                        </div>
-
-                        <div class="driver-number">
-                            #${driver.number}
-                        </div>
-
-                    </div>
-
-                `;
-
-
-                row.appendChild(card);
-
-            }
-
-
-            grid.appendChild(row);
-
-        }
+        /*
+         * Iniciamos el carrusel.
+         */
+        startCarousel();
 
     }
 
 }
+
+
+
+/* ==========================================================================
+   MOSTRAR PAREJA ACTUAL
+========================================================================== */
+
+function showPage() {
+
+
+    const grid =
+        document.getElementById("grid-list");
+
+
+    /*
+     * Limpiar la pareja anterior.
+     */
+    grid.innerHTML = "";
+
+
+    /*
+     * Cada página contiene 2 pilotos.
+     */
+    const start =
+        currentPage * 2;
+
+
+    /*
+     * Obtener máximo 2 pilotos.
+     */
+    const pageDrivers =
+        drivers.slice(start, start + 2);
+
+
+    /*
+     * Crear fila.
+     */
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "grid-row";
+
+
+    /*
+     * Crear las tarjetas.
+     */
+    pageDrivers.forEach(driver => {
+
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "driver-card";
+
+
+        card.innerHTML = `
+
+            <div class="position">
+                ${driver.position}
+            </div>
+
+
+            <div class="driver-photo">
+
+                <img
+                    src="${driver.photo}"
+                    alt="${driver.name}">
+
+            </div>
+
+
+            <div class="driver-info">
+
+                <div class="driver-name">
+                    ${driver.name}
+                </div>
+
+                <div class="driver-number">
+                    #${driver.number}
+                </div>
+
+            </div>
+
+        `;
+
+
+        row.appendChild(card);
+
+    });
+
+
+    /*
+     * Mostrar la fila.
+     */
+    grid.appendChild(row);
+
+}
+
+
+
+/* ==========================================================================
+   PLAY
+========================================================================== */
+
+function play() {
+
+    /*
+     * Inicia el carrusel.
+     */
+    startCarousel();
+
+}
+
+
+
+/* ==========================================================================
+   STOP
+========================================================================== */
+
+function stop() {
+
+    /*
+     * Detiene el carrusel.
+     */
+    clearInterval(carouselInterval);
+
+}
+
+
+
+/* ==========================================================================
+   CARRUSEL
+========================================================================== */
+
+function startCarousel() {
+
+
+    /*
+     * Evitar que existan varios intervalos
+     * funcionando al mismo tiempo.
+     */
+    clearInterval(carouselInterval);
+
+
+    /*
+     * Si no hay pilotos, no hacer nada.
+     */
+    if(drivers.length === 0){
+
+        return;
+
+    }
+
+
+    /*
+     * Mostrar inmediatamente
+     * la primera pareja.
+     */
+    showPage();
+
+
+    /*
+     * Si hay solamente 1 o 2 pilotos,
+     * no necesitamos carrusel.
+     */
+    if(drivers.length <= 2){
+
+        return;
+
+    }
+
+
+    /*
+     * Cambiar de pareja cada 3 segundos.
+     */
+    carouselInterval = setInterval(() => {
+
+
+        /*
+         * Siguiente pareja.
+         */
+        currentPage++;
+
+
+        /*
+         * Número total de páginas.
+         */
+        const totalPages =
+            Math.ceil(drivers.length / 2);
+
+
+        /*
+         * Si llegamos al final,
+         * volver a la primera pareja.
+         */
+        if(currentPage >= totalPages){
+
+            currentPage = 0;
+
+        }
+
+
+        /*
+         * Mostrar nueva pareja.
+         */
+        showPage();
+
+
+    }, 3000);
+
+}
+
+
+
+/* ==========================================================================
+   DATOS DE PRUEBA
+========================================================================== */
+
+update({
+
+    title: "Starting Grid",
+
+    subtitle: "Grilla de Partida",
+
+    logo: "../img/logoap.png",
+
+
+    drivers: [
+
+        {
+            position: 1,
+            name: "PILOTO 1",
+            number: 1,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 2,
+            name: "PILOTO 2",
+            number: 2,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 3,
+            name: "PILOTO 3",
+            number: 3,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 4,
+            name: "PILOTO 4",
+            number: 4,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 5,
+            name: "PILOTO 5",
+            number: 5,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 6,
+            name: "PILOTO 6",
+            number: 6,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 7,
+            name: "PILOTO 7",
+            number: 7,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 8,
+            name: "PILOTO 8",
+            number: 8,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 9,
+            name: "PILOTO 9",
+            number: 9,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 10,
+            name: "PILOTO 10",
+            number: 10,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 11,
+            name: "PILOTO 11",
+            number: 11,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 12,
+            name: "PILOTO 12",
+            number: 12,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 13,
+            name: "PILOTO 13",
+            number: 13,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 14,
+            name: "PILOTO 14",
+            number: 14,
+            photo: "../img/pilot.png"
+        },
+
+        {
+            position: 15,
+            name: "PILOTO 15",
+            number: 15,
+            photo: "../img/pilot.png"
+        }
+
+    ]
+
+});
 
 </script>
 

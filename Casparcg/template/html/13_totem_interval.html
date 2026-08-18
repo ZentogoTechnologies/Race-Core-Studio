@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Totem Shortname Interval</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/totem_names.css">
+    <link rel="stylesheet" href="../css/totem_interval.css">
+
+</head>
+
+
+<body>
+
+
+<div class="leaderboard" id="leaderboard">
+
+
+    <!-- ==============================================================
+         HEADER
+    ============================================================== -->
+
+    <div class="lb-header">
+
+
+        <!-- LOGO -->
+
+        <div class="lb-logo">
+
+            <img
+                id="logo"
+                src="../img/logoap.png"
+                alt="Autódromo Panamá">
+
+        </div>
+
+
+        <!-- INFORMACIÓN -->
+
+        <div class="lb-info">
+
+
+            <div
+                class="lb-heat"
+                id="heatName">
+
+                HEAT 1
+
+            </div>
+
+
+            <div class="lb-timer">
+
+                <span>
+                    TIME
+                </span>
+
+                <span id="raceTimer">
+                    00:01:51
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==============================================================
+         TABLA
+    ============================================================== -->
+
+    <div
+        class="lb-body"
+        id="leaderboardBody">
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* ==========================================================================
+   DATOS DE PRUEBA
+
+   El "interval" representa la diferencia con el piloto
+   que está inmediatamente delante.
+========================================================================== */
+
+const standings = [
+
+    {
+        pos:1,
+        name:"D.CAR",
+        number:"570",
+        interval:"LEADER"
+    },
+
+    {
+        pos:2,
+        name:"L.RAM",
+        number:"33",
+        interval:"+0.842"
+    },
+
+    {
+        pos:3,
+        name:"A.RAM",
+        number:"69",
+        interval:"+0.372"
+    },
+
+    {
+        pos:4,
+        name:"J.CAR",
+        number:"42",
+        interval:"+1.317"
+    },
+
+    {
+        pos:5,
+        name:"M.SOL",
+        number:"16",
+        interval:"+0.473"
+    },
+
+    {
+        pos:6,
+        name:"M.BAR",
+        number:"12",
+        interval:"+1.116"
+    },
+
+    {
+        pos:7,
+        name:"G.ORT",
+        number:"51",
+        interval:"+1.167"
+    },
+
+    {
+        pos:8,
+        name:"S.GUE",
+        number:"24",
+        interval:"+0.744"
+    },
+
+    {
+        pos:9,
+        name:"L.FRO",
+        number:"41",
+        interval:"+1.214"
+    },
+
+    {
+        pos:10,
+        name:"G.ALE",
+        number:"48",
+        interval:"+1.176"
+    }
+
+];
+
+
+
+/* ==========================================================================
+   CREAR TABLA
+========================================================================== */
+
+function createLeaderboard(){
+
+    const container =
+        document.getElementById(
+            "leaderboardBody"
+        );
+
+
+    container.innerHTML = "";
+
+
+    standings.forEach((driver,index)=>{
+
+
+        const row =
+            document.createElement("div");
+
+
+        /*
+         * El primer piloto es el líder.
+         */
+
+        row.className =
+            index === 0
+                ? "lb-row leader"
+                : "lb-row";
+
+
+        row.innerHTML = `
+
+            <div class="lb-pos pos-${driver.pos}">
+                ${driver.pos}
+            </div>
+
+
+            <div class="lb-separator"></div>
+
+
+            <div class="lb-name">
+                ${driver.name}
+            </div>
+
+
+            <div class="lb-number">
+                ${driver.number}
+            </div>
+
+
+            <div class="lb-interval">
+                ${driver.interval}
+            </div>
+
+        `;
+
+
+        container.appendChild(row);
+
+    });
+
+}
+
+
+createLeaderboard();
+
+
+
+/* ==========================================================================
+   UPDATE
+========================================================================== */
+
+function update(data){
+
+
+    /* ==============================================================
+       HEAT
+    ============================================================== */
+
+    if(data.heat !== undefined){
+
+        document.getElementById(
+            "heatName"
+        ).textContent =
+            data.heat.toUpperCase();
+
+    }
+
+
+    /* ==============================================================
+       TIEMPO
+    ============================================================== */
+
+    if(data.time !== undefined){
+
+        document.getElementById(
+            "raceTimer"
+        ).textContent =
+            data.time;
+
+    }
+
+
+    /* ==============================================================
+       LOGO
+    ============================================================== */
+
+    if(data.logo !== undefined){
+
+        document.getElementById(
+            "logo"
+        ).src =
+            data.logo;
+
+    }
+
+
+    /* ==============================================================
+       STANDINGS
+    ============================================================== */
+
+    if(data.standings !== undefined){
+
+        standings.length = 0;
+
+        standings.push(
+            ...data.standings
+        );
+
+        createLeaderboard();
+
+    }
+
+}
+
+</script>
+
+
+</body>
+
+</html>
