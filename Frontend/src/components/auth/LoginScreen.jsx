@@ -22,17 +22,13 @@ export default function LoginScreen({ onLogin }) {
     >
       <div className="bg-[#141414] border border-red-600/30 p-8 rounded-xl w-full max-w-md shadow-[0_0_50px_rgba(220,38,38,0.15)]">
         
-        {/* Logo + Título */}
+        {/* Logo */}
         <div className="text-center mb-8">
           <img
-            src="/logo-panama.png"
-            alt="Panama Logo"
-            className="h-16 mx-auto mb-3 object-contain"
+            src="/Logo.png"
+            alt="Race Core Studio"
+            className="w-64 mx-auto object-contain"
           />
-          <h1 className="text-3xl font-black text-white italic tracking-wider">
-            RACE CORE <span className="text-red-600">STUDIO</span>
-          </h1>
-          <p className="text-neutral-400 mt-2 text-sm">Sistema de Gestión</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
