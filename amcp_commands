@@ -1,0 +1,45 @@
+### 1-10 BACKGROUNDS
+
+CG 1-10 ADD 1 "html/10_no_background" 1
+CG 1-10 ADD 1 "html/11_red_background" 1
+CG 1-10 ADD 1 "html/12_blue_background" 1
+CG 1-10 ADD 1 "html/13_yellow_background" 1
+CG 1-10 ADD 1 "html/14_green_background" 1
+CG 1-10 ADD 1 "html/15_cian_background" 1
+CG 1-10 ADD 1 "html/16_magenta_background" 1
+CLEAR 1-10
+
+### 1-20 TOTEM
+CG 1-20 ADD 1 "html/20_totem_fullname" 1
+CG 1-20 ADD 1 "html/21_totem_shortname" 1
+CG 1-20 ADD 1 "html/22_totem_leader" 1
+CG 1-20 ADD 1 "html/23_totem_interval" 1
+CLEAR 1-20
+
+### 1-30 FLAGS
+CG 1-30 ADD 1 "html/30_green_flag" 1
+CG 1-30 ADD 1 "html/31_yellow_flag" 1
+CG 1-30 ADD 1 "html/32_safety_car_flag" 1
+CG 1-30 ADD 1 "html/33_red_flag" 1
+CG 1-30 ADD 1 "html/34_finish_flag" 1
+CLEAR 1-30
+
+### 1-40 STARTING_GRID
+CG 1-40 ADD 1 "html/40_starting_grid_names" 1
+CG 1-40 ADD 1 "html/41_starting_grid_short" 1
+CLEAR 1-40
+
+### 1-50 PILOT_CARDS
+CG 1-50 ADD 1 "html/50_pilot_card_complete" 1
+CG 1-50 ADD 1 "html/51_pilot_card_short" 1
+CLEAR 1-50
+
+### 1-60 MISCELANEOS
+CG 1-60 ADD 1 "html/10_no_background" 1
+CG 1-60 ADD 1 "html/11_red_background" 1
+CG 1-60 ADD 1 "html/12_blue_background" 1
+CG 1-60 ADD 1 "html/13_yellow_background" 1
+CG 1-60 ADD 1 "html/14_green_background" 1
+CG 1-60 ADD 1 "html/15_cian_background" 1
+CG 1-60 ADD 1 "html/16_magenta_background" 1
+CLEAR 1-60
