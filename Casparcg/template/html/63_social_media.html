@@ -5,7 +5,7 @@
 
     <meta charset="UTF-8">
 
-    <title>Social Media Intro</title>
+    <title>Social Media</title>
 
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/social_media.css">
@@ -14,162 +14,210 @@
 
 <body>
 
-<div class="social-media" id="socialMedia">
-
-    <div class="logo-box">
-
-        <img
-            id="logo"
-            src="../img/logoap.png"
-            alt="logo">
-
-    </div>
-
     <div
-        class="info-panel"
-        id="infoPanelSocialMedia">
+        class="social-media"
+        id="socialMedia">
+
+        <!-- PANEL LOGO -->
+
+        <div class="logo-box">
+
+            <img
+                id="logo"
+                src="../img/logoap.png"
+                alt="Autódromo Panamá">
+
+        </div>
+
+        <!-- PANEL INFORMACIÓN -->
 
         <div
-            class="event-title"
-            id="title">
+            class="info-panel"
+            id="infoPanelSocialMedia">
 
-            FOLLOW US
+            <div class="content-section">
 
-        </div>
+                <!-- INSTAGRAM -->
 
-        <div class="social-list">
+                <div class="social-row">
 
-            <div class="social-row">
+                    <svg
+                        class="social-icon"
+                        viewBox="0 0 24 24"
+                        aria-label="Instagram">
 
-    <img
-        class="social-icon"
-        src="https://fontawesome.com/icons/brands/solid/instagram"
-        alt="Instagram">
+                        <rect
+                            x="2.5" y="2.5"
+                            width="19" height="19"
+                            rx="5.5"
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="2"/>
 
-    <span
-        class="social-value"
-        id="instagram">
+                        <circle
+                            cx="12" cy="12" r="4.5"
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="2"/>
 
-        @AUTODROMOPANAMA
+                        <circle
+                            cx="17.6" cy="6.4" r="1.4"
+                            fill="#ffffff"/>
 
-    </span>
+                    </svg>
 
-</div>
+                    <span
+                        class="social-value"
+                        id="instagram">
 
-<div class="social-row">
+                        @autodromopanama
 
-    <i style="font-size:24px" class="fa">&#xf167;</i>
+                    </span>
 
+                </div>
 
-    <span
-        class="social-value"
-        id="youtube">
+                <!-- YOUTUBE -->
 
-        AUTODROMO PANAMA
+                <div class="social-row">
 
-    </span>
+                    <svg
+                        class="social-icon"
+                        viewBox="0 0 24 24"
+                        aria-label="YouTube">
 
-</div>
+                        <rect
+                            x="1.8" y="5"
+                            width="20.4" height="14"
+                            rx="4.5"
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="2"/>
 
-<div class="social-row">
+                        <path
+                            d="M10.3 8.9 L16.2 12 L10.3 15.1 Z"
+                            fill="#ffffff"/>
 
-    <img
-        class="social-icon"
-        src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png"
-        alt="Website">
+                    </svg>
 
-    <span
-        class="social-value"
-        id="website">
+                    <span
+                        class="social-value"
+                        id="youtube">
 
-        AUTODROMOPANAMA.COM
+                        @Autodromo Panama
 
-    </span>
+                    </span>
 
-</div>
+                </div>
+
+                <!-- WEBSITE -->
+
+                <div class="social-row">
+
+                    <svg
+                        class="social-icon"
+                        viewBox="0 0 24 24"
+                        aria-label="Website">
+
+                        <circle
+                            cx="12" cy="12" r="9.5"
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="2"/>
+
+                        <ellipse
+                            cx="12" cy="12" rx="4.2" ry="9.5"
+                            fill="none"
+                            stroke="#ffffff"
+                            stroke-width="2"/>
+
+                        <path
+                            d="M2.9 9 H21.1 M2.9 15 H21.1"
+                            stroke="#ffffff"
+                            stroke-width="2"/>
+
+                    </svg>
+
+                    <span
+                        class="social-value"
+                        id="website">
+
+                        autodromopanama.com
+
+                    </span>
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
-
-</div>
 
 <script>
 
 function update(data){
 
-    if(data.instagram !== undefined){
+    if(data.instagram !== undefined)
+        document.getElementById("instagram").textContent =
+            data.instagram;
 
-        document.getElementById("instagram")
-            .textContent = data.instagram;
+    if(data.youtube !== undefined)
+        document.getElementById("youtube").textContent =
+            data.youtube;
 
-    }
+    if(data.website !== undefined)
+        document.getElementById("website").textContent =
+            data.website;
 
-    if(data.youtube !== undefined){
-
-        document.getElementById("youtube")
-            .textContent = data.youtube;
-
-    }
-
-    if(data.website !== undefined){
-
-        document.getElementById("website")
-            .textContent = data.website;
-
-    }
-
-    if(data.logo !== undefined){
-
-        document.getElementById("logo")
-            .src = data.logo;
-
-    }
-
+    if(data.logo !== undefined)
+        document.getElementById("logo").src =
+            data.logo;
 }
 
 function play(){
 
-    const socialMedia =
+    const widget =
         document.getElementById("socialMedia");
 
     const panel =
-        socialMedia.querySelector(".info-panel");
+        document.getElementById("infoPanelSocialMedia");
 
-    socialMedia.style.animation =
+    widget.style.animation =
         "slideUp .5s ease forwards";
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
         panel.style.animation =
             "expandPanel .6s ease forwards";
 
     },500);
-
 }
 
 function stop(){
 
-    const socialMedia =
+    const widget =
         document.getElementById("socialMedia");
 
     const panel =
-        socialMedia.querySelector(".info-panel");
+        document.getElementById("infoPanelSocialMedia");
 
     panel.style.animation =
         "collapsePanel .5s ease forwards";
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
-        socialMedia.style.animation =
+        widget.style.animation =
             "slideDown .5s ease forwards";
 
     },500);
-
 }
+
+window.onload = function(){
+
+    play();
+};
 
 </script>
 
 </body>
-
 </html>

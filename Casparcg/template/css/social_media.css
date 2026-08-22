@@ -1,5 +1,15 @@
 @charset "UTF-8";
 
+/* ==================================================
+   SOCIAL MEDIA
+   Misma estructura y animacion que weather.css
+================================================== */
+
+
+/* ==================================================
+   LOGO
+================================================== */
+
 .logo-box img{
 
     max-width:140px;
@@ -8,78 +18,81 @@
     object-fit:contain;
 }
 
-/* ==================================================
-   PANEL
-================================================== */
-
-.info-panel{
-    width: 10px;
-}
 
 /* ==================================================
-   TITULO
+   PANEL INFORMACIÓN
 ================================================== */
 
-.event-title{
+#infoPanelSocialMedia{
 
-    margin-left:25px;
+    overflow:hidden;
 
-    font-size:34px;
-    line-height:1;
+    display:flex;
+    align-items:center;
 
-    color:#ffffff;
+    border-left:0px;
+    border-radius:0 12px 12px 0;
 
-    text-transform:uppercase;
-
-    text-shadow:
-        2px 2px 4px rgba(0,0,0,.5);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.4);
 }
+
+
+/* ==================================================
+   CONTENIDO
+================================================== */
+
+.content-section{
+
+    width:460px;
+
+    padding:15px 35px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    gap:12px;
+}
+
 
 /* ==================================================
    REDES
 ================================================== */
-
-.social-list{
-
-    margin-top:12px;
-    margin-left:25px;
-
-    display:flex;
-    flex-direction:column;
-
-    gap:8px;
-}
 
 .social-row{
 
     display:flex;
     align-items:center;
 
-    gap:14px;
+    gap:18px;
 }
 
 .social-icon{
 
-    width:28px;
-    height:28px;
-
-    object-fit:contain;
+    width:32px;
+    height:32px;
 
     flex-shrink:0;
 
-    filter:brightness(0) invert(1);
+    display:block;
 }
 
 .social-value{
 
-    font-size:20px;
+    font-size:26px;
+    font-weight:700;
+
+    line-height:1;
+
+    letter-spacing:.5px;
 
     color:#ffffff;
 
-    text-transform:uppercase;
-
-    letter-spacing:.5px;
+    text-shadow:
+        2px 2px 4px rgba(0,0,0,.5);
 }
+
 
 /* ==================================================
    ANIMACIONES
@@ -93,8 +106,8 @@
 
         transform:
             translateX(-50%)
-            translateY(250px)
-            scale(1.25);
+            translateY(120px)
+            scale(.95);
     }
 
     to{
@@ -106,7 +119,6 @@
             translateY(0)
             scale(1);
     }
-
 }
 
 @keyframes slideDown{
@@ -127,10 +139,9 @@
 
         transform:
             translateX(-50%)
-            translateY(250px)
-            scale(1.25);
+            translateY(120px)
+            scale(.95);
     }
-
 }
 
 @keyframes expandPanel{
@@ -138,29 +149,27 @@
     from{
 
         width:0;
-        padding-left:0;
+        opacity:0;
     }
 
     to{
 
-        width:750px;
-        padding-left:15px;
+        width:460px;
+        opacity:1;
     }
-
 }
 
 @keyframes collapsePanel{
 
     from{
 
-        width:750px;
-        padding-left:15px;
+        width:460px;
+        opacity:1;
     }
 
     to{
 
         width:0;
-        padding-left:0;
+        opacity:0;
     }
-
 }

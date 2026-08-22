@@ -69,9 +69,9 @@
 
 .content-section{
     /* Se cambió a min-width y max-width para congelar el tamaño real */
-    width:600px;
-    min-width:600px;
-    max-width:600px;
+    width:690px;
+    min-width:690px;
+    max-width:690px;
 
     padding:20px 35px;
 
@@ -102,30 +102,12 @@
     border-radius:0 10px 10px 0;
 }
 
-.background-number{
-    position:absolute;
-
-    top:-15px;
-    left:-60px;
-
-    font-size:120px;
-    font-weight:900;
-
-    color:transparent;
-    opacity:.7;
-
-    -webkit-text-stroke:2px rgba(255,0,0,.4);
-
-    z-index:1;
-    pointer-events:none;
-}
-
 .pilot-photo{
     position:absolute;
 
     bottom:0;
     /* Bajamos el porcentaje para que la foto no se salga del nuevo espacio corto */
-    left:50%; 
+    left:50%;
 
     height:100%;
 
@@ -139,6 +121,14 @@
    TEXTO PRINCIPAL
 ================================================== */
 
+.name-row{
+    display:flex;
+    align-items:baseline;
+    gap:22px;
+
+    margin-bottom:14px;
+}
+
 .pilot-name{
     font-family:"Impact","Arial Black",sans-serif;
     font-size:46px;
@@ -147,19 +137,15 @@
     text-transform:uppercase;
 
     color:#fff;
-
-    margin-bottom:5px;
 }
 
 .car-number{
     font-family:"Impact","Arial Black",sans-serif;
-    font-size:40px;
+    font-size:58px;
     font-weight:400;
     line-height:1;
 
     color:#ff0000;
-
-    margin-bottom:10px;
 }
 
 /* ==================================================
@@ -168,7 +154,7 @@
 
 .info-row{
     display:flex;
-    gap:40px;
+    gap:30px;
 }
 
 .info-block{
@@ -177,10 +163,10 @@
 }
 
 .label{
-    margin-bottom:4px;
+    margin-bottom:2px;
 
-    font-family:"Impact","Arial Black",sans-serif;
-    font-size:12px;
+    font-family:"Rajdhani","Arial",sans-serif;
+    font-size:16px;
     font-weight:600;
     text-transform:uppercase;
     letter-spacing: 1px;
@@ -188,10 +174,11 @@
 }
 
 .value{
-    font-family:"Impact","Arial Black",sans-serif;
-    font-size:18px;
-    font-weight:bold;
-    letter-spacing: 1px;
+    font-family:"Rajdhani","Arial",sans-serif;
+    font-size:26px;
+    font-weight:700;
+    line-height:1.1;
+    letter-spacing: .5px;
     color:#fff;
 }
 
@@ -229,13 +216,13 @@
     }
 
     to{
-        width: 850px;
+        width: 910px;
     }
 }
 
 @keyframes collapsePanel{
     from{
-        width: 850px;
+        width: 910px;
     }
 
     to{

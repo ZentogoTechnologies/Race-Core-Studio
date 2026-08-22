@@ -40,14 +40,6 @@
 
                 <div class="pilot-photo-container">
 
-                    <div
-                        id="bigNumber"
-                        class="pilot-big-number">
-
-                        43
-
-                    </div>
-
                     <img
                         id="pilotPhoto"
                         class="pilot-photo"
@@ -158,9 +150,6 @@
 
             document.getElementById("carNumber").textContent =
                 "#" + data.car_number;
-
-            document.getElementById("bigNumber").textContent =
-                data.car_number;
         }
 
         if(data.car_brand !== undefined) {
@@ -189,7 +178,7 @@
         document.getElementById("pilotCard").style.opacity = "1";
 
         document.getElementById("pilotCard").style.transform =
-            "translate(-50%, -50%)";
+            "translate(-50%, -50%) scale(.65)";
 
         document.getElementById("pilotContent").style.transform =
             "none";

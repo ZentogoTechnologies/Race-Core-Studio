@@ -15,6 +15,7 @@ from src.models.vehicles_model import Vehicle
 from src.routes.categories_routes import categories
 from src.routes.pilots_routes import pilots
 from src.routes.vehicles_routes import vehicles
+from src.routes.graphics_routes import graphics
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -46,3 +47,4 @@ app.add_middleware(
 app.include_router(categories, prefix="/api/v1/categories", tags=["Categories"])
 app.include_router(pilots, prefix="/api/v1/pilots", tags=["Pilots"])
 app.include_router(vehicles, prefix="/api/v1/vehicles", tags=["Vehicles"])
+app.include_router(graphics, prefix="/api/v1/graphics", tags=["Graphics"])

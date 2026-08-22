@@ -9,10 +9,10 @@
             left: 50%;
             top: 50%;
 
-            width: 2000px;
+            width: 1840px;
             height: 980px;
 
-            transform: translate(-50%, -50%) translateY(300px);
+            transform: translate(-50%, -50%) scale(.65) translateY(300px);
 
             opacity: 0;
 
@@ -27,7 +27,7 @@
 
         .pilot-left {
 
-            width: 220px;
+            width: 260px;
 
             background: #0d0d0d;
 
@@ -42,8 +42,8 @@
 
         .pilot-brand-logo {
 
-            max-width: 180px;
-            max-height: 120px;
+            max-width: 230px;
+            max-height: 200px;
 
             object-fit: contain;
         }
@@ -52,7 +52,7 @@
 
         .pilot-content {
 
-            width: 1650px;
+            width: 1580px;
             overflow: hidden;
             background: #050505;
             display: flex;
@@ -129,30 +129,12 @@
             margin: 20px;
         }
 
-        .pilot-big-number {
-
-            position: absolute;
-
-            left: 15px;
-            top: 10px;
-
-            font-size: 300px;
-
-            font-weight: 900;
-
-            color: transparent;
-
-            -webkit-text-stroke: 3px rgba(255, 0, 0, .4);
-
-            z-index: 1;
-        }
-
         .pilot-photo {
 
             position: absolute;
 
             bottom: 0;
-            left: 60%;
+            left: 50%;
 
             transform: translateX(-50%);
 

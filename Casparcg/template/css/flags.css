@@ -9,7 +9,11 @@
 .lb-info-checkered,
 .lb-info-yellow{
 
-    flex:1;
+    /* Ancho fijo: se anima de 0 al ancho final */
+
+    flex:0 0 auto;
+
+    width:0;
 
     display:flex;
     justify-content:center;
@@ -19,7 +23,13 @@
 
     position:relative;
 
+    /* overflow:hidden tambien anula el min-width:auto
+       del flex item, si no el panel no podria valer 0 */
+
     overflow:hidden;
+    white-space:nowrap;
+
+    animation:flagOpen .5s cubic-bezier(.22,.61,.36,1) forwards;
 }
 
 /* Elimina el fondo del CSS original */
@@ -64,7 +74,8 @@
 
 .lb-heat.flag{
 
-    width:100%;
+    width:250px;
+    min-width:250px;
     height:100%;
 
     display:flex;
@@ -82,7 +93,7 @@
 
     color:#FFFFFF;
 
-    font-size:15px;
+    font-size:10px;
 
     font-weight:700;
 
@@ -95,11 +106,73 @@
 
     color:#FFFFFF;
 
-    font-size:34px;
+    font-size:25px;
 
     font-weight:900;
 
     line-height:1;
 
     letter-spacing:1px;
+}
+
+/* ===================================
+   CONTENEDOR
+
+   El totem base mide 420px, pero aqui el
+   panel debe ajustarse a lo que hay visible
+   (logo + bandera) para que la caja negra
+   no se vea antes de que la bandera salga.
+=================================== */
+
+.leaderboard{
+
+    width:max-content;
+}
+
+.lb-logo{
+
+    flex:0 0 auto;
+}
+
+/* ===================================
+   ANIMACIONES
+
+   La bandera se despliega de izquierda a
+   derecha desde el borde del logo.
+   El logo nunca se mueve de su posicion.
+=================================== */
+
+@keyframes flagOpen{
+
+    from{
+        width:0;
+    }
+
+    to{
+        width:250px;
+    }
+}
+
+@keyframes flagClose{
+
+    from{
+        width:250px;
+    }
+
+    to{
+        width:0;
+    }
+}
+
+.leaderboard.flag-closing .lb-info-red,
+.leaderboard.flag-closing .lb-info-green,
+.leaderboard.flag-closing .lb-info-checkered,
+.leaderboard.flag-closing .lb-info-yellow{
+
+    animation:flagClose .4s ease forwards;
+}
+
+.leaderboard.flag-hidden{
+
+    opacity:0;
 }

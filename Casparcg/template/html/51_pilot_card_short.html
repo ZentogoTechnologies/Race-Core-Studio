@@ -25,19 +25,23 @@
 
         <div class="content-section">
 
-                <div
-                    class="pilot-name"
-                    id="pilotName">
+                <div class="name-row">
 
-                    JIMMY LLIBRE
+                    <div
+                        class="pilot-name"
+                        id="pilotName">
 
-                </div>
+                        JIMMY LLIBRE
 
-                <div
-                    class="car-number"
-                    id="carNumber">
+                    </div>
 
-                    #43
+                    <div
+                        class="car-number"
+                        id="carNumber">
+
+                        #43
+
+                    </div>
 
                 </div>
 
@@ -113,14 +117,6 @@
 
             <div class="photo-section">
 
-                <div
-                    class="background-number"
-                    id="backgroundNumber">
-
-                    43
-
-                </div>
-
                 <img
                     id="pilotPhoto"
                     class="pilot-photo"
@@ -144,9 +140,6 @@ function update(data){
 
         document.getElementById("carNumber").textContent =
             "#" + data.car_number;
-
-        document.getElementById("backgroundNumber").textContent =
-            data.car_number;
     }
 
     if(data.category !== undefined)

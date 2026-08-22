@@ -32,9 +32,9 @@
 
     text-align:right;
 
-    color:#ffcc00;
+    color:#ffffff;
 
-    font-size:18px;
+    font-size: 26px;
 
     font-weight:700;
 
@@ -51,10 +51,22 @@
 
     color:#ffffff;
 
-    font-size:14px;
+    font-size:16px;
 
     font-weight:800;
 
     text-transform:uppercase;
+
+}
+
+
+/* ==========================================================================
+   NUMERO DEL PILOTO
+   Un poco mas chico para dar aire al tiempo
+========================================================================== */
+
+.lb-number{
+
+    font-size:32px;
 
 }

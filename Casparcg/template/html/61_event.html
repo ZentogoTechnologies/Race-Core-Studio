@@ -1,68 +1,90 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<title>Event Intro</title>
-<link rel="stylesheet" href="../css/global.css">
-<link rel="stylesheet" href="../css/event.css">
+
+    <meta charset="UTF-8">
+
+    <title>Event</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/event.css">
 
 </head>
 
 <body>
 
-<div class="overlay" id="overlay">
+    <div
+        class="overlay"
+        id="overlay">
 
-    <div class="logo-box">
-        <img id="logo"
-             src="../img/logoap.png"
-             alt="logo">
-    </div>
+        <!-- PANEL LOGO -->
 
-    <div class="info-panel">
+        <div class="logo-box">
 
-        <div class="event-title"
-             id="title">
-            AUTODROMO PANAMA
+            <img
+                id="logo"
+                src="../img/logoap.png"
+                alt="Autódromo Panamá">
+
         </div>
 
-        <div class="event-subtitle"
-             id="subtitle">
-            #DRAGTIME
+        <!-- PANEL INFORMACIÓN -->
+
+        <div
+            class="info-panel"
+            id="eventPanel">
+
+            <div class="content-section">
+
+                <div
+                    class="event-label"
+                    id="label">
+
+                    EVENTO
+
+                </div>
+
+                <div
+                    class="event-name"
+                    id="eventName">
+
+                    PROSPEC - SERIES
+
+                </div>
+
+            </div>
+
         </div>
 
     </div>
-
-</div>
 
 <script>
 
 function update(data){
 
-    if(data.title !== undefined){
-        document.getElementById("title").textContent =
-            data.title.toUpperCase();
-    }
+    if(data.label !== undefined)
+        document.getElementById("label").textContent =
+            data.label.toUpperCase();
 
-    if(data.subtitle !== undefined){
-        document.getElementById("subtitle").textContent =
-            data.subtitle;
-    }
+    if(data.event !== undefined)
+        document.getElementById("eventName").textContent =
+            data.event.toUpperCase();
 
-    if(data.logo !== undefined){
+    if(data.logo !== undefined)
         document.getElementById("logo").src =
             data.logo;
-    }
 }
 
-function play() {
+function play(){
 
-    const overlay =
+    const widget =
         document.getElementById("overlay");
 
     const panel =
-        overlay.querySelector(".info-panel");
+        document.getElementById("eventPanel");
 
-    overlay.style.animation =
+    widget.style.animation =
         "slideUp .5s ease forwards";
 
     setTimeout(() => {
@@ -73,24 +95,29 @@ function play() {
     },500);
 }
 
-function stop() {
+function stop(){
 
-    const overlay =
+    const widget =
         document.getElementById("overlay");
 
     const panel =
-        overlay.querySelector(".info-panel");
+        document.getElementById("eventPanel");
 
     panel.style.animation =
         "collapsePanel .5s ease forwards";
 
     setTimeout(() => {
 
-        overlay.style.animation =
+        widget.style.animation =
             "slideDown .5s ease forwards";
 
     },500);
 }
+
+window.onload = function(){
+
+    play();
+};
 
 </script>
 

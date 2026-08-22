@@ -26,7 +26,7 @@ CLEAR 1-30
 
 ### 1-40 STARTING_GRID
 CG 1-40 ADD 1 "html/40_starting_grid_names" 1
-CG 1-40 ADD 1 "html/41_starting_grid_short" 1
+CG 1-40 ADD 1 "html/41_starting_grid_foto" 1
 CLEAR 1-40
 
 ### 1-50 PILOT_CARDS
@@ -35,11 +35,10 @@ CG 1-50 ADD 1 "html/51_pilot_card_short" 1
 CLEAR 1-50
 
 ### 1-60 MISCELANEOS
-CG 1-60 ADD 1 "html/10_no_background" 1
-CG 1-60 ADD 1 "html/11_red_background" 1
-CG 1-60 ADD 1 "html/12_blue_background" 1
-CG 1-60 ADD 1 "html/13_yellow_background" 1
-CG 1-60 ADD 1 "html/14_green_background" 1
-CG 1-60 ADD 1 "html/15_cian_background" 1
-CG 1-60 ADD 1 "html/16_magenta_background" 1
+CG 1-60 ADD 1 "html/60_circuit_track" 1
+CG 1-60 ADD 1 "html/61_event" 1
+CG 1-60 ADD 1 "html/62_narrator" 1
+CG 1-60 ADD 1 "html/63_social_media" 1
+CG 1-60 ADD 1 "html/64_track" 1
+CG 1-60 ADD 1 "html/65_weather" 1
 CLEAR 1-60
