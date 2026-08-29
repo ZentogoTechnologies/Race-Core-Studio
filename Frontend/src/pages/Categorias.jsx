@@ -1,8 +1,28 @@
-import { useState, useMemo } from 'react'
-import { Pencil, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Pencil, Trash2, Plus, X, ChevronUp, ChevronDown, ChevronsUpDown, Loader2 } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
+import Pagination from '../components/shared/Pagination'
+import ConfirmDialog from '../components/shared/ConfirmDialog'
+import { categoriasApi } from '../api/registro'
+import { useListado } from '../hooks/useListado'
+import { useToast } from '../context/ToastContext'
+import { useAuth } from '../context/AuthContext'
+import { useDisciplina } from '../context/DisciplinaContext'
 
-const EMPTY_CATEGORY = { nombre: '', restricciones: '', pesoMinimo: '' }
+// Sin category_id: lo asigna el servidor tomando el siguiente libre.
+// Sin discipline: la hereda del selector global, que es el que decide qué
+// se está viendo. Crear aquí una categoría de la otra disciplina solo
+// serviría para que desapareciera de la lista al guardarla.
+const EMPTY_CATEGORY = {
+  category_name: '', description: '', sub_categories: [],
+}
+
+// El id de una subcategoría es a lo que apunta el `sub_category_id` de cada
+// vehículo, así que no se reutiliza ni se edita a mano: cambiarlo dejaría a
+// los carros señalando a otra cosa. Se toma siempre el siguiente libre.
+function siguienteSubId(subs) {
+  return subs.reduce((mayor, s) => Math.max(mayor, s.sub_category_id), 0) + 1
+}
 
 function SortIcon({ columnKey, sortField, sortDirection, onSort }) {
   const isActive = sortField === columnKey
@@ -15,86 +35,200 @@ function SortIcon({ columnKey, sortField, sortDirection, onSort }) {
   )
 }
 
-export default function CategoriasModule({ categorias, setCategorias }) {
-  const [searchText,    setSearchText]    = useState('')
+export default function CategoriasModule() {
+  const toast = useToast()
+  const { puedeEscribir } = useAuth()
+  const { disciplina, etiqueta: etiquetaDisciplina } = useDisciplina()
+
+  const filtros = useMemo(() => ({ discipline: disciplina }), [disciplina])
+  const lista = useListado(categoriasApi, { ordenInicial: 'category_name', filtros })
+
   const [isFormOpen,    setIsFormOpen]    = useState(false)
   const [currentEditId, setCurrentEditId] = useState(null)
   const [categoryForm,  setCategoryForm]  = useState(EMPTY_CATEGORY)
-  const [sortField,     setSortField]     = useState(null)
-  const [sortDirection, setSortDirection] = useState('asc')
+  const [guardando,     setGuardando]     = useState(false)
+  const [porBorrar,     setPorBorrar]     = useState(null)
 
-  const handleSort = (field) => {
-    if (sortField === field) setSortDirection(d => d === 'asc' ? 'desc' : 'asc')
-    else { setSortField(field); setSortDirection('asc') }
-  }
-
-  const openAddForm = () => { setCategoryForm(EMPTY_CATEGORY); setCurrentEditId(null); setIsFormOpen(true) }
-  const openEditForm = (categoria) => { setCategoryForm({ ...categoria }); setCurrentEditId(categoria.id); setIsFormOpen(true) }
-  const closeForm = () => { setIsFormOpen(false); setCurrentEditId(null); setCategoryForm(EMPTY_CATEGORY) }
+  const openAddForm  = () => { setCategoryForm(EMPTY_CATEGORY); setCurrentEditId(null); setIsFormOpen(true) }
+  const closeForm    = () => { setIsFormOpen(false); setCurrentEditId(null); setCategoryForm(EMPTY_CATEGORY) }
   const handleFormToggle = () => isFormOpen ? closeForm() : openAddForm()
 
-  const handleSave = (e) => {
-    e.preventDefault()
-    if (currentEditId) {
-      setCategorias(categorias.map(c => c.id === currentEditId ? { ...categoryForm, id: currentEditId } : c))
-    } else {
-      setCategorias([...categorias, { ...categoryForm, id: Date.now() }])
-    }
-    closeForm()
+  const openEditForm = (categoria) => {
+    setCategoryForm({
+      category_name: categoria.category_name,
+      description: categoria.description || '',
+      sub_categories: categoria.sub_categories || [],
+    })
+    setCurrentEditId(categoria.category_id)
+    setIsFormOpen(true)
   }
 
-  const filteredAndSortedCategories = useMemo(() => {
-    let result = categorias.filter(c =>
-      c.nombre.toLowerCase().includes(searchText.toLowerCase()) ||
-      (c.restricciones || '').toLowerCase().includes(searchText.toLowerCase())
-    )
-    if (sortField) {
-      result = [...result].sort((a, b) => {
-        const valueA = (a[sortField] || '').toString().toLowerCase()
-        const valueB = (b[sortField] || '').toString().toLowerCase()
-        return sortDirection === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA)
-      })
+  const agregarSub = () => {
+    setCategoryForm(f => ({
+      ...f,
+      sub_categories: [
+        ...f.sub_categories,
+        { sub_category_id: siguienteSubId(f.sub_categories), sub_category_name: '' },
+      ],
+    }))
+  }
+
+  const renombrarSub = (id, nombre) => {
+    setCategoryForm(f => ({
+      ...f,
+      sub_categories: f.sub_categories.map(s =>
+        s.sub_category_id === id ? { ...s, sub_category_name: nombre } : s,
+      ),
+    }))
+  }
+
+  const quitarSub = (id) => {
+    setCategoryForm(f => ({
+      ...f,
+      sub_categories: f.sub_categories.filter(s => s.sub_category_id !== id),
+    }))
+  }
+
+  const handleSave = async (e) => {
+    e.preventDefault()
+    setGuardando(true)
+
+    // Una fila en blanco es una que abrieron y no llenaron; se descarta en
+    // vez de guardar una subcategoría sin nombre.
+    const subs = categoryForm.sub_categories
+      .filter(s => s.sub_category_name.trim())
+      .map(s => ({ ...s, sub_category_name: s.sub_category_name.trim() }))
+
+    try {
+      if (currentEditId) {
+        // El category_id no viaja en el update: es la llave por la que se
+        // busca el documento, no un campo editable.
+        // La disciplina no se manda al actualizar: no se cambia desde
+        // aquí, y omitirla deja intacta la que ya tiene el documento.
+        await categoriasApi.actualizar(currentEditId, {
+          category_name: categoryForm.category_name,
+          description: categoryForm.description || null,
+          sub_categories: subs,
+        })
+        toast.exito('Categoría actualizada', categoryForm.category_name)
+      } else {
+        // Sin category_id: lo pone el servidor. Calcularlo en el navegador
+        // haría chocar a dos personas que abran el formulario a la vez.
+        const creada = await categoriasApi.crear({
+          category_name: categoryForm.category_name,
+          discipline: disciplina,
+          description: categoryForm.description || null,
+          sub_categories: subs,
+        })
+        toast.exito('Categoría creada', `${creada.category_name} · ${etiquetaDisciplina}`)
+      }
+      closeForm()
+      lista.recargar()
+    } catch (err) {
+      // El formulario se queda abierto con lo escrito: si el guardado
+      // falló, perder lo cargado sería el peor final posible.
+      toast.error(currentEditId ? 'No se pudo actualizar' : 'No se pudo crear', err.message)
+    } finally {
+      setGuardando(false)
     }
-    return result
-  }, [categorias, searchText, sortField, sortDirection])
+  }
+
+  const confirmarBorrado = async () => {
+    const categoria = porBorrar
+    setPorBorrar(null)
+
+    try {
+      await categoriasApi.eliminar(categoria.category_id)
+      toast.exito('Categoría eliminada', categoria.category_name)
+      lista.recargar()
+    } catch (err) {
+      toast.error('No se pudo eliminar', err.message)
+    }
+  }
 
   return (
     <div className="w-full animate-fade-in">
       <ModuleHeader
         entityName="categorías"
-        searchText={searchText}
-        onSearchChange={setSearchText}
+        searchText={lista.texto}
+        onSearchChange={lista.setTexto}
         isFormOpen={isFormOpen}
         onFormToggle={handleFormToggle}
         addButtonLabel="NUEVA CATEGORÍA"
-        exportData={categorias}
+        puedeCrear={puedeEscribir}
+        exportData={() => categoriasApi.listar({ ...filtros, search: lista.texto || undefined, sort_by: lista.sortBy, sort_dir: lista.sortDir }).then(p => p.items)}
+        onExportError={m => toast.error('No se pudo exportar', m)}
         exportFileName="categorias"
-        exportColumnMap={{ nombre: 'Categoría', restricciones: 'Reglas / Motor', pesoMinimo: 'Peso Mínimo' }}
+        exportColumnMap={{ category_name: 'Categoría', discipline: 'Disciplina', description: 'Descripción' }}
       />
 
       {isFormOpen && (
-        <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre</label>
-            <input required type="text" value={categoryForm.nombre}
-              onChange={e => setCategoryForm({...categoryForm, nombre: e.target.value})}
+            <input required type="text" value={categoryForm.category_name}
+              onChange={e => setCategoryForm({ ...categoryForm, category_name: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Reglas / Motor</label>
-            <input required type="text" value={categoryForm.restricciones}
-              onChange={e => setCategoryForm({...categoryForm, restricciones: e.target.value})}
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">Descripción</label>
+            <input type="text" value={categoryForm.description}
+              onChange={e => setCategoryForm({ ...categoryForm, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
-          <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Peso Mínimo</label>
-            <input required type="text" value={categoryForm.pesoMinimo}
-              onChange={e => setCategoryForm({...categoryForm, pesoMinimo: e.target.value})}
-              className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
+          <div className="col-span-full mt-2">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-neutral-400 text-xs uppercase">
+                Subcategorías ({categoryForm.sub_categories.length})
+              </label>
+              <button
+                type="button" onClick={agregarSub}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 transition-colors text-xs font-bold"
+              >
+                <Plus size={14}/> AGREGAR
+              </button>
+            </div>
+
+            {categoryForm.sub_categories.length === 0 ? (
+              <p className="text-sm text-neutral-600 py-2">
+                Sin subcategorías. Son las divisiones dentro de la categoría (GTS, GTS Jr, V8…) y
+                es lo que se elige después en cada vehículo.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {categoryForm.sub_categories.map(sub => (
+                  <div key={sub.sub_category_id} className="flex items-center gap-2">
+                    {/* El id se muestra pero no se edita: es a lo que apunta
+                        el sub_category_id de cada vehículo. */}
+                    <span className="w-10 text-center text-xs font-mono text-neutral-600 flex-shrink-0">
+                      #{sub.sub_category_id}
+                    </span>
+                    <input
+                      type="text" value={sub.sub_category_name}
+                      placeholder="Nombre de la subcategoría"
+                      onChange={e => renombrarSub(sub.sub_category_id, e.target.value)}
+                      className="flex-1 bg-[#0a0a0a] border border-neutral-800 rounded p-2 text-sm focus:border-red-600 focus:outline-none text-white"
+                    />
+                    <button
+                      type="button" onClick={() => quitarSub(sub.sub_category_id)}
+                      className="p-2 rounded-lg text-neutral-500 hover:text-red-500 hover:bg-red-500/10 transition-colors flex-shrink-0"
+                      aria-label="Quitar subcategoría"
+                    >
+                      <X size={15}/>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+
           <div className="col-span-full flex justify-end gap-3 mt-2">
             <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">CANCELAR</button>
-            <button type="submit" className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 transition-colors">{currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}</button>
+            <button type="submit" disabled={guardando}
+              className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+              {guardando && <Loader2 size={16} className="animate-spin"/>}
+              {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+            </button>
           </div>
         </form>
       )}
@@ -103,29 +237,68 @@ export default function CategoriasModule({ categorias, setCategorias }) {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-neutral-900 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
-              <th className="p-4 font-bold"><span className="flex items-center">Categoría <SortIcon columnKey="nombre" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Especificaciones <SortIcon columnKey="restricciones" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}/></span></th>
-              <th className="p-4 font-bold text-right"><span className="flex items-center justify-end">Peso Req. <SortIcon columnKey="pesoMinimo" sortField={sortField} sortDirection={sortDirection} onSort={handleSort}/></span></th>
-              <th className="p-4 font-bold text-right">Acciones</th>
+              {/* Ni el ID ni la disciplina se muestran: el ID es interno y
+                  la disciplina ya la fija el selector global, así que la
+                  columna repetiría el mismo valor en todas las filas. */}
+              <th className="p-4 font-bold"><span className="flex items-center">Categoría <SortIcon columnKey="category_name" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold">Subcategorías</th>
+              {puedeEscribir && <th className="p-4 font-bold text-right">Acciones</th>}
             </tr>
           </thead>
           <tbody>
-            {filteredAndSortedCategories.length === 0 && (
-              <tr><td colSpan={4} className="p-10 text-center text-neutral-500">No hay categorías registradas.</td></tr>
+            {lista.cargando && (
+              <tr><td colSpan={puedeEscribir ? 3 : 2} className="p-10 text-center">
+                <Loader2 className="w-6 h-6 animate-spin mx-auto text-red-600"/>
+              </td></tr>
             )}
-            {filteredAndSortedCategories.map(categoria => (
-              <tr key={categoria.id} className="border-b border-neutral-800/50 hover:bg-neutral-800/30">
-                <td className="p-4 font-bold text-white italic">{categoria.nombre}</td>
-                <td className="p-4 text-neutral-300 text-sm">{categoria.restricciones}</td>
-                <td className="p-4 text-right text-red-400 font-mono">{categoria.pesoMinimo}</td>
-                <td className="p-4 text-right">
-                  <button onClick={() => openEditForm(categoria)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
+
+            {!lista.cargando && lista.error && (
+              <tr><td colSpan={puedeEscribir ? 3 : 2} className="p-10 text-center text-red-500">{lista.error.message}</td></tr>
+            )}
+
+            {!lista.cargando && !lista.error && lista.items.length === 0 && (
+              <tr><td colSpan={puedeEscribir ? 3 : 2} className="p-10 text-center text-neutral-500">
+                {lista.texto ? `Sin resultados para "${lista.texto}".` : 'No hay categorías registradas.'}
+              </td></tr>
+            )}
+
+            {!lista.cargando && !lista.error && lista.items.map(categoria => (
+              <tr key={categoria.category_id} className="border-b border-neutral-800/50 hover:bg-neutral-800/30">
+                <td className="p-4">
+                  <p className="font-bold text-white italic">{categoria.category_name}</p>
+                  {categoria.description && <p className="text-xs text-neutral-500 mt-0.5">{categoria.description}</p>}
                 </td>
+                <td className="p-4 text-neutral-400 text-sm">
+                  {categoria.sub_categories?.length
+                    ? categoria.sub_categories.map(s => s.sub_category_name).join(', ')
+                    : <span className="text-neutral-600">—</span>}
+                </td>
+                {puedeEscribir && (
+                  <td className="p-4 text-right whitespace-nowrap">
+                    <button onClick={() => openEditForm(categoria)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
+                    <button onClick={() => setPorBorrar(categoria)} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
         </table>
+
+        {!lista.cargando && !lista.error && (
+          <Pagination
+            total={lista.total} skip={lista.skip} limit={lista.limit}
+            onCambiarPagina={lista.setSkip} onCambiarTamano={lista.setLimit}
+          />
+        )}
       </div>
+
+      <ConfirmDialog
+        abierto={Boolean(porBorrar)}
+        titulo="Eliminar categoría"
+        mensaje={porBorrar ? `Se va a eliminar ${porBorrar.category_name}.` : ''}
+        onCancelar={() => setPorBorrar(null)}
+        onConfirmar={confirmarBorrado}
+      />
     </div>
   )
 }

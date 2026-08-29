@@ -1,7 +1,13 @@
-from beanie import Link # <- FALTABA ESTE
+from typing import Optional
+
+from beanie.operators import In
 from src.models.pilots_model import Pilot
 from src.models.categories_model import Category
 from src.schemas.pilots_schemas import PilotCreate, PilotUpdate, PilotResponse
+from src.schemas.common_schemas import Page
+from src.services.pagination import (
+    campo_orden, combinar, direccion, filtro_busqueda,
+)
 from fastapi import HTTPException
 
 class PilotService:
@@ -17,6 +23,7 @@ class PilotService:
             last_name=pilot.last_name,
             nationality=pilot.nationality,
             team_brand=pilot.team_brand,
+            photo=pilot.photo,
             categories=categories_data,
             discipline=pilot.discipline,
             is_active=pilot.is_active
@@ -31,12 +38,12 @@ class PilotService:
         # 2. Buscar las categories y convertirlas a Link
         categories_links = []
         if data.category_ids:
-            categories = await Category.find(Category.category_id.in_(data.category_ids)).to_list()
+            categories = await Category.find(In(Category.category_id, data.category_ids)).to_list()
             if len(categories)!= len(data.category_ids):
                 found_ids = [c.category_id for c in categories]
                 missing = set(data.category_ids) - set(found_ids)
                 raise HTTPException(status_code=404, detail=f"Categorías no encontradas: {missing}")
-            categories_links = [Link(Category, c.id) for c in categories]
+            categories_links = list(categories)  # Beanie los convierte a Link al guardar
 
         pilot = Pilot(
             **data.model_dump(exclude={"category_ids"}),
@@ -45,24 +52,56 @@ class PilotService:
         await pilot.insert()
         return await self._build_response(pilot)
 
-    async def get_all_pilots(self, discipline: str = None, category_id: str = None) -> list[PilotResponse]: # <- str
-        query = {}
-        if discipline:
-            query["discipline"] = discipline
+    # Campos por los que se deja ordenar. La lista es blanca a propósito:
+    # sort_by llega del cliente y termina en el sort de Mongo.
+    ORDENABLES = {"pilot_id", "name", "last_name", "nationality", "team_brand"}
+    BUSCABLES = ["name", "last_name", "nationality", "team_brand"]
 
-        pilots = await Pilot.find(query).to_list()
+    async def get_all_pilots(
+        self,
+        discipline: Optional[str] = None,
+        category_id: Optional[str] = None,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_dir: Optional[str] = None,
+        skip: int = 0,
+        limit: Optional[int] = None,
+    ) -> Page[PilotResponse]:
+        filtros = [
+            {"discipline": discipline} if discipline else None,
+            filtro_busqueda(search, self.BUSCABLES),
+        ]
 
-        # Si filtran por category_id, filtramos en memoria porque categories es Link
+        # El filtro por categoría se resuelve contra el DBRef guardado, no
+        # trayendo todos los pilotos y descartando en memoria: con eso la
+        # paginación tendría que ocurrir después de leer la colección entera.
         if category_id:
-            cat_id_int = int(category_id) # <- convertimos porque en DB es int
-            filtered = []
-            for p in pilots:
-                await p.fetch_all_links()
-                if any(c.category_id == cat_id_int for c in p.categories):
-                    filtered.append(p)
-            pilots = filtered
+            categoria = await Category.find_one(Category.category_id == int(category_id))
+            if not categoria:
+                return Page(items=[], total=0, skip=skip, limit=limit)
+            filtros.append({"categories.$id": categoria.id})
 
-        return [await self._build_response(p) for p in pilots]
+        query = combinar(*filtros)
+
+        total = await Pilot.find(query).count()
+
+        consulta = Pilot.find(query).sort(
+            (campo_orden(sort_by, self.ORDENABLES, "last_name"), direccion(sort_dir))
+        ).skip(skip)
+
+        # limit=None es "tráeme todo": lo usa el panel de gráficos, que
+        # necesita la lista completa para el selector de pilotos.
+        if limit is not None:
+            consulta = consulta.limit(limit)
+
+        pilots = await consulta.to_list()
+
+        return Page(
+            items=[await self._build_response(p) for p in pilots],
+            total=total,
+            skip=skip,
+            limit=limit,
+        )
 
     async def get_pilot_by_id(self, pilot_id: str) -> PilotResponse: # <- str
         pilot = await Pilot.find_one(Pilot.pilot_id == int(pilot_id)) # <- int porque en DB es int
@@ -79,16 +118,21 @@ class PilotService:
 
         # Si vienen category_ids nuevos, los convertimos a Link
         if "category_ids" in update_data:
-            categories = await Category.find(Category.category_id.in_(update_data["category_ids"])).to_list()
+            categories = await Category.find(In(Category.category_id, update_data["category_ids"])).to_list()
             if len(categories)!= len(update_data["category_ids"]):
                 found_ids = [c.category_id for c in categories]
                 missing = set(update_data["category_ids"]) - set(found_ids)
                 raise HTTPException(status_code=404, detail=f"Categorías no encontradas: {missing}")
-            update_data["categories"] = [Link(Category, c.id) for c in categories]
+            update_data["categories"] = list(categories)  # Beanie los convierte a Link
             del update_data["category_ids"]
 
-        await pilot.update({"$set": update_data})
-        await pilot.reload()
+        for campo, valor in update_data.items():
+            setattr(pilot, campo, valor)
+
+        # save() y no update({"$set": ...}): solo al guardar el documento
+        # Beanie convierte los Document en Link. Con $set se incrustaba el
+        # documento completo y la relacion se perdia.
+        await pilot.save()
         return await self._build_response(pilot)
 
     async def delete_pilot(self, pilot_id: str) -> dict: # <- str

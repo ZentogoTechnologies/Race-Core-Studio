@@ -17,6 +17,37 @@
   .animate-fade-in {
     animation: fade-in 0.4s ease-out forwards;
   }
+
+  /* ── Avisos (toasts) ── */
+  /* Entran desde la derecha porque se apilan en esa esquina; venir desde
+     abajo los hace chocar visualmente con el toast que ya estaba. */
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(24px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  .animate-toast-in {
+    animation: toast-in 0.22s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  }
+
+  /* La duración la pone el componente en línea, porque cambia según el
+     tipo de aviso: un error se queda más tiempo que una confirmación. */
+  @keyframes toast-bar {
+    from { width: 100%; }
+    to   { width: 0%; }
+  }
+
+  .animate-toast-bar {
+    animation-name: toast-bar;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
 }
 
 * {

@@ -106,3 +106,53 @@
     text-shadow:
         1px 1px 0 rgba(0,0,0,.5);
 }
+
+/* ==========================================================================
+   ENTRADA Y SALIDA
+
+   CasparCG llama play() al cargar y stop() con CG STOP. Sin esto la
+   plantilla aparecia y desaparecia de golpe.
+   ========================================================================== */
+
+.narrator{
+
+    opacity:0;
+
+    transform:translateX(-50%) translateY(120px);
+}
+
+.narrator.entrando{
+
+    animation:narradorEntra .45s ease forwards;
+}
+
+.narrator.saliendo{
+
+    animation:narradorSale .4s ease forwards;
+}
+
+@keyframes narradorEntra{
+
+    from{
+        opacity:0;
+        transform:translateX(-50%) translateY(120px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes narradorSale{
+
+    from{
+        opacity:1;
+        transform:translateX(-50%) translateY(0);
+    }
+
+    to{
+        opacity:0;
+        transform:translateX(-50%) translateY(120px);
+    }
+}

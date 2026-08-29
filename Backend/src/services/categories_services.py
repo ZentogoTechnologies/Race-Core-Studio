@@ -1,5 +1,12 @@
 from src.models.categories_model import Category, SubCategoryEmbedded
+from src.models.vehicles_model import Vehicle
+from typing import Optional
+
 from src.schemas.categories_schemas import CategoryCreate, CategoryUpdate, CategoryResponse
+from src.schemas.common_schemas import Page
+from src.services.pagination import (
+    campo_orden, combinar, direccion, filtro_busqueda,
+)
 from fastapi import HTTPException
 
 class CategoryService:
@@ -19,13 +26,36 @@ class CategoryService:
             description=category.description
         )
 
+    async def _siguiente_id(self) -> int:
+        """El id más alto que hay, más uno.
+
+        Se calcula aquí y no en el navegador: si dos personas abren el
+        formulario a la vez, las dos verían el mismo número libre y la
+        segunda chocaría al guardar.
+        """
+        ultima = await Category.find_all().sort(("category_id", -1)).limit(1).to_list()
+        return (ultima[0].category_id + 1) if ultima else 1
+
     async def create_category(self, data: CategoryCreate) -> CategoryResponse:
-        exists = await Category.find_one(Category.category_id == data.category_id)
-        if exists:
-            raise HTTPException(status_code=400, detail="category_id ya existe")
+        if data.category_id is None:
+            category_id = await self._siguiente_id()
+        else:
+            category_id = data.category_id
+            exists = await Category.find_one(Category.category_id == category_id)
+            if exists:
+                raise HTTPException(status_code=400, detail="category_id ya existe")
+
+        # Misma regla que en el update: dos subcategorías con el mismo id
+        # dentro de una categoría dejan al vehículo apuntando a cualquiera.
+        ids = [sc.sub_category_id for sc in data.sub_categories]
+        if len(ids) != len(set(ids)):
+            raise HTTPException(
+                status_code=400,
+                detail="Hay sub_category_id repetidos en la categoría",
+            )
 
         category = Category(
-            category_id=data.category_id,
+            category_id=category_id,
             category_name=data.category_name,
             discipline=data.discipline,
             sub_categories=[SubCategoryEmbedded(**sc.model_dump()) for sc in data.sub_categories],
@@ -34,12 +64,40 @@ class CategoryService:
         await category.insert()
         return self._to_response(category)
 
-    async def get_categories(self, discipline: str = None) -> list[CategoryResponse]:
-        query = {}
-        if discipline:
-            query["discipline"] = discipline
-        categories = await Category.find(query).to_list()
-        return [self._to_response(c) for c in categories]
+    ORDENABLES = {"category_id", "category_name", "discipline"}
+    BUSCABLES = ["category_name", "description"]
+
+    async def get_categories(
+        self,
+        discipline: Optional[str] = None,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_dir: Optional[str] = None,
+        skip: int = 0,
+        limit: Optional[int] = None,
+    ) -> Page[CategoryResponse]:
+        query = combinar(
+            {"discipline": discipline} if discipline else None,
+            filtro_busqueda(search, self.BUSCABLES),
+        )
+
+        total = await Category.find(query).count()
+
+        consulta = Category.find(query).sort(
+            (campo_orden(sort_by, self.ORDENABLES, "category_name"), direccion(sort_dir))
+        ).skip(skip)
+
+        if limit is not None:
+            consulta = consulta.limit(limit)
+
+        categories = await consulta.to_list()
+
+        return Page(
+            items=[self._to_response(c) for c in categories],
+            total=total,
+            skip=skip,
+            limit=limit,
+        )
 
     async def get_category_by_id(self, category_id: str) -> CategoryResponse:
         category = await Category.find_one(Category.category_id == int(category_id))
@@ -53,27 +111,57 @@ class CategoryService:
             raise HTTPException(status_code=404, detail="Categoría no encontrada")
 
         update_data = data.model_dump(exclude_unset=True)
-        if "sub_categories" in update_data and update_data["sub_categories"]:
-            update_data["sub_categories"] = [SubCategoryEmbedded(**sc.model_dump()) for sc in update_data["sub_categories"]]
+
+        if "sub_categories" in update_data:
+            subs = update_data["sub_categories"] or []
+
+            # No se vuelven a construir como SubCategoryEmbedded: model_dump()
+            # ya bajó los modelos anidados a diccionarios, y llamar
+            # sc.model_dump() sobre un diccionario reventaba con un 500.
+            # Mongo guarda diccionarios, así que van tal cual.
+
+            # Dos subcategorías con el mismo id dentro de la misma categoría
+            # dejarían al vehículo apuntando a cualquiera de las dos.
+            ids = [sc["sub_category_id"] for sc in subs]
+            if len(ids) != len(set(ids)):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Hay sub_category_id repetidos en la categoría",
+                )
+
+            # Quitar una subcategoría que algún vehículo usa lo deja
+            # apuntando a un id que ya no existe, y al aire la ficha sale
+            # sin subcategoría. Se avisa con cuántos carros están en juego
+            # en vez de romper los datos en silencio.
+            quedan = {sc["sub_category_id"] for sc in subs}
+            eliminadas = [
+                s.sub_category_id
+                for s in category.sub_categories
+                if s.sub_category_id not in quedan
+            ]
+
+            if eliminadas:
+                en_uso = await Vehicle.find({
+                    "category_id": category.category_id,
+                    "sub_category_id": {"$in": eliminadas},
+                }).count()
+
+                if en_uso:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=(
+                            f"No se puede quitar: {en_uso} vehículo(s) usan esa "
+                            "subcategoría. Cámbialos de subcategoría primero."
+                        ),
+                    )
+
+            update_data["sub_categories"] = subs
 
         await category.update({"$set": update_data})
-        await category.reload()
-        return self._to_response(category)
 
-    async def update_category(self, category_id: str, data: CategoryUpdate) -> CategoryResponse:
-        category = await Category.find_one(Category.category_id == int(category_id))
-        if not category:
-            raise HTTPException(status_code=404, detail="Categoría no encontrada")
-
-        update_data = data.model_dump(exclude_unset=True)
-        if "sub_categories" in update_data and update_data["sub_categories"]:
-            update_data["sub_categories"] = [SubCategoryEmbedded(**sc.model_dump()) for sc in update_data["sub_categories"]]
-
-        await category.update({"$set": update_data})
-        
         # Beanie viejo no tiene reload. Hacemos un find de nuevo
         updated_category = await Category.find_one(Category.category_id == int(category_id))
-        return self._to_response(updated_category)    
+        return self._to_response(updated_category)
 
     async def delete_category(self, category_id: str) -> dict:
         category = await Category.find_one(Category.category_id == int(category_id))

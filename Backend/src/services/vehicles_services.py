@@ -1,7 +1,14 @@
+from typing import Optional
+
+from beanie.operators import In
 from src.models.vehicles_model import Vehicle
 from src.models.pilots_model import Pilot
 from src.models.categories_model import Category
 from src.schemas.vehicles_schemas import VehicleCreate, VehicleUpdate, VehicleResponse
+from src.schemas.common_schemas import Page
+from src.services.pagination import (
+    campo_orden, combinar, direccion, filtro_busqueda,
+)
 from fastapi import HTTPException
 
 class VehicleService:
@@ -27,10 +34,12 @@ class VehicleService:
             id=str(vehicle.id),
             vehicle_id=vehicle.vehicle_id,
             number=vehicle.number,
+            display_number=vehicle.display_number or str(vehicle.number),
             brand=vehicle.brand,
             model=vehicle.model,
             color=vehicle.color,
             pilots=pilots_data,
+            active_pilot_id=vehicle.active_pilot_id,
             category_id=vehicle.category_id,
             category_name=cat_name,
             sub_category_id=vehicle.sub_category_id,
@@ -62,26 +71,58 @@ class VehicleService:
                 raise HTTPException(status_code=404, detail=f"Piloto con id {pid} no encontrado")
             pilots_links.append(pilot)
 
-        vehicle = Vehicle(
-            **data.model_dump(exclude={"pilot_ids"}),
-            pilots=pilots_links
-        )
+        campos = data.model_dump(exclude={"pilot_ids"})
+        # Sin dorsal escrito se asume que es el entero. Solo se separa
+        # cuando el carro lleva ceros a la izquierda ('044' != '44').
+        if not campos.get("display_number"):
+            campos["display_number"] = str(campos["number"])
+
+        vehicle = Vehicle(**campos, pilots=pilots_links)
         await vehicle.insert()
         return await self._build_response(vehicle)
 
-    async def get_all_vehicles(self, discipline: str = None, category_id: str = None) -> list[VehicleResponse]: # <- str
-        categories = []
-        if discipline:
-            categories = await Category.find(Category.discipline == discipline).to_list()
-            category_ids = [c.category_id for c in categories]
-            vehicles = await Vehicle.find(Vehicle.category_id.in_(category_ids)).to_list()
-        else:
-            query = {}
-            if category_id:
-                query["category_id"] = int(category_id) # <- convertimos porque en DB es int
-            vehicles = await Vehicle.find(query).to_list()
+    ORDENABLES = {"vehicle_id", "number", "brand", "model", "category_id"}
+    BUSCABLES = ["brand", "model", "display_number", "color"]
 
-        return [await self._build_response(v) for v in vehicles]
+    async def get_all_vehicles(
+        self,
+        discipline: Optional[str] = None,
+        category_id: Optional[str] = None,
+        search: Optional[str] = None,
+        sort_by: Optional[str] = None,
+        sort_dir: Optional[str] = None,
+        skip: int = 0,
+        limit: Optional[int] = None,
+    ) -> Page[VehicleResponse]:
+        filtros = [filtro_busqueda(search, self.BUSCABLES)]
+
+        # La disciplina vive en la categoría, no en el vehículo: primero se
+        # resuelven las categorías de esa disciplina y se filtra por sus ids.
+        if discipline:
+            categorias = await Category.find(Category.discipline == discipline).to_list()
+            filtros.append({"category_id": {"$in": [c.category_id for c in categorias]}})
+        elif category_id:
+            filtros.append({"category_id": int(category_id)})
+
+        query = combinar(*filtros)
+
+        total = await Vehicle.find(query).count()
+
+        consulta = Vehicle.find(query).sort(
+            (campo_orden(sort_by, self.ORDENABLES, "number"), direccion(sort_dir))
+        ).skip(skip)
+
+        if limit is not None:
+            consulta = consulta.limit(limit)
+
+        vehicles = await consulta.to_list()
+
+        return Page(
+            items=[await self._build_response(v) for v in vehicles],
+            total=total,
+            skip=skip,
+            limit=limit,
+        )
 
     async def get_vehicle_by_id(self, vehicle_id: str) -> VehicleResponse: # <- str
         vehicle = await Vehicle.find_one(Vehicle.vehicle_id == int(vehicle_id)) # <- int
@@ -121,8 +162,13 @@ class VehicleService:
                 if not sub_exists:
                     raise HTTPException(status_code=400, detail=f"sub_category_id {sub_id} no pertenece a category {cat_id}")
 
-        await vehicle.update({"$set": update_data})
-        await vehicle.reload()
+        for campo, valor in update_data.items():
+            setattr(vehicle, campo, valor)
+
+        # save() y no update({"$set": ...}): solo al guardar el documento
+        # Beanie convierte los Document en Link. Con $set se incrustaba el
+        # documento completo y la relacion se perdia.
+        await vehicle.save()
         return await self._build_response(vehicle)
 
     async def delete_vehicle(self, vehicle_id: str) -> dict: # <- FALTABA ESTE MÉTODO

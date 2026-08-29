@@ -1,21 +1,32 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional
 from src.services.categories_services import CategoryService
 from src.schemas.categories_schemas import CategoryCreate, CategoryUpdate, CategoryResponse
+from src.schemas.common_schemas import Page
+from src.services.auth_services import puede_escribir
 
 categories = APIRouter()
 service = CategoryService()
 
-@categories.get("/", tags=["Categories"], response_model=list[CategoryResponse])
+@categories.get("/", tags=["Categories"], response_model=Page[CategoryResponse])
 async def get_categories(
-    discipline: Optional[str] = Query(None, description="Filter by discipline: circuit o drag")
+    discipline: Optional[str] = Query(None, description="Filter by discipline: circuit o drag"),
+    search: Optional[str] = Query(None, description="Búsqueda parcial, sin distinguir mayúsculas"),
+    sort_by: Optional[str] = Query(None, description="Campo por el que ordenar"),
+    sort_dir: Optional[str] = Query("asc", description="asc o desc"),
+    skip: int = Query(0, ge=0, description="Cuántos registros saltar"),
+    limit: Optional[int] = Query(None, ge=1, le=200, description="Tamaño de página. Sin valor devuelve todo"),
 ):
     """
-    Obtiene todas las categorías. Puedes filtrar por disciplina
+    Obtiene las categorías paginadas. Puedes filtrar por disciplina o texto.
+    Ordena por: category_id, category_name, discipline
     """
-    return await service.get_categories(discipline=discipline)
+    return await service.get_categories(
+        discipline=discipline, search=search,
+        sort_by=sort_by, sort_dir=sort_dir, skip=skip, limit=limit,
+    )
 
-@categories.post("/", tags=["Categories"], response_model=CategoryResponse, status_code=201)
+@categories.post("/", tags=["Categories"], response_model=CategoryResponse, status_code=201, dependencies=[Depends(puede_escribir)])
 async def create_category(data: CategoryCreate):
     """
     Crea una nueva categoría con sus subcategorías
@@ -32,7 +43,7 @@ async def get_category_by_id(category_id: str):
         raise HTTPException(status_code=404, detail="Category Not Found!")
     return category
 
-@categories.put("/{category_id}", tags=["Categories"], response_model=CategoryResponse)
+@categories.put("/{category_id}", tags=["Categories"], response_model=CategoryResponse, dependencies=[Depends(puede_escribir)])
 async def update_category(category_id: str, data: CategoryUpdate):
     """
     Actualiza una categoría
@@ -42,7 +53,7 @@ async def update_category(category_id: str, data: CategoryUpdate):
         raise HTTPException(status_code=404, detail="Category Not Found!")
     return category
 
-@categories.delete("/{category_id}", tags=["Categories"])
+@categories.delete("/{category_id}", tags=["Categories"], dependencies=[Depends(puede_escribir)])
 async def delete_category(category_id: str):
     """
     Elimina una categoría

@@ -7,7 +7,12 @@
 .lb-info-red,
 .lb-info-green,
 .lb-info-checkered,
-.lb-info-yellow{
+.lb-info-yellow,
+.lb-info-blue,
+.lb-info-black,
+.lb-info-meatball,
+.lb-info-slippery,
+.lb-info-white{
 
     /* Ancho fijo: se anima de 0 al ancho final */
 
@@ -37,7 +42,12 @@
 .lb-info-red::before,
 .lb-info-green::before,
 .lb-info-checkered::before,
-.lb-info-yellow::before{
+.lb-info-yellow::before,
+.lb-info-blue::before,
+.lb-info-black::before,
+.lb-info-meatball::before,
+.lb-info-slippery::before,
+.lb-info-white::before{
 
     display:none;
 }
@@ -58,6 +68,51 @@
     background:#e8be03;
 }
 
+.lb-info-white{
+    background:#FFFFFF;
+}
+
+.lb-info-blue{
+    background:#0B4FA2;
+}
+
+.lb-info-black{
+    background:#0A0A0A;
+}
+
+/* Negra con circulo naranja. Al aire, con el disco centrado, el texto le
+   cruza por encima y la palabra se lee como una mancha; corrido a la
+   izquierda funciona como el marcador que es, y el texto respira. */
+
+.lb-info-meatball{
+
+    background:
+        radial-gradient(circle at 46px 50%,
+            #FF6B00 0 24px,
+            transparent 24px),
+        #0A0A0A;
+}
+
+/* El texto se aparta del disco. El ancho total no cambia: global.css pone
+   box-sizing:border-box, asi que el padding se come de los 262px y la
+   bandera sigue midiendo lo mismo que las otras nueve. */
+
+.lb-info-meatball .lb-heat.flag{
+
+    padding-left:56px;
+}
+
+/* Pista resbaladiza: franjas diagonales amarillas y rojas. */
+
+.lb-info-slippery{
+
+    background:repeating-linear-gradient(
+        45deg,
+        #e8be03 0 22px,
+        #D50000 22px 44px);
+}
+
+
 .lb-info-checkered{
 
   background:
@@ -74,8 +129,9 @@
 
 .lb-heat.flag{
 
-    width:250px;
-    min-width:250px;
+    /* 170 del logo + 350 = 520, el mismo ancho que el totem. */
+    width:262px;
+    min-width:262px;
     height:100%;
 
     display:flex;
@@ -93,20 +149,20 @@
 
     color:#FFFFFF;
 
-    font-size:10px;
+    font-size:8px;
 
     font-weight:700;
 
     letter-spacing:2px;
 
-    margin-bottom:8px;
+    margin-bottom:6px;
 }
 
 .lb-heat.flag .status-value{
 
     color:#FFFFFF;
 
-    font-size:25px;
+    font-size:19px;
 
     font-weight:900;
 
@@ -149,14 +205,14 @@
     }
 
     to{
-        width:250px;
+        width:262px;
     }
 }
 
 @keyframes flagClose{
 
     from{
-        width:250px;
+        width:262px;
     }
 
     to{
@@ -167,7 +223,12 @@
 .leaderboard.flag-closing .lb-info-red,
 .leaderboard.flag-closing .lb-info-green,
 .leaderboard.flag-closing .lb-info-checkered,
-.leaderboard.flag-closing .lb-info-yellow{
+.leaderboard.flag-closing .lb-info-yellow,
+.leaderboard.flag-closing .lb-info-blue,
+.leaderboard.flag-closing .lb-info-black,
+.leaderboard.flag-closing .lb-info-meatball,
+.leaderboard.flag-closing .lb-info-slippery,
+.leaderboard.flag-closing .lb-info-white{
 
     animation:flagClose .4s ease forwards;
 }
@@ -175,4 +236,41 @@
 .leaderboard.flag-hidden{
 
     opacity:0;
+}
+
+/* ===================================
+   BANDERA BLANCA
+   ===================================
+   Unico panel claro: sobre blanco el texto blanco no existe, y el halo
+   oscuro que traen los totems para sostener el texto sobre el video aqui
+   solo ensucia.
+=================================== */
+
+.lb-info-white .lb-heat.flag .status-title,
+.lb-info-white .lb-heat.flag .status-value{
+
+    color:#000000;
+
+    text-shadow:none;
+}
+
+/* ===================================
+   PISTA RESBALADIZA
+   ===================================
+   El amarillo es tan claro como el blanco: el texto blanco desaparece
+   sobre las franjas. Mismo tratamiento que la bandera blanca.
+=================================== */
+
+.lb-info-slippery .lb-heat.flag .status-title,
+.lb-info-slippery .lb-heat.flag .status-value{
+
+    color:#000000;
+
+    /* Sobre el amarillo el negro se lee solo, pero sobre las franjas rojas
+       se apaga. El halo claro lo despega del fondo sin meter una placa
+       encima, que taparia justo el dibujo que identifica a la bandera. */
+    text-shadow:
+        0 0 5px rgba(255,255,255,.95),
+        0 0 10px rgba(255,255,255,.8),
+        0 0 16px rgba(255,255,255,.6);
 }

@@ -42,6 +42,13 @@
         <div class="lb-info">
 
 
+            <!-- GRUPO / CATEGORIA -->
+            <div
+                class="lb-group"
+                id="groupName">
+                PROSPEC SERIES
+            </div>
+
             <div
                 class="lb-heat"
                 id="heatName">
@@ -53,9 +60,7 @@
 
             <div class="lb-timer">
 
-                <span>
-                    TIME
-                </span>
+                <span id="timerLabel">TIME</span>
 
                 <span id="raceTimer">
                     00:01:51
@@ -86,6 +91,7 @@
 
 
 
+<script src="../js/timing.js"></script>
 <script>
 
 
@@ -93,221 +99,185 @@
    DATOS DE PRUEBA
 ========================================================================== */
 
-const standings = [
+/* ==========================================================================
+   TOTEM AL LIDER
 
-    {
-        pos: 1,
-        name: "D.CAR",
-        number: "570",
-        interval: "LEADER"
-    },
+   Misma tabla que el totem corto, con la columna de tiempo fija:
+   la diferencia de cada piloto contra el primero.
+   Los datos llegan del backend, que ya cruzo el numero de carro contra la
+   base para sacar el nombre bien escrito.
+========================================================================== */
 
-    {
-        pos: 2,
-        name: "L.RAM",
-        number: "33",
-        interval: "+0.842"
-    },
+const container = document.getElementById("leaderboardBody");
 
-    {
-        pos: 3,
-        name: "A.RAM",
-        number: "69",
-        interval: "+1.214"
-    },
+const LIMITE = 10;
 
-    {
-        pos: 4,
-        name: "J.CAR",
-        number: "42",
-        interval: "+2.531"
-    },
+/* "leader" = contra el primero, "interval" = contra el de adelante. */
+const COLUMNA = "leader";
 
-    {
-        pos: 5,
-        name: "M.SOL",
-        number: "16",
-        interval: "+3.004"
-    },
+const ETIQUETA = "LEADER";
 
-    {
-        pos: 6,
-        name: "M.BAR",
-        number: "12",
-        interval: "+4.120"
-    },
+let firmaAnterior = null;
 
-    {
-        pos: 7,
-        name: "G.ORT",
-        number: "51",
-        interval: "+5.287"
-    },
 
-    {
-        pos: 8,
-        name: "S.GUE",
-        number: "24",
-        interval: "+6.031"
-    },
+function textoTiempo(piloto, indice){
 
-    {
-        pos: 9,
-        name: "L.FRO",
-        number: "41",
-        interval: "+7.245"
-    },
+    /* El primero no tiene contra quien medirse. */
+    if (indice === 0) return ETIQUETA;
 
-    {
-        pos: 10,
-        name: "G.ALE",
-        number: "48",
-        interval: "+8.421"
+    return piloto[COLUMNA] || "";
+}
+
+
+function pintarFilas(standings){
+
+    /* Antes de arrancar la tanda no hay clasificacion: se deja solo la
+       cabecera en vez de una tabla vacia o las posiciones anteriores. */
+
+    if (standings.length === 0) {
+        container.innerHTML = "";
+        firmaAnterior = null;
+        return;
     }
 
-];
+    /* El bucle corre dos veces por segundo: rehacer el DOM cada vez hace
+       parpadear el totem. Solo se reconstruye si cambio el orden. */
 
-
-
-/* ==========================================================================
-   ELEMENTOS
-========================================================================== */
-
-const container =
-    document.getElementById(
-        "leaderboardBody"
-    );
-
-
-
-/* ==========================================================================
-   CREAR LEADERBOARD
-========================================================================== */
-
-function createLeaderboard(){
-
+    const firma = timingFirma(standings, ["position", "short_name", "number"]);
+    if (firma === firmaAnterior) {
+        actualizarTiempos(standings);
+        return;
+    }
+    firmaAnterior = firma;
 
     container.innerHTML = "";
 
+    standings.forEach((piloto, index) => {
 
-    standings.forEach((driver, index) => {
+        const row = document.createElement("div");
 
-
-        const row =
-            document.createElement("div");
-
-
-        /*
-         * El líder recibe la clase "leader".
-         */
-
-        row.className =
-            index === 0
-                ? "lb-row leader"
-                : "lb-row";
-
+        row.className = index === 0 ? "lb-row leader" : "lb-row";
 
         row.innerHTML = `
 
-            <div class="lb-pos pos-${driver.pos}">
-                ${driver.pos}
+            <div class="lb-pos pos-${piloto.position}">
+                ${piloto.position}
             </div>
-
 
             <div class="lb-separator"></div>
 
-
             <div class="lb-name">
-                ${driver.name}
+                ${piloto.short_name}
             </div>
-
 
             <div class="lb-number">
-                ${driver.number}
+                ${piloto.number}
             </div>
 
-
             <div class="lb-interval">
-                ${driver.interval}
+                ${textoTiempo(piloto, index)}
             </div>
 
         `;
 
-
         container.appendChild(row);
-
     });
-
 }
 
 
+/* Solo el texto: los tiempos cambian a cada vuelta y no hace falta
+   reconstruir las filas para eso. */
+
+function actualizarTiempos(standings){
+
+    const celdas = container.querySelectorAll(".lb-interval");
+
+    standings.forEach((piloto, index) => {
+        if (celdas[index]) celdas[index].textContent = textoTiempo(piloto, index);
+    });
+}
+
+
+function pintarCabecera(datos){
+
+    const grupo = document.getElementById("groupName");
+    if (grupo) grupo.textContent = datos.group_name || datos.group || "";
+
+    const heat = document.getElementById("heatName");
+    if (heat) heat.textContent = datos.heat || "";
+
+    /* La etiqueta cambia con el modo: TIME en cuenta atras, LAP cuando
+       se cuentan vueltas. */
+
+    const etiqueta = document.getElementById("timerLabel");
+    if (etiqueta) etiqueta.textContent = datos.time_label || "TIME";
+
+    const timer = document.getElementById("raceTimer");
+    if (timer) timer.textContent = datos.time || "";
+}
+
+
+function pintar(datos){
+    pintarCabecera(datos);
+    pintarFilas(datos.standings || []);
+}
+
 
 /* ==========================================================================
-   PLAY
+   PLAY / STOP
 ========================================================================== */
 
 function play(){
 
-    const widget =
-        document.getElementById(
-            "leaderboard"
-        );
+    const widget = document.getElementById("leaderboard");
 
-
-    widget.style.animation =
-        "slideUp .5s ease forwards";
-
+    widget.style.animation = "slideUp .5s ease forwards";
 
     setTimeout(() => {
-
-        widget.style.animation =
-            "expandPanel .6s ease forwards";
-
+        widget.style.animation = "expandPanel .6s ease forwards";
     },500);
 
+    arrancarTiming({ limite: LIMITE, alRecibir: pintar });
 }
 
-
-
-/* ==========================================================================
-   STOP
-========================================================================== */
 
 function stop(){
 
-    const widget =
-        document.getElementById(
-            "leaderboard"
-        );
+    detenerTiming();
 
+    const widget = document.getElementById("leaderboard");
 
-    widget.style.animation =
-        "collapsePanel .5s ease forwards";
-
+    widget.style.animation = "collapsePanel .5s ease forwards";
 
     setTimeout(() => {
-
-        widget.style.animation =
-            "slideDown .5s ease forwards";
-
+        widget.style.animation = "slideDown .5s ease forwards";
     },500);
-
 }
 
 
-
 /* ==========================================================================
-   CARGAR
+   UPDATE
 ========================================================================== */
 
-window.onload = function(){
+function update(data){
 
-    createLeaderboard();
+    if (typeof data === "string") {
+        try { data = JSON.parse(data); }
+        catch (e) { return; }
+    }
 
-    play();
+    if (!data) return;
 
-};
+    if (data.api !== undefined) configurarTiming(data.api);
 
+    if (data.logo !== undefined) {
+        const logo = document.getElementById("logo");
+        if (logo) logo.src = data.logo;
+    }
+}
+
+
+window.onload = play;
 </script>
 
 

@@ -22,3 +22,13 @@ venv/
 # OS
 .DS_Store
 desktop.ini
+
+# Configuración local: lleva la firma de los JWT
+Backend/.env
+
+# Material de trabajo, no forma parte del sistema
+Backend/src/public/_zips/
+Backend/src/public/_fotos-evento-anterior/
+
+# Capturas del comando PRINT de CasparCG
+Casparcg/media/*.png

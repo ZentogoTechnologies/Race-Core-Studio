@@ -16,6 +16,10 @@
 
             opacity: 0;
 
+            transition:
+                opacity .5s ease,
+                transform .5s ease;
+
             display: flex;
             align-items: stretch;
             border-radius: 10px;
@@ -60,6 +64,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, .7);
             border-radius: 0px 10px 10px 0px;
             transform: translateX(-100%);
+            transition: transform .6s ease .15s;
             z-index: 1;
         }
 

@@ -6,7 +6,10 @@ class SubCategoryEmbedded(BaseModel): # mismo nombre que en el model
     sub_category_name: str
 
 class CategoryCreate(BaseModel):
-    category_id: int
+    # Opcional: si no viene, el servicio toma el siguiente libre. El
+    # frontend ya no lo manda; se deja aceptar por si algún script carga
+    # categorías con ids fijos.
+    category_id: Optional[int] = None
     category_name: str
     discipline: str # "circuito" o "drag"
     sub_categories: List[SubCategoryEmbedded] = []

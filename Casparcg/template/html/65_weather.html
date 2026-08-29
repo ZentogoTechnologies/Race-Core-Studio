@@ -147,6 +147,15 @@
 <script>
 
 function update(data){
+    /* CasparCG 2.5 entrega el payload del CG ADD/UPDATE como texto JSON,
+       no como objeto. Sin este parseo data.<campo> siempre era undefined
+       y la plantilla se quedaba con sus valores por defecto. */
+
+    if (typeof data === "string") {
+        try { data = JSON.parse(data); }
+        catch (e) { return; }
+    }
+
 
     if(data.temperature !== undefined)
         document.getElementById("temperature").textContent =

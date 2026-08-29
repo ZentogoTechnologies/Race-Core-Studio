@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Comentarista</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/narrator.css">
+</head>
+
+<body>
+
+    <div class="narrator" id="narrator">
+
+        <!-- LOGO -->
+        <div class="narrator-logo">
+            <img
+                id="logo"
+                src="../img/logoap.png"
+                alt="Logo"
+            >
+        </div>
+
+        <!-- INFORMACIÓN -->
+        <div class="narrator-info">
+
+            <!-- NOMBRE -->
+            <div
+                class="narrator-name"
+                id="name">
+                COMENTARISTA
+            </div>
+
+            <!-- TEXTO -->
+            <div
+                class="narrator-text"
+                id="text">
+                Bienvenidos a la carrera.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        function update(data) {
+    /* CasparCG 2.5 entrega el payload del CG ADD/UPDATE como texto JSON,
+       no como objeto. Sin este parseo data.<campo> siempre era undefined
+       y la plantilla se quedaba con sus valores por defecto. */
+
+    if (typeof data === "string") {
+        try { data = JSON.parse(data); }
+        catch (e) { return; }
+    }
+
+
+            if (data.name !== undefined) {
+                document.getElementById("name").textContent =
+                    data.name.toUpperCase();
+            }
+
+            if (data.text !== undefined) {
+                document.getElementById("text").textContent =
+                    data.text;
+            }
+
+            if (data.logo !== undefined) {
+                document.getElementById("logo").src =
+                    data.logo;
+            }
+
+        }
+
+    
+
+        /* ==================================================================
+           PLAY / STOP
+           CasparCG las llama al cargar (play-on-load) y con CG STOP.
+        ================================================================== */
+
+        function play() {
+            const el = document.getElementById("narrator");
+            el.classList.remove("saliendo");
+            el.classList.add("entrando");
+        }
+
+        function stop() {
+            const el = document.getElementById("narrator");
+            el.classList.remove("entrando");
+            el.classList.add("saliendo");
+        }
+
+        window.onload = play;
+</script>
+
+</body>
+
+</html>

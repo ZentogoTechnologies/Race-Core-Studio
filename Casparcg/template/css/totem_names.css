@@ -1,6 +1,47 @@
 @charset "UTF-8";
 
 /* ===================================
+   TRANSPARENCIA
+   ===================================
+   El totem se monta encima del video de carrera. La mezcla la hace el
+   mixer de CasparCG entre capas, no el navegador: por eso aca no sirve
+   backdrop-filter (el CEF no ve lo que hay en la capa de abajo) y todo
+   se resuelve con alfa.
+
+   Subir el ultimo numero de cada rgba = mas solido, menos pista.
+=================================== */
+
+:root{
+
+    --fondo-panel:    rgba(3,5,7,.55);
+
+    --fondo-header:   rgba(0,0,0,.66);
+
+    /* El logo va mas solido: es el unico elemento que no es texto y se
+       ensucia rapido contra el asfalto. */
+    --fondo-logo-1:   rgba(7,11,17,.85);
+    --fondo-logo-2:   rgba(17,21,28,.85);
+
+    --fondo-info-1:   rgba(0,0,0,.58);
+    --fondo-info-2:   rgba(6,6,6,.58);
+    --fondo-info-3:   rgba(22,0,0,.58);
+
+    --fondo-fila-1:   rgba(18,22,30,.60);
+    --fondo-fila-2:   rgba(0,0,0,.60);
+
+    /* El lider manda: se deja casi opaco para que el dorado no se lave. */
+    --fondo-lider-1:  rgba(53,36,0,.88);
+    --fondo-lider-2:  rgba(201,149,0,.88);
+    --fondo-lider-3:  rgba(220,164,0,.88);
+
+    --velo-fondo:     .45;
+
+    /* Contra un carro blanco o el cielo el texto se pierde: el halo lo
+       sostiene sin tener que subir el fondo. */
+    --sombra-texto:   0 2px 4px rgba(0,0,0,.9), 0 0 2px rgba(0,0,0,.85);
+}
+
+/* ===================================
    PANEL
 =================================== */
 
@@ -12,7 +53,7 @@
 
     border-radius:10px;
 
-    background:#030507;
+    background:var(--fondo-panel);
 
     box-shadow:
         0 10px 25px rgba(0,0,0,.35);
@@ -28,7 +69,7 @@
 
     display:flex;
 
-    background:#000;
+    background:var(--fondo-header);
 }
 
 /* ===================================
@@ -46,8 +87,8 @@
     background:
         linear-gradient(
             180deg,
-            #070b11,
-            #11151c
+            var(--fondo-logo-1),
+            var(--fondo-logo-2)
         );
 
     border-right:1px solid rgba(255,255,255,.08);
@@ -92,9 +133,9 @@
     background:
         linear-gradient(
             135deg,
-            #000000,
-            #060606 50%,
-            #160000 100%
+            var(--fondo-info-1),
+            var(--fondo-info-2) 50%,
+            var(--fondo-info-3) 100%
         );
 
     position:relative;
@@ -116,7 +157,7 @@
 
     background:url("../img/fondo.jpg") center center / cover no-repeat;
     margin-left: 70px;
-    opacity:.9;
+    opacity:var(--velo-fondo);
 }
 
 /* ===================================
@@ -188,10 +229,11 @@
     display:grid;
 
     grid-template-columns:
-        80px
-        20px
+        60px
+        15px
         1fr
-        80px;
+        60px
+        75px;
 
     align-items:center;
 
@@ -201,8 +243,8 @@
     background:
         linear-gradient(
             90deg,
-            rgba(18,22,30,.95),
-            rgba(0,0,0,.95)
+            var(--fondo-fila-1),
+            var(--fondo-fila-2)
         );
 }
 
@@ -215,9 +257,9 @@
     background:
         linear-gradient(
             90deg,
-            #352400,
-            #c99500,
-            #dca400
+            var(--fondo-lider-1),
+            var(--fondo-lider-2),
+            var(--fondo-lider-3)
         );
 }
 
@@ -344,8 +386,10 @@
    PANEL
 =================================== */
 
+/* Los cuatro totems miden lo mismo: al pasar de nombres a corto o a
+   intervalos solo cambia la informacion, el panel no se mueve. */
 .leaderboard{
-    width:420px;
+    width:390px;
 }
 
 /* ===================================
@@ -353,7 +397,7 @@
 =================================== */
 
 .lb-header{
-    height:100px;
+    height:90px;
 }
 
 /* ===================================
@@ -361,15 +405,15 @@
 =================================== */
 
 .lb-logo{
-    width:170px;
+    width:128px;
 }
 
 .lb-logo::before{
-    width:7px;
+    width:5px;
 }
 
 .lb-logo img{
-    width:100px;
+    width:75px;
 }
 
 /* ===================================
@@ -377,7 +421,7 @@
 =================================== */
 
 .lb-info{
-    padding:20px 25px;
+    padding:15px 19px;
 }
 
 /* ===================================
@@ -385,7 +429,7 @@
 =================================== */
 
 .lb-heat{
-    font-size:30px;
+    font-size:22px;
     letter-spacing:1px;
 }
 
@@ -394,16 +438,16 @@
 =================================== */
 
 .lb-timer{
-    margin-top:6px;
+    margin-top:4px;
     gap:12px;
 }
 
 .lb-timer span:first-child{
-    font-size:22px;
+    font-size:16px;
 }
 
 .lb-timer span:last-child{
-    font-size:28px;
+    font-size:21px;
     letter-spacing:1px;
 }
 
@@ -413,13 +457,14 @@
 
 .lb-row{
 
-    height:75px;
+    height:56px;
 
     grid-template-columns:
-        80px
-        20px
+        60px
+        15px
         1fr
-        80px;
+        60px
+        75px;
 }
 
 /* ===================================
@@ -427,7 +472,7 @@
 =================================== */
 
 .lb-pos{
-    font-size:38px;
+    font-size:28px;
 }
 
 /* ===================================
@@ -436,7 +481,7 @@
 
 .lb-separator{
     width:2px;
-    height:45px;
+    height:34px;
 }
 
 /* ===================================
@@ -444,8 +489,8 @@
 =================================== */
 
 .lb-name{
-    padding-left:12px;
-    font-size:22px;
+    padding-left:9px;
+    font-size:17px;
 }
 
 /* ===================================
@@ -453,5 +498,69 @@
 =================================== */
 
 .lb-number{
-    font-size:38px;
+    font-size:28px;
+}
+
+/* ===================================
+   GRUPO
+
+   El nombre de la categoria, encima del HEAT. Va mas discreto que el
+   heat para que la jerarquia se lea de un vistazo.
+=================================== */
+
+.lb-group{
+
+    /* .lb-info es flex column: sin esto el div se encoge a 7px
+       y el texto se sale por arriba del header. */
+    flex-shrink:0;
+
+    position:relative;
+
+    z-index:2;
+
+    margin-bottom:4px;
+
+    font-family:"Rajdhani","Arial",sans-serif;
+    font-size:12px;
+    font-weight:600;
+
+    letter-spacing:1.5px;
+    line-height:1;
+
+    text-transform:uppercase;
+
+    color:#bdbdbd;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* ===================================
+   LEGIBILIDAD SOBRE EL VIDEO
+   ===================================
+   Va al final para que gane sobre los bloques de arriba. Sin esto el
+   texto blanco desaparece cuando por detras pasa un carro claro o el
+   cielo, que es justo cuando el fondo transparente se nota mas.
+=================================== */
+
+.lb-group,
+.lb-heat,
+.lb-timer span,
+.lb-pos,
+.lb-name,
+.lb-number,
+.lb-interval{
+
+    text-shadow:var(--sombra-texto);
+}
+
+/* La fila del lider ya va casi opaca y en dorado claro: ahi el halo
+   negro ensucia en vez de ayudar. */
+.lb-row.leader .lb-pos,
+.lb-row.leader .lb-name,
+.lb-row.leader .lb-number,
+.lb-row.leader .lb-interval{
+
+    text-shadow:0 1px 2px rgba(0,0,0,.45);
 }

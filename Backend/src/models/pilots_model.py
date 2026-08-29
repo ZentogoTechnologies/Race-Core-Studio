@@ -8,6 +8,7 @@ class Pilot(Document):
     last_name: str
     nationality: Optional[str] = None
     team_brand: Optional[str] = None # "Zentogo Racing" - para mostrar en grilla/fichas
+    photo: Optional[str] = None # ruta relativa dentro de public/, ej "pilotos/prospec-series/1.png"
     categories: List[Link[Category]] = []
     discipline: List[str] = [] # ["circuito", "drag"]
     is_active: bool = True

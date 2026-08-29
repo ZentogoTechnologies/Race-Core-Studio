@@ -1,4 +1,5 @@
-import { Search, Plus, X, Download } from 'lucide-react'
+import { useState } from 'react'
+import { Search, Plus, X, Download, Loader2 } from 'lucide-react'
 import { exportToJSON } from '../../utils/exportJSON'
 
 export default function ModuleHeader({
@@ -8,16 +9,35 @@ export default function ModuleHeader({
   isFormOpen,
   onFormToggle,
   addButtonLabel,
+  // El rol estándar no crea registros. Esconder el botón es cortesía: el
+  // backend responde 403 igual si alguien llama la ruta a mano.
+  puedeCrear = true,
+  // Array, o función que devuelve una promesa con las filas. Los listados
+  // paginados pasan una función: si pasaran su página, el archivo saldría
+  // con los 25 registros a la vista en vez de con todos los que hay.
   exportData,
   exportFileName,
   exportColumnMap,
+  onExportError,
 }) {
-  const handleExport = () => {
-    if (!exportData || exportData.length === 0) {
-      alert('No hay datos para exportar.')
-      return
+  const [exportando, setExportando] = useState(false)
+
+  const handleExport = async () => {
+    setExportando(true)
+    try {
+      const filas = typeof exportData === 'function' ? await exportData() : exportData
+
+      if (!filas || filas.length === 0) {
+        onExportError?.('No hay datos para exportar')
+        return
+      }
+
+      exportToJSON(filas, exportFileName, exportColumnMap)
+    } catch (err) {
+      onExportError?.(err.message)
+    } finally {
+      setExportando(false)
     }
-    exportToJSON(exportData, exportFileName, exportColumnMap)
   }
 
   return (
@@ -36,18 +56,21 @@ export default function ModuleHeader({
       <div className="flex gap-3 w-full sm:w-auto">
         <button
           onClick={handleExport}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 transition-colors font-bold text-sm whitespace-nowrap"
+          disabled={exportando}
+          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold text-sm whitespace-nowrap"
         >
-          <Download size={18} />
+          {exportando ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
           EXPORTAR
         </button>
-        <button
-          onClick={onFormToggle}
-          className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors whitespace-nowrap"
-        >
-          {isFormOpen ? <X size={20} /> : <Plus size={20} />}
-          {isFormOpen ? 'CANCELAR' : addButtonLabel}
-        </button>
+        {puedeCrear && (
+          <button
+            onClick={onFormToggle}
+            className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors whitespace-nowrap"
+          >
+            {isFormOpen ? <X size={20} /> : <Plus size={20} />}
+            {isFormOpen ? 'CANCELAR' : addButtonLabel}
+          </button>
+        )}
       </div>
     </div>
   )

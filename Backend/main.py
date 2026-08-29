@@ -1,7 +1,9 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from contextlib import asynccontextmanager
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 from beanie import init_beanie
 from config import settings
 from docs import tags_metadata
@@ -10,23 +12,36 @@ from docs import tags_metadata
 from src.models.categories_model import Category
 from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
+from src.models.users_model import User
 
 # Routes
 from src.routes.categories_routes import categories
 from src.routes.pilots_routes import pilots
 from src.routes.vehicles_routes import vehicles
 from src.routes.graphics_routes import graphics
+from src.routes.timing_routes import timing
+from src.routes.users_routes import users
+from src.routes.login_routes import login
+
+# Auth
+from src.services.auth_services import usuario_actual
+
+# CasparCG
+from src.services.casparcg_client import casparcg
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    client = AsyncIOMotorClient(settings.MONGO_URI)
+    client = AsyncMongoClient(settings.MONGO_URI)
     await init_beanie(
         database=client[settings.DB_NAME],
-        document_models=[Category, Pilot, Vehicle]
+        document_models=[Category, Pilot, Vehicle, User]
     )
     print("✅ Conectado a MongoDB")
     yield
-    client.close()
+    await client.close()
+    # La conexión con CasparCG se abre sola al primer comando; aquí solo
+    # se cierra para no dejar el socket colgando al apagar el servidor.
+    await casparcg.close()
 
 app = FastAPI(
     title="Race Core Studio",
@@ -44,7 +59,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(categories, prefix="/api/v1/categories", tags=["Categories"])
-app.include_router(pilots, prefix="/api/v1/pilots", tags=["Pilots"])
-app.include_router(vehicles, prefix="/api/v1/vehicles", tags=["Vehicles"])
-app.include_router(graphics, prefix="/api/v1/graphics", tags=["Graphics"])
+# Fotos de pilotos y logos de marcas. CasparCG los carga por HTTP desde
+# aquí, así que el backend debe estar corriendo para que se vean al aire.
+app.mount(
+    "/public",
+    StaticFiles(directory=Path(__file__).parent / "src" / "public"),
+    name="public",
+)
+
+# Todo lo que toca la base o manda al aire exige un JWT válido. La
+# dependencia se declara aquí y no dentro de cada router para que la
+# política de acceso se lea de un vistazo en un solo lugar.
+PROTEGIDO = [Depends(usuario_actual)]
+
+app.include_router(login, prefix="/api/v1/auth", tags=["Auth"])
+app.include_router(users, prefix="/api/v1/users", tags=["Users"])
+
+app.include_router(categories, prefix="/api/v1/categories", tags=["Categories"], dependencies=PROTEGIDO)
+app.include_router(pilots, prefix="/api/v1/pilots", tags=["Pilots"], dependencies=PROTEGIDO)
+app.include_router(vehicles, prefix="/api/v1/vehicles", tags=["Vehicles"], dependencies=PROTEGIDO)
+app.include_router(graphics, prefix="/api/v1/graphics", tags=["Graphics"], dependencies=PROTEGIDO)
+
+# Timing se protege por ruta, no en bloque: la única abierta es
+# GET /timing/current, que es lo que consultan las plantillas de CasparCG
+# desde file:// sin poder mandar cabeceras. La excepción se declara en
+# timing_routes.py, al lado de las rutas. Lo mismo aplica a /public, que
+# sirve las fotos con <img>, y un <img> tampoco manda Authorization.
+app.include_router(timing, prefix="/api/v1/timing", tags=["Timing"])
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host=settings.API_HOST, port=settings.API_PORT, reload=True)

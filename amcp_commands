@@ -22,6 +22,11 @@ CG 1-30 ADD 1 "html/31_yellow_flag" 1
 CG 1-30 ADD 1 "html/32_safety_car_flag" 1
 CG 1-30 ADD 1 "html/33_red_flag" 1
 CG 1-30 ADD 1 "html/34_finish_flag" 1
+CG 1-30 ADD 1 "html/35_white_flag" 1
+CG 1-30 ADD 1 "html/36_blue_flag" 1
+CG 1-30 ADD 1 "html/37_black_flag" 1
+CG 1-30 ADD 1 "html/38_meatball_flag" 1
+CG 1-30 ADD 1 "html/39_slippery_flag" 1
 CLEAR 1-30
 
 ### 1-40 STARTING_GRID
@@ -41,4 +46,5 @@ CG 1-60 ADD 1 "html/62_narrator" 1
 CG 1-60 ADD 1 "html/63_social_media" 1
 CG 1-60 ADD 1 "html/64_track" 1
 CG 1-60 ADD 1 "html/65_weather" 1
+CG 1-60 ADD 1 "html/66_comentarist" 1
 CLEAR 1-60

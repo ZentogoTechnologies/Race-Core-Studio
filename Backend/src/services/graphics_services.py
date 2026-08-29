@@ -1,0 +1,343 @@
+"""
+Catálogo de plantillas y traducción a comandos AMCP.
+
+El frontend nunca manda comandos crudos: manda el id del gráfico y este
+servicio decide el canal, la capa y la ruta de la plantilla. Así el mapa
+de capas vive en un solo lugar.
+"""
+
+import json
+import unicodedata
+from dataclasses import dataclass
+from pathlib import Path
+
+from fastapi import HTTPException
+
+from config import settings
+from src.models.categories_model import Category
+from src.models.pilots_model import Pilot
+from src.models.vehicles_model import Vehicle
+from src.services.casparcg_client import casparcg
+
+
+# ── Catálogo ──────────────────────────────────────────────────
+
+@dataclass(frozen=True)
+class Template:
+    graphic_id: str      # el mismo id que usan los botones del frontend
+    name: str
+    group: str           # background | totem | flag | grid | pilot | misc
+    layer: int           # capa AMCP dentro del canal
+    path: str            # ruta de la plantilla en el template-path de CasparCG
+    accepts_data: bool = False
+
+
+# Cada grupo ocupa su propia capa: los fondos viven detrás y los gráficos
+# encima, así se puede cambiar uno sin tocar el otro.
+LAYERS = {
+    "background": 10,
+    "totem": 20,
+    "flag": 30,
+    "grid": 40,
+    "pilot": 50,
+    "misc": 60,
+}
+
+
+TEMPLATES: dict[str, Template] = {
+    t.graphic_id: t
+    for t in [
+        # ── Fondos (capa 10) ──────────────────────────────────
+        Template("bg-none",    "Sin Fondo",      "background", 10, "html/10_no_background"),
+        Template("bg-red",     "Fondo Rojo",     "background", 10, "html/11_red_background"),
+        Template("bg-blue",    "Fondo Azul",     "background", 10, "html/12_blue_background"),
+        Template("bg-yellow",  "Fondo Amarillo", "background", 10, "html/13_yellow_background"),
+        Template("bg-green",   "Fondo Verde",    "background", 10, "html/14_green_background"),
+        Template("bg-cyan",    "Fondo Cian",     "background", 10, "html/15_cian_background"),
+        Template("bg-magenta", "Fondo Magenta",  "background", 10, "html/16_magenta_background"),
+
+        # ── Tótems (capa 20) ──────────────────────────────────
+        Template("totem-completo",  "Tótem Nombre Completo", "totem", 20, "html/20_totem_fullname",  accepts_data=True),
+        Template("totem-corto",     "Tótem Nombre Corto",    "totem", 20, "html/21_totem_shortname", accepts_data=True),
+        Template("totem-lider",     "Tótem al Líder",        "totem", 20, "html/22_totem_leader",    accepts_data=True),
+        Template("totem-intervalo", "Tótem Intervalo",       "totem", 20, "html/23_totem_interval",  accepts_data=True),
+
+        # ── Banderas (capa 30) ────────────────────────────────
+        Template("bandera-verde",    "Bandera Verde",      "flag", 30, "html/30_green_flag"),
+        Template("bandera-amarilla", "Bandera Amarilla",   "flag", 30, "html/31_yellow_flag"),
+        Template("safety-car",       "Safety Car",         "flag", 30, "html/32_safety_car_flag"),
+        Template("bandera-roja",     "Bandera Roja",       "flag", 30, "html/33_red_flag"),
+        Template("bandera-cuadros",  "Bandera de Cuadros", "flag", 30, "html/34_finish_flag"),
+        Template("bandera-blanca",   "Bandera Blanca",     "flag", 30, "html/35_white_flag"),
+        Template("bandera-azul",     "Bandera Azul",       "flag", 30, "html/36_blue_flag"),
+        Template("bandera-negra",    "Bandera Negra",      "flag", 30, "html/37_black_flag"),
+        Template("bandera-mecanica", "Problema Mecánico",  "flag", 30, "html/38_meatball_flag"),
+        Template("pista-resbaladiza","Pista Resbaladiza",  "flag", 30, "html/39_slippery_flag"),
+
+        # ── Grilla de partida (capa 40) ───────────────────────
+        Template("grilla",      "Grilla de Partida",   "grid", 40, "html/40_starting_grid_names", accepts_data=True),
+        Template("grilla-fotos", "Grilla con Fotos",    "grid", 40, "html/41_starting_grid_foto",  accepts_data=True),
+
+        # ── Fichas de piloto (capa 50) ────────────────────────
+        Template("ficha-completa", "Ficha Completa", "pilot", 50, "html/50_pilot_card_complete", accepts_data=True),
+        Template("ficha-corta",    "Ficha Corta",    "pilot", 50, "html/51_pilot_card_short",    accepts_data=True),
+
+        # ── Misceláneos (capa 60) ─────────────────────────────
+        Template("circuito", "Circuito",       "misc", 60, "html/60_circuit_track", accepts_data=True),
+        Template("evento",   "Evento",         "misc", 60, "html/61_event",         accepts_data=True),
+        Template("narrador", "Narrador",       "misc", 60, "html/62_narrator",      accepts_data=True),
+        Template("redes",    "Redes Sociales", "misc", 60, "html/63_social_media",  accepts_data=True),
+        Template("pista",    "Pista",          "misc", 60, "html/64_track",         accepts_data=True),
+        Template("clima",       "Clima",        "misc", 60, "html/65_weather",      accepts_data=True),
+        Template("comentarista", "Comentarista", "misc", 60, "html/66_comentarist", accepts_data=True),
+    ]
+}
+
+
+# ── Escapado AMCP ─────────────────────────────────────────────
+
+def quote(value: str) -> str:
+    """
+    Envuelve un valor entre comillas escapando lo que AMCP interpreta.
+
+    El orden importa: primero las barras invertidas, si no se escaparían
+    también las que agrega el escape de las comillas.
+    """
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def serialize_data(data: dict) -> str:
+    """
+    Convierte el diccionario en el literal que CasparCG le pasará a la
+    función update() de la plantilla.
+
+    ensure_ascii deja los acentos escapados como secuencias unicode, así
+    el comando viaja en ASCII puro y no depende de la codificación del
+    socket; el navegador los reconstruye al evaluar el literal.
+    """
+    return json.dumps(data, ensure_ascii=True, separators=(",", ":"))
+
+
+# ── Fotos de pilotos y logos de marcas ────────────────────────
+
+PUBLIC_DIR = Path(__file__).resolve().parents[2] / "src" / "public"
+
+# Formatos que CEF (el navegador de CasparCG) sabe pintar.
+EXTENSIONES = (".png", ".jpg", ".jpeg", ".webp", ".avif")
+
+
+def _slug(value: str) -> str:
+    """'Mini Cooper' -> 'mini-cooper'. Sin acentos, para nombrar archivos."""
+    limpio = unicodedata.normalize("NFD", value.strip().lower())
+    limpio = "".join(c for c in limpio if unicodedata.category(c) != "Mn")
+    return "-".join(limpio.replace("_", " ").replace("-", " ").split())
+
+
+def _url(ruta: Path) -> str:
+    """
+    URL absoluta del archivo, con la fecha de modificación como versión.
+
+    Sin eso CEF se queda con la imagen cacheada y no se vería el cambio
+    al reemplazar una foto sin reiniciar CasparCG.
+    """
+    relativa = ruta.relative_to(PUBLIC_DIR).as_posix()
+    return f"{settings.PUBLIC_BASE_URL}/public/{relativa}?v={int(ruta.stat().st_mtime)}"
+
+
+def _buscar(carpeta: Path, nombre: str) -> Path | None:
+    for ext in EXTENSIONES:
+        candidato = carpeta / f"{nombre}{ext}"
+        if candidato.is_file():
+            return candidato
+    return None
+
+
+def pilot_photo_url(pilot_id: int, photo: str | None = None) -> str:
+    """
+    Foto del piloto.
+
+    Manda el campo `photo` del piloto si lo tiene: es una ruta dentro de
+    public/ y permite cualquier nombre de archivo. Si está vacío se busca
+    <pilot_id>.<ext> en cualquier subcarpeta de pilotos/, así la
+    organización por categorías es libre.
+    """
+    if photo:
+        archivo = PUBLIC_DIR / photo.lstrip("/")
+        if archivo.is_file():
+            return _url(archivo)
+
+    raiz = PUBLIC_DIR / "pilotos"
+    if raiz.is_dir():
+        for carpeta in [raiz, *(d for d in raiz.iterdir() if d.is_dir())]:
+            hallado = _buscar(carpeta, str(pilot_id))
+            if hallado:
+                return _url(hallado)
+
+    # Transparente: mejor un hueco vacío que la foto del piloto anterior.
+    reserva = _buscar(raiz, "_sin-foto")
+    return _url(reserva) if reserva else ""
+
+
+def brand_logo_url(brand: str | None) -> str:
+    """
+    Logo de la marca, tolerante con el nombre del archivo.
+
+    Se compara el slug del archivo contra el de la marca, así da igual
+    si el archivo se llama "mini cooper.jpg", "Mini-Cooper.PNG" o
+    "mini_cooper.webp": todos resuelven a mini-cooper.
+    """
+    raiz = PUBLIC_DIR / "marcas"
+
+    if brand and raiz.is_dir():
+        buscado = _slug(brand)
+        for archivo in sorted(raiz.iterdir()):
+            if not archivo.is_file() or archivo.suffix.lower() not in EXTENSIONES:
+                continue
+            if _slug(archivo.stem) == buscado:
+                return _url(archivo)
+
+    reserva = _buscar(raiz, "_sin-logo")
+    return _url(reserva) if reserva else ""
+
+
+# ── Datos de un piloto para las plantillas ────────────────────
+
+# Cada plantilla nombra sus campos a su manera, asi que se arma el
+# payload segun el destino. La logica vive aqui, en el backend, no en
+# el frontend: el boton solo manda el pilot_id.
+
+async def build_pilot_payload(graphic_id: str, pilot_id: int) -> dict:
+    pilot = await Pilot.find_one(Pilot.pilot_id == pilot_id)
+    if pilot is None:
+        raise HTTPException(status_code=404, detail=f"Piloto {pilot_id} no encontrado")
+
+    # El vehiculo guarda la relacion, asi que se busca por el DBRef.
+    vehicle = await Vehicle.find_one({"pilots.$id": pilot.id})
+
+    category = None
+    if vehicle is not None:
+        category = await Category.find_one(Category.category_id == vehicle.category_id)
+
+    nombre = " ".join(x for x in (pilot.name, pilot.last_name) if x)
+
+    numero = str(vehicle.number) if vehicle else ""
+    carro = " ".join(x for x in ((vehicle.brand if vehicle else None),
+                                 (vehicle.model if vehicle else None)) if x)
+
+    # Si la categoria tiene subcategorias se muestra la del vehiculo.
+    categoria = category.category_name if category else ""
+    if category and vehicle and vehicle.sub_category_id:
+        sub = next((sc for sc in category.sub_categories
+                    if sc.sub_category_id == vehicle.sub_category_id), None)
+        if sub:
+            categoria = sub.sub_category_name
+
+    # Siempre se mandan foto y logo, aunque sea el transparente: si se
+    # omitieran, update() dejaría los del gráfico anterior en pantalla.
+    foto = pilot_photo_url(pilot.pilot_id, pilot.photo)
+    logo = brand_logo_url(vehicle.brand if vehicle else None)
+
+    if graphic_id == "ficha-corta":
+        return {
+            "pilot_name": nombre,
+            "car_number": numero,
+            "category": categoria,
+            "vehicle": carro,
+            "team": pilot.team_brand or "",
+            "country": pilot.nationality or "",
+            "pilot_photo": foto,
+            "brand_logo": logo,
+        }
+
+    if graphic_id == "ficha-completa":
+        return {
+            "pilot_name": nombre,
+            "car_number": numero,
+            "category": categoria,
+            "car_brand": carro,
+            "team_name": pilot.team_brand or "",
+            "country": pilot.nationality or "",
+            "pilot_photo": foto,
+            "brand_logo": logo,
+        }
+
+    raise HTTPException(
+        status_code=400,
+        detail=f"La plantilla '{graphic_id}' no se alimenta con un pilot_id",
+    )
+
+
+# ── Servicio ──────────────────────────────────────────────────
+
+class GraphicsService:
+    def __init__(self):
+        self.channel = settings.CASPARCG_CHANNEL
+        # Qué gráfico quedó al aire en cada capa: {layer: graphic_id}
+        self._on_air: dict[int, str] = {}
+
+    # ── Consultas ─────────────────────────────────────────────
+
+    def get_template(self, graphic_id: str) -> Template | None:
+        return TEMPLATES.get(graphic_id)
+
+    def list_templates(self, group: str | None = None) -> list[Template]:
+        items = list(TEMPLATES.values())
+        if group:
+            items = [t for t in items if t.group == group]
+        return sorted(items, key=lambda t: (t.layer, t.path))
+
+    def on_air(self) -> dict[str, str]:
+        """Lo que está al aire, indexado por grupo, para que lo lea el frontend."""
+        return {
+            TEMPLATES[gid].group: gid
+            for gid in self._on_air.values()
+            if gid in TEMPLATES
+        }
+
+    def _target(self, layer: int) -> str:
+        return f"{self.channel}-{layer}"
+
+    # ── Comandos ──────────────────────────────────────────────
+
+    async def play(self, template: Template, data: dict | None = None) -> dict:
+        """
+        CG <canal>-<capa> ADD 1 "<plantilla>" 1 ["<datos>"]
+
+        El último 1 es play-on-load: CasparCG llama a play() apenas carga
+        la plantilla, que es como están escritas todas las nuestras.
+        """
+        command = f"CG {self._target(template.layer)} ADD 1 {quote(template.path)} 1"
+
+        if data:
+            command += f" {quote(serialize_data(data))}"
+
+        result = await casparcg.send(command)
+
+        # Una capa solo sostiene un gráfico: el nuevo reemplaza al anterior.
+        self._on_air[template.layer] = template.graphic_id
+
+        return result
+
+    async def update(self, template: Template, data: dict) -> dict:
+        """CG <canal>-<capa> UPDATE 1 "<datos>" — refresca sin recargar."""
+        command = (
+            f"CG {self._target(template.layer)} UPDATE 1 "
+            f"{quote(serialize_data(data))}"
+        )
+        return await casparcg.send(command)
+
+    async def clear_layer(self, layer: int) -> dict:
+        """CLEAR <canal>-<capa> — saca de aire todo lo que haya en esa capa."""
+        result = await casparcg.send(f"CLEAR {self._target(layer)}")
+        self._on_air.pop(layer, None)
+        return result
+
+    async def clear_all(self) -> dict:
+        """CLEAR <canal> — vacía el canal completo."""
+        result = await casparcg.send(f"CLEAR {self.channel}")
+        self._on_air.clear()
+        return result
+
+
+service = GraphicsService()

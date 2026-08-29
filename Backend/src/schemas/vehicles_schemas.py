@@ -4,6 +4,7 @@ from typing import Optional, List
 class VehicleCreate(BaseModel):
     vehicle_id: int
     number: int
+    display_number: Optional[str] = None
     brand: Optional[str] = None
     model: Optional[str] = None
     color: Optional[str] = None
@@ -20,6 +21,7 @@ class VehicleCreate(BaseModel):
 
 class VehicleUpdate(BaseModel):
     number: Optional[int] = None
+    display_number: Optional[str] = None
     brand: Optional[str] = None
     model: Optional[str] = None
     color: Optional[str] = None
@@ -31,11 +33,13 @@ class VehicleResponse(BaseModel):
     id: str = Field(alias="_id")
     vehicle_id: int
     number: int
+    display_number: Optional[str] = None
     brand: Optional[str] = None
     model: Optional[str] = None
     color: Optional[str] = None
 
     pilots: List[dict] = [] # [{"pilot_id": 1, "name": "Juan", "team_brand": "Zentogo"}]
+    active_pilot_id: Optional[int] = None
     category_id: int
     category_name: Optional[str] = None
     sub_category_id: Optional[int] = None

@@ -1,58 +1,51 @@
 import { useState } from 'react'
-import { Menu, X, Home, Users, Car, LogOut, Calendar, Tag, BarChart3 } from 'lucide-react'
-import NavItem        from '../components/layout/NavItem'
-import HomeModule     from '../pages/Home'
-import EventosModule  from '../pages/Eventos'
-import CategoriasModule from '../pages/Categorias'
-import PilotosModule  from '../pages/Pilotos'
-import VehiculosModule from '../pages/Vehiculos'
-import GraficosModule from '../pages/Graficos'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Menu, X, Home, Users, Car, LogOut, Calendar, Tag, BarChart3,
+  Shield, Flag, Zap, Repeat,
+} from 'lucide-react'
+import NavItem from '../components/layout/NavItem'
+import { useAuth } from '../context/AuthContext'
+import { useDisciplina } from '../context/DisciplinaContext'
 
-export default function MainLayout({ onLogout }) {
+// Una sola tabla para el sidebar, el título de la cabecera y las rutas:
+// antes eran tres listas separadas que había que acordarse de tocar juntas.
+// `roles` limita quién ve la entrada; sin `roles`, la ve cualquiera.
+const MODULOS = [
+  { to: '/',           icon: <Home />,      label: 'Inicio',     titulo: 'Panel Principal' },
+  { to: '/eventos',    icon: <Calendar />,  label: 'Eventos',    titulo: 'Gestión de Eventos',    separar: true },
+  { to: '/categorias', icon: <Tag />,       label: 'Categorías', titulo: 'Gestión de Categorías' },
+  { to: '/pilotos',    icon: <Users />,     label: 'Pilotos',    titulo: 'Directorio de Pilotos' },
+  { to: '/vehiculos',  icon: <Car />,       label: 'Vehículos',  titulo: 'Directorio de Vehículos' },
+  { to: '/graficos',   icon: <BarChart3 />, label: 'Gráficos',   titulo: 'Gráficos' },
+  { to: '/usuarios',   icon: <Shield />,    label: 'Usuarios',   titulo: 'Gestión de Usuarios',
+    separar: true, roles: ['owner'] },
+]
+
+const ROTULO_ROL = { owner: 'DUEÑO', admin: 'ADMIN', standard: 'ESTÁNDAR' }
+const ICONO_DISCIPLINA = { circuito: Flag, drag: Zap }
+
+export default function MainLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [activeModule,  setActiveModule]  = useState('home')
+  const { usuario, rol, cerrarSesion } = useAuth()
+  const { disciplina, etiqueta: etiquetaDisciplina, limpiar: cambiarDisciplina } = useDisciplina()
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
 
-  // ── Estado global vacío al iniciar ──
-  const [pilotos,    setPilotos]    = useState([])
-  const [vehiculos,  setVehiculos]  = useState([])
-  const [categorias, setCategorias] = useState([])
-  const [eventos,    setEventos]    = useState([])
+  const visibles = MODULOS.filter(m => !m.roles || m.roles.includes(rol))
+  const IconoDisciplina = ICONO_DISCIPLINA[disciplina] || Flag
 
-  const renderModule = () => {
-    switch (activeModule) {
-      case 'home':
-        return (
-          <HomeModule
-            stats={{ p: pilotos.length, v: vehiculos.length, c: categorias.length, e: eventos.length }}
-            allData={{ eventos, categorias, pilotos, vehiculos }}
-          />
-        )
-      case 'eventos':
-        return <EventosModule eventos={eventos} setEventos={setEventos} />
-      case 'categorias':
-        return <CategoriasModule categorias={categorias} setCategorias={setCategorias} />
-      case 'pilotos':
-        return <PilotosModule pilotos={pilotos} setPilotos={setPilotos} />
-      case 'vehiculos':
-        return (
-          <VehiculosModule
-            vehiculos={vehiculos}   setVehiculos={setVehiculos}
-            categorias={categorias}
-            pilotos={pilotos}
-          />
-        )
-      case 'graficos':
-        return <GraficosModule />
-      default:
-        return <HomeModule stats={{ p: 0, v: 0, c: 0, e: 0 }} allData={{ eventos, categorias, pilotos, vehiculos }} />
-    }
+  // Pilotos, vehículos y categorías ya no viven aquí: cada módulo los
+  // pide al backend con su propia paginación. Solo eventos sigue en
+  // memoria, porque su CRUD del servidor está sin construir.
+  const [eventos, setEventos] = useState([])
+
+  const salir = () => {
+    cerrarSesion()
+    navigate('/login', { replace: true })
   }
 
-  const headerTitles = {
-    home: 'Panel Principal', eventos: 'Gestión de Eventos',
-    categorias: 'Gestión de Categorías', pilotos: 'Directorio de Pilotos',
-    vehiculos: 'Directorio de Vehículos', graficos: 'Gráficos',
-  }
+  const titulo = MODULOS.find(m => m.to === pathname)?.titulo || 'Panel Principal'
 
   return (
     <div className="flex h-screen bg-[#0a0a0a] text-white font-sans overflow-hidden">
@@ -67,17 +60,50 @@ export default function MainLayout({ onLogout }) {
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
+
+        {/* Disciplina activa. Filtra categorías, pilotos y vehículos, así
+            que tiene que verse siempre: si no, no hay forma de saber por
+            qué una tabla salió vacía. */}
+        <button
+          onClick={cambiarDisciplina}
+          title="Cambiar de disciplina"
+          className={`mx-3 mt-4 flex items-center gap-2 rounded-lg border border-neutral-800 hover:border-red-600/60 bg-[#0a0a0a] transition-colors group ${isSidebarOpen ? 'px-3 py-2.5' : 'p-2.5 justify-center'}`}
+        >
+          <IconoDisciplina size={16} className="text-red-500 flex-shrink-0" />
+          {isSidebarOpen && (
+            <>
+              <span className="flex-1 text-left">
+                <span className="block text-[10px] uppercase tracking-wider text-neutral-500">Disciplina</span>
+                <span className="block text-sm font-bold text-neutral-200">{etiquetaDisciplina}</span>
+              </span>
+              <Repeat size={14} className="text-neutral-600 group-hover:text-red-500 transition-colors" />
+            </>
+          )}
+        </button>
+
         <nav className="flex-1 py-6 flex flex-col gap-2 px-3 overflow-y-auto">
-          <NavItem icon={<Home />}     label="Inicio"     isActive={activeModule === 'home'}       onClick={() => setActiveModule('home')}       isOpen={isSidebarOpen} />
-          <div className="my-2 border-t border-neutral-800" />
-          <NavItem icon={<Calendar />} label="Eventos"    isActive={activeModule === 'eventos'}    onClick={() => setActiveModule('eventos')}    isOpen={isSidebarOpen} />
-          <NavItem icon={<Tag />}      label="Categorías" isActive={activeModule === 'categorias'} onClick={() => setActiveModule('categorias')} isOpen={isSidebarOpen} />
-          <NavItem icon={<Users />}    label="Pilotos"    isActive={activeModule === 'pilotos'}    onClick={() => setActiveModule('pilotos')}    isOpen={isSidebarOpen} />
-          <NavItem icon={<Car />}      label="Vehículos"  isActive={activeModule === 'vehiculos'}  onClick={() => setActiveModule('vehiculos')}  isOpen={isSidebarOpen} />
-          <NavItem icon={<BarChart3 />} label="Gráficos"  isActive={activeModule === 'graficos'}   onClick={() => setActiveModule('graficos')}   isOpen={isSidebarOpen} />
+          {visibles.map(m => (
+            <div key={m.to}>
+              {m.separar && <div className="my-2 border-t border-neutral-800" />}
+              {/* NavLink resuelve solo cuál está activo y, al ser un <a>,
+                  deja abrir un módulo en otra pestaña con clic derecho. */}
+              <NavLink to={m.to} end={m.to === '/'}>
+                {({ isActive }) => (
+                  <NavItem icon={m.icon} label={m.label} isActive={isActive} isOpen={isSidebarOpen} />
+                )}
+              </NavLink>
+            </div>
+          ))}
         </nav>
+
         <div className="p-4 border-t border-neutral-800">
-          <button onClick={onLogout} className={`w-full flex items-center ${isSidebarOpen ? 'justify-start px-4' : 'justify-center'} py-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors gap-3`}>
+          {isSidebarOpen && usuario && (
+            <div className="mb-3 px-1">
+              <p className="text-sm font-semibold text-neutral-200 truncate">{usuario.username}</p>
+              <p className="text-[11px] uppercase tracking-wider text-neutral-500">{ROTULO_ROL[usuario.role] || usuario.role}</p>
+            </div>
+          )}
+          <button onClick={salir} className={`w-full flex items-center ${isSidebarOpen ? 'justify-start px-4' : 'justify-center'} py-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors gap-3`}>
             <LogOut size={18} />
             {isSidebarOpen && <span className="font-semibold text-sm">Cerrar Sesión</span>}
           </button>
@@ -87,9 +113,11 @@ export default function MainLayout({ onLogout }) {
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-2 bg-red-600 rounded-bl-3xl opacity-80 z-0" />
         <header className="h-16 border-b border-neutral-800/50 flex items-center px-8 z-10 bg-[#0a0a0a]/80 backdrop-blur-sm">
-          <h2 className="text-xl font-bold uppercase tracking-wider text-neutral-200">{headerTitles[activeModule]}</h2>
+          <h2 className="text-xl font-bold uppercase tracking-wider text-neutral-200">{titulo}</h2>
         </header>
-        <div className="flex-1 overflow-auto p-8 z-10">{renderModule()}</div>
+        <div className="flex-1 overflow-auto p-8 z-10">
+          <Outlet context={{ eventos, setEventos }} />
+        </div>
       </main>
     </div>
   )

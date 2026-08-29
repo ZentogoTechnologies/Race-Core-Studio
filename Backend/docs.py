@@ -22,7 +22,15 @@ tags_metadata = [
         "description": "Gestión del CRUD completo de los usuarios del sistema.",
     },
     {
-        "name": "Login",
-        "description": "Manejo del acceso al sistema.",
+        "name": "Auth",
+        "description": "Inicio de sesión y validación del token. Devuelve el JWT que exige el resto del API.",
+    },
+    {
+        "name": "Timing",
+        "description": "Clasificación en vivo leída del current.xml de MyLaps, cruzada con los pilotos de la base.",
+    },
+    {
+        "name": "Graphics",
+        "description": "Envío de gráficos al servidor CasparCG por AMCP: sacar al aire, actualizar datos y limpiar capas.",
     }
 ]

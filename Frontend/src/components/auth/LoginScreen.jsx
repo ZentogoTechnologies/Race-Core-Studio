@@ -1,17 +1,44 @@
 import { useState } from 'react'
-import { User, Shield } from 'lucide-react'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { User, Shield, Loader2 } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
-export default function LoginScreen({ onLogin }) {
+export default function LoginScreen() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [enviando, setEnviando] = useState(false)
 
-  const handleLogin = (e) => {
+  const { autenticado, cargando, iniciarSesion } = useAuth()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Volver al login con sesión abierta no debe pedir credenciales otra vez.
+  // Se espera a que termine de validarse el token guardado: si no, esto
+  // deja pasar al login a alguien que sí tenía sesión.
+  if (!cargando && autenticado) {
+    return <Navigate to={location.state?.desde || '/'} replace />
+  }
+
+  const handleLogin = async (e) => {
     e.preventDefault()
-    if (username === 'admin' && password === 'admin') {
-      onLogin()
-    } else {
-      setError('Credenciales incorrectas. Usa admin / admin')
+    setError('')
+    setEnviando(true)
+
+    try {
+      await iniciarSesion(username, password)
+      // Si la guarda lo mandó aquí, se vuelve a donde iba.
+      navigate(location.state?.desde || '/', { replace: true })
+    } catch (err) {
+      // El backend distingue credenciales malas (401) de no poder
+      // contactarlo (0), y son dos problemas muy distintos para el operador.
+      setError(
+        err.status === 0
+          ? 'No se pudo contactar al backend. ¿Está corriendo en el 8080?'
+          : err.message,
+      )
+    } finally {
+      setEnviando(false)
     }
   }
 
@@ -42,6 +69,8 @@ export default function LoginScreen({ onLogin }) {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={enviando}
+                autoComplete="username"
                 className="w-full bg-[#0a0a0a] border border-neutral-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:border-red-600 transition-colors"
                 placeholder="admin"
               />
@@ -58,6 +87,8 @@ export default function LoginScreen({ onLogin }) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={enviando}
+                autoComplete="current-password"
                 className="w-full bg-[#0a0a0a] border border-neutral-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:border-red-600 transition-colors"
                 placeholder="admin"
               />
@@ -72,9 +103,11 @@ export default function LoginScreen({ onLogin }) {
 
           <button
             type="submit"
-            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
+            disabled={enviando}
+            className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
           >
-            INGRESAR AL SISTEMA
+            {enviando && <Loader2 size={18} className="animate-spin" />}
+            {enviando ? 'VERIFICANDO...' : 'INGRESAR AL SISTEMA'}
           </button>
         </form>
       </div>
