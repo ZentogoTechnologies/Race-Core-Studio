@@ -197,9 +197,18 @@ def leer_env() -> dict:
 
 
 def lanzar(comando, cwd, log, nueva_consola=False):
-    """Arranca un proceso que sobrevive al cierre del lanzador."""
+    """Arranca un proceso que sobrevive al cierre del lanzador.
+
+    Con `nueva_consola` la salida NO se captura: el proceso escribe en su
+    propia ventana. Es el caso de CasparCG, y es deliberado. Redirigiendo
+    su salida a un archivo la ventana queda en negro, y entonces no hay
+    forma de distinguir "arrancó bien" de "no arrancó": justo la duda que
+    esto provocó la primera vez.
+    """
     LOGS.mkdir(exist_ok=True)
-    salida = open(LOGS / log, "w", encoding="utf-8", errors="replace")
+    salida = None if nueva_consola else open(
+        LOGS / log, "w", encoding="utf-8", errors="replace"
+    )
 
     entorno = os.environ.copy()
     # El backend imprime un emoji al conectar con Mongo. Con la salida
@@ -219,7 +228,7 @@ def lanzar(comando, cwd, log, nueva_consola=False):
         comando,
         cwd=str(cwd),
         stdout=salida,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.STDOUT if salida else None,
         env=entorno,
         creationflags=banderas,
     )
@@ -238,6 +247,7 @@ def paso_casparcg() -> bool:
 
     if puerto_abierto(PUERTO_CASPARCG):
         ok(f"ya estaba corriendo en el puerto {PUERTO_CASPARCG}")
+        detalle("no se abre otra ventana: se reutiliza la que ya está")
         return True
 
     if not CASPARCG.exists():
@@ -247,7 +257,7 @@ def paso_casparcg() -> bool:
 
     # cwd en la carpeta de CasparCG: lee casparcg.config y las plantillas
     # con rutas relativas, y desde otra carpeta arranca sin canales.
-    proceso = lanzar([str(CASPARCG)], CASPARCG.parent, "casparcg.log", nueva_consola=True)
+    proceso = lanzar([str(CASPARCG)], CASPARCG.parent, None, nueva_consola=True)
     print("      arrancando", end="", flush=True)
 
     if not esperar(lambda: puerto_abierto(PUERTO_CASPARCG), 40):
