@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import { DisciplinaProvider } from './context/DisciplinaContext'
+import { CarreraProvider } from './context/CarreraContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import RoleRoute from './components/auth/RoleRoute'
 import DisciplinaGate from './components/shared/DisciplinaGate'
@@ -24,6 +25,7 @@ export default function App() {
             expirada tiene que poder mostrarse también en el login. */}
         <ToastProvider>
           <DisciplinaProvider>
+            <CarreraProvider>
             <Routes>
               <Route path="/login" element={<LoginScreen />} />
 
@@ -59,6 +61,7 @@ export default function App() {
                   raíz vuelve a pasar por las guardas. */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+            </CarreraProvider>
           </DisciplinaProvider>
         </ToastProvider>
       </AuthProvider>

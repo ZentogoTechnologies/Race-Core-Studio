@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import SelectorCarrera from '../components/graphics/SelectorCarrera'
+import { useCarrera } from '../context/CarreraContext'
 import {
   Flag, Siren, CloudSun, Mic, Calendar, Share2, Map,
   SquareUser, Contact, ListOrdered, List, Crown, ArrowUpDown, LayoutGrid,
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
-  Wrench, Droplets, Ban, Table2,
+  Wrench, Droplets, Ban, Table2, Lock, Repeat,
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
@@ -616,6 +618,11 @@ function PilotosEnPista({ carros, cargando, error, ocupado, onElegir, onRecargar
 // ─── Pestañas ─────────────────────────────────────────────────
 // General junta lo que se opera igual: se pulsa y sale al aire.
 // Pilotos y Grilla van aparte porque piden datos antes de graficar.
+// Sin carrera elegida estas pestañas quedan cerradas: las fichas salen de
+// los pilotos inscritos, la grilla de los vehículos del evento y el cuadro
+// de resultados lleva el nombre de la tanda. General no depende de nada.
+const TABS_QUE_NECESITAN_CARRERA = ['carrera', 'pilotos', 'grilla']
+
 const TABS = [
   {
     id: 'general',
@@ -675,6 +682,8 @@ export default function GraficosModule() {
   // Una entrada por capa: { background, totem, flag, grid, pilot, misc }.
   // Las seis conviven al aire; tocar una no afecta a las demás.
   const [alAire,    setAlAire]    = useState({})
+  const { carrera, omitida, hayCarrera, limpiar } = useCarrera()
+
   const [activeTab, setActiveTab] = useState('general')
 
   // Formulario de datos: qué botón lo tiene abierto y sus valores.
@@ -845,8 +854,47 @@ export default function GraficosModule() {
     .map(s => ({ seccion: s, item: s.items.find(i => alAire[s.grupo] === i.id) }))
     .filter(x => x.item)
 
+  // Antes de la botonera se pregunta qué se va a graficar. Si nadie ha
+  // elegido ni ha decidido saltárselo, no se muestra nada más.
+  if (!carrera && !omitida) {
+    return <SelectorCarrera />
+  }
+
   return (
     <div className="w-full space-y-6 animate-fade-in">
+
+      {/* ── Qué carrera se está graficando ── */}
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl px-5 py-3 border ${
+        hayCarrera ? 'bg-[#141414] border-neutral-800' : 'bg-amber-950/20 border-amber-700/40'
+      }`}>
+        <div className="min-w-0">
+          {hayCarrera ? (
+            <>
+              <p className="text-[11px] uppercase tracking-wider text-neutral-500">Graficando</p>
+              <p className="text-sm font-bold text-white truncate">
+                {carrera.nombre}
+                {carrera.sesion && (
+                  <span className="text-red-400"> · {carrera.sesion.nombre}</span>
+                )}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[11px] uppercase tracking-wider text-amber-500">Sin carrera seleccionada</p>
+              <p className="text-sm text-amber-200/80">
+                Solo está disponible la pestaña General.
+              </p>
+            </>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => { limpiar(); setActiveTab('general') }}
+          className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 transition-colors text-xs font-bold whitespace-nowrap flex-shrink-0"
+        >
+          <Repeat size={14}/> {hayCarrera ? 'CAMBIAR CARRERA' : 'ELEGIR CARRERA'}
+        </button>
+      </div>
 
       {/* ── Barra de estado: qué está al aire, por capa ── */}
       <div className="bg-[#141414] rounded-xl px-6 py-4 border border-neutral-800 relative overflow-hidden">
@@ -908,16 +956,22 @@ export default function GraficosModule() {
           {TABS.map(tab => {
             const enAire     = alAireEn(tab)
             const esteActivo = activeTab === tab.id
+            const bloqueada  = !hayCarrera && TABS_QUE_NECESITAN_CARRERA.includes(tab.id)
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => !bloqueada && setActiveTab(tab.id)}
+                disabled={bloqueada}
+                title={bloqueada ? 'Elige una carrera para usar esta pestaña' : undefined}
                 className={`flex items-center gap-2 px-4 py-3 -mb-px border-b-2 font-bold text-xs uppercase tracking-wider whitespace-nowrap transition-colors ${
-                  esteActivo
-                    ? 'border-red-600 text-white'
-                    : 'border-transparent text-neutral-500 hover:text-neutral-300'
+                  bloqueada
+                    ? 'border-transparent text-neutral-700 cursor-not-allowed'
+                    : esteActivo
+                      ? 'border-red-600 text-white'
+                      : 'border-transparent text-neutral-500 hover:text-neutral-300'
                 }`}
               >
+                {bloqueada && <Lock size={11} />}
                 {tab.titulo}
                 {/* Marca la pestaña que tiene algo al aire aunque esté cerrada */}
                 {enAire && (
