@@ -27,6 +27,7 @@ from src.routes.login_routes import login
 from src.routes.system_routes import system
 from src.routes.events_routes import events
 from src.routes.settings_routes import ajustes
+from src.routes.weather_routes import weather
 
 # Auth
 from src.services.auth_services import usuario_actual
@@ -98,6 +99,7 @@ app.include_router(vehicles, prefix="/api/v1/vehicles", tags=["Vehicles"], depen
 app.include_router(graphics, prefix="/api/v1/graphics", tags=["Graphics"], dependencies=PROTEGIDO)
 app.include_router(events, prefix="/api/v1/events", tags=["Events"], dependencies=PROTEGIDO)
 app.include_router(ajustes, prefix="/api/v1/settings", tags=["Settings"], dependencies=PROTEGIDO)
+app.include_router(weather, prefix="/api/v1/weather", tags=["Weather"], dependencies=PROTEGIDO)
 
 # Timing se protege por ruta, no en bloque: la única abierta es
 # GET /timing/current, que es lo que consultan las plantillas de CasparCG

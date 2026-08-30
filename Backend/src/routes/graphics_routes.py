@@ -37,6 +37,19 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict]) -> O
     `data` se aplica encima, para poder corregir un campo puntual sin
     tener que mandar el resto.
     """
+    # El clima se resuelve solo: pulsar el botón tiene que sacar el dato
+    # real sin que nadie lo escriba a mano. Lo que venga en `data` manda
+    # encima, por si hay que corregir algo puntual al aire.
+    if template.graphic_id == "clima":
+        from src.services.weather_services import obtener_clima
+
+        clima = obtener_clima()
+        if clima.get("ok"):
+            return {**clima, **(data or {})}
+        # Sin clima disponible se sigue adelante con lo que haya llegado:
+        # la plantilla tiene sus propios valores por defecto.
+        return data
+
     if pilot_id is None:
         return data
 

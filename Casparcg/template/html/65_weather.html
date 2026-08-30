@@ -10,6 +10,21 @@
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/weather.css">
 
+<style>
+    /* El icono era un <img> y ahora es un <div> con un <svg> dentro: sin
+       esto el dibujo no ocupa el hueco que tenia la imagen. */
+    #weatherIcon{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    #weatherIcon svg{
+        width:100%;
+        height:100%;
+        max-width:110px;
+        max-height:120px;
+    }
+</style>
 </head>
 
 <body>
@@ -22,11 +37,11 @@
 
         <div class="icon-panel">
 
-            <img
-                id="weatherIcon"
-                class="weather-icon"
-                src="https://openweathermap.org/img/wn/02d@2x.png"
-                alt="Weather Icon">
+            <!-- El icono se dibuja aquí y no se descarga de internet: la
+                 máquina de CasparCG puede estar en la red aislada del
+                 autódromo, y un icono que no carga deja el panel cojo
+                 justo cuando sale al aire. -->
+            <div id="weatherIcon" class="weather-icon"></div>
 
         </div>
 
@@ -146,6 +161,57 @@
 
 <script>
 
+/* Iconos por condición. `d` es de día y `n` de noche: lo único que
+   cambia es el sol por la luna, el resto del dibujo se reutiliza. */
+
+const SOL   = '<circle cx="32" cy="30" r="13" fill="#F5C518"/>' +
+              '<g stroke="#F5C518" stroke-width="4" stroke-linecap="round">' +
+              '<path d="M32 6v7M32 47v7M8 30h7M49 30h7M15 13l5 5M44 42l5 5M49 13l-5 5M20 42l-5 5"/></g>';
+
+const LUNA  = '<path d="M40 12a20 20 0 1 0 14 30 22 22 0 0 1-14-30z" fill="#E8ECF2"/>';
+
+const NUBE  = '<path d="M22 56h30a12 12 0 0 0 1-24 17 17 0 0 0-32-4 11 11 0 0 0 1 28z" fill="#D7DDE6"/>';
+
+const NUBE_OSCURA = NUBE.replace(/#D7DDE6/g, "#9AA6B4");
+
+function gotas(n){
+    let s = '';
+    for (let i = 0; i < n; i++) {
+        const x = 24 + i * 10;
+        s += `<path d="M${x} 60l-3 7a3.4 3.4 0 0 0 6 0z" fill="#4FA8E8"/>`;
+    }
+    return s;
+}
+
+const ICONOS = {
+    despejado: d => d ? SOL : LUNA,
+    parcial:   d => (d ? '<circle cx="24" cy="22" r="11" fill="#F5C518"/>'
+                       : '<path d="M30 8a14 14 0 1 0 10 21 15 15 0 0 1-10-21z" fill="#E8ECF2"/>') + NUBE,
+    nublado:   () => NUBE,
+    niebla:    () => NUBE + '<g stroke="#B7C0CC" stroke-width="4" stroke-linecap="round">' +
+                     '<path d="M16 64h32M22 72h28"/></g>',
+    llovizna:  () => NUBE + gotas(2),
+    lluvia:    () => NUBE_OSCURA + gotas(3),
+    tormenta:  () => NUBE_OSCURA + '<path d="M36 58l-10 16h8l-4 12 16-18h-9l6-10z" fill="#F5C518"/>',
+    nieve:     () => NUBE + '<g fill="#E8ECF2"><circle cx="26" cy="64" r="3"/>' +
+                     '<circle cx="38" cy="68" r="3"/><circle cx="50" cy="64" r="3"/></g>',
+};
+
+
+function pintarIcono(condicion, esDia){
+
+    const destino = document.getElementById("weatherIcon");
+    if (!destino) return;
+
+    const dibujo = ICONOS[condicion] || ICONOS.nublado;
+
+    destino.innerHTML =
+        '<svg viewBox="0 0 80 88" xmlns="http://www.w3.org/2000/svg">'
+        + dibujo(esDia !== false)
+        + '</svg>';
+}
+
+
 function update(data){
     /* CasparCG 2.5 entrega el payload del CG ADD/UPDATE como texto JSON,
        no como objeto. Sin este parseo data.<campo> siempre era undefined
@@ -192,11 +258,8 @@ function update(data){
         document.getElementById("currentDate").textContent =
             data.current_date.toUpperCase();
 
-    if(data.icon !== undefined)
-        document.getElementById("weatherIcon").src =
-            "https://openweathermap.org/img/wn/" +
-            data.icon +
-            "@2x.png";
+    if(data.condition !== undefined)
+        pintarIcono(data.condition, data.is_day);
 }
 
 function play(){
@@ -246,14 +309,15 @@ window.onload = function(){
         humidity:78,
         wind_speed:15,
 
-        city:"Ciudad de Panama",
-        country:"PTY",
+        city:"Sajalices, Capira",
+        country:"PANAMÁ",
 
         description:"Parcialmente nublado",
 
         current_date:"08 JUN 2026",
 
-        icon:"02d"
+        condition:"parcial",
+        is_day:true
     });
 
     play();

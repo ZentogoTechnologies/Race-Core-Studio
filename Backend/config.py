@@ -52,4 +52,21 @@ class Settings(BaseSettings):
     # entrar a media transmisión.
     JWT_EXPIRE_HOURS: int = 12
 
+    # ── Clima ────────────────────────────────────────────────
+    # Autódromo Panamá, Sajalices (Capira). Coordenadas tomadas del
+    # marcador del sitio en Google Maps.
+    WEATHER_LAT: float = 8.7016426
+    WEATHER_LON: float = -79.8702415
+    WEATHER_PLACE: str = "Sajalices, Capira"
+    WEATHER_COUNTRY: str = "PANAMÁ"
+
+    # Segundos que se reutiliza la última consulta. El clima no cambia de
+    # un segundo a otro y la plantilla se puede sacar al aire muchas veces
+    # en una tanda; sin esto se golpearía el servicio sin necesidad.
+    WEATHER_CACHE_SECONDS: int = 600
+
+    # Espera de la consulta. Corta a propósito: si el servicio no responde
+    # se prefiere el último dato conocido antes que retrasar un gráfico.
+    WEATHER_TIMEOUT: float = 6.0
+
 settings = Settings()
