@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
   Menu, X, Home, Users, Car, LogOut, Calendar, Tag, BarChart3,
-  Shield, Flag, Zap, Repeat,
+  Shield, Flag, Zap, Repeat, SlidersHorizontal,
 } from 'lucide-react'
 import NavItem from '../components/layout/NavItem'
 import { useAuth } from '../context/AuthContext'
@@ -18,8 +18,10 @@ const MODULOS = [
   { to: '/pilotos',    icon: <Users />,     label: 'Pilotos',    titulo: 'Directorio de Pilotos' },
   { to: '/vehiculos',  icon: <Car />,       label: 'Vehículos',  titulo: 'Directorio de Vehículos' },
   { to: '/graficos',   icon: <BarChart3 />, label: 'Gráficos',   titulo: 'Gráficos' },
+  { to: '/ajustes',    icon: <SlidersHorizontal />, label: 'Ajustes', titulo: 'Ajustes del Sistema',
+    separar: true, roles: ['owner', 'admin'] },
   { to: '/usuarios',   icon: <Shield />,    label: 'Usuarios',   titulo: 'Gestión de Usuarios',
-    separar: true, roles: ['owner'] },
+    roles: ['owner'] },
 ]
 
 const ROTULO_ROL = { owner: 'DUEÑO', admin: 'ADMIN', standard: 'ESTÁNDAR' }

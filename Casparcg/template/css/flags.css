@@ -274,3 +274,48 @@
         0 0 10px rgba(255,255,255,.8),
         0 0 16px rgba(255,255,255,.6);
 }
+
+/* ===================================
+   SAFETY CAR
+   ===================================
+   El coche va junto al texto, no detras: sobre el amarillo una silueta de
+   fondo se lee como una mancha, y al aire hay que reconocerla de un
+   vistazo.
+=================================== */
+
+.lb-heat.flag.safety{
+
+    flex-direction:row;
+
+    gap:10px;
+}
+
+.sc-carro{
+
+    width:38px;
+
+    height:auto;
+
+    /* Negro como el texto del panel amarillo: una silueta blanca sobre
+       amarillo casi no existe. */
+    fill:#111111;
+
+    flex:0 0 auto;
+}
+
+.sc-carro .sc-baliza{
+
+    fill:#D50000;
+}
+
+.sc-carro .sc-llanta{
+
+    fill:#e8be03;
+}
+
+.lb-info-yellow .lb-heat.flag.safety .status-value{
+
+    color:#111111;
+
+    text-shadow:none;
+}

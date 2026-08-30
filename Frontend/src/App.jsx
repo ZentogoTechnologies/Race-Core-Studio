@@ -14,6 +14,7 @@ import PilotosModule from './pages/Pilotos'
 import VehiculosModule from './pages/Vehiculos'
 import GraficosModule from './pages/Graficos'
 import UsuariosModule from './pages/Usuarios'
+import AjustesModule from './pages/Ajustes'
 
 export default function App() {
   return (
@@ -38,6 +39,12 @@ export default function App() {
                     <Route path="pilotos"    element={<PilotosModule />} />
                     <Route path="vehiculos"  element={<VehiculosModule />} />
                     <Route path="graficos"   element={<GraficosModule />} />
+
+                    {/* Ajustes toca la configuración del cronometraje, que
+                        cambia lo que sale al aire: owner y admin. */}
+                    <Route element={<RoleRoute roles={['owner', 'admin']} />}>
+                      <Route path="ajustes" element={<AjustesModule />} />
+                    </Route>
 
                     {/* Solo el dueño. Un admin que escriba /usuarios a mano
                         rebota al inicio, y el backend le daría 403 igual. */}

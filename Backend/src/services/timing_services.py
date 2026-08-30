@@ -21,6 +21,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from config import settings
+from src.services.graphics_services import brand_logo_url
 from src.models.categories_model import Category
 from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
@@ -423,7 +424,11 @@ def leer_xml(ruta: str | None = None) -> dict:
     Lanza FileNotFoundError si no está el archivo y ET.ParseError si
     MyLaps lo pilló a medio escribir.
     """
-    archivo = Path(ruta or settings.TIMING_XML_PATH)
+    # La ruta efectiva sale de los ajustes, que pueden haberla cambiado
+    # en caliente; el .env queda como valor por defecto.
+    from src.services.settings_services import ruta_timing
+
+    archivo = Path(ruta or ruta_timing())
 
     raiz = ET.parse(archivo).getroot()
 
@@ -483,8 +488,17 @@ async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> di
         # Número + categoría: el dorsal solo no es único entre categorías.
         cat_id = _resolver_categoria(f.get("class", ""), categorias) or cat_tanda
 
+        marca = None
+        marca_logo = None
+
         vehiculo = await _buscar_vehiculo(numero, cat_id)
         if vehiculo is not None:
+            # La marca alimenta el logo de cada fila del tótem. Se resuelve
+            # aquí porque es donde ya se tiene el vehículo del dorsal; el
+            # tótem no puede cruzarlo por su cuenta desde una plantilla.
+            marca = vehiculo.brand
+            marca_logo = brand_logo_url(vehiculo.brand) if vehiculo.brand else None
+
             await vehiculo.fetch_all_links()
             if vehiculo.pilots:
                 # MyLaps no dice cuál de los dos va manejando: manda los dos
@@ -516,6 +530,8 @@ async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> di
             "laps": (f.get("laps") or "").strip(),
             "last_time": (f.get("lasttime") or "").strip(),
             "best_time": (f.get("besttime") or "").strip(),
+            "brand": marca,
+            "brand_logo": marca_logo,
         })
 
     # Antes de arrancar, MyLaps deja racetime vacío y pone la cuenta atrás

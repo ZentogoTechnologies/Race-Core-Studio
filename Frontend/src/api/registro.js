@@ -104,6 +104,18 @@ export const agregarSesion = (eventId, datos) =>
 export const quitarSesion = (eventId, numeroOrden) =>
   pedir(`/events/${eventId}/sesiones/${numeroOrden}`, { method: 'DELETE' })
 
+// ─── Ajustes en caliente ──────────────────────────────────────
+// La ruta del current.xml se cambia sin reiniciar el backend: queda
+// guardada en la base y se aplica en la siguiente lectura.
+
+export const leerAjustes = () => pedir('/settings/')
+
+export const probarRutaXml = (ruta) =>
+  pedir('/settings/timing/probar', { method: 'POST', body: { timing_xml_path: ruta } })
+
+export const guardarRutaXml = (ruta) =>
+  pedir('/settings/timing', { method: 'PUT', body: { timing_xml_path: ruta } })
+
 export const usuariosApi   = recurso('/users')
 
 // Apaga CasparCG, el frontend y el backend. MongoDB no se toca. Solo

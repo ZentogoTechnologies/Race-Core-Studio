@@ -14,6 +14,7 @@ from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
 from src.models.users_model import User
 from src.models.events_model import Event
+from src.models.settings_model import Ajustes
 
 # Routes
 from src.routes.categories_routes import categories
@@ -25,6 +26,7 @@ from src.routes.users_routes import users
 from src.routes.login_routes import login
 from src.routes.system_routes import system
 from src.routes.events_routes import events
+from src.routes.settings_routes import ajustes
 
 # Auth
 from src.services.auth_services import usuario_actual
@@ -37,9 +39,18 @@ async def lifespan(app: FastAPI):
     client = AsyncMongoClient(settings.MONGO_URI)
     await init_beanie(
         database=client[settings.DB_NAME],
-        document_models=[Category, Pilot, Vehicle, User, Event]
+        document_models=[Category, Pilot, Vehicle, User, Event, Ajustes]
     )
     print("✅ Conectado a MongoDB")
+
+    # Los ajustes que se cambian en caliente viven en la base; se traen a
+    # memoria aquí para que leer_xml no consulte Mongo en cada lectura.
+    from src.services.settings_services import cargar_ajustes
+
+    ruta = await cargar_ajustes()
+    if ruta:
+        print(f"   current.xml: {ruta} (ajuste guardado)")
+
     yield
     await client.close()
     # La conexión con CasparCG se abre sola al primer comando; aquí solo
@@ -86,6 +97,7 @@ app.include_router(pilots, prefix="/api/v1/pilots", tags=["Pilots"], dependencie
 app.include_router(vehicles, prefix="/api/v1/vehicles", tags=["Vehicles"], dependencies=PROTEGIDO)
 app.include_router(graphics, prefix="/api/v1/graphics", tags=["Graphics"], dependencies=PROTEGIDO)
 app.include_router(events, prefix="/api/v1/events", tags=["Events"], dependencies=PROTEGIDO)
+app.include_router(ajustes, prefix="/api/v1/settings", tags=["Settings"], dependencies=PROTEGIDO)
 
 # Timing se protege por ruta, no en bloque: la única abierta es
 # GET /timing/current, que es lo que consultan las plantillas de CasparCG

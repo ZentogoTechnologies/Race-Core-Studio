@@ -2,47 +2,35 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Leaderboard</title>
+    <title>Totem Nombre Completo</title>
     <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/totem_names.css">
+    <link rel="stylesheet" href="../css/totem_fullname.css">
 </head>
 <body>
 
-<div class="leaderboard" id="leaderboard">
+<div class="tf-torre" id="torre">
 
-    <!-- HEADER -->
-    <div class="lb-header">
+    <div class="tf-cabecera">
 
-        <div class="lb-logo">
+        <div class="tf-logo">
             <img src="../img/logoap.png" alt="Autódromo Panamá">
         </div>
 
-        <div class="lb-info">
-
-            <!-- GRUPO / CATEGORIA -->
-            <div
-                class="lb-group"
-                id="groupName">
-                PROSPEC SERIES
+        <div class="tf-info">
+            <div class="tf-grupo" id="grupo">STREET LEGAL</div>
+            <div class="tf-sub">
+                <span class="tf-heat" id="heat">HEAT 1</span>
+                <span class="tf-reloj">
+                    <span class="tf-reloj-etiqueta" id="relojEtiqueta">TIME</span><span id="reloj">0:00</span>
+                </span>
             </div>
-
-            <div class="lb-heat" id="heatName">
-                HEAT 1
-            </div>
-
-            <div class="lb-timer">
-                <span id="timerLabel">TIME</span>
-                <span id="raceTimer">00:01:51</span>
-            </div>
-
         </div>
 
     </div>
 
-    <!-- TABLA -->
-    <div class="lb-body" id="leaderboardBody">
+    <div class="tf-estado" id="estado"></div>
 
-    </div>
+    <div class="tf-cuerpo" id="cuerpo"></div>
 
 </div>
 
@@ -50,115 +38,127 @@
 <script>
 
 /* ==========================================================================
-   TOTEM NOMBRE COMPLETO
+   TÓTEM NOMBRE COMPLETO
 
-   Posicion tal cual la manda MyLaps, inicial del nombre + apellido, y el
-   numero del carro. Los datos llegan del backend, que ya cruzo el numero
-   contra la base para sacar el nombre bien escrito.
+   Torre vertical con la posición, el logo de la marca del carro y el
+   nombre completo del piloto. Los datos llegan del backend, que ya cruzó
+   el dorsal contra la base para sacar el nombre bien escrito y la marca.
+
+   La lógica de consulta no cambió respecto a la versión anterior: lo que
+   se rehízo es cómo se ve.
 ========================================================================== */
 
-const container = document.getElementById("leaderboardBody");
+const cuerpo = document.getElementById("cuerpo");
+const torre  = document.getElementById("torre");
 
-const LIMITE = 10;
+/* Cuántas posiciones caben. CasparCG puede cambiarlo con
+   CG ... UPDATE 1 "{\"limite\":15}" */
+let LIMITE = 10;
 
 let firmaAnterior = null;
 
 
+/* Las banderas de MyLaps al color de la banda superior. */
+const BANDERAS = {
+    red:        { clase: "roja",     texto: "BANDERA ROJA · SESIÓN DETENIDA" },
+    yellow:     { clase: "amarilla", texto: "BANDERA AMARILLA" },
+    green:      { clase: "verde",    texto: "PISTA VERDE" },
+    white:      { clase: "blanca",   texto: "ÚLTIMA VUELTA" },
+    checkered:  { clase: "cuadros",  texto: "BANDERA A CUADROS" },
+    finish:     { clase: "cuadros",  texto: "FIN DE CARRERA" },
+};
+
+
+function escapar(texto){
+
+    /* Los nombres salen de la base y del XML de MyLaps. Un apellido con
+       un & o un < romperia el innerHTML de la fila. */
+
+    return String(texto == null ? "" : texto)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+
 function pintarFilas(standings){
-    /* Antes de arrancar la tanda no hay clasificacion. Se deja solo la
-       cabecera con la cuenta atras: mejor eso que una tabla vacia
-       colgando o, peor, las posiciones de la tanda anterior. */
 
-    if (standings.length === 0) {
-        container.innerHTML = "";
-        return;
-    }
+    /* Se redibuja solo si cambio algo. Repintar diez veces por segundo
+       hace parpadear los logos, que son peticiones al backend. */
 
-
-    /* Solo se rehace la tabla si cambio algo: el bucle corre dos veces por
-       segundo y reconstruir el DOM cada vez hace parpadear el totem. */
-
-    const firma = timingFirma(standings, ["position", "short_name", "number"]);
+    const firma = timingFirma(standings, ["position", "full_name", "number", "brand_logo"]);
     if (firma === firmaAnterior) return;
     firmaAnterior = firma;
 
-    container.innerHTML = "";
+    cuerpo.innerHTML = "";
 
     standings.forEach((piloto, index) => {
 
-        const row = document.createElement("div");
+        const fila = document.createElement("div");
+        fila.className = index === 0 ? "tf-fila lider" : "tf-fila";
 
-        row.className = index === 0 ? "lb-row leader" : "lb-row";
+        /* Sin logo se deja el hueco vacio en vez de un roto: la columna
+           tiene que seguir alineada aunque falte una marca. */
+        const logo = piloto.brand_logo
+            ? `<img src="${escapar(piloto.brand_logo)}" alt="${escapar(piloto.brand || "")}">`
+            : "";
 
-        row.innerHTML = `
-
-            <div class="lb-pos pos-${piloto.position}">
-                ${piloto.position}
-            </div>
-
-            <div class="lb-separator"></div>
-
-            <div class="lb-name">
-                ${piloto.short_name}
-            </div>
-
-            <div class="lb-number">
-                ${piloto.number}
-            </div>
-
+        fila.innerHTML = `
+            <div class="tf-pos">${escapar(piloto.position)}</div>
+            <div class="tf-barra"></div>
+            <div class="tf-marca">${logo}</div>
+            <div class="tf-nombre">${escapar(piloto.full_name)}</div>
+            <div class="tf-dorsal">${escapar(piloto.number)}</div>
         `;
 
-        container.appendChild(row);
+        cuerpo.appendChild(fila);
     });
 }
 
 
 function pintarCabecera(datos){
 
-    /* La categoria de la tanda, encima del heat. */
-
-    const grupo = document.getElementById("groupName");
+    const grupo = document.getElementById("grupo");
     if (grupo) grupo.textContent = datos.group_name || datos.group || "";
 
+    const heat = document.getElementById("heat");
+    if (heat) heat.textContent = datos.heat || datos.run_name || "";
 
-    /* HEAT-3 / QUALY-1 / PRACTICE-2, calculado por el backend a partir
-       del runtype y el runname de MyLaps. */
-
-    const heat = document.getElementById("heatName");
-    if (heat) heat.textContent = datos.heat || "";
-
-    /* MyLaps refresca racetime constantemente. */
-
-    /* La etiqueta cambia con el modo: TIME en cuenta atras, LAP cuando
-       se cuentan vueltas. */
-
-    const etiqueta = document.getElementById("timerLabel");
+    /* El backend decide si manda el reloj de carrera o la cuenta atras, y
+       manda tambien la etiqueta que corresponde. */
+    const etiqueta = document.getElementById("relojEtiqueta");
     if (etiqueta) etiqueta.textContent = datos.time_label || "TIME";
 
-    const timer = document.getElementById("raceTimer");
-    if (timer) timer.textContent = datos.time || "";
+    const reloj = document.getElementById("reloj");
+    if (reloj) reloj.textContent = datos.time || "0:00";
+
+    /* Banda de estado: solo cuando hay bandera. */
+    const estado = document.getElementById("estado");
+    const bandera = BANDERAS[(datos.flag || "none").toLowerCase()];
+
+    if (estado && bandera) {
+        estado.className = "tf-estado " + bandera.clase;
+        estado.textContent = bandera.texto;
+        torre.classList.add("con-estado");
+    } else {
+        torre.classList.remove("con-estado");
+    }
 }
 
 
 function pintar(datos){
+
+    if (!datos) return;
+
     pintarCabecera(datos);
     pintarFilas(datos.standings || []);
 }
 
 
-/* ==========================================================================
-   PLAY / STOP
-========================================================================== */
+/* ─── Ciclo de vida de CasparCG ─────────────────────────────── */
 
 function play(){
-
-    const widget = document.getElementById("leaderboard");
-
-    widget.style.animation = "slideUp .5s ease forwards";
-
-    setTimeout(() => {
-        widget.style.animation = "expandPanel .6s ease forwards";
-    },500);
 
     arrancarTiming({ limite: LIMITE, alRecibir: pintar });
 }
@@ -167,43 +167,35 @@ function play(){
 function stop(){
 
     detenerTiming();
-
-    const widget = document.getElementById("leaderboard");
-
-    widget.style.animation = "collapsePanel .5s ease forwards";
-
-    setTimeout(() => {
-        widget.style.animation = "slideDown .5s ease forwards";
-    },500);
 }
 
-
-/* ==========================================================================
-   UPDATE
-
-   Este totem se alimenta solo del current.xml, asi que update() solo
-   sirve para apuntar a otro backend o cambiar el logo.
-========================================================================== */
 
 function update(data){
 
-    if (typeof data === "string") {
-        try { data = JSON.parse(data); }
-        catch (e) { return; }
-    }
+    /* Acepta {"limite":15} y {"api":"http://otra-maquina:8080/api/v1"} */
 
-    if (!data) return;
+    try {
+        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
 
-    if (data.api !== undefined) configurarTiming(data.api);
+        if (d.api) configurarTiming(d.api);
 
-    if (data.logo !== undefined) {
-        const logo = document.getElementById("logo");
-        if (logo) logo.src = data.logo;
+        if (d.limite) {
+            LIMITE = parseInt(d.limite, 10) || LIMITE;
+            firmaAnterior = null;          // fuerza el repintado
+            arrancarTiming({ limite: LIMITE, alRecibir: pintar });
+        }
+    } catch (e) {
+        /* Un UPDATE con basura no puede tumbar el grafico al aire. */
     }
 }
 
 
-window.onload = play;
+/* Fuera de CasparCG (abriendo el html a mano) no hay play(), asi que se
+   arranca solo para poder verlo en el navegador. */
+if (!window.__casparcg) {
+    play();
+}
+
 </script>
 
 </body>

@@ -1,0 +1,376 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   TÓTEM NOMBRE COMPLETO
+
+   Torre vertical al estilo de las transmisiones de F1: una franja
+   estrecha con la posición a la izquierda, el logo de la marca y el
+   nombre. Solo la usa 20_totem_fullname; los otros tres tótems siguen con
+   totem_names.css, que no se toca.
+
+   Fondo translúcido a propósito. El video va en otra capa de CasparCG, de
+   modo que backdrop-filter no ve nada que desenfocar: lo único que
+   funciona es bajar el alfa del color y dejar que la carrera se vea por
+   detrás.
+========================================================================== */
+
+:root{
+
+    /* Un solo lugar para ajustar cuánto se transparenta todo. */
+    --tf-panel:      rgba(6, 8, 11, .55);
+    --tf-cabecera:   rgba(0, 0, 0, .66);
+    --tf-logo:       rgba(0, 0, 0, .85);
+    --tf-fila:       rgba(9, 11, 15, .60);
+    --tf-fila-alt:   rgba(16, 19, 24, .60);
+    --tf-lider:      rgba(20, 16, 6, .88);
+
+    --tf-acento:     #D50000;
+    --tf-oro:        #E8BE03;
+
+    --tf-ancho:      390px;
+    --tf-alto-fila:  34px;
+}
+
+/* ===================================
+   CONTENEDOR
+=================================== */
+
+.tf-torre{
+
+    width:var(--tf-ancho);
+
+    background:var(--tf-panel);
+
+    border-radius:6px;
+
+    overflow:hidden;
+
+    /* La sombra despega la torre del asfalto: sin ella, sobre un fondo
+       claro el borde translúcido se confunde con la pista. */
+    box-shadow:0 4px 22px rgba(0,0,0,.55);
+
+    font-family:"Titillium Web", "Segoe UI", Arial, sans-serif;
+}
+
+/* ===================================
+   CABECERA
+=================================== */
+
+.tf-cabecera{
+
+    display:flex;
+
+    align-items:stretch;
+
+    height:56px;
+
+    background:var(--tf-cabecera);
+}
+
+.tf-logo{
+
+    width:96px;
+
+    flex:0 0 auto;
+
+    background:var(--tf-logo);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    position:relative;
+}
+
+/* Filo rojo del lado izquierdo, la firma del canal. */
+.tf-logo::before{
+
+    content:"";
+
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+
+    width:5px;
+
+    background:var(--tf-acento);
+}
+
+.tf-logo img{
+
+    width:62px;
+
+    height:auto;
+}
+
+.tf-info{
+
+    flex:1;
+
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    padding:0 12px;
+
+    gap:2px;
+}
+
+.tf-grupo{
+
+    font-size:15px;
+
+    font-weight:900;
+
+    letter-spacing:.5px;
+
+    color:#FFFFFF;
+
+    text-transform:uppercase;
+
+    line-height:1;
+
+    /* Un nombre largo no puede empujar al reloj fuera de la caja. */
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.tf-sub{
+
+    display:flex;
+
+    align-items:baseline;
+
+    gap:8px;
+
+    font-size:11px;
+
+    letter-spacing:1.4px;
+
+    text-transform:uppercase;
+}
+
+.tf-heat{
+
+    color:var(--tf-oro);
+
+    font-weight:900;
+}
+
+.tf-reloj{
+
+    color:#FFFFFF;
+
+    font-weight:700;
+
+    font-variant-numeric:tabular-nums;
+
+    margin-left:auto;
+}
+
+.tf-reloj-etiqueta{
+
+    color:rgba(255,255,255,.45);
+
+    font-weight:700;
+
+    margin-right:4px;
+}
+
+/* ===================================
+   BANDA DE ESTADO
+   ===================================
+   Solo aparece cuando MyLaps manda una bandera distinta de "none".
+=================================== */
+
+.tf-estado{
+
+    display:none;
+
+    align-items:center;
+
+    height:24px;
+
+    padding:0 12px;
+
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+
+    color:#FFFFFF;
+}
+
+.tf-torre.con-estado .tf-estado{
+
+    display:flex;
+}
+
+.tf-estado.roja      { background:rgba(213,0,0,.92); }
+.tf-estado.amarilla  { background:rgba(232,190,3,.92); color:#111; }
+.tf-estado.verde     { background:rgba(0,155,58,.92); }
+.tf-estado.blanca    { background:rgba(255,255,255,.92); color:#111; }
+.tf-estado.cuadros   { background:rgba(20,20,20,.92); }
+
+/* ===================================
+   FILAS
+=================================== */
+
+.tf-cuerpo{
+
+    display:flex;
+
+    flex-direction:column;
+}
+
+.tf-fila{
+
+    display:flex;
+
+    align-items:center;
+
+    height:var(--tf-alto-fila);
+
+    background:var(--tf-fila);
+
+    border-top:1px solid rgba(255,255,255,.05);
+}
+
+.tf-fila:nth-child(even){
+
+    background:var(--tf-fila-alt);
+}
+
+/* Al líder se le sube la opacidad: el dorado se lava sobre el video y es
+   justo el dato que la gente busca primero. */
+.tf-fila.lider{
+
+    background:var(--tf-lider);
+}
+
+.tf-pos{
+
+    width:34px;
+
+    flex:0 0 auto;
+
+    text-align:center;
+
+    font-size:15px;
+    font-weight:900;
+
+    color:#FFFFFF;
+
+    font-variant-numeric:tabular-nums;
+}
+
+.tf-fila.lider .tf-pos{
+
+    color:var(--tf-oro);
+}
+
+/* Franja de color que separa la posición del resto, como la barra de
+   equipo de la referencia. */
+.tf-barra{
+
+    width:4px;
+
+    align-self:stretch;
+
+    flex:0 0 auto;
+
+    background:rgba(255,255,255,.18);
+}
+
+.tf-fila.lider .tf-barra{
+
+    background:var(--tf-oro);
+}
+
+.tf-marca{
+
+    width:30px;
+
+    height:22px;
+
+    flex:0 0 auto;
+
+    margin:0 8px 0 7px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.tf-marca img{
+
+    max-width:100%;
+
+    max-height:100%;
+
+    object-fit:contain;
+
+    /* Los logos vienen en colores de marca muy distintos; un realce suave
+       los empareja sobre el fondo oscuro sin desteñirlos. */
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));
+}
+
+.tf-nombre{
+
+    flex:1;
+
+    min-width:0;
+
+    font-size:14px;
+
+    font-weight:800;
+
+    letter-spacing:.3px;
+
+    color:#FFFFFF;
+
+    text-transform:uppercase;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    /* Halo oscuro: el texto blanco pasa por encima del video y sobre una
+       recta soleada desaparece sin esto. */
+    text-shadow:0 1px 3px rgba(0,0,0,.9);
+}
+
+.tf-dorsal{
+
+    flex:0 0 auto;
+
+    min-width:30px;
+
+    margin-right:8px;
+
+    text-align:center;
+
+    font-size:12px;
+    font-weight:900;
+
+    color:rgba(255,255,255,.85);
+
+    font-variant-numeric:tabular-nums;
+
+    background:rgba(255,255,255,.10);
+
+    border-radius:3px;
+
+    padding:2px 5px;
+}
+
+.tf-fila.lider .tf-dorsal{
+
+    background:rgba(232,190,3,.20);
+
+    color:var(--tf-oro);
+}
