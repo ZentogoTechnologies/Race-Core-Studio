@@ -3,6 +3,7 @@ import {
   Loader2, CheckCircle2, AlertCircle, FolderSearch, Save, FlaskConical,
 } from 'lucide-react'
 import { guardarRutaXml, leerAjustes, probarRutaXml } from '../api/registro'
+import Trazados from '../components/settings/Trazados'
 import { useToast } from '../context/ToastContext'
 
 export default function AjustesModule() {
@@ -189,6 +190,8 @@ export default function AjustesModule() {
           )}
         </div>
       </div>
+
+      <Trazados />
 
     </div>
   )

@@ -15,6 +15,7 @@ from src.models.vehicles_model import Vehicle
 from src.models.users_model import User
 from src.models.events_model import Event
 from src.models.settings_model import Ajustes
+from src.models.tracks_model import Trazado
 
 # Routes
 from src.routes.categories_routes import categories
@@ -40,7 +41,7 @@ async def lifespan(app: FastAPI):
     client = AsyncMongoClient(settings.MONGO_URI)
     await init_beanie(
         database=client[settings.DB_NAME],
-        document_models=[Category, Pilot, Vehicle, User, Event, Ajustes]
+        document_models=[Category, Pilot, Vehicle, User, Event, Ajustes, Trazado]
     )
     print("✅ Conectado a MongoDB")
 
@@ -80,6 +81,21 @@ app.mount(
     "/public",
     StaticFiles(directory=Path(__file__).parent / "src" / "public"),
     name="public",
+)
+
+# Imágenes de los trazados. CasparCG las lee del disco por ruta relativa,
+# pero la interfaz necesita verlas por HTTP para la vista previa, y una
+# etiqueta <img> no puede mandar la cabecera del token. Son dibujos de
+# pista, lo mismo que ya sale al aire, así que van abiertas igual que
+# /public.
+from src.services.tracks_services import CARPETA_IMAGENES
+
+CARPETA_IMAGENES.mkdir(parents=True, exist_ok=True)
+
+app.mount(
+    "/media/circuits",
+    StaticFiles(directory=CARPETA_IMAGENES),
+    name="circuits",
 )
 
 # Todo lo que toca la base o manda al aire exige un JWT válido. La

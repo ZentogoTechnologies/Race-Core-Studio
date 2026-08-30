@@ -50,6 +50,30 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict]) -> O
         # la plantilla tiene sus propios valores por defecto.
         return data
 
+    # El circuito sale del trazado marcado como activo en Ajustes. Igual
+    # que el clima: pulsar el botón tiene que sacar lo que corresponde sin
+    # que nadie escriba nada, y lo que venga en `data` manda encima.
+    if template.graphic_id == "circuito":
+        from src.services.tracks_services import ruta_plantilla, trazados_service
+
+        trazado = await trazados_service.activo()
+        if trazado is not None:
+            base = {"circuit_name": trazado.name}
+
+            if trazado.variante:
+                base["label"] = trazado.variante
+            elif trazado.length_km:
+                base["label"] = f"{trazado.length_km:g} km"
+
+            imagen = ruta_plantilla(trazado.image)
+            if imagen:
+                base["circuit_image"] = imagen
+
+            return {**base, **(data or {})}
+
+        # Sin trazado dado de alta la plantilla se queda con lo suyo.
+        return data
+
     if pilot_id is None:
         return data
 

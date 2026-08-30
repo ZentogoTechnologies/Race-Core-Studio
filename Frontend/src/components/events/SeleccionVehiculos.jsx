@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Check, ChevronRight, Layers } from 'lucide-react'
+import { Check, CheckSquare, ChevronRight, Layers, Square, User } from 'lucide-react'
 
 const SIN_SUB = '__sin__'
 
@@ -80,8 +80,11 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
     }])
   }
 
-  const alternarGrupo = (grupo) => {
-    const ids = grupo.carros.map(v => v.vehicle_id)
+  // Marca la lista entera, o la vacía si ya estaba completa. Sirve igual
+  // para una subcategoría que para la categoría completa, que es la misma
+  // operación sobre distintos conjuntos de carros.
+  const alternarLista = (lista) => {
+    const ids = lista.map(v => v.vehicle_id)
     const todos = ids.length > 0 && ids.every(id => seleccionados.has(id))
 
     if (todos) {
@@ -89,12 +92,21 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
       return
     }
 
-    const faltan = grupo.carros.filter(v => !seleccionados.has(v.vehicle_id))
+    // Solo se añaden los que faltan: volver a meter uno ya inscrito
+    // duplicaría la fila y perdería los pilotos que se hubieran quitado.
+    const faltan = lista.filter(v => !seleccionados.has(v.vehicle_id))
     onCambiar([...inscritos, ...faltan.map(v => ({
       vehicle_id: v.vehicle_id,
       pilot_ids: (v.pilots || []).map(p => p.pilot_id),
     }))])
   }
+
+  // Recuento de la categoría abierta, para la cabecera de la derecha.
+  const todosDeCategoria = (() => {
+    const total = carros.length
+    const puestos = carros.filter(v => seleccionados.has(v.vehicle_id)).length
+    return { total, puestos, completa: total > 0 && puestos === total }
+  })()
 
   const alternarPiloto = (vehicleId, pilotId) => {
     onCambiar(inscritos.map(i => {
@@ -150,6 +162,36 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
       </div>
 
       <div className="flex-1 min-w-0 bg-[#0a0a0a] border border-neutral-800 rounded-lg p-4 max-h-[26rem] overflow-y-auto">
+
+        {/* Con parrillas de veinte o treinta carros, marcarlos de uno en uno
+            es media hora de clics. Lo normal es que corra la categoría
+            entera y que se quite alguno suelto, no al revés. */}
+        {carros.length > 0 && (
+          <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-neutral-800 sticky top-0 bg-[#0a0a0a] z-10">
+            <div className="min-w-0">
+              <p className="text-sm font-black italic text-white truncate">
+                {categoria?.category_name}
+              </p>
+              <p className="text-[11px] text-neutral-600">
+                {todosDeCategoria.puestos} de {todosDeCategoria.total} carros marcados
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => alternarLista(carros)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-bold text-xs whitespace-nowrap flex-shrink-0 transition-colors ${
+                todosDeCategoria.completa
+                  ? 'border-red-600/60 text-red-400 hover:bg-red-600/10'
+                  : 'border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400'
+              }`}
+            >
+              {todosDeCategoria.completa
+                ? <><Square size={13}/> QUITAR TODOS</>
+                : <><CheckSquare size={13}/> MARCAR TODOS</>}
+            </button>
+          </div>
+        )}
+
         {carros.length === 0 && (
           <p className="text-sm text-neutral-600">
             No hay vehículos registrados en {categoria?.category_name}.
@@ -168,7 +210,7 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
               {grupo.nombre && (
                 <button
                   type="button"
-                  onClick={() => alternarGrupo(grupo)}
+                  onClick={() => alternarLista(grupo.carros)}
                   className="w-full flex items-center gap-2 mb-2 pb-1.5 border-b border-neutral-800/70 text-left group"
                 >
                   <span className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 border transition-colors ${
@@ -211,14 +253,32 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
                           }`}>
                             {v.display_number || v.number}
                           </span>
+                          {/* El piloto va primero y el carro debajo. En esta
+                              pantalla se decide quién corre, no qué máquina:
+                              con el nombre en gris pequeño bajo la marca
+                              había que buscarlo para leerlo. */}
                           <span className="flex-1 min-w-0">
-                            <span className="block text-sm font-bold text-white truncate">
-                              {v.brand || 'Sin marca'} {v.model || ''}
-                            </span>
-                            {(v.pilots || []).length > 0 && (
-                              <span className="block text-xs text-neutral-500 truncate">
-                                {v.pilots.map(p => p.name).join(' · ')}
-                              </span>
+                            {(v.pilots || []).length > 0 ? (
+                              <>
+                                <span className="flex items-center gap-1.5 min-w-0">
+                                  <User size={13} className={`flex-shrink-0 ${ins ? 'text-red-500' : 'text-neutral-600'}`}/>
+                                  <span className="text-[15px] font-bold text-white truncate leading-tight">
+                                    {v.pilots.map(p => p.name).join('  ·  ')}
+                                  </span>
+                                </span>
+                                <span className="block text-xs text-neutral-500 truncate mt-0.5 pl-[19px]">
+                                  {v.brand || 'Sin marca'} {v.model || ''}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="block text-sm font-bold text-white truncate">
+                                  {v.brand || 'Sin marca'} {v.model || ''}
+                                </span>
+                                <span className="block text-xs text-yellow-600/80 truncate mt-0.5">
+                                  Sin piloto asignado
+                                </span>
+                              </>
                             )}
                           </span>
                         </button>
@@ -234,10 +294,10 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
                                 <button
                                   key={p.pilot_id} type="button"
                                   onClick={() => alternarPiloto(v.vehicle_id, p.pilot_id)}
-                                  className={`px-2.5 py-1 rounded text-[11px] font-bold border transition-colors ${
+                                  className={`px-3 py-1.5 rounded text-xs font-bold border transition-colors ${
                                     corre
-                                      ? 'border-green-600/60 bg-green-600/10 text-green-400'
-                                      : 'border-neutral-800 text-neutral-600 hover:border-neutral-600'
+                                      ? 'border-green-600/60 bg-green-600/10 text-green-300'
+                                      : 'border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
                                   }`}
                                 >
                                   {p.name}

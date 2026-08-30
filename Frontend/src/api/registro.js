@@ -116,6 +116,65 @@ export const probarRutaXml = (ruta) =>
 export const guardarRutaXml = (ruta) =>
   pedir('/settings/timing', { method: 'PUT', body: { timing_xml_path: ruta } })
 
+
+// ─── Trazados ─────────────────────────────────────────────────
+// Un mismo recinto se corre de varias formas —pista corta, pista larga,
+// cuarto de milla— y cada una tiene su imagen. El gráfico de Circuito usa
+// el que esté marcado como activo.
+
+// Las imágenes se sirven fuera del prefijo del API, así que se recorta.
+const ORIGEN = BASE.replace(/\/api\/v1\/?$/, '')
+
+export const urlImagenTrazado = (imagen) =>
+  imagen ? `${ORIGEN}/media/circuits/${imagen}` : null
+
+export const listarTrazados = () => pedir('/settings/trazados')
+
+export const crearTrazado = (datos) =>
+  pedir('/settings/trazados', { method: 'POST', body: datos })
+
+export const editarTrazado = (id, datos) =>
+  pedir(`/settings/trazados/${id}`, { method: 'PUT', body: datos })
+
+export const activarTrazado = (id) =>
+  pedir(`/settings/trazados/${id}/activar`, { method: 'PUT' })
+
+export const borrarTrazado = (id) =>
+  pedir(`/settings/trazados/${id}`, { method: 'DELETE' })
+
+export const imagenTrazadoPorRuta = (id, ruta) =>
+  pedir(`/settings/trazados/${id}/imagen`, { method: 'PUT', body: { ruta } })
+
+// La subida no pasa por `pedir`: con FormData el navegador tiene que poner
+// él mismo el Content-Type, porque lleva el boundary que separa las partes.
+// Fijarlo a application/json dejaría el cuerpo ilegible para el servidor.
+export async function subirImagenTrazado(id, archivo) {
+  const cuerpo = new FormData()
+  cuerpo.append('archivo', archivo)
+
+  let response
+  try {
+    response = await fetch(`${BASE}/settings/trazados/${id}/imagen`, {
+      method: 'POST',
+      headers: { ...cabeceraAuth() },
+      body: cuerpo,
+    })
+  } catch {
+    throw new ApiError('No se pudo contactar al backend', 0)
+  }
+
+  if (response.status === 401) {
+    avisarSesionExpirada()
+    throw new ApiError('La sesión expiró, vuelve a iniciar sesión', 401)
+  }
+
+  const payload = await response.json().catch(() => null)
+
+  if (!response.ok) throw new ApiError(leerDetalle(payload, response.status), response.status)
+
+  return payload
+}
+
 export const usuariosApi   = recurso('/users')
 
 // Apaga CasparCG, el frontend y el backend. MongoDB no se toca. Solo
