@@ -100,6 +100,18 @@ function torreNombre(piloto){
 
     html += torreLetra(" ", false);
 
+    /* Un apellido compuesto se deja entero: ALAN DE GRACIA abreviado a las
+       tres primeras letras daba "A. DE", que no dice quién es. La partícula
+       sola no identifica a nadie, y hay varios "DE" en la parrilla.
+
+       Se detecta por el espacio y no por una lista de partículas: así vale
+       igual para DE GRACIA que para JEAN FRANCOIS, donde lo que sigue no es
+       una partícula sino otro apellido. */
+    if (apellido.includes(" ")) {
+        html += [...apellido].map(c => torreLetra(c, false)).join("");
+        return html;
+    }
+
     /* Tres primeras del apellido, igual que el abbr_name del backend, para
        que todos los tótems digan exactamente lo mismo. */
     html += [...apellido.slice(0, 3)].map(c => torreLetra(c, false)).join("");

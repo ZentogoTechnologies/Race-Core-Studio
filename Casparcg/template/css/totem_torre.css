@@ -1,5 +1,7 @@
 @charset "UTF-8";
 
+@import url("torre_medidas.css");
+
 /* ==========================================================================
    TÓTEM NOMBRE COMPLETO
 
@@ -35,10 +37,10 @@
     --tf-morado:     #B72DFF;
     --tf-morado-bg:  rgba(94, 20, 138, .70);
 
-    /* Un 15% sobre los 390/34 originales, y las filas llevan además su
-       propio respiro para que los nombres no vayan pegados. */
-    --tf-ancho:      449px;
-    --tf-alto-fila:  42px;
+    /* El tamaño vive en torre_medidas.css, que comparte con las banderas.
+       Bajado un 15% de ancho y un 20% de alto respecto al anterior: las
+       banderas ocupan la cabecera de la torre y con la torre más grande
+       dejaban de cuadrar. */
 }
 
 /* ===================================
@@ -50,7 +52,7 @@
     /* Despegado de las esquinas: pegado al borde parece un error de
        encuadre, y en muchos televisores el borde queda fuera de la zona
        segura y se recorta. */
-    margin:34px 0 0 34px;
+    margin:var(--tf-margen) 0 0 var(--tf-margen);
 
     width:var(--tf-ancho);
 
@@ -77,14 +79,14 @@
 
     align-items:stretch;
 
-    height:64px;
+    height:var(--tf-cabecera-alto);
 
     background:var(--tf-cabecera);
 }
 
 .tf-logo{
 
-    width:110px;
+    width:var(--tf-logo-ancho);
 
     flex:0 0 auto;
 
@@ -114,7 +116,7 @@
 
 .tf-logo img{
 
-    width:71px;
+    width:var(--tf-logo-img);
 
     height:auto;
 }
@@ -136,7 +138,7 @@
 
 .tf-grupo{
 
-    font-size:17px;
+    font-size:14px;
 
     font-weight:900;
 
@@ -162,7 +164,7 @@
 
     gap:8px;
 
-    font-size:11px;
+    font-size:10px;
 
     letter-spacing:1.4px;
 
@@ -208,11 +210,11 @@
 
     align-items:center;
 
-    height:24px;
+    height:19px;
 
-    padding:0 12px;
+    padding:0 10px;
 
-    font-size:12px;
+    font-size:11px;
     font-weight:900;
     letter-spacing:2px;
     text-transform:uppercase;
@@ -271,13 +273,13 @@
 
 .tf-pos{
 
-    width:40px;
+    width:34px;
 
     flex:0 0 auto;
 
     text-align:center;
 
-    font-size:17px;
+    font-size:15px;
     font-weight:900;
 
     color:#FFFFFF;
@@ -312,13 +314,13 @@
 
 .tf-marca{
 
-    width:34px;
+    width:29px;
 
-    height:25px;
+    height:21px;
 
     flex:0 0 auto;
 
-    margin:0 11px 0 9px;
+    margin:0 9px 0 7px;
 
     display:flex;
     align-items:center;
@@ -344,7 +346,7 @@
 
     min-width:0;
 
-    font-size:16px;
+    font-size:14px;
 
     font-weight:800;
 
@@ -373,13 +375,13 @@
 
     flex:0 0 auto;
 
-    min-width:36px;
+    min-width:31px;
 
     margin-right:10px;
 
     text-align:center;
 
-    font-size:13px;
+    font-size:11px;
     font-weight:900;
 
     color:rgba(255,255,255,.85);
@@ -476,7 +478,7 @@
 
 .tf-dif{
 
-    width:96px;
+    width:82px;
 
     flex:0 0 auto;
 
@@ -490,7 +492,7 @@
 
     background:rgba(0,0,0,.34);
 
-    font-size:15px;
+    font-size:13px;
     font-weight:900;
 
     color:#FFFFFF;

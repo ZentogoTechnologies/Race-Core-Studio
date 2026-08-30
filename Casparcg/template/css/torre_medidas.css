@@ -1,0 +1,37 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   MEDIDAS DE LA TORRE
+
+   Un solo sitio para el tamaño de la torre de clasificación y de todo lo
+   que tiene que encajar con ella.
+
+   Las banderas no son un gráfico aparte que casualmente se parece al
+   tótem: se dibujan en el mismo hueco, ocupando su cabecera. Cuando cada
+   una llevaba sus propias cifras, cambiar el tamaño del tótem dejaba las
+   banderas descuadradas, tapándole el grupo y la primera posición. Aquí
+   se declaran una vez y las usan las dos.
+========================================================================== */
+
+:root{
+
+    /* Despegue de la esquina. Pegado al borde parece un error de encuadre,
+       y en muchos televisores el borde queda fuera de la zona segura. */
+    --tf-margen:         34px;
+
+    --tf-ancho:          382px;
+
+    --tf-alto-fila:      34px;
+
+    --tf-cabecera-alto:  51px;
+
+    /* Caja del logo del autódromo, a la izquierda de la cabecera. Es la
+       parte que la bandera tiene que hacer coincidir para que el corte
+       entre el logo y el color caiga en el mismo sitio. */
+    --tf-logo-ancho:     94px;
+    --tf-logo-img:       60px;
+
+    /* Lo que le queda a la bandera después del logo. Se deriva en vez de
+       escribirse para que no pueda quedarse desfasada del ancho. */
+    --tf-panel-bandera:  calc(var(--tf-ancho) - var(--tf-logo-ancho));
+}

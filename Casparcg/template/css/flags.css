@@ -1,5 +1,7 @@
 @charset "UTF-8";
 
+@import url("torre_medidas.css");
+
 /* ===================================
    FLAG PANELS
 =================================== */
@@ -318,4 +320,63 @@
     color:#111111;
 
     text-shadow:none;
+}
+
+
+/* ==========================================================================
+   ENCAJE CON LA TORRE
+
+   La bandera se dibuja sobre la cabecera del tótem, así que tiene que
+   medir exactamente lo mismo. totem_names.css trae las medidas del tótem
+   viejo —cabecera de 90px y caja de logo de 128px— y desde aquí se
+   corrigen a las de torre_medidas.css, que es de donde las toma también
+   la torre.
+
+   Van al final del archivo a propósito: flags.css se carga después de
+   totem_names.css, y así ganan sin subir la especificidad.
+
+   El ancho del panel no se escribe, se calcula: lo que sobra de la torre
+   después del logo. `.leaderboard` se deja en width:max-content como
+   estaba, para que la caja negra no asome antes de que la bandera salga.
+========================================================================== */
+
+.leaderboard{
+
+    /* Mismo despegue de la esquina que la torre, o la bandera aparece
+       desplazada arriba y a la izquierda. */
+    margin:var(--tf-margen, 34px) 0 0 var(--tf-margen, 34px);
+}
+
+.lb-header{
+
+    height:var(--tf-cabecera-alto, 51px);
+}
+
+.lb-logo{
+
+    width:var(--tf-logo-ancho, 94px);
+}
+
+.lb-logo img{
+
+    width:var(--tf-logo-img, 60px);
+}
+
+.lb-heat.flag{
+
+    width:var(--tf-panel-bandera);
+    min-width:var(--tf-panel-bandera);
+}
+
+/* La animación de apertura, al mismo ancho. */
+@keyframes flagOpen{
+
+    from{ width:0; }
+    to  { width:var(--tf-panel-bandera); }
+}
+
+@keyframes flagClose{
+
+    from{ width:var(--tf-panel-bandera); }
+    to  { width:0; }
 }
