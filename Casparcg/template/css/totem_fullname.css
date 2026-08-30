@@ -16,13 +16,16 @@
 
 :root{
 
-    /* Un solo lugar para ajustar cuánto se transparenta todo. */
-    --tf-panel:      rgba(6, 8, 11, .55);
-    --tf-cabecera:   rgba(0, 0, 0, .66);
-    --tf-logo:       rgba(0, 0, 0, .85);
-    --tf-fila:       rgba(9, 11, 15, .60);
-    --tf-fila-alt:   rgba(16, 19, 24, .60);
-    --tf-lider:      rgba(20, 16, 6, .88);
+    /* Un solo lugar para ajustar cuánto se transparenta todo.
+       Niveles bajados para acercarse a la torre de F1: la carrera pesa
+       más que el gráfico. Lo que compensa la pérdida de contraste es el
+       halo del texto, no el fondo. */
+    --tf-panel:      rgba(6, 8, 11, .38);
+    --tf-cabecera:   rgba(0, 0, 0, .52);
+    --tf-logo:       rgba(0, 0, 0, .74);
+    --tf-fila:       rgba(9, 11, 15, .44);
+    --tf-fila-alt:   rgba(16, 19, 24, .44);
+    --tf-lider:      rgba(30, 24, 4, .74);
 
     --tf-acento:     #D50000;
     --tf-oro:        #E8BE03;
@@ -30,7 +33,7 @@
     /* Morado de vuelta rápida, el mismo código que usa la F1. Se reserva
        para eso y no se usa en ningún otro sitio del gráfico. */
     --tf-morado:     #B72DFF;
-    --tf-morado-bg:  rgba(94, 20, 138, .82);
+    --tf-morado-bg:  rgba(94, 20, 138, .70);
 
     /* Un 15% sobre los 390/34 originales, y las filas llevan además su
        propio respiro para que los nombres no vayan pegados. */
@@ -43,6 +46,11 @@
 =================================== */
 
 .tf-torre{
+
+    /* Despegado de las esquinas: pegado al borde parece un error de
+       encuadre, y en muchos televisores el borde queda fuera de la zona
+       segura y se recorta. */
+    margin:34px 0 0 34px;
 
     width:var(--tf-ancho);
 
@@ -275,6 +283,8 @@
     color:#FFFFFF;
 
     font-variant-numeric:tabular-nums;
+
+    text-shadow:0 1px 2px rgba(0,0,0,1), 0 0 8px rgba(0,0,0,.9);
 }
 
 .tf-fila.lider .tf-pos{
@@ -350,9 +360,13 @@
     overflow:hidden;
     text-overflow:ellipsis;
 
-    /* Halo oscuro: el texto blanco pasa por encima del video y sobre una
-       recta soleada desaparece sin esto. */
-    text-shadow:0 1px 3px rgba(0,0,0,.9);
+    /* Halo oscuro. Con el panel casi transparente esto deja de ser un
+       adorno: es lo único que sostiene el texto blanco sobre una recta
+       soleada. Van tres capas, de más cerrada a más abierta. */
+    text-shadow:
+        0 1px 2px rgba(0,0,0,1),
+        0 0 6px rgba(0,0,0,.95),
+        0 0 14px rgba(0,0,0,.7);
 }
 
 .tf-dorsal{
@@ -372,11 +386,15 @@
 
     font-variant-numeric:tabular-nums;
 
-    background:rgba(255,255,255,.10);
+    /* El dorsal sube su propio fondo: con el panel tan transparente, un
+       10% de blanco sobre asfalto claro deja la pastilla invisible. */
+    background:rgba(0,0,0,.45);
 
     border-radius:3px;
 
     padding:2px 5px;
+
+    text-shadow:0 1px 2px rgba(0,0,0,1);
 }
 
 .tf-fila.lider .tf-dorsal{
@@ -446,4 +464,65 @@
     background:var(--tf-morado);
 
     vertical-align:middle;
+}
+
+/* ==========================================================================
+   DE NOMBRE COMPLETO A CORTO
+
+   Cada letra es su propio elemento. Al pasar a corto, las que sobran se
+   encogen a cero ancho y las que quedan se corren solas hacia la
+   izquierda: no hay que animar ninguna posición, basta con quitarles el
+   sitio a las de en medio.
+
+   ENRIQUE NORIEGA  ->  E. NOR
+========================================================================== */
+
+.tf-nombre{
+
+    /* Contenedor de las letras: no puede partir el nombre en dos líneas
+       mientras se encoge. */
+    white-space:nowrap;
+}
+
+.tf-ch{
+
+    display:inline-block;
+
+    /* 1.4em cubre cualquier letra de la tipografía; lo que importa es que
+       haya un valor concreto del que bajar a cero. */
+    max-width:1.4em;
+
+    overflow:hidden;
+
+    white-space:pre;
+
+    vertical-align:bottom;
+
+    transition:
+        max-width .45s cubic-bezier(.4,0,.2,1),
+        opacity   .30s ease;
+}
+
+/* Las que desaparecen al pasar a corto. */
+.tf-torre.corto .tf-ch.tf-fuera{
+
+    max-width:0;
+
+    opacity:0;
+}
+
+/* El punto de "E." no está en el nombre original: se planta oculto y solo
+   aparece cuando el nombre se abrevia. */
+.tf-ch.tf-punto{
+
+    max-width:0;
+
+    opacity:0;
+}
+
+.tf-torre.corto .tf-ch.tf-punto{
+
+    max-width:.5em;
+
+    opacity:1;
 }

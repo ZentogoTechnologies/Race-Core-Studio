@@ -55,6 +55,14 @@ const torre  = document.getElementById("torre");
    CG ... UPDATE 1 "{\"limite\":15}" */
 let LIMITE = 20;
 
+/* Segundos que el tótem muestra los nombres completos antes de encogerse.
+   Da tiempo a leerlos y después deja de tapar la carrera. Con
+   CG ... UPDATE 1 "{\"retraso\":10}" se cambia, y con
+   {\"modo\":\"completo\"} o {\"modo\":\"corto\"} se fuerza uno de los dos. */
+let RETRASO = 6;
+
+let temporizadorCorto = null;
+
 let firmaAnterior = null;
 
 
@@ -79,6 +87,76 @@ function escapar(texto){
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+}
+
+
+function letra(caracter, fuera){
+
+    /* Cada letra va en su propia caja para poder quitarle el ancho sin
+       tocar a las demás: al encogerse, las que quedan se corren solas
+       hacia la izquierda. */
+
+    return `<span class="tf-ch${fuera ? " tf-fuera" : ""}">${escapar(caracter)}</span>`;
+}
+
+
+function nombreAnimado(piloto){
+
+    /* ENRIQUE NORIEGA -> E. NOR
+
+       Se conservan la inicial del nombre, un punto que aparece al
+       abreviar, el espacio y las tres primeras letras del apellido. El
+       resto se marca para desaparecer.
+
+       Se usan `name` y `last_name` por separado y no `full_name`: partir
+       la cadena entera fallaría con apellidos compuestos como DE GRACIA,
+       donde el espacio del medio no separa nombre de apellido. */
+
+    const nombre   = String(piloto.name || "").toUpperCase();
+    const apellido = String(piloto.last_name || "").toUpperCase();
+
+    /* Sin apellido no hay nada que abreviar: se deja el texto tal cual. */
+    if (!apellido) {
+        return [...(piloto.full_name || "")].map(c => letra(c, false)).join("");
+    }
+
+    let html = "";
+
+    /* Inicial del nombre, y detrás el punto oculto. */
+    if (nombre) {
+        html += letra(nombre[0], false);
+        html += `<span class="tf-ch tf-punto">.</span>`;
+        html += [...nombre.slice(1)].map(c => letra(c, true)).join("");
+    }
+
+    html += letra(" ", false);
+
+    /* Tres primeras del apellido, igual que el abbr_name del backend, para
+       que este tótem y el corto digan exactamente lo mismo. */
+    html += [...apellido.slice(0, 3)].map(c => letra(c, false)).join("");
+    html += [...apellido.slice(3)].map(c => letra(c, true)).join("");
+
+    return html;
+}
+
+
+function programarCorto(){
+
+    /* Se reprograma en cada repintado: si entra un piloto nuevo mientras
+       corre la cuenta, la animación no se dispara a medias. */
+
+    clearTimeout(temporizadorCorto);
+
+    if (RETRASO <= 0) {
+        torre.classList.add("corto");
+        return;
+    }
+
+    torre.classList.remove("corto");
+
+    temporizadorCorto = setTimeout(() => {
+        torre.classList.add("corto");
+    }, RETRASO * 1000);
 }
 
 
@@ -114,12 +192,16 @@ function pintarFilas(standings){
             <div class="tf-pos">${escapar(piloto.position)}</div>
             <div class="tf-barra"></div>
             <div class="tf-marca">${logo}</div>
-            <div class="tf-nombre">${escapar(piloto.full_name)}</div>
+            <div class="tf-nombre">${nombreAnimado(piloto)}</div>
             <div class="tf-dorsal">${escapar(piloto.number)}</div>
         `;
 
         cuerpo.appendChild(fila);
     });
+
+    /* Las letras nacen enteras y se encogen después; si se pintaran ya
+       encogidas no habría animación que ver. */
+    programarCorto();
 }
 
 
@@ -184,6 +266,19 @@ function update(data){
         const d = typeof data === "string" ? JSON.parse(data) : (data || {});
 
         if (d.api) configurarTiming(d.api);
+
+        if (d.retraso !== undefined) {
+            RETRASO = parseInt(d.retraso, 10);
+            programarCorto();
+        }
+
+        if (d.modo === "corto") {
+            clearTimeout(temporizadorCorto);
+            torre.classList.add("corto");
+        } else if (d.modo === "completo") {
+            clearTimeout(temporizadorCorto);
+            torre.classList.remove("corto");
+        }
 
         if (d.limite) {
             LIMITE = parseInt(d.limite, 10) || LIMITE;
