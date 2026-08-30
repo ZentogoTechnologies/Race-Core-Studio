@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes, useOutletContext } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import { DisciplinaProvider } from './context/DisciplinaContext'
@@ -14,20 +14,6 @@ import PilotosModule from './pages/Pilotos'
 import VehiculosModule from './pages/Vehiculos'
 import GraficosModule from './pages/Graficos'
 import UsuariosModule from './pages/Usuarios'
-
-// ─── Módulos que dependen del estado del layout ───────────────
-// Los demás piden sus datos al backend. Solo eventos sigue en memoria,
-// así que es el único que aún recibe estado por el context del Outlet.
-
-function Inicio() {
-  const { eventos } = useOutletContext()
-  return <HomeModule eventos={eventos} />
-}
-
-function Eventos() {
-  const { eventos, setEventos } = useOutletContext()
-  return <EventosModule eventos={eventos} setEventos={setEventos} />
-}
 
 export default function App() {
   return (
@@ -46,8 +32,8 @@ export default function App() {
               <Route element={<ProtectedRoute />}>
                 <Route element={<DisciplinaGate />}>
                   <Route element={<MainLayout />}>
-                    <Route index             element={<Inicio />} />
-                    <Route path="eventos"    element={<Eventos />} />
+                    <Route index             element={<HomeModule />} />
+                    <Route path="eventos"    element={<EventosModule />} />
                     <Route path="categorias" element={<CategoriasModule />} />
                     <Route path="pilotos"    element={<PilotosModule />} />
                     <Route path="vehiculos"  element={<VehiculosModule />} />

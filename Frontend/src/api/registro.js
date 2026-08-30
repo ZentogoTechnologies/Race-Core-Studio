@@ -93,6 +93,17 @@ export const categoriasApi = recurso('/categories')
 
 // Solo responde al usuario dueño; a cualquier otro rol el backend le
 // devuelve 403 aunque llame la ruta directamente.
+export const eventosApi    = recurso('/events')
+
+// Las sesiones no son un recurso aparte: viven dentro del evento y las
+// dos operaciones devuelven el evento entero ya recalculado, con el
+// nombre y el número que le tocó a la sesión nueva.
+export const agregarSesion = (eventId, datos) =>
+  pedir(`/events/${eventId}/sesiones`, { method: 'POST', body: datos })
+
+export const quitarSesion = (eventId, numeroOrden) =>
+  pedir(`/events/${eventId}/sesiones/${numeroOrden}`, { method: 'DELETE' })
+
 export const usuariosApi   = recurso('/users')
 
 // Apaga CasparCG, el frontend y el backend. MongoDB no se toca. Solo

@@ -35,10 +35,8 @@ export default function MainLayout() {
   const visibles = MODULOS.filter(m => !m.roles || m.roles.includes(rol))
   const IconoDisciplina = ICONO_DISCIPLINA[disciplina] || Flag
 
-  // Pilotos, vehículos y categorías ya no viven aquí: cada módulo los
-  // pide al backend con su propia paginación. Solo eventos sigue en
-  // memoria, porque su CRUD del servidor está sin construir.
-  const [eventos, setEventos] = useState([])
+  // Ya no hay estado compartido: cada módulo pide sus datos al backend
+  // con su propia paginación.
 
   const salir = () => {
     cerrarSesion()
@@ -116,7 +114,7 @@ export default function MainLayout() {
           <h2 className="text-xl font-bold uppercase tracking-wider text-neutral-200">{titulo}</h2>
         </header>
         <div className="flex-1 overflow-auto p-8 z-10">
-          <Outlet context={{ eventos, setEventos }} />
+          <Outlet />
         </div>
       </main>
     </div>

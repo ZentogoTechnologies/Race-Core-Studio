@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Calendar, Tag, Users, Car, Download, Loader2, Power, AlertTriangle } from 'lucide-react'
 import { exportAllToJSON } from '../utils/exportJSON'
-import { apagarSistema, categoriasApi, pilotosApi, vehiculosApi } from '../api/registro'
+import { apagarSistema, categoriasApi, eventosApi, pilotosApi, vehiculosApi } from '../api/registro'
 import { useToast } from '../context/ToastContext'
 import { useDisciplina } from '../context/DisciplinaContext'
 import { useAuth } from '../context/AuthContext'
@@ -20,11 +20,11 @@ function StatCard({ icon, title, count, cargando }) {
   )
 }
 
-export default function HomeModule({ eventos = [] }) {
+export default function HomeModule() {
   const toast = useToast()
   const { disciplina, etiqueta } = useDisciplina()
   const { puedeEscribir } = useAuth()
-  const [totales,  setTotales]  = useState({ p: 0, v: 0, c: 0 })
+  const [totales,  setTotales]  = useState({ p: 0, v: 0, c: 0, e: 0 })
   const [cargando, setCargando] = useState(true)
   const [exportando, setExportando] = useState(false)
   const [confirmando, setConfirmando] = useState(false)
@@ -43,9 +43,10 @@ export default function HomeModule({ eventos = [] }) {
       pilotosApi.listar({ limit: 1, discipline: disciplina }),
       vehiculosApi.listar({ limit: 1, discipline: disciplina }),
       categoriasApi.listar({ limit: 1, discipline: disciplina }),
+      eventosApi.listar({ limit: 1, discipline: disciplina }),
     ])
-      .then(([p, v, c]) => {
-        if (vigente) setTotales({ p: p.total, v: v.total, c: c.total })
+      .then(([p, v, c, e]) => {
+        if (vigente) setTotales({ p: p.total, v: v.total, c: c.total, e: e.total })
       })
       .catch(err => {
         if (vigente) toast.error('No se pudieron cargar los totales', err.message)
@@ -60,13 +61,14 @@ export default function HomeModule({ eventos = [] }) {
   const exportarTodo = async () => {
     setExportando(true)
     try {
-      const [pilotos, vehiculos, categorias] = await Promise.all([
+      const [pilotos, vehiculos, categorias, eventos] = await Promise.all([
         pilotosApi.listar({ sort_by: 'last_name', discipline: disciplina }),
         vehiculosApi.listar({ sort_by: 'number', discipline: disciplina }),
         categoriasApi.listar({ sort_by: 'category_name', discipline: disciplina }),
+        eventosApi.listar({ sort_by: 'start_date', discipline: disciplina }),
       ])
       exportAllToJSON({
-        eventos,
+        eventos: eventos.items,
         categorias: categorias.items,
         pilotos: pilotos.items,
         vehiculos: vehiculos.items,
@@ -173,7 +175,7 @@ export default function HomeModule({ eventos = [] }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 relative z-10">
-          <StatCard icon={<Calendar />} title="Eventos"    count={eventos.length} />
+          <StatCard icon={<Calendar />} title="Eventos"    count={totales.e} cargando={cargando} />
           <StatCard icon={<Tag />}      title="Categorías" count={totales.c} cargando={cargando} />
           <StatCard icon={<Users />}    title="Pilotos"    count={totales.p} cargando={cargando} />
           <StatCard icon={<Car />}      title="Vehículos"  count={totales.v} cargando={cargando} />

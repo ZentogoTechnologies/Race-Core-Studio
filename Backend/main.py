@@ -13,6 +13,7 @@ from src.models.categories_model import Category
 from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
 from src.models.users_model import User
+from src.models.events_model import Event
 
 # Routes
 from src.routes.categories_routes import categories
@@ -23,6 +24,7 @@ from src.routes.timing_routes import timing
 from src.routes.users_routes import users
 from src.routes.login_routes import login
 from src.routes.system_routes import system
+from src.routes.events_routes import events
 
 # Auth
 from src.services.auth_services import usuario_actual
@@ -35,7 +37,7 @@ async def lifespan(app: FastAPI):
     client = AsyncMongoClient(settings.MONGO_URI)
     await init_beanie(
         database=client[settings.DB_NAME],
-        document_models=[Category, Pilot, Vehicle, User]
+        document_models=[Category, Pilot, Vehicle, User, Event]
     )
     print("✅ Conectado a MongoDB")
     yield
@@ -83,6 +85,7 @@ app.include_router(categories, prefix="/api/v1/categories", tags=["Categories"],
 app.include_router(pilots, prefix="/api/v1/pilots", tags=["Pilots"], dependencies=PROTEGIDO)
 app.include_router(vehicles, prefix="/api/v1/vehicles", tags=["Vehicles"], dependencies=PROTEGIDO)
 app.include_router(graphics, prefix="/api/v1/graphics", tags=["Graphics"], dependencies=PROTEGIDO)
+app.include_router(events, prefix="/api/v1/events", tags=["Events"], dependencies=PROTEGIDO)
 
 # Timing se protege por ruta, no en bloque: la única abierta es
 # GET /timing/current, que es lo que consultan las plantillas de CasparCG
