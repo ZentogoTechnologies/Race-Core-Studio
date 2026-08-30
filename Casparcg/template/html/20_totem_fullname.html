@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Totem Nombre Completo</title>
     <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/totem_fullname.css">
+    <link rel="stylesheet" href="../css/totem_torre.css">
 </head>
 <body>
 
@@ -35,263 +35,48 @@
 </div>
 
 <script src="../js/timing.js"></script>
+<script src="../js/torre.js"></script>
 <script>
 
 /* ==========================================================================
    TÓTEM NOMBRE COMPLETO
 
-   Torre vertical con la posición, el logo de la marca del carro y el
-   nombre completo del piloto. Los datos llegan del backend, que ya cruzó
-   el dorsal contra la base para sacar el nombre bien escrito y la marca.
+   Entra con el nombre completo y a los seis segundos se abrevia solo:
+   las letras que sobran pierden el ancho y las que quedan se corren
+   hacia la izquierda. Es el tótem con el que se presenta a la gente.
 
-   La lógica de consulta no cambió respecto a la versión anterior: lo que
-   se rehízo es cómo se ve.
+   Todo lo común a los cuatro tótems vive en js/torre.js. Aquí solo se
+   declara en qué se diferencia este.
 ========================================================================== */
 
-const cuerpo = document.getElementById("cuerpo");
-const torre  = document.getElementById("torre");
-
-/* Cuántas posiciones caben. CasparCG puede cambiarlo con
-   CG ... UPDATE 1 "{\"limite\":15}" */
-let LIMITE = 20;
-
-/* Segundos que el tótem muestra los nombres completos antes de encogerse.
-   Da tiempo a leerlos y después deja de tapar la carrera. Con
-   CG ... UPDATE 1 "{\"retraso\":10}" se cambia, y con
-   {\"modo\":\"completo\"} o {\"modo\":\"corto\"} se fuerza uno de los dos. */
-let RETRASO = 6;
-
-let temporizadorCorto = null;
-
-let firmaAnterior = null;
-
-
-/* Las banderas de MyLaps al color de la banda superior. */
-const BANDERAS = {
-    red:        { clase: "roja",     texto: "BANDERA ROJA · SESIÓN DETENIDA" },
-    yellow:     { clase: "amarilla", texto: "BANDERA AMARILLA" },
-    green:      { clase: "verde",    texto: "PISTA VERDE" },
-    white:      { clase: "blanca",   texto: "ÚLTIMA VUELTA" },
-    checkered:  { clase: "cuadros",  texto: "BANDERA A CUADROS" },
-    finish:     { clase: "cuadros",  texto: "FIN DE CARRERA" },
-};
-
-
-function escapar(texto){
-
-    /* Los nombres salen de la base y del XML de MyLaps. Un apellido con
-       un & o un < romperia el innerHTML de la fila. */
-
-    return String(texto == null ? "" : texto)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-}
-
-
-function letra(caracter, fuera){
-
-    /* Cada letra va en su propia caja para poder quitarle el ancho sin
-       tocar a las demás: al encogerse, las que quedan se corren solas
-       hacia la izquierda. */
-
-    return `<span class="tf-ch${fuera ? " tf-fuera" : ""}">${escapar(caracter)}</span>`;
-}
-
-
-function nombreAnimado(piloto){
-
-    /* ENRIQUE NORIEGA -> E. NOR
-
-       Se conservan la inicial del nombre, un punto que aparece al
-       abreviar, el espacio y las tres primeras letras del apellido. El
-       resto se marca para desaparecer.
-
-       Se usan `name` y `last_name` por separado y no `full_name`: partir
-       la cadena entera fallaría con apellidos compuestos como DE GRACIA,
-       donde el espacio del medio no separa nombre de apellido. */
-
-    const nombre   = String(piloto.name || "").toUpperCase();
-    const apellido = String(piloto.last_name || "").toUpperCase();
-
-    /* Sin apellido no hay nada que abreviar: se deja el texto tal cual. */
-    if (!apellido) {
-        return [...(piloto.full_name || "")].map(c => letra(c, false)).join("");
-    }
-
-    let html = "";
-
-    /* Inicial del nombre, y detrás el punto oculto. */
-    if (nombre) {
-        html += letra(nombre[0], false);
-        html += `<span class="tf-ch tf-punto">.</span>`;
-        html += [...nombre.slice(1)].map(c => letra(c, true)).join("");
-    }
-
-    html += letra(" ", false);
-
-    /* Tres primeras del apellido, igual que el abbr_name del backend, para
-       que este tótem y el corto digan exactamente lo mismo. */
-    html += [...apellido.slice(0, 3)].map(c => letra(c, false)).join("");
-    html += [...apellido.slice(3)].map(c => letra(c, true)).join("");
-
-    return html;
-}
-
-
-function programarCorto(){
-
-    /* Se reprograma en cada repintado: si entra un piloto nuevo mientras
-       corre la cuenta, la animación no se dispara a medias. */
-
-    clearTimeout(temporizadorCorto);
-
-    if (RETRASO <= 0) {
-        torre.classList.add("corto");
-        return;
-    }
-
-    torre.classList.remove("corto");
-
-    temporizadorCorto = setTimeout(() => {
-        torre.classList.add("corto");
-    }, RETRASO * 1000);
-}
-
-
-function pintarFilas(standings){
-
-    /* Se redibuja solo si cambio algo. Repintar diez veces por segundo
-       hace parpadear los logos, que son peticiones al backend. */
-
-    const firma = timingFirma(standings, ["position", "full_name", "number", "brand_logo", "is_best_lap"]);
-    if (firma === firmaAnterior) return;
-    firmaAnterior = firma;
-
-    cuerpo.innerHTML = "";
-
-    standings.forEach((piloto, index) => {
-
-        const fila = document.createElement("div");
-        const clases = ["tf-fila"];
-        if (index === 0) clases.push("lider");
-        // El backend marca quien tiene la vuelta rapida comparando el
-        // dorsal de la cabecera del XML con el de cada fila.
-        if (piloto.is_best_lap) clases.push("vuelta-rapida");
-
-        fila.className = clases.join(" ");
-
-        /* Sin logo se deja el hueco vacio en vez de un roto: la columna
-           tiene que seguir alineada aunque falte una marca. */
-        const logo = piloto.brand_logo
-            ? `<img src="${escapar(piloto.brand_logo)}" alt="${escapar(piloto.brand || "")}">`
-            : "";
-
-        fila.innerHTML = `
-            <div class="tf-pos">${escapar(piloto.position)}</div>
-            <div class="tf-barra"></div>
-            <div class="tf-marca">${logo}</div>
-            <div class="tf-nombre">${nombreAnimado(piloto)}</div>
-            <div class="tf-dorsal">${escapar(piloto.number)}</div>
-        `;
-
-        cuerpo.appendChild(fila);
-    });
-
-    /* Las letras nacen enteras y se encogen después; si se pintaran ya
-       encogidas no habría animación que ver. */
-    programarCorto();
-}
-
-
-function pintarCabecera(datos){
-
-    const grupo = document.getElementById("grupo");
-    if (grupo) grupo.textContent = datos.group_name || datos.group || "";
-
-    const heat = document.getElementById("heat");
-    if (heat) heat.textContent = datos.heat || datos.run_name || "";
-
-    /* El backend decide si manda el reloj de carrera o la cuenta atras, y
-       manda tambien la etiqueta que corresponde. */
-    const etiqueta = document.getElementById("relojEtiqueta");
-    if (etiqueta) etiqueta.textContent = datos.time_label || "TIME";
-
-    const reloj = document.getElementById("reloj");
-    if (reloj) reloj.textContent = datos.time || "0:00";
-
-    /* Banda de estado: solo cuando hay bandera. */
-    const estado = document.getElementById("estado");
-    const bandera = BANDERAS[(datos.flag || "none").toLowerCase()];
-
-    if (estado && bandera) {
-        estado.className = "tf-estado " + bandera.clase;
-        estado.textContent = bandera.texto;
-        torre.classList.add("con-estado");
-    } else {
-        torre.classList.remove("con-estado");
-    }
-}
-
-
-function pintar(datos){
-
-    if (!datos) return;
-
-    pintarCabecera(datos);
-    pintarFilas(datos.standings || []);
-}
-
-
-/* ─── Ciclo de vida de CasparCG ─────────────────────────────── */
 
 function play(){
 
-    arrancarTiming({ limite: LIMITE, alRecibir: pintar });
+    arrancarTorre({
+        limite: 20,
+
+        /* Segundos de nombre completo antes de encogerse. Da tiempo a
+           leerlos y después deja de tapar la carrera. */
+        retraso: 6,
+
+        marca: true,
+    });
 }
 
 
 function stop(){
 
-    detenerTiming();
+    detenerTorre();
 }
 
 
 function update(data){
 
-    /* Acepta {"limite":15} y {"api":"http://otra-maquina:8080/api/v1"} */
-
-    try {
-        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
-
-        if (d.api) configurarTiming(d.api);
-
-        if (d.retraso !== undefined) {
-            RETRASO = parseInt(d.retraso, 10);
-            programarCorto();
-        }
-
-        if (d.modo === "corto") {
-            clearTimeout(temporizadorCorto);
-            torre.classList.add("corto");
-        } else if (d.modo === "completo") {
-            clearTimeout(temporizadorCorto);
-            torre.classList.remove("corto");
-        }
-
-        if (d.limite) {
-            LIMITE = parseInt(d.limite, 10) || LIMITE;
-            firmaAnterior = null;          // fuerza el repintado
-            arrancarTiming({ limite: LIMITE, alRecibir: pintar });
-        }
-    } catch (e) {
-        /* Un UPDATE con basura no puede tumbar el grafico al aire. */
-    }
+    actualizarTorre(data);
 }
 
 
-/* Fuera de CasparCG (abriendo el html a mano) no hay play(), asi que se
+/* Fuera de CasparCG (abriendo el html a mano) no hay play(), así que se
    arranca solo para poder verlo en el navegador. */
 if (!window.__casparcg) {
     play();

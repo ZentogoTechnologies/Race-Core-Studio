@@ -1,300 +1,87 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <title>Timing Tower</title>
-
-    <link rel="stylesheet" href="../css/totem_names.css">
+    <title>Totem Nombre Corto</title>
     <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/totem_shortname.css">
-
+    <link rel="stylesheet" href="../css/totem_torre.css">
 </head>
-
 <body>
 
-<div class="leaderboard" id="leaderboard">
+<div class="tf-torre" id="torre">
 
-    <!-- HEADER -->
-    <div class="lb-header">
+    <div class="tf-cabecera">
 
-        <div class="lb-logo">
+        <div class="tf-logo">
             <img src="../img/logoap.png" alt="Autódromo Panamá">
         </div>
 
-        <div class="lb-info">
-
-            <!-- GRUPO / CATEGORIA -->
-            <div
-                class="lb-group"
-                id="groupName">
-                PROSPEC SERIES
+        <div class="tf-info">
+            <div class="tf-grupo" id="grupo">STREET LEGAL</div>
+            <div class="tf-sub">
+                <span class="tf-heat" id="heat">HEAT 1</span>
+                <span class="tf-reloj">
+                    <span class="tf-reloj-etiqueta" id="relojEtiqueta">TIME</span><span id="reloj">0:00</span>
+                </span>
             </div>
-
-            <div class="lb-heat" id="heatName">
-                HEAT 1
-            </div>
-
-            <div class="lb-timer">
-                <span id="timerLabel">TIME</span>
-                <span id="raceTimer">00:01:51</span>
-            </div>
-
         </div>
 
     </div>
 
-    <!-- TABLA -->
-    <div class="lb-body" id="leaderboardBody">
+    <div class="tf-estado" id="estado"></div>
 
-    </div>
+    <div class="tf-cuerpo" id="cuerpo"></div>
 
 </div>
 
 <script src="../js/timing.js"></script>
+<script src="../js/torre.js"></script>
 <script>
 
 /* ==========================================================================
-   TOTEM NOMBRE CORTO
+   TÓTEM NOMBRE CORTO
 
-   Misma informacion que el totem de nombres, pero la fila deja ya
-   reservada la quinta columna del tiempo. Asi al mostrar el tiempo al
-   lider o el intervalo no se reacomoda nada: solo se rellena el hueco.
+   La misma torre, pero entra ya abreviada. Es la que se deja puesta
+   durante la carrera: el de nombre completo sirve para presentar, este
+   para acompañar sin robar pantalla.
+
+   Todo lo común a los cuatro tótems vive en js/torre.js. Aquí solo se
+   declara en qué se diferencia este.
 ========================================================================== */
 
-const container = document.getElementById("leaderboardBody");
-
-const LIMITE = 10;
-
-let firmaAnterior = null;
-
-/* null = sin tiempos, "leader" = contra el lider, "interval" = contra
-   el de adelante. Lo cambia update() desde el frontend. */
-let columna = null;
-
-
-function textoTiempo(piloto, indice){
-
-    if (!columna) return "";
-
-    if (indice === 0) {
-        // El primero no tiene contra quien medirse.
-        return columna === "leader" ? "LEADER" : "INTERVAL";
-    }
-
-    return piloto[columna] || "";
-}
-
-
-function pintarFilas(standings){
-    /* Antes de arrancar la tanda no hay clasificacion. Se deja solo la
-       cabecera con la cuenta atras: mejor eso que una tabla vacia
-       colgando o, peor, las posiciones de la tanda anterior. */
-
-    if (standings.length === 0) {
-        container.innerHTML = "";
-        return;
-    }
-
-
-    /* El bucle corre dos veces por segundo: si se rehace el DOM cada vez
-       el totem parpadea y se pierde la animacion de los tiempos. */
-
-    const firma = timingFirma(standings, ["position", "abbr_name", "number"]) + "#" + columna;
-    if (firma === firmaAnterior) {
-        actualizarTiempos(standings);
-        return;
-    }
-    firmaAnterior = firma;
-
-    container.innerHTML = "";
-
-    standings.forEach((piloto, index) => {
-
-        const row = document.createElement("div");
-
-        row.className = index === 0 ? "lb-row leader" : "lb-row";
-
-        row.innerHTML = `
-
-            <div class="lb-pos pos-${piloto.position}">
-                ${piloto.position}
-            </div>
-
-            <div class="lb-separator"></div>
-
-            <div class="lb-name">
-                ${piloto.abbr_name}
-            </div>
-
-            <div class="lb-number">
-                ${piloto.number}
-            </div>
-
-            <div class="lb-interval">
-                ${textoTiempo(piloto, index)}
-            </div>
-
-        `;
-
-        container.appendChild(row);
-    });
-
-    if (columna) animarTiempos();
-}
-
-
-/* Solo el texto, sin tocar la estructura: los tiempos cambian a cada
-   vuelta y no deben reiniciar la animacion de entrada. */
-
-function actualizarTiempos(standings){
-
-    const celdas = container.querySelectorAll(".lb-interval");
-
-    standings.forEach((piloto, index) => {
-        if (celdas[index]) celdas[index].textContent = textoTiempo(piloto, index);
-    });
-}
-
-
-/* Entrada de izquierda a derecha, escalonada de arriba hacia abajo. */
-
-function animarTiempos(){
-
-    container.querySelectorAll(".lb-interval").forEach((celda, i) => {
-        celda.classList.remove("saliendo");
-        celda.style.animationDelay = (i * 0.05) + "s";
-        celda.classList.add("visible");
-    });
-}
-
-
-function ocultarTiempos(){
-
-    container.querySelectorAll(".lb-interval").forEach((celda, i) => {
-        celda.classList.remove("visible");
-        celda.style.animationDelay = (i * 0.04) + "s";
-        celda.classList.add("saliendo");
-    });
-}
-
-
-/**
- * Muestra u oculta la columna de tiempos.
- *
- *   mostrarColumna("leader")    -> diferencia contra el primero
- *   mostrarColumna("interval")  -> diferencia contra el de adelante
- *   mostrarColumna(null)        -> la esconde
- */
-function mostrarColumna(cual){
-
-    if (cual === columna) return;
-
-    if (!cual) {
-        ocultarTiempos();
-        columna = null;
-        firmaAnterior = null;
-        return;
-    }
-
-    columna = cual;
-    firmaAnterior = null;
-
-    const datos = timingUltimo();
-    if (datos) pintarFilas(datos.standings || []);
-}
-
-
-function pintarCabecera(datos){
-
-    /* La categoria de la tanda, encima del heat. */
-
-    const grupo = document.getElementById("groupName");
-    if (grupo) grupo.textContent = datos.group_name || datos.group || "";
-
-
-    const heat = document.getElementById("heatName");
-    if (heat) heat.textContent = datos.heat || "";
-
-    /* La etiqueta cambia con el modo: TIME en cuenta atras, LAP cuando
-       se cuentan vueltas. */
-
-    const etiqueta = document.getElementById("timerLabel");
-    if (etiqueta) etiqueta.textContent = datos.time_label || "TIME";
-
-    const timer = document.getElementById("raceTimer");
-    if (timer) timer.textContent = datos.time || "";
-}
-
-
-function pintar(datos){
-    pintarCabecera(datos);
-    pintarFilas(datos.standings || []);
-}
-
-
-/* ==========================================================================
-   PLAY / STOP
-========================================================================== */
 
 function play(){
 
-    const widget = document.getElementById("leaderboard");
+    arrancarTorre({
+        limite: 20,
 
-    widget.style.animation = "slideUp .5s ease forwards";
+        /* Sin espera: nace corta. Si alguna vez se quiere ver el nombre
+           entero, un UPDATE con {"modo":"completo"} lo abre. */
+        retraso: 0,
 
-    setTimeout(() => {
-        widget.style.animation = "expandPanel .6s ease forwards";
-    },500);
-
-    arrancarTiming({ limite: LIMITE, alRecibir: pintar });
+        marca: true,
+    });
 }
 
 
 function stop(){
 
-    detenerTiming();
-
-    const widget = document.getElementById("leaderboard");
-
-    widget.style.animation = "collapsePanel .5s ease forwards";
-
-    setTimeout(() => {
-        widget.style.animation = "slideDown .5s ease forwards";
-    },500);
+    detenerTorre();
 }
 
-
-/* ==========================================================================
-   UPDATE
-
-   CG 1-20 UPDATE 1 "{\"columna\":\"leader\"}"    -> saca los tiempos
-   CG 1-20 UPDATE 1 "{\"columna\":null}"          -> los esconde
-========================================================================== */
 
 function update(data){
 
-    if (typeof data === "string") {
-        try { data = JSON.parse(data); }
-        catch (e) { return; }
-    }
-
-    if (!data) return;
-
-    if (data.api !== undefined) configurarTiming(data.api);
-
-    if (data.columna !== undefined) mostrarColumna(data.columna);
-
-    if (data.logo !== undefined) {
-        const logo = document.getElementById("logo");
-        if (logo) logo.src = data.logo;
-    }
+    actualizarTorre(data);
 }
 
 
-window.onload = play;
+/* Fuera de CasparCG (abriendo el html a mano) no hay play(), así que se
+   arranca solo para poder verlo en el navegador. */
+if (!window.__casparcg) {
+    play();
+}
+
 </script>
 
 </body>

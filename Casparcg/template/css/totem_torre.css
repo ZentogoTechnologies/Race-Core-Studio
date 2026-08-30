@@ -467,6 +467,79 @@
 }
 
 /* ==========================================================================
+   COLUMNA DE DIFERENCIA
+
+   Solo la usan los tótems al líder y de intervalo. Va con fondo propio y
+   pegada al borde derecho, como en la torre de televisión: el ojo salta
+   del nombre al hueco sin recorrer la fila entera.
+========================================================================== */
+
+.tf-dif{
+
+    width:96px;
+
+    flex:0 0 auto;
+
+    align-self:stretch;
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+
+    padding:0 12px 0 8px;
+
+    background:rgba(0,0,0,.34);
+
+    font-size:15px;
+    font-weight:900;
+
+    color:#FFFFFF;
+
+    font-variant-numeric:tabular-nums;
+
+    text-shadow:
+        0 1px 2px rgba(0,0,0,1),
+        0 0 6px rgba(0,0,0,.9);
+}
+
+/* El primero no tiene contra quién medirse: en su fila la columna dice de
+   qué diferencia se está hablando, y por eso va en texto y no en cifra. */
+.tf-fila.lider .tf-dif{
+
+    font-size:11px;
+
+    letter-spacing:1.6px;
+
+    color:var(--tf-oro);
+}
+
+.tf-fila.vuelta-rapida .tf-dif{
+
+    background:rgba(183,45,255,.18);
+}
+
+
+/* ==========================================================================
+   TORRE SIN LOGO DE MARCA
+
+   En los tótems de líder e intervalo el sitio del logo lo ocupa el dorsal:
+   la columna de diferencia ya alarga la fila, y en categorías donde todos
+   corren la misma marca el logo no distingue a nadie.
+========================================================================== */
+
+.tf-torre.sin-marca .tf-marca{
+
+    display:none;
+}
+
+/* El dorsal pasa a la izquierda, donde iba el logo. */
+.tf-dorsal.izquierda{
+
+    margin-left:9px;
+}
+
+
+/* ==========================================================================
    DE NOMBRE COMPLETO A CORTO
 
    Cada letra es su propio elemento. Al pasar a corto, las que sobran se
