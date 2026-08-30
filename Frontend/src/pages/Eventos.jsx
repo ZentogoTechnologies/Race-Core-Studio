@@ -119,6 +119,15 @@ export default function EventosModule() {
 
   const handleSave = async (e) => {
     e.preventDefault()
+
+    // Guardia real, no cosmética. El paso 1 no puede guardar nada: si un
+    // submit se cuela desde ahí, el evento se crearía sin inscritos y el
+    // formulario se cerraría, que es justo lo que pasaba.
+    if (paso !== 2) {
+      setPaso(2)
+      return
+    }
+
     setGuardando(true)
 
     const cuerpo = {
@@ -340,15 +349,25 @@ export default function EventosModule() {
                   el submit del formulario se dispararía al pulsarlo. */}
               {paso === 1 ? (
                 <button
+                  // key distinta de la del botón de guardar: sin ella React
+                  // reutiliza el mismo nodo del DOM y solo le cambia el
+                  // type, que es el origen del submit accidental.
+                  key="ir-al-paso-2"
                   type="button"
-                  onClick={() => setPaso(2)}
+                  onClick={(e) => {
+                    // React repinta de forma síncrona y este mismo nodo
+                    // pasa a type="submit"; el navegador evalúa la acción
+                    // por defecto después y enviaba el formulario.
+                    e.preventDefault()
+                    setPaso(2)
+                  }}
                   disabled={faltantes.length > 0}
                   className="flex items-center gap-2 bg-white text-black font-bold py-2 px-6 rounded hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   SIGUIENTE <ArrowRight size={15}/>
                 </button>
               ) : (
-                <button type="submit" disabled={guardando}
+                <button key="guardar" type="submit" disabled={guardando}
                   className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
                   {guardando && <Loader2 size={16} className="animate-spin"/>}
                   {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
