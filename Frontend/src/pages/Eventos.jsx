@@ -168,6 +168,15 @@ export default function EventosModule() {
     lista.recargar()
   }
 
+  // Qué le falta al paso 1 para poder avanzar. Se calcula aquí y se
+  // muestra al lado del botón: un botón apagado sin explicación deja al
+  // operador pulsándolo sin entender por qué no pasa nada.
+  const faltantes = []
+  if (!eventForm.name.trim())            faltantes.push('el nombre')
+  if (!eventForm.start_date)             faltantes.push('la fecha de inicio')
+  if (!eventForm.end_date)               faltantes.push('la fecha final')
+  if (eventForm.category_ids.length === 0) faltantes.push('al menos una categoría')
+
   const columnas = puedeEscribir ? 6 : 5
 
   return (
@@ -255,6 +264,11 @@ export default function EventosModule() {
           <div className="mt-5">
             <label className="block text-neutral-400 text-xs mb-2 uppercase">
               Categorías que corren ({eventForm.category_ids.length})
+              {eventForm.category_ids.length === 0 && (
+                <span className="ml-2 normal-case tracking-normal text-amber-400 font-normal">
+                  · elige al menos una para continuar
+                </span>
+              )}
             </label>
             <div className="flex flex-wrap gap-2">
               {categorias.map(c => {
@@ -309,6 +323,12 @@ export default function EventosModule() {
             </button>
 
             <div className="flex items-center gap-3">
+              {paso === 1 && faltantes.length > 0 && (
+                <p className="text-xs text-amber-400 text-right max-w-xs">
+                  Falta {faltantes.join(', ').replace(/, ([^,]*)$/, ' y $1')}.
+                </p>
+              )}
+
               {paso === 2 && (
                 <button type="button" onClick={() => setPaso(1)}
                   className="flex items-center gap-2 px-5 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold text-sm">
@@ -322,7 +342,7 @@ export default function EventosModule() {
                 <button
                   type="button"
                   onClick={() => setPaso(2)}
-                  disabled={!eventForm.name || !eventForm.start_date || !eventForm.end_date || eventForm.category_ids.length === 0}
+                  disabled={faltantes.length > 0}
                   className="flex items-center gap-2 bg-white text-black font-bold py-2 px-6 rounded hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   SIGUIENTE <ArrowRight size={15}/>
