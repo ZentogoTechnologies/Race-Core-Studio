@@ -1,12 +1,13 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2,
-  CalendarDays, Users, Car, ListOrdered,
+  CalendarDays, Car, ListOrdered, ArrowLeft, ArrowRight,
 } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import SesionesEvento from '../components/events/SesionesEvento'
+import SeleccionVehiculos from '../components/events/SeleccionVehiculos'
 import { categoriasApi, eventosApi, vehiculosApi } from '../api/registro'
 import { useListado } from '../hooks/useListado'
 import { useToast } from '../context/ToastContext'
@@ -56,6 +57,7 @@ export default function EventosModule() {
   const [guardando,    setGuardando]    = useState(false)
   const [porBorrar,    setPorBorrar]    = useState(null)
   const [expandido,    setExpandido]    = useState(null)   // evento con el programa abierto
+  const [paso,         setPaso]         = useState(1)      // 1 datos · 2 vehículos
 
   // Catálogos de la disciplina activa. Los vehículos traen sus pilotos ya
   // resueltos, que es lo que hace falta para elegir quién corre.
@@ -70,18 +72,17 @@ export default function EventosModule() {
 
   const totalDias = contarDias(eventForm.start_date, eventForm.end_date)
 
-  // Solo se pueden inscribir carros de las categorías elegidas: el backend
-  // lo rechaza igual, y ofrecer el resto solo lleva a un error evitable.
-  const vehiculosElegibles = useMemo(
-    () => vehiculos.filter(v => eventForm.category_ids.includes(v.category_id)),
-    [vehiculos, eventForm.category_ids],
+  // Objetos completos de las categorías elegidas: el paso 2 necesita sus
+  // subcategorías para agrupar. Se respeta el orden en que se marcaron.
+  const categoriasElegidas = useMemo(
+    () => eventForm.category_ids
+      .map(id => categorias.find(c => c.category_id === id))
+      .filter(Boolean),
+    [eventForm.category_ids, categorias],
   )
 
-  const inscrito = (vehicleId) =>
-    eventForm.inscritos.find(i => i.vehicle_id === vehicleId)
-
-  const openAddForm = () => { setEventForm(EMPTY_EVENT); setCurrentEditId(null); setIsFormOpen(true) }
-  const closeForm = () => { setIsFormOpen(false); setCurrentEditId(null); setEventForm(EMPTY_EVENT) }
+  const openAddForm = () => { setEventForm(EMPTY_EVENT); setCurrentEditId(null); setPaso(1); setIsFormOpen(true) }
+  const closeForm = () => { setIsFormOpen(false); setCurrentEditId(null); setEventForm(EMPTY_EVENT); setPaso(1) }
   const handleFormToggle = () => isFormOpen ? closeForm() : openAddForm()
 
   const openEditForm = (ev) => {
@@ -94,6 +95,7 @@ export default function EventosModule() {
       inscritos: ev.inscritos.map(i => ({ vehicle_id: i.vehicle_id, pilot_ids: i.pilot_ids })),
     })
     setCurrentEditId(ev.event_id)
+    setPaso(1)
     setIsFormOpen(true)
   }
 
@@ -113,37 +115,6 @@ export default function EventosModule() {
           : f.inscritos,
       }
     })
-  }
-
-  const alternarVehiculo = (v) => {
-    setEventForm(f => {
-      if (f.inscritos.some(i => i.vehicle_id === v.vehicle_id)) {
-        return { ...f, inscritos: f.inscritos.filter(i => i.vehicle_id !== v.vehicle_id) }
-      }
-      // Al inscribir un carro entran todos sus pilotos; lo normal es que
-      // corran todos, y quitar es más rápido que agregar uno por uno.
-      return {
-        ...f,
-        inscritos: [...f.inscritos, {
-          vehicle_id: v.vehicle_id,
-          pilot_ids: (v.pilots || []).map(p => p.pilot_id),
-        }],
-      }
-    })
-  }
-
-  const alternarPiloto = (vehicleId, pilotId) => {
-    setEventForm(f => ({
-      ...f,
-      inscritos: f.inscritos.map(i => {
-        if (i.vehicle_id !== vehicleId) return i
-        const dentro = i.pilot_ids.includes(pilotId)
-        return {
-          ...i,
-          pilot_ids: dentro ? i.pilot_ids.filter(p => p !== pilotId) : [...i.pilot_ids, pilotId],
-        }
-      }),
-    }))
   }
 
   const handleSave = async (e) => {
@@ -217,6 +188,35 @@ export default function EventosModule() {
 
       {isFormOpen && (
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6">
+          {/* Dos pasos porque son dos decisiones distintas: primero qué
+              categorías corren, y solo entonces tiene sentido preguntar
+              qué carros de cada una. */}
+          <div className="flex items-center gap-3 mb-5 pb-4 border-b border-neutral-800">
+            {[
+              { n: 1, titulo: 'Datos y categorías' },
+              { n: 2, titulo: 'Vehículos que corren' },
+            ].map(({ n, titulo }, i) => (
+              <Fragment key={n}>
+                {i > 0 && <span className="flex-1 h-px bg-neutral-800" />}
+                <button
+                  type="button"
+                  onClick={() => n === 1 && setPaso(1)}
+                  disabled={n === 2 && eventForm.category_ids.length === 0}
+                  className={`flex items-center gap-2 text-xs font-bold transition-colors disabled:cursor-not-allowed ${
+                    paso === n ? 'text-white' : 'text-neutral-600'
+                  }`}
+                >
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] ${
+                    paso === n ? 'bg-red-600 text-white' : 'bg-neutral-800 text-neutral-500'
+                  }`}>{n}</span>
+                  <span className="hidden sm:inline uppercase tracking-wider">{titulo}</span>
+                </button>
+              </Fragment>
+            ))}
+          </div>
+
+          {paso === 1 && (
+          <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2">
               <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre del evento</label>
@@ -278,88 +278,63 @@ export default function EventosModule() {
               )}
             </div>
           </div>
+          </>
+          )}
 
-          <div className="mt-5">
-            <label className="block text-neutral-400 text-xs mb-2 uppercase">
-              Vehículos inscritos ({eventForm.inscritos.length})
-            </label>
-
-            {eventForm.category_ids.length === 0 ? (
-              <p className="text-sm text-neutral-600 py-2">
-                Elige primero las categorías; los vehículos se filtran por ellas.
-              </p>
-            ) : (
-              <div className="max-h-72 overflow-y-auto flex flex-col gap-2 p-1">
-                {vehiculosElegibles.map(v => {
-                  const ins = inscrito(v.vehicle_id)
-                  return (
-                    <div
-                      key={v.vehicle_id}
-                      className={`rounded-lg border transition-colors ${
-                        ins ? 'border-red-600/60 bg-red-600/5' : 'border-neutral-800'
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => alternarVehiculo(v)}
-                        className="w-full flex items-center gap-3 px-3 py-2 text-left"
-                      >
-                        <span className={`inline-flex items-center justify-center min-w-[38px] h-8 px-2 rounded font-black font-mono text-sm ${
-                          ins ? 'bg-red-600 text-white' : 'bg-neutral-800 text-neutral-400'
-                        }`}>
-                          {v.display_number || v.number}
-                        </span>
-                        <span className="flex-1 min-w-0">
-                          <span className="block text-sm font-bold text-white truncate">
-                            {v.brand || 'Sin marca'} {v.model || ''}
-                          </span>
-                          <span className="block text-xs text-neutral-500">
-                            {v.category_name}{v.sub_category_name ? ` · ${v.sub_category_name}` : ''}
-                          </span>
-                        </span>
-                      </button>
-
-                      {/* Los pilotos aparecen al inscribir el carro: quién
-                          corre depende del vehículo, no al revés. */}
-                      {ins && (v.pilots || []).length > 0 && (
-                        <div className="flex flex-wrap gap-2 px-3 pb-2.5 pl-[62px]">
-                          {v.pilots.map(p => {
-                            const corre = ins.pilot_ids.includes(p.pilot_id)
-                            return (
-                              <button
-                                key={p.pilot_id} type="button"
-                                onClick={() => alternarPiloto(v.vehicle_id, p.pilot_id)}
-                                className={`px-2.5 py-1 rounded text-[11px] font-bold border transition-colors ${
-                                  corre
-                                    ? 'border-green-600/60 bg-green-600/10 text-green-400'
-                                    : 'border-neutral-800 text-neutral-600 hover:border-neutral-600'
-                                }`}
-                              >
-                                {p.name} {p.last_name}
-                              </button>
-                            )
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-                {vehiculosElegibles.length === 0 && (
-                  <p className="text-sm text-neutral-600 py-2">
-                    No hay vehículos en las categorías elegidas.
-                  </p>
-                )}
+          {paso === 2 && (
+            <div>
+              <div className="flex items-baseline justify-between mb-3">
+                <label className="text-neutral-400 text-xs uppercase">
+                  Vehículos que corren ({eventForm.inscritos.length})
+                </label>
+                <p className="text-xs text-neutral-600">
+                  Se elige categoría por categoría, y dentro por subcategoría.
+                </p>
               </div>
-            )}
-          </div>
 
-          <div className="flex justify-end gap-3 mt-5">
-            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">CANCELAR</button>
-            <button type="submit" disabled={guardando}
-              className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
-              {guardando && <Loader2 size={16} className="animate-spin"/>}
-              {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+              <SeleccionVehiculos
+                categorias={categoriasElegidas}
+                vehiculos={vehiculos}
+                inscritos={eventForm.inscritos}
+                onCambiar={inscritos => setEventForm(f => ({ ...f, inscritos }))}
+              />
+            </div>
+          )}
+
+
+          <div className="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-neutral-800">
+            <button type="button" onClick={closeForm}
+              className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">
+              CANCELAR
             </button>
+
+            <div className="flex items-center gap-3">
+              {paso === 2 && (
+                <button type="button" onClick={() => setPaso(1)}
+                  className="flex items-center gap-2 px-5 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold text-sm">
+                  <ArrowLeft size={15}/> ATRÁS
+                </button>
+              )}
+
+              {/* En el paso 1 el botón avanza, no guarda: sin type="button"
+                  el submit del formulario se dispararía al pulsarlo. */}
+              {paso === 1 ? (
+                <button
+                  type="button"
+                  onClick={() => setPaso(2)}
+                  disabled={!eventForm.name || !eventForm.start_date || !eventForm.end_date || eventForm.category_ids.length === 0}
+                  className="flex items-center gap-2 bg-white text-black font-bold py-2 px-6 rounded hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  SIGUIENTE <ArrowRight size={15}/>
+                </button>
+              ) : (
+                <button type="submit" disabled={guardando}
+                  className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
+                  {guardando && <Loader2 size={16} className="animate-spin"/>}
+                  {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+                </button>
+              )}
+            </div>
           </div>
         </form>
       )}

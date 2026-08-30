@@ -284,7 +284,7 @@ export default function VehiculosModule() {
                         : 'border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
                     }`}
                   >
-                    {piloto.name} {piloto.last_name}
+                    {piloto.name}
                   </button>
                 )
               })}
@@ -354,7 +354,7 @@ export default function VehiculosModule() {
                       <div className="flex flex-col gap-0.5">
                         {vehiculo.pilots.map(p => (
                           <span key={p.pilot_id} className="text-sm text-neutral-300 flex items-center gap-2">
-                            <Users size={12} className="text-neutral-600"/>{p.name} {p.last_name}
+                            <Users size={12} className="text-neutral-600"/>{p.name}
                           </span>
                         ))}
                       </div>
