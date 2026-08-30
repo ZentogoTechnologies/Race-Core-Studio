@@ -19,21 +19,21 @@
        y en muchos televisores el borde queda fuera de la zona segura. */
     --tf-margen:         34px;
 
-    --tf-ancho:          382px;
+    --tf-ancho:          420px;
 
-    --tf-alto-fila:      34px;
+    --tf-alto-fila:      37px;
 
     /* La cabecera se queda con el alto que tenía antes de achicar la
        torre. Es lo único que no se redujo: aquí van el grupo, la tanda y
        el reloj, y sobre esta misma franja se dibujan las banderas. Con
        51px entraba todo, pero había que fijarse para leerlo. */
-    --tf-cabecera-alto:  64px;
+    --tf-cabecera-alto:  70px;
 
     /* Caja del logo del autódromo, a la izquierda de la cabecera. Es la
        parte que la bandera tiene que hacer coincidir para que el corte
        entre el logo y el color caiga en el mismo sitio. */
-    --tf-logo-ancho:     94px;
-    --tf-logo-img:       68px;
+    --tf-logo-ancho:     103px;
+    --tf-logo-img:       75px;
 
     /* Lo que le queda a la bandera después del logo. Se deriva en vez de
        escribirse para que no pueda quedarse desfasada del ancho. */

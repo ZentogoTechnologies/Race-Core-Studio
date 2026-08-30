@@ -142,7 +142,9 @@ export default function VehiculosModule() {
         await vehiculosApi.actualizar(currentEditId, cuerpo)
         toast.exito('Vehículo actualizado', etiqueta)
       } else {
-        await vehiculosApi.crear({ ...cuerpo, vehicle_id: Number(vehicleForm.vehicle_id) })
+        // Sin vehicle_id: lo asigna el backend. El dorsal (`number`) sí
+        // lo escribe quien inscribe; esto era solo la clave interna.
+        await vehiculosApi.crear(cuerpo)
         toast.exito('Vehículo creado', etiqueta)
       }
       closeForm()
@@ -200,13 +202,6 @@ export default function VehiculosModule() {
       {isFormOpen && (
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">ID</label>
-              <input required type="number" min="1" value={vehicleForm.vehicle_id}
-                disabled={Boolean(currentEditId)}
-                onChange={e => setVehicleForm({ ...vehicleForm, vehicle_id: e.target.value })}
-                className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white disabled:opacity-40 disabled:cursor-not-allowed"/>
-            </div>
             <div>
               <label className="block text-neutral-400 text-xs mb-1 uppercase">Dorsal</label>
               <input required type="number" min="0" value={vehicleForm.number}

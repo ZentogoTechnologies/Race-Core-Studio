@@ -2,13 +2,27 @@ from typing import Optional
 
 from beanie.operators import In
 from src.models.pilots_model import Pilot
+from pathlib import Path
+
 from src.models.categories_model import Category
+from src.services.imagenes_services import (
+    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+)
 from src.schemas.pilots_schemas import PilotCreate, PilotUpdate, PilotResponse
 from src.schemas.common_schemas import Page
 from src.services.pagination import (
     campo_orden, combinar, direccion, filtro_busqueda,
 )
 from fastapi import HTTPException
+
+# Backend/src/public/pilotos, mirando desde Backend/src/services. Las
+# fotos subidas van a la raíz de pilotos/ y no a una subcarpeta de
+# categoría: un piloto puede correr en varias, y el campo `photo` guarda
+# la ruta exacta, así que no hace falta adivinarla después.
+CARPETA_FOTOS = Path(__file__).resolve().parents[1] / "public" / "pilotos"
+
+RUTA_RELATIVA = "pilotos"
+
 
 class PilotService:
     async def _build_response(self, pilot: Pilot) -> PilotResponse:
@@ -29,11 +43,25 @@ class PilotService:
             is_active=pilot.is_active
         )
 
+    async def _siguiente_id(self) -> int:
+        """El id más alto que hay, más uno.
+
+        Se calcula aquí y no en el navegador: si dos personas dan de alta
+        un piloto a la vez, las dos verían el mismo número libre y la
+        segunda chocaría al guardar.
+        """
+        ultimo = await Pilot.find_all().sort(("pilot_id", -1)).limit(1).to_list()
+        return (ultimo[0].pilot_id + 1) if ultimo else 1
+
     async def create_pilot(self, data: PilotCreate) -> PilotResponse:
-        # 1. Validar que no exista el pilot_id
-        exists = await Pilot.find_one(Pilot.pilot_id == data.pilot_id)
-        if exists:
-            raise HTTPException(status_code=400, detail="pilot_id ya existe")
+        # 1. El id lo pone el servicio salvo que venga escrito, que es el
+        # caso de una importación que quiere conservar su numeración.
+        if data.pilot_id is None:
+            data.pilot_id = await self._siguiente_id()
+        else:
+            exists = await Pilot.find_one(Pilot.pilot_id == data.pilot_id)
+            if exists:
+                raise HTTPException(status_code=400, detail="pilot_id ya existe")
 
         # 2. Buscar las categories y convertirlas a Link
         categories_links = []
@@ -140,6 +168,77 @@ class PilotService:
         if not pilot:
             raise HTTPException(status_code=404, detail="Piloto no encontrado")
 
+        # La foto se va con el piloto. Si no, cada alta y baja deja un
+        # archivo suelto en public/pilotos que nadie vuelve a mirar, y el
+        # siguiente piloto que reciba ese id heredaría la cara del anterior.
+        foto = (CARPETA_FOTOS.parent / pilot.photo.lstrip("/")) if pilot.photo else None
+
         # Opcional: validar que no esté asignado a un Vehicle
         await pilot.delete()
+
+        borrar_si_sobra(foto, CARPETA_FOTOS / "__ninguno__")
+
         return {"detail": "Piloto eliminado"}
+
+    # ── Foto ──────────────────────────────────────────────────────────
+
+    def _destino_foto(self, pilot_id: int) -> Path:
+        """El fichero se llama como el id.
+
+        Con el nombre del piloto habría que renombrarlo al corregir una
+        tilde, y el id no cambia nunca. Además es lo que ya busca
+        pilot_photo_url cuando el campo `photo` viene vacío.
+        """
+        return CARPETA_FOTOS / str(pilot_id)
+
+    async def _guardar_foto(self, pilot_id: int, destino: Path) -> PilotResponse:
+        pilot = await Pilot.find_one(Pilot.pilot_id == int(pilot_id))
+        if not pilot:
+            raise HTTPException(status_code=404, detail="Piloto no encontrado")
+
+        anterior = (CARPETA_FOTOS.parent / pilot.photo.lstrip("/")
+                    if pilot.photo else None)
+
+        pilot.photo = f"{RUTA_RELATIVA}/{destino.name}"
+        await pilot.save()
+
+        borrar_si_sobra(anterior, destino)
+
+        return await self._build_response(pilot)
+
+    async def subir_foto(self, pilot_id: str, nombre: str, contenido: bytes) -> PilotResponse:
+        """La que llega desde el navegador."""
+        pid = int(pilot_id)
+
+        pilot = await Pilot.find_one(Pilot.pilot_id == pid)
+        if not pilot:
+            raise HTTPException(status_code=404, detail="Piloto no encontrado")
+
+        destino = guardar_bytes(contenido, nombre, self._destino_foto(pid))
+        return await self._guardar_foto(pid, destino)
+
+    async def foto_por_ruta(self, pilot_id: str, ruta: str) -> PilotResponse:
+        """La que ya está en el disco del servidor, escrita a mano."""
+        pid = int(pilot_id)
+
+        pilot = await Pilot.find_one(Pilot.pilot_id == pid)
+        if not pilot:
+            raise HTTPException(status_code=404, detail="Piloto no encontrado")
+
+        destino = copiar_de_ruta(ruta, self._destino_foto(pid))
+        return await self._guardar_foto(pid, destino)
+
+    async def borrar_foto(self, pilot_id: str) -> PilotResponse:
+        pilot = await Pilot.find_one(Pilot.pilot_id == int(pilot_id))
+        if not pilot:
+            raise HTTPException(status_code=404, detail="Piloto no encontrado")
+
+        if pilot.photo:
+            fichero = CARPETA_FOTOS.parent / pilot.photo.lstrip("/")
+            pilot.photo = None
+            await pilot.save()
+
+            # Se pasa un destino que no existe para que siempre borre.
+            borrar_si_sobra(fichero, CARPETA_FOTOS / "__ninguno__")
+
+        return await self._build_response(pilot)

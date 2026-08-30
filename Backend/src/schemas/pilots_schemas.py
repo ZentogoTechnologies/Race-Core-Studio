@@ -2,7 +2,9 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 
 class PilotCreate(BaseModel):
-    pilot_id: int
+    # Opcional: lo normal es que lo ponga el servicio. Se sigue aceptando
+    # escrito para poder importar datos conservando su numeración.
+    pilot_id: Optional[int] = None
     name: str
     last_name: str
     nationality: Optional[str] = None

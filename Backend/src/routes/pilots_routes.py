@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from pydantic import BaseModel
 from typing import Optional
 from src.services.pilots_services import PilotService
 from src.schemas.pilots_schemas import PilotCreate, PilotUpdate, PilotResponse
@@ -66,3 +67,45 @@ async def delete_pilot(pilot_id: str): # <- str no int
     if not deleted:
         raise HTTPException(status_code=404, detail="Piloto no encontrado")
     return {"message": "Piloto eliminado"}
+
+
+# ======================================================================
+#  FOTO
+#
+#  El fichero va al disco y en la base queda solo su ruta. Guardar la
+#  imagen dentro del documento obligaría a arrastrarla en cada listado de
+#  pilotos, y las plantillas de CasparCG piden la foto por URL, que es
+#  como ya se sirven las que hay.
+# ======================================================================
+
+
+class RutaFoto(BaseModel):
+    ruta: str
+
+
+@pilots.post("/{pilot_id}/foto", tags=["Pilots"], response_model=PilotResponse,
+             dependencies=[Depends(puede_escribir)])
+async def subir_foto(pilot_id: str, archivo: UploadFile = File(...)):
+    """
+    Sube la foto del piloto desde el navegador
+    """
+    contenido = await archivo.read()
+    return await service.subir_foto(pilot_id, archivo.filename or "", contenido)
+
+
+@pilots.put("/{pilot_id}/foto", tags=["Pilots"], response_model=PilotResponse,
+            dependencies=[Depends(puede_escribir)])
+async def foto_por_ruta(pilot_id: str, datos: RutaFoto):
+    """
+    Toma la foto de una ruta del servidor y la copia a public/pilotos
+    """
+    return await service.foto_por_ruta(pilot_id, datos.ruta)
+
+
+@pilots.delete("/{pilot_id}/foto", tags=["Pilots"], response_model=PilotResponse,
+               dependencies=[Depends(puede_escribir)])
+async def borrar_foto(pilot_id: str):
+    """
+    Quita la foto. El gráfico vuelve a la silueta de reserva
+    """
+    return await service.borrar_foto(pilot_id)

@@ -47,7 +47,21 @@ class VehicleService:
             is_active=vehicle.is_active
         )
 
+    async def _siguiente_id(self) -> int:
+        """El id más alto que hay, más uno. Mismo motivo que en pilotos:
+        dos altas a la vez verían el mismo hueco libre."""
+        ultimo = await Vehicle.find_all().sort(("vehicle_id", -1)).limit(1).to_list()
+        return (ultimo[0].vehicle_id + 1) if ultimo else 1
+
     async def create_vehicle(self, data: VehicleCreate) -> VehicleResponse:
+        # 0. El id lo pone el servicio salvo que venga escrito.
+        if data.vehicle_id is None:
+            data.vehicle_id = await self._siguiente_id()
+        else:
+            existe = await Vehicle.find_one(Vehicle.vehicle_id == data.vehicle_id)
+            if existe:
+                raise HTTPException(status_code=400, detail="vehicle_id ya existe")
+
         # 1. Validar max 2 pilotos
         if len(data.pilot_ids) > 2:
             raise HTTPException(status_code=400, detail="Un vehículo solo puede tener máximo 2 pilotos")

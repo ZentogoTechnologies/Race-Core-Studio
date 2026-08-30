@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2, Upload, User, X } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
-import { categoriasApi, pilotosApi } from '../api/registro'
+import {
+  borrarFotoPiloto, categoriasApi, pilotosApi, subirFotoPiloto, urlFotoPiloto,
+} from '../api/registro'
 import { useListado } from '../hooks/useListado'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
@@ -13,7 +15,7 @@ import { useDisciplina } from '../context/DisciplinaContext'
 // elegirla, crear un piloto de la otra disciplina solo serviría para que
 // desapareciera de la lista al guardarlo.
 const EMPTY_PILOT = {
-  pilot_id: '', name: '', last_name: '', nationality: '',
+  name: '', last_name: '', nationality: '',
   team_brand: '', category_ids: [],
 }
 
@@ -65,8 +67,31 @@ export default function PilotosModule() {
   const nombreCategoria = (id) =>
     categorias.find(c => c.category_id === id)?.category_name || `#${id}`
 
-  const openAddForm  = () => { setPilotForm(EMPTY_PILOT); setCurrentEditId(null); setIsFormOpen(true) }
-  const closeForm    = () => { setIsFormOpen(false); setCurrentEditId(null); setPilotForm(EMPTY_PILOT) }
+  // La foto se maneja aparte del resto del formulario: no viaja en el JSON
+  // del piloto sino como archivo, y en un alta todavía no hay id al que
+  // asociarla, así que se guarda aquí y se sube en cuanto el piloto existe.
+  const [foto, setFoto] = useState(null)          // File elegido, sin subir
+  const [fotoActual, setFotoActual] = useState(null)   // ruta ya guardada
+  const inputFoto = useRef(null)
+
+  // Vista previa de lo elegido antes de subirlo. Se revoca al cambiar para
+  // no ir dejando URLs de objeto vivas en memoria.
+  const [previa, setPrevia] = useState(null)
+  useEffect(() => {
+    if (!foto) { setPrevia(null); return }
+    const url = URL.createObjectURL(foto)
+    setPrevia(url)
+    return () => URL.revokeObjectURL(url)
+  }, [foto])
+
+  const limpiarFoto = () => {
+    setFoto(null)
+    setFotoActual(null)
+    if (inputFoto.current) inputFoto.current.value = ''
+  }
+
+  const openAddForm  = () => { setPilotForm(EMPTY_PILOT); setCurrentEditId(null); limpiarFoto(); setIsFormOpen(true) }
+  const closeForm    = () => { setIsFormOpen(false); setCurrentEditId(null); setPilotForm(EMPTY_PILOT); limpiarFoto() }
   const handleFormToggle = () => isFormOpen ? closeForm() : openAddForm()
 
   const openEditForm = (piloto) => {
@@ -79,7 +104,22 @@ export default function PilotosModule() {
       category_ids: piloto.categories || [],
     })
     setCurrentEditId(piloto.pilot_id)
+    setFoto(null)
+    setFotoActual(piloto.photo || null)
+    if (inputFoto.current) inputFoto.current.value = ''
     setIsFormOpen(true)
+  }
+
+  const quitarFoto = async () => {
+    if (!currentEditId) { limpiarFoto(); return }
+    try {
+      await borrarFotoPiloto(currentEditId)
+      limpiarFoto()
+      lista.recargar()
+      toast.exito('Foto quitada', 'El gráfico usará la silueta de reserva')
+    } catch (err) {
+      toast.error('No se pudo quitar la foto', err.message)
+    }
   }
 
   const alternarCategoria = (id) => {
@@ -108,12 +148,28 @@ export default function PilotosModule() {
     }
 
     try {
+      let id = currentEditId
+
       if (currentEditId) {
         await pilotosApi.actualizar(currentEditId, cuerpo)
         toast.exito('Piloto actualizado', `${pilotForm.name} ${pilotForm.last_name}`)
       } else {
-        await pilotosApi.crear({ ...cuerpo, pilot_id: Number(pilotForm.pilot_id) })
+        // Sin pilot_id: lo asigna el backend, que es el único que sabe
+        // cuál está libre aunque haya dos altas a la vez.
+        const creado = await pilotosApi.crear(cuerpo)
+        id = creado.pilot_id
         toast.exito('Piloto creado', `${pilotForm.name} ${pilotForm.last_name}`)
+      }
+
+      // Va después de guardar porque en un alta el id no existe hasta
+      // ahora. Si falla la foto no se deshace el piloto: se avisa y ya,
+      // que volver a intentarlo es abrir y elegir el archivo otra vez.
+      if (foto && id) {
+        try {
+          await subirFotoPiloto(id, foto)
+        } catch (err) {
+          toast.error('El piloto se guardó, pero la foto no', err.message)
+        }
       }
       closeForm()
       lista.recargar()
@@ -170,13 +226,6 @@ export default function PilotosModule() {
       {isFormOpen && (
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">ID</label>
-            <input required type="number" min="1" value={pilotForm.pilot_id}
-              disabled={Boolean(currentEditId)}
-              onChange={e => setPilotForm({ ...pilotForm, pilot_id: e.target.value })}
-              className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white disabled:opacity-40 disabled:cursor-not-allowed"/>
-          </div>
-          <div>
             <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre</label>
             <input required type="text" value={pilotForm.name}
               onChange={e => setPilotForm({ ...pilotForm, name: e.target.value })}
@@ -200,6 +249,51 @@ export default function PilotosModule() {
               onChange={e => setPilotForm({ ...pilotForm, team_brand: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
+          <div className="col-span-full flex items-center gap-4 border-t border-neutral-800 pt-4">
+
+            <div className="w-20 h-20 rounded-lg bg-[#0a0a0a] border border-neutral-800 overflow-hidden flex items-center justify-center flex-shrink-0">
+              {previa || fotoActual
+                ? <img src={previa || urlFotoPiloto(fotoActual)} alt="" className="w-full h-full object-cover"/>
+                : <User size={26} className="text-neutral-700"/>}
+            </div>
+
+            <div className="min-w-0">
+              <label className="block text-neutral-400 text-xs mb-2 uppercase">Foto del piloto</label>
+
+              <input
+                type="file" accept="image/*" ref={inputFoto} className="hidden"
+                onChange={e => setFoto(e.target.files?.[0] || null)}
+              />
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button" onClick={() => inputFoto.current?.click()}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 transition-colors font-bold text-xs"
+                >
+                  <Upload size={14}/>
+                  {previa || fotoActual ? 'CAMBIAR' : 'ELEGIR FOTO'}
+                </button>
+
+                {(previa || fotoActual) && (
+                  <button
+                    type="button" onClick={quitarFoto}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 transition-colors font-bold text-xs"
+                  >
+                    <X size={14}/> QUITAR
+                  </button>
+                )}
+              </div>
+
+              {/* Se avisa porque la foto no se sube al elegirla: en un alta
+                  todavía no hay piloto al que asociarla. */}
+              <p className="text-[11px] text-neutral-600 mt-2">
+                {foto
+                  ? 'Se sube al guardar el piloto.'
+                  : 'La usan la ficha del piloto y la grilla con fotos.'}
+              </p>
+            </div>
+          </div>
+
           <div className="col-span-full">
             <label className="block text-neutral-400 text-xs mb-2 uppercase">Categorías</label>
             <div className="flex flex-wrap gap-2">
@@ -271,7 +365,6 @@ export default function PilotosModule() {
                     </div>
                     <div>
                       <p className="font-bold text-white">{piloto.name} <span className="uppercase">{piloto.last_name}</span></p>
-                      <p className="text-xs text-neutral-600 font-mono">#{piloto.pilot_id}</p>
                     </div>
                   </div>
                 </td>

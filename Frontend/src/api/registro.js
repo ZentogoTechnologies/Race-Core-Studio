@@ -88,6 +88,20 @@ function recurso(ruta) {
 }
 
 export const pilotosApi    = recurso('/pilots')
+
+// ─── Foto del piloto ──────────────────────────────────────────────
+// El archivo va al disco del backend y en la base queda solo su ruta.
+// Guardarlo dentro del documento obligaría a arrastrar la imagen en cada
+// listado, y las plantillas de CasparCG piden la foto por URL.
+
+export const urlFotoPiloto = (photo) =>
+  photo ? `${ORIGEN}/public/${photo}` : null
+
+export const subirFotoPiloto = (pilotId, archivo) =>
+  subirArchivo(`/pilots/${pilotId}/foto`, archivo)
+
+export const borrarFotoPiloto = (pilotId) =>
+  pedir(`/pilots/${pilotId}/foto`, { method: 'DELETE' })
 export const vehiculosApi  = recurso('/vehicles')
 export const categoriasApi = recurso('/categories')
 
@@ -148,13 +162,13 @@ export const imagenTrazadoPorRuta = (id, ruta) =>
 // La subida no pasa por `pedir`: con FormData el navegador tiene que poner
 // él mismo el Content-Type, porque lleva el boundary que separa las partes.
 // Fijarlo a application/json dejaría el cuerpo ilegible para el servidor.
-export async function subirImagenTrazado(id, archivo) {
+async function subirArchivo(ruta, archivo) {
   const cuerpo = new FormData()
   cuerpo.append('archivo', archivo)
 
   let response
   try {
-    response = await fetch(`${BASE}/settings/trazados/${id}/imagen`, {
+    response = await fetch(`${BASE}${ruta}`, {
       method: 'POST',
       headers: { ...cabeceraAuth() },
       body: cuerpo,
@@ -174,6 +188,9 @@ export async function subirImagenTrazado(id, archivo) {
 
   return payload
 }
+
+export const subirImagenTrazado = (id, archivo) =>
+  subirArchivo(`/settings/trazados/${id}/imagen`, archivo)
 
 export const usuariosApi   = recurso('/users')
 

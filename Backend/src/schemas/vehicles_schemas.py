@@ -2,7 +2,9 @@ from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 
 class VehicleCreate(BaseModel):
-    vehicle_id: int
+    # Opcional: lo pone el servicio. `number` es el dorsal de carrera y ese
+    # sí lo escribe quien inscribe; este es solo la clave interna.
+    vehicle_id: Optional[int] = None
     number: int
     display_number: Optional[str] = None
     brand: Optional[str] = None
