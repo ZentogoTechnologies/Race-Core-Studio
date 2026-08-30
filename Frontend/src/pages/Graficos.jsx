@@ -110,14 +110,19 @@ const BANDERAS = [
 ]
 
 // ─── Misceláneos ──────────────────────────────────────────────
+// Orden pedido: primero lo del evento y la pista, después las personas
+// que hablan. Los tres últimos comparten plantilla y formulario; solo
+// cambia el rótulo que sale en el arte.
 const MISCELANEOS = [
+  { id: 'evento',   label: 'Evento',   nombre: 'Evento',         detalle: 'Datos del evento en curso',   Icon: Calendar, ...ROJO },
+  { id: 'circuito', label: 'Circuito', nombre: 'Circuito',       detalle: 'Imagen de la pista',          Icon: Map,      ...ROJO },
   { id: 'clima',    label: 'Clima',    nombre: 'Clima',          detalle: 'Condiciones de pista',        Icon: CloudSun, ...ROJO },
+  { id: 'redes',    label: 'Redes',    nombre: 'Redes Sociales', detalle: 'Cuentas oficiales',           Icon: Share2,   ...ROJO },
   { id: 'narrador', label: 'Narrador', nombre: 'Narrador',       detalle: 'Identificación del narrador', Icon: Mic,      ...ROJO },
   { id: 'comentarista', label: 'Comentarista', nombre: 'Comentarista',
     detalle: 'Identificación del comentarista', Icon: MessageSquare, ...ROJO },
-  { id: 'evento',   label: 'Evento',   nombre: 'Evento',         detalle: 'Datos del evento en curso',   Icon: Calendar, ...ROJO },
-  { id: 'redes',    label: 'Redes',    nombre: 'Redes Sociales', detalle: 'Cuentas oficiales',           Icon: Share2,   ...ROJO },
-  { id: 'circuito', label: 'Circuito', nombre: 'Circuito',       detalle: 'Imagen de la pista',          Icon: Map,      ...ROJO },
+  { id: 'reportero', label: 'Reportero', nombre: 'Reportero',
+    detalle: 'Identificación del reportero', Icon: Radio, ...ROJO },
 ]
 
 // ─── Tótems: la clasificación en vivo ─────────────────────────
@@ -196,6 +201,7 @@ function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClic
 const REQUIERE_DATOS = {
   'narrador':       'narrador',  // se escribe al momento, no se guarda
   'comentarista':   'narrador',  // mismo formulario, misma plantilla base
+  'reportero':      'narrador',  // idem; cambia el rótulo del arte
   'ficha-corta':    'piloto',    // sale del registro de pilotos
 }
 
@@ -839,6 +845,25 @@ export default function GraficosModule() {
     }
     // Cualquier otro botón cierra el formulario que estuviera abierto.
     setFormAbierto(null)
+
+    // El gráfico de evento saca su texto del evento elegido arriba, no de
+    // un valor escrito en la plantilla: si se cambia de carrera, el arte
+    // tiene que cambiar con ella.
+    if (item.id === 'evento' && carrera) {
+      alternar(item.id, {
+        data: {
+          event: carrera.nombre,
+          // Las fechas van en el rótulo superior: en el arte solo cabe una
+          // línea encima del nombre, y saber cuándo fue distingue este
+          // evento de otro que se llame igual.
+          label: carrera.sesion
+            ? carrera.sesion.nombre
+            : `${carrera.start_date} — ${carrera.end_date}`,
+        },
+      })
+      return
+    }
+
     alternar(item.id)
   }
 
@@ -871,8 +896,14 @@ export default function GraficosModule() {
           {hayCarrera ? (
             <>
               <p className="text-[11px] uppercase tracking-wider text-neutral-500">Graficando</p>
+              {/* Con las fechas se distingue un evento de otro del mismo
+                  nombre: dos Prospec Series del mismo año, o el del año
+                  pasado. Solo el nombre no basta. */}
               <p className="text-sm font-bold text-white truncate">
                 {carrera.nombre}
+                <span className="text-neutral-500 font-normal">
+                  {' — '}{carrera.start_date} — {carrera.end_date}
+                </span>
                 {carrera.sesion && (
                   <span className="text-red-400"> · {carrera.sesion.nombre}</span>
                 )}

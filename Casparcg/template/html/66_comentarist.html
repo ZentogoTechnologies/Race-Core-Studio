@@ -27,11 +27,18 @@
         <!-- INFORMACIÓN -->
         <div class="narrator-info">
 
+            <!-- ROL -->
+            <div
+                class="narrator-role"
+                id="role">
+                COMENTARISTA
+            </div>
+
             <!-- NOMBRE -->
             <div
                 class="narrator-name"
                 id="name">
-                COMENTARISTA
+                Nombre del comentarista
             </div>
 
             <!-- TEXTO -->
@@ -58,6 +65,11 @@
         catch (e) { return; }
     }
 
+
+            if (data.role !== undefined) {
+                document.getElementById("role").textContent =
+                    data.role.toUpperCase();
+            }
 
             if (data.name !== undefined) {
                 document.getElementById("name").textContent =

@@ -156,3 +156,28 @@
         transform:translateX(-50%) translateY(120px);
     }
 }
+
+/* ===================================
+   ROL
+   ===================================
+   Encima del nombre y en pequeno: dice que papel cumple quien habla
+   (NARRADOR, COMENTARISTA, REPORTERO) sin robarle protagonismo al
+   nombre, que es lo que la gente quiere leer.
+=================================== */
+
+.narrator-role{
+
+    font-size:12px;
+
+    font-weight:900;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    color:#D50000;
+
+    line-height:1;
+
+    margin-bottom:5px;
+}

@@ -45,6 +45,7 @@ CG 1-60 ADD 1 "html/62_narrator" 1
 CG 1-60 ADD 1 "html/63_social_media" 1
 CG 1-60 ADD 1 "html/65_weather" 1
 CG 1-60 ADD 1 "html/66_comentarist" 1
+CG 1-60 ADD 1 "html/67_reporter" 1
 CLEAR 1-60
 
 ### 1-70 RESULTADOS

@@ -89,6 +89,7 @@ TEMPLATES: dict[str, Template] = {
         Template("redes",    "Redes Sociales", "misc", 60, "html/63_social_media",  accepts_data=True),
         Template("clima",       "Clima",        "misc", 60, "html/65_weather",      accepts_data=True),
         Template("comentarista", "Comentarista", "misc", 60, "html/66_comentarist", accepts_data=True),
+        Template("reportero",    "Reportero",    "misc", 60, "html/67_reporter",    accepts_data=True),
 
         # ── 1-70 RESULTADOS ──
         # Capa propia: el cuadro ocupa la pantalla y no debe compartir capa
