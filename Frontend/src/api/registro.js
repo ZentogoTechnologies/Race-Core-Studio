@@ -94,3 +94,11 @@ export const categoriasApi = recurso('/categories')
 // Solo responde al usuario dueño; a cualquier otro rol el backend le
 // devuelve 403 aunque llame la ruta directamente.
 export const usuariosApi   = recurso('/users')
+
+// Apaga CasparCG, el frontend y el backend. MongoDB no se toca. Solo
+// responde a owner y admin; a un estándar el backend le da 403.
+//
+// El backend se cierra a sí mismo justo después de contestar, así que
+// esta llamada devuelve el resumen y acto seguido el API deja de existir:
+// quien la use no debe encadenar nada detrás.
+export const apagarSistema = () => pedir('/system/shutdown', { method: 'POST' })

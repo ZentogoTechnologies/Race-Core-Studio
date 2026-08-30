@@ -22,6 +22,7 @@ from src.routes.graphics_routes import graphics
 from src.routes.timing_routes import timing
 from src.routes.users_routes import users
 from src.routes.login_routes import login
+from src.routes.system_routes import system
 
 # Auth
 from src.services.auth_services import usuario_actual
@@ -74,6 +75,9 @@ PROTEGIDO = [Depends(usuario_actual)]
 
 app.include_router(login, prefix="/api/v1/auth", tags=["Auth"])
 app.include_router(users, prefix="/api/v1/users", tags=["Users"])
+
+# Apagado del sistema. La guardia de rol va dentro del router.
+app.include_router(system, prefix="/api/v1/system", tags=["System"])
 
 app.include_router(categories, prefix="/api/v1/categories", tags=["Categories"], dependencies=PROTEGIDO)
 app.include_router(pilots, prefix="/api/v1/pilots", tags=["Pilots"], dependencies=PROTEGIDO)

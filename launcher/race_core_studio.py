@@ -384,6 +384,24 @@ def paso_navegador() -> bool:
 
 # ─── Apagado ─────────────────────────────────────────────────
 
+def pids_en_puerto(puerto: int) -> set:
+    """PIDs escuchando en ese puerto, leyendo netstat.
+
+    Sirve cuando el proceso no está en el archivo de PIDs: lo arrancó otra
+    persona, o el archivo se perdió.
+    """
+    import re
+
+    try:
+        salida = subprocess.run(["netstat", "-ano"],
+                                capture_output=True, text=True, timeout=10).stdout
+    except (OSError, subprocess.SubprocessError):
+        return set()
+
+    patron = re.compile(r"^\s*TCP\s+\S+:(\d+)\s+\S+\s+LISTENING\s+(\d+)\s*$", re.M)
+    return {int(pid) for p, pid in patron.findall(salida) if int(p) == puerto}
+
+
 def leer_pids() -> dict:
     try:
         return json.loads(PIDS.read_text(encoding="utf-8"))
@@ -399,9 +417,10 @@ def detener():
         aviso("no hay procesos registrados")
         detalle(f"esperaba encontrarlos en {PIDS}")
 
-    # CasparCG no se toca: tiene su propia ventana y cerrarlo desde aquí,
-    # con algo al aire, corta la transmisión sin avisar.
-    for nombre in ("frontend", "backend"):
+    # Se cierra también CasparCG, igual que el botón "Detener Race Core
+    # Studio" del panel: tener dos formas de apagar con alcances distintos
+    # solo genera dudas sobre qué quedó vivo. MongoDB nunca se toca.
+    for nombre in ("casparcg", "frontend", "backend"):
         pid = pids.get(nombre)
         if not pid:
             continue
@@ -416,10 +435,19 @@ def detener():
         else:
             aviso(f"{nombre} ya no estaba corriendo (PID {pid})")
 
+    # Puede quedar vivo si lo arrancó otra persona y no está en el
+    # archivo de PIDs; se busca por el puerto antes de darse por vencido.
     if puerto_abierto(PUERTO_CASPARCG):
-        aviso("CasparCG sigue al aire; ciérralo desde su propia ventana")
+        for pid in pids_en_puerto(PUERTO_CASPARCG):
+            subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"],
+                           capture_output=True, text=True)
+            ok(f"CasparCG detenido (PID {pid})")
 
-    guardar_pids({k: v for k, v in pids.items() if k == "casparcg"})
+    if puerto_abierto(PUERTO_CASPARCG):
+        aviso("CasparCG sigue respondiendo; ciérralo desde su propia ventana")
+
+    detalle("MongoDB no se toca: es un servicio de Windows")
+    guardar_pids({})
     print()
 
 
@@ -461,7 +489,8 @@ def main():
 
 {GRIS}  Cerrar esta ventana NO apaga nada: los servicios quedan corriendo
   para que un cierre accidental no tumbe los gráficos al aire.
-  Para apagarlos:  race-core-studio.exe --detener{FIN}
+  Para apagar todo:  race-core-studio.exe --detener
+  (o el botón «Detener Race Core Studio» del panel){FIN}
 """)
     esperar_enter("Pulsa Enter para cerrar esta ventana...")
     return 0
