@@ -32,3 +32,9 @@ Backend/src/public/_fotos-evento-anterior/
 
 # Capturas del comando PRINT de CasparCG
 Casparcg/media/*.png
+
+# Lanzador: registros de arranque y artefactos del empaquetado.
+# El .exe se reconstruye con launcher\construir.bat (24 MB, no va a git).
+logs/
+launcher/*.spec
+race-core-studio.exe
