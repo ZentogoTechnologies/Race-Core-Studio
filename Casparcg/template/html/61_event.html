@@ -49,7 +49,7 @@
                     class="event-name"
                     id="eventName">
 
-                    PROSPEC - SERIES
+                    Nombre del evento
 
                 </div>
 
@@ -60,6 +60,63 @@
     </div>
 
 <script>
+
+/* Un nombre como "GT Challenge de las Américas" no cabe en el panel de
+   700px que servía para "Prospec Series". En vez de recortarlo, el panel
+   crece hasta un tope; si ni así entra, baja el cuerpo de letra. */
+
+const ANCHO_MIN  = 700;
+const ANCHO_MAX  = 1180;
+const RELLENO    = 70;      /* los 35px de padding a cada lado */
+const CUERPO_MAX = 58;
+const CUERPO_MIN = 34;
+
+
+function ajustarPanel(){
+
+    const panel   = document.getElementById("eventPanel");
+    const seccion = document.querySelector(".content-section");
+    const nombre  = document.getElementById("eventName");
+
+    if(!panel || !seccion || !nombre) return;
+
+    /* Se parte siempre del cuerpo grande: si antes hubo un nombre largo,
+       el siguiente no tiene por qué heredar su letra pequeña. */
+    nombre.style.fontSize = CUERPO_MAX + "px";
+
+    const DISPONIBLE = ANCHO_MAX - RELLENO;
+
+    /* Se mide con scrollWidth y no con el rectángulo: el max-width del
+       CSS recorta la caja, así que el rectángulo nunca pasaría del tope
+       y el bucle no llegaría a encoger nada. scrollWidth sí devuelve lo
+       que ocupa el texto de verdad. */
+
+    let cuerpo = CUERPO_MAX;
+
+    /* Se baja de dos en dos y se vuelve a medir. Calcularlo de una vez
+       con una regla de tres falla: el ancho no es lineal con el cuerpo.
+       Son doce pasadas en el peor caso, y solo al cambiar el nombre. */
+    while(nombre.scrollWidth > DISPONIBLE && cuerpo > CUERPO_MIN){
+
+        cuerpo -= 2;
+
+        nombre.style.fontSize = cuerpo + "px";
+    }
+
+    /* El rótulo también cuenta: con un nombre corto y un rótulo largo,
+       quien manda es el rótulo. */
+    const etiqueta = document.getElementById("label");
+    const texto = Math.max(
+        nombre.scrollWidth,
+        etiqueta ? etiqueta.scrollWidth : 0);
+
+    const total = Math.min(
+        ANCHO_MAX,
+        Math.max(ANCHO_MIN, Math.ceil(texto) + RELLENO));
+
+    panel.style.setProperty("--panel-w", total + "px");
+}
+
 
 function update(data){
     /* CasparCG 2.5 entrega el payload del CG ADD/UPDATE como texto JSON,
@@ -76,16 +133,25 @@ function update(data){
         document.getElementById("label").textContent =
             data.label.toUpperCase();
 
+    /* El nombre va tal cual está escrito en la base. "GT Challenge de
+       las Américas" en versales pierde las mayúsculas que sí importan y
+       queda un bloque de letras difícil de leer de un vistazo. */
     if(data.event !== undefined)
         document.getElementById("eventName").textContent =
-            data.event.toUpperCase();
+            data.event;
 
     if(data.logo !== undefined)
         document.getElementById("logo").src =
             data.logo;
+
+    /* Después de escribir, no antes: el ancho depende del texto que
+       acaba de entrar. */
+    ajustarPanel();
 }
 
 function play(){
+
+    ajustarPanel();
 
     const widget =
         document.getElementById("overlay");

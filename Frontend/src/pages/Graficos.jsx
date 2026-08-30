@@ -850,17 +850,10 @@ export default function GraficosModule() {
     // un valor escrito en la plantilla: si se cambia de carrera, el arte
     // tiene que cambiar con ella.
     if (item.id === 'evento' && carrera) {
-      alternar(item.id, {
-        data: {
-          event: carrera.nombre,
-          // Las fechas van en el rótulo superior: en el arte solo cabe una
-          // línea encima del nombre, y saber cuándo fue distingue este
-          // evento de otro que se llame igual.
-          label: carrera.sesion
-            ? carrera.sesion.nombre
-            : `${carrera.start_date} — ${carrera.end_date}`,
-        },
-      })
+      // Solo el nombre. Las fechas se quedan en la cabecera del panel,
+      // que es donde hacen falta para no confundir dos ediciones; en el
+      // aire sobran y ensucian el arte.
+      alternar(item.id, { data: { event: carrera.nombre } })
       return
     }
 
