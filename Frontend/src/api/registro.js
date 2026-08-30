@@ -6,7 +6,10 @@
 import { avisarSesionExpirada, cabeceraAuth } from './auth'
 
 const BASE =
-  import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1'
+  // Ruta relativa: el frontend pide a quien se lo sirvió. Así vale
+  // igual en localhost, en la red local o a través del túnel, sin
+  // tener que recompilar con la dirección de turno.
+  import.meta.env.VITE_API_URL || '/api/v1'
 
 export class ApiError extends Error {
   constructor(message, status = 0) {

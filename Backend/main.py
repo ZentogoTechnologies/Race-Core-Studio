@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from pathlib import Path
 from contextlib import asynccontextmanager
 from pymongo import AsyncMongoClient
@@ -123,6 +124,49 @@ app.include_router(weather, prefix="/api/v1/weather", tags=["Weather"], dependen
 # timing_routes.py, al lado de las rutas. Lo mismo aplica a /public, que
 # sirve las fotos con <img>, y un <img> tampoco manda Authorization.
 app.include_router(timing, prefix="/api/v1/timing", tags=["Timing"])
+
+
+# ======================================================================
+#  EL FRONTEND, SERVIDO POR EL PROPIO BACKEND
+#
+#  Va al final a propósito: este montaje responde a todo lo que no haya
+#  atendido ya una ruta del API, así que tiene que declararse el último.
+#
+#  Sirve para no depender de dos puertos. Con el frontend en 5173 y el
+#  API en 8080 hay que decirle al navegador en qué host está el API, y esa
+#  dirección cambia según desde dónde se entre: localhost aquí, otra IP en
+#  la red local, otro nombre a través de un túnel. Sirviéndolo desde aquí
+#  el navegador pide siempre a quien le dio la página.
+# ======================================================================
+
+FRONTEND_DIST = Path(__file__).resolve().parent.parent / "Frontend" / "dist"
+
+
+class FrontendSPA(StaticFiles):
+    """Estáticos con vuelta a index.html.
+
+    React Router maneja las rutas en el navegador, así que /pilotos no es
+    un archivo. Sin esto, entrar directo a una dirección que no sea la
+    raíz —o recargar la página— daría 404.
+    """
+
+    async def get_response(self, path: str, scope):
+        try:
+            return await super().get_response(path, scope)
+        except StarletteHTTPException as e:
+            # Starlette no devuelve un 404, lo lanza. Comprobar el código
+            # de la respuesta no servía de nada: nunca llegaba a haberla.
+            if e.status_code != 404:
+                raise
+            return await super().get_response("index.html", scope)
+
+
+if FRONTEND_DIST.is_dir():
+    app.mount("/", FrontendSPA(directory=FRONTEND_DIST, html=True), name="frontend")
+else:
+    # No es un error: en desarrollo el frontend lo sirve Vite y esta
+    # carpeta puede no existir hasta que alguien compile.
+    print(f"Sin frontend compilado en {FRONTEND_DIST}; solo se sirve el API")
 
 
 if __name__ == "__main__":
