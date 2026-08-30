@@ -1,16 +1,22 @@
 @echo off
 REM Reconstruye race-core-studio.exe a partir del script del lanzador.
-REM Ejecutar desde la raiz del proyecto:  launcher\construir.bat
+REM Ejecutar desde cualquier sitio:  launcher\construir.bat
 
-cd /d "%~dp0.."
+REM %~dp0 es la carpeta launcher\ con ruta absoluta. El icono se pasa
+REM asi a proposito: PyInstaller resuelve --icon contra --specpath, no
+REM contra el directorio actual, y una ruta relativa acaba duplicando
+REM la carpeta (launcher\launcher\...).
+set "AQUI=%~dp0"
+cd /d "%AQUI%.."
 
 echo Empaquetando el lanzador...
 Backend\venv\Scripts\python.exe -m PyInstaller ^
   --onefile --console --clean --noconfirm ^
   --name race-core-studio ^
+  --icon "%AQUI%race-core-studio.ico" ^
   --hidden-import pymongo ^
-  --distpath launcher\dist --workpath launcher\build --specpath launcher ^
-  launcher\race_core_studio.py
+  --distpath "%AQUI%dist" --workpath "%AQUI%build" --specpath "%AQUI%." ^
+  "%AQUI%race_core_studio.py"
 
 if errorlevel 1 (
   echo.
@@ -20,7 +26,10 @@ if errorlevel 1 (
   exit /b 1
 )
 
-copy /Y launcher\dist\race-core-studio.exe race-core-studio.exe
+REM El .exe queda bloqueado mientras el lanzador este abierto.
+taskkill /IM race-core-studio.exe /F >nul 2>&1
+
+copy /Y "%AQUI%dist\race-core-studio.exe" race-core-studio.exe
 echo.
 echo Listo: race-core-studio.exe
 pause
