@@ -1,0 +1,455 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   CUADRO DE RESULTADOS
+
+   Tabla completa de la tanda, para sacar al final de una carrera o entre
+   tandas. A diferencia del tótem, aquí sí se ocupa la pantalla: es un
+   gráfico para leer, no para acompañar la imagen en vivo.
+========================================================================== */
+
+:root{
+    --rs-fondo:      rgba(8, 10, 14, .93);
+    --rs-cabecera:   rgba(0, 0, 0, .96);
+    --rs-fila:       rgba(14, 17, 22, .92);
+    --rs-fila-alt:   rgba(21, 25, 32, .92);
+    --rs-lider:      rgba(46, 36, 6, .96);
+
+    --rs-acento:     #D50000;
+    --rs-oro:        #E8BE03;
+    --rs-morado:     #B72DFF;
+    --rs-morado-bg:  rgba(74, 16, 110, .92);
+
+    --rs-tenue:      rgba(255,255,255,.42);
+}
+
+.rs-cuadro{
+
+    position:absolute;
+
+    top:44px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:1420px;
+
+    background:var(--rs-fondo);
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    box-shadow:0 10px 44px rgba(0,0,0,.7);
+
+    font-family:"Titillium Web", "Segoe UI", Arial, sans-serif;
+}
+
+/* ===================================
+   CABECERA
+=================================== */
+
+.rs-cabecera{
+
+    display:flex;
+
+    align-items:stretch;
+
+    background:var(--rs-cabecera);
+
+    border-bottom:3px solid var(--rs-acento);
+}
+
+.rs-logo{
+
+    width:150px;
+
+    flex:0 0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:16px 0;
+
+    position:relative;
+}
+
+.rs-logo::before{
+
+    content:"";
+
+    position:absolute;
+    left:0; top:0; bottom:0;
+
+    width:6px;
+
+    background:var(--rs-acento);
+}
+
+.rs-logo img{
+
+    width:96px;
+
+    height:auto;
+}
+
+.rs-titulos{
+
+    flex:1;
+
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    padding:14px 22px;
+
+    gap:4px;
+}
+
+/* El rótulo del cuadro, encima de todo: dice qué se está mirando antes
+   de que alguien lea un solo nombre. */
+.rs-rotulo{
+
+    font-size:13px;
+
+    font-weight:900;
+
+    letter-spacing:4px;
+
+    color:var(--rs-acento);
+
+    text-transform:uppercase;
+
+    line-height:1;
+}
+
+.rs-evento{
+
+    font-size:26px;
+
+    font-weight:900;
+
+    font-style:italic;
+
+    color:#FFFFFF;
+
+    text-transform:uppercase;
+
+    line-height:1.05;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.rs-linea{
+
+    display:flex;
+
+    align-items:baseline;
+
+    gap:14px;
+
+    font-size:14px;
+
+    letter-spacing:1.6px;
+
+    text-transform:uppercase;
+
+    color:var(--rs-tenue);
+}
+
+.rs-tanda{
+
+    color:var(--rs-oro);
+
+    font-weight:900;
+}
+
+.rs-meta{
+
+    width:270px;
+
+    flex:0 0 auto;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    gap:6px;
+
+    padding:14px 22px;
+
+    border-left:1px solid rgba(255,255,255,.10);
+}
+
+.rs-dato{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:baseline;
+
+    gap:10px;
+
+    font-size:13px;
+}
+
+.rs-dato-etiqueta{
+
+    color:var(--rs-tenue);
+
+    letter-spacing:1.4px;
+
+    text-transform:uppercase;
+
+    font-weight:700;
+}
+
+.rs-dato-valor{
+
+    color:#FFFFFF;
+
+    font-weight:900;
+
+    font-variant-numeric:tabular-nums;
+}
+
+.rs-dato-valor.morado{
+
+    color:var(--rs-morado);
+}
+
+/* ===================================
+   TABLA
+=================================== */
+
+.rs-tabla{
+
+    width:100%;
+
+    border-collapse:collapse;
+}
+
+.rs-tabla thead th{
+
+    background:rgba(0,0,0,.55);
+
+    padding:10px 12px;
+
+    font-size:11px;
+    font-weight:900;
+
+    letter-spacing:1.8px;
+
+    text-transform:uppercase;
+
+    color:var(--rs-tenue);
+
+    text-align:left;
+
+    border-bottom:1px solid rgba(255,255,255,.10);
+}
+
+.rs-tabla tbody td{
+
+    padding:0 12px;
+
+    height:38px;
+
+    font-size:16px;
+
+    color:#FFFFFF;
+
+    border-bottom:1px solid rgba(0,0,0,.4);
+}
+
+.rs-tabla tbody tr{
+
+    background:var(--rs-fila);
+}
+
+.rs-tabla tbody tr:nth-child(even){
+
+    background:var(--rs-fila-alt);
+}
+
+.rs-tabla tbody tr.lider{
+
+    background:var(--rs-lider);
+}
+
+/* La vuelta rápida manda sobre el líder, igual que en el tótem: que sea
+   primero ya se ve por la posición, que tenga la vuelta rápida no. */
+.rs-tabla tbody tr.vuelta-rapida{
+
+    background:var(--rs-morado-bg);
+}
+
+/* ── Columnas ── */
+
+.rs-pos{
+
+    width:64px;
+
+    text-align:center !important;
+
+    font-weight:900;
+
+    font-size:18px;
+
+    font-variant-numeric:tabular-nums;
+}
+
+tr.lider .rs-pos{ color:var(--rs-oro); }
+
+.rs-dorsal{
+
+    width:80px;
+}
+
+.rs-dorsal span{
+
+    display:inline-block;
+
+    min-width:42px;
+
+    padding:3px 8px;
+
+    border-radius:4px;
+
+    background:rgba(255,255,255,.12);
+
+    text-align:center;
+
+    font-weight:900;
+
+    font-size:14px;
+
+    font-variant-numeric:tabular-nums;
+}
+
+tr.vuelta-rapida .rs-dorsal span{
+
+    background:rgba(183,45,255,.28);
+
+    color:#EFD8FF;
+}
+
+.rs-marca{
+
+    width:56px;
+}
+
+.rs-marca img{
+
+    max-width:38px;
+
+    max-height:26px;
+
+    object-fit:contain;
+
+    vertical-align:middle;
+
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.8));
+}
+
+.rs-piloto{
+
+    font-weight:800;
+
+    letter-spacing:.4px;
+
+    text-transform:uppercase;
+}
+
+.rs-equipo{
+
+    color:var(--rs-tenue);
+
+    font-size:13px;
+
+    text-transform:uppercase;
+}
+
+.rs-num{
+
+    text-align:right !important;
+
+    font-variant-numeric:tabular-nums;
+
+    font-weight:700;
+}
+
+.rs-num.tenue{
+
+    color:var(--rs-tenue);
+
+    font-weight:400;
+}
+
+/* La mejor vuelta de cada piloto en morado solo cuando es la de la tanda;
+   el resto en blanco para que el morado siga significando una sola cosa. */
+.rs-best{
+
+    text-align:right !important;
+
+    font-variant-numeric:tabular-nums;
+
+    font-weight:700;
+}
+
+tr.vuelta-rapida .rs-best{
+
+    color:var(--rs-morado);
+
+    font-weight:900;
+}
+
+/* ===================================
+   PIE
+=================================== */
+
+.rs-pie{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:9px 22px;
+
+    background:rgba(0,0,0,.6);
+
+    font-size:12px;
+
+    letter-spacing:1.4px;
+
+    text-transform:uppercase;
+
+    color:var(--rs-tenue);
+}
+
+.rs-leyenda{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+}
+
+.rs-punto{
+
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:var(--rs-morado);
+}

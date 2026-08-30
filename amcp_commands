@@ -35,7 +35,6 @@ CG 1-40 ADD 1 "html/41_starting_grid_foto" 1
 CLEAR 1-40
 
 ### 1-50 PILOT_CARDS
-CG 1-50 ADD 1 "html/50_pilot_card_complete" 1
 CG 1-50 ADD 1 "html/51_pilot_card_short" 1
 CLEAR 1-50
 
@@ -44,7 +43,10 @@ CG 1-60 ADD 1 "html/60_circuit_track" 1
 CG 1-60 ADD 1 "html/61_event" 1
 CG 1-60 ADD 1 "html/62_narrator" 1
 CG 1-60 ADD 1 "html/63_social_media" 1
-CG 1-60 ADD 1 "html/64_track" 1
 CG 1-60 ADD 1 "html/65_weather" 1
 CG 1-60 ADD 1 "html/66_comentarist" 1
 CLEAR 1-60
+
+### 1-70 RESULTADOS
+CG 1-70 ADD 1 "html/70_results" 1
+CLEAR 1-70

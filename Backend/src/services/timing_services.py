@@ -51,6 +51,19 @@ def _titulo_tanda(runtype: str, runname: str) -> str:
     return f"{etiqueta}-{numero}" if numero else etiqueta
 
 
+def _dorsal_de(texto: str) -> str:
+    """El dorsal de una cadena tipo "23 - JOSIMAR JEAN FRANCOIS".
+
+    Devuelve "" si no hay guion o si delante no hay un número: en las
+    tandas sin vueltas cronometradas MyLaps deja el campo vacío.
+    """
+    if not texto or "-" not in texto:
+        return ""
+
+    posible = texto.split("-", 1)[0].strip()
+    return posible if posible.isdigit() else ""
+
+
 def _iniciales(nombre: str, apellido: str) -> str:
     """'Ian Sebastián' + 'León' -> 'I. LEÓN'. Para el tótem de nombres."""
     inicial = nombre.strip()[:1].upper()
@@ -533,6 +546,14 @@ async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> di
             "brand": marca,
             "brand_logo": marca_logo,
         })
+
+    # Vuelta rápida de la tanda. MyLaps la manda en la cabecera como
+    # "23 - JOSIMAR JEAN FRANCOIS", así que se compara por el dorsal, que
+    # es lo único fiable: el nombre del XML viene sin acentos y a veces
+    # abreviado, y el de la base está bien escrito.
+    dorsal_rapido = _dorsal_de(labels.get("bestlapby", ""))
+    for fila in standings:
+        fila["is_best_lap"] = bool(dorsal_rapido) and fila["number"] == dorsal_rapido
 
     # Antes de arrancar, MyLaps deja racetime vacío y pone la cuenta atrás
     # en timetogo. Se muestra lo que haya, para que el reloj del tótem no

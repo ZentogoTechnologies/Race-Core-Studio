@@ -27,8 +27,15 @@
     --tf-acento:     #D50000;
     --tf-oro:        #E8BE03;
 
-    --tf-ancho:      390px;
-    --tf-alto-fila:  34px;
+    /* Morado de vuelta rápida, el mismo código que usa la F1. Se reserva
+       para eso y no se usa en ningún otro sitio del gráfico. */
+    --tf-morado:     #B72DFF;
+    --tf-morado-bg:  rgba(94, 20, 138, .82);
+
+    /* Un 15% sobre los 390/34 originales, y las filas llevan además su
+       propio respiro para que los nombres no vayan pegados. */
+    --tf-ancho:      449px;
+    --tf-alto-fila:  42px;
 }
 
 /* ===================================
@@ -62,14 +69,14 @@
 
     align-items:stretch;
 
-    height:56px;
+    height:64px;
 
     background:var(--tf-cabecera);
 }
 
 .tf-logo{
 
-    width:96px;
+    width:110px;
 
     flex:0 0 auto;
 
@@ -99,7 +106,7 @@
 
 .tf-logo img{
 
-    width:62px;
+    width:71px;
 
     height:auto;
 }
@@ -121,7 +128,7 @@
 
 .tf-grupo{
 
-    font-size:15px;
+    font-size:17px;
 
     font-weight:900;
 
@@ -237,7 +244,9 @@
 
     background:var(--tf-fila);
 
-    border-top:1px solid rgba(255,255,255,.05);
+    /* Línea de separación más marcada que antes: con veinte filas
+       seguidas, un borde apenas visible las hace parecer un bloque. */
+    border-top:2px solid rgba(0,0,0,.35);
 }
 
 .tf-fila:nth-child(even){
@@ -254,13 +263,13 @@
 
 .tf-pos{
 
-    width:34px;
+    width:40px;
 
     flex:0 0 auto;
 
     text-align:center;
 
-    font-size:15px;
+    font-size:17px;
     font-weight:900;
 
     color:#FFFFFF;
@@ -293,13 +302,13 @@
 
 .tf-marca{
 
-    width:30px;
+    width:34px;
 
-    height:22px;
+    height:25px;
 
     flex:0 0 auto;
 
-    margin:0 8px 0 7px;
+    margin:0 11px 0 9px;
 
     display:flex;
     align-items:center;
@@ -325,11 +334,13 @@
 
     min-width:0;
 
-    font-size:14px;
+    font-size:16px;
 
     font-weight:800;
 
-    letter-spacing:.3px;
+    /* Un poco más de separación entre letras: a veinte filas el bloque de
+       mayúsculas se lee mejor suelto que apretado. */
+    letter-spacing:.6px;
 
     color:#FFFFFF;
 
@@ -348,13 +359,13 @@
 
     flex:0 0 auto;
 
-    min-width:30px;
+    min-width:36px;
 
-    margin-right:8px;
+    margin-right:10px;
 
     text-align:center;
 
-    font-size:12px;
+    font-size:13px;
     font-weight:900;
 
     color:rgba(255,255,255,.85);
@@ -373,4 +384,66 @@
     background:rgba(232,190,3,.20);
 
     color:var(--tf-oro);
+}
+
+/* ===================================
+   VUELTA RÁPIDA
+   ===================================
+   El morado es el código universal de la vuelta rápida en televisión: se
+   reconoce sin leer nada. Va sobre la fila entera y no solo en el número,
+   para que se distinga de un vistazo en una lista de veinte.
+=================================== */
+
+.tf-fila.vuelta-rapida{
+
+    background:var(--tf-morado-bg);
+}
+
+.tf-fila.vuelta-rapida .tf-barra{
+
+    background:var(--tf-morado);
+}
+
+.tf-fila.vuelta-rapida .tf-dorsal{
+
+    background:rgba(183,45,255,.25);
+
+    color:#EFD8FF;
+}
+
+/* Si el líder es además quien tiene la vuelta rápida, manda el morado: el
+   oro ya se deduce de que va primero en la lista, el morado no. */
+.tf-fila.lider.vuelta-rapida{
+
+    background:var(--tf-morado-bg);
+}
+
+.tf-fila.lider.vuelta-rapida .tf-pos{
+
+    color:#EFD8FF;
+}
+
+.tf-fila.lider.vuelta-rapida .tf-barra{
+
+    background:var(--tf-morado);
+}
+
+/* Punto morado al final de la fila: refuerza el motivo del color cuando
+   el gráfico se ve pequeño en un monitor de control. */
+.tf-fila.vuelta-rapida .tf-nombre::after{
+
+    content:"";
+
+    display:inline-block;
+
+    width:7px;
+    height:7px;
+
+    margin-left:8px;
+
+    border-radius:50%;
+
+    background:var(--tf-morado);
+
+    vertical-align:middle;
 }

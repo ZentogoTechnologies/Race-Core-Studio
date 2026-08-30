@@ -53,7 +53,7 @@ const torre  = document.getElementById("torre");
 
 /* Cuántas posiciones caben. CasparCG puede cambiarlo con
    CG ... UPDATE 1 "{\"limite\":15}" */
-let LIMITE = 10;
+let LIMITE = 20;
 
 let firmaAnterior = null;
 
@@ -87,7 +87,7 @@ function pintarFilas(standings){
     /* Se redibuja solo si cambio algo. Repintar diez veces por segundo
        hace parpadear los logos, que son peticiones al backend. */
 
-    const firma = timingFirma(standings, ["position", "full_name", "number", "brand_logo"]);
+    const firma = timingFirma(standings, ["position", "full_name", "number", "brand_logo", "is_best_lap"]);
     if (firma === firmaAnterior) return;
     firmaAnterior = firma;
 
@@ -96,7 +96,13 @@ function pintarFilas(standings){
     standings.forEach((piloto, index) => {
 
         const fila = document.createElement("div");
-        fila.className = index === 0 ? "tf-fila lider" : "tf-fila";
+        const clases = ["tf-fila"];
+        if (index === 0) clases.push("lider");
+        // El backend marca quien tiene la vuelta rapida comparando el
+        // dorsal de la cabecera del XML con el de cada fila.
+        if (piloto.is_best_lap) clases.push("vuelta-rapida");
+
+        fila.className = clases.join(" ");
 
         /* Sin logo se deja el hueco vacio en vez de un roto: la columna
            tiene que seguir alineada aunque falte una marca. */

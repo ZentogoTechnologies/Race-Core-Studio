@@ -41,6 +41,7 @@ LAYERS = {
     "grid": 40,
     "pilot": 50,
     "misc": 60,
+    "results": 70,
 }
 
 
@@ -79,7 +80,6 @@ TEMPLATES: dict[str, Template] = {
         Template("grilla-fotos", "Grilla con Fotos",    "grid", 40, "html/41_starting_grid_foto",  accepts_data=True),
 
         # ── Fichas de piloto (capa 50) ────────────────────────
-        Template("ficha-completa", "Ficha Completa", "pilot", 50, "html/50_pilot_card_complete", accepts_data=True),
         Template("ficha-corta",    "Ficha Corta",    "pilot", 50, "html/51_pilot_card_short",    accepts_data=True),
 
         # ── Misceláneos (capa 60) ─────────────────────────────
@@ -87,9 +87,13 @@ TEMPLATES: dict[str, Template] = {
         Template("evento",   "Evento",         "misc", 60, "html/61_event",         accepts_data=True),
         Template("narrador", "Narrador",       "misc", 60, "html/62_narrator",      accepts_data=True),
         Template("redes",    "Redes Sociales", "misc", 60, "html/63_social_media",  accepts_data=True),
-        Template("pista",    "Pista",          "misc", 60, "html/64_track",         accepts_data=True),
         Template("clima",       "Clima",        "misc", 60, "html/65_weather",      accepts_data=True),
         Template("comentarista", "Comentarista", "misc", 60, "html/66_comentarist", accepts_data=True),
+
+        # ── 1-70 RESULTADOS ──
+        # Capa propia: el cuadro ocupa la pantalla y no debe compartir capa
+        # con nada, ni tumbar los misceláneos al salir.
+        Template("resultados", "Cuadro de Resultados", "results", 70, "html/70_results", accepts_data=True),
     ]
 }
 
@@ -245,18 +249,6 @@ async def build_pilot_payload(graphic_id: str, pilot_id: int) -> dict:
             "category": categoria,
             "vehicle": carro,
             "team": pilot.team_brand or "",
-            "country": pilot.nationality or "",
-            "pilot_photo": foto,
-            "brand_logo": logo,
-        }
-
-    if graphic_id == "ficha-completa":
-        return {
-            "pilot_name": nombre,
-            "car_number": numero,
-            "category": categoria,
-            "car_brand": carro,
-            "team_name": pilot.team_brand or "",
             "country": pilot.nationality or "",
             "pilot_photo": foto,
             "brand_logo": logo,

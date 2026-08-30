@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cuadro de Resultados</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/results.css">
+</head>
+<body>
+
+<div class="rs-cuadro" id="cuadro">
+
+    <div class="rs-cabecera">
+
+        <div class="rs-logo">
+            <img src="../img/logoap.png" alt="Autódromo Panamá">
+        </div>
+
+        <div class="rs-titulos">
+            <div class="rs-rotulo" id="rotulo">Cuadro de Resultados</div>
+            <div class="rs-evento" id="evento">—</div>
+            <div class="rs-linea">
+                <span class="rs-tanda" id="tanda">—</span>
+                <span id="grupo">—</span>
+                <span id="fecha">—</span>
+            </div>
+        </div>
+
+        <div class="rs-meta">
+            <div class="rs-dato">
+                <span class="rs-dato-etiqueta">Vueltas</span>
+                <span class="rs-dato-valor" id="vueltas">—</span>
+            </div>
+            <div class="rs-dato">
+                <span class="rs-dato-etiqueta">Mejor vuelta</span>
+                <span class="rs-dato-valor morado" id="mejorTiempo">—</span>
+            </div>
+            <div class="rs-dato">
+                <span class="rs-dato-etiqueta" id="mejorEtiqueta">Piloto</span>
+                <span class="rs-dato-valor" id="mejorPiloto">—</span>
+            </div>
+        </div>
+
+    </div>
+
+    <table class="rs-tabla">
+        <thead>
+            <tr>
+                <th class="rs-pos">Pos</th>
+                <th class="rs-dorsal">Nro</th>
+                <th class="rs-marca"></th>
+                <th>Piloto</th>
+                <th>Equipo</th>
+                <th class="rs-num">Vts</th>
+                <th class="rs-num">Líder</th>
+                <th class="rs-num">Intervalo</th>
+                <th class="rs-num">Última</th>
+                <th class="rs-best">Mejor</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpo"></tbody>
+    </table>
+
+    <div class="rs-pie">
+        <span id="pieIzq">Autódromo Panamá</span>
+        <span class="rs-leyenda"><span class="rs-punto"></span> Vuelta rápida de la tanda</span>
+    </div>
+
+</div>
+
+<script src="../js/timing.js"></script>
+<script>
+
+/* ==========================================================================
+   CUADRO DE RESULTADOS
+
+   Tabla completa de la tanda en curso: dorsal, piloto, equipo, vueltas,
+   diferencia con el líder, intervalo con el de adelante, última vuelta y
+   mejor vuelta. La fila morada es quien tiene la vuelta rápida.
+
+   Los datos son los mismos que alimentan el tótem; aquí se muestran todos
+   los campos en vez de solo el nombre.
+========================================================================== */
+
+const cuerpo = document.getElementById("cuerpo");
+
+/* Cuántos pilotos entran. El limite no es estetico: con la cabecera, el
+   encabezado de la tabla y el pie, veinte filas de 38px es lo ultimo que
+   cabe en 1080 sin que la tabla se salga por abajo. Subirlo con
+   CG ... UPDATE 1 "{\"limite\":24}" desborda el cuadro. */
+let LIMITE = 20;
+
+let firmaAnterior = null;
+
+
+function escapar(texto){
+
+    return String(texto == null ? "" : texto)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+
+/* Un campo vacío se dibuja como raya y no como hueco: una columna con
+   celdas en blanco parece un fallo de carga. */
+function oVacio(valor){
+
+    const v = (valor == null ? "" : String(valor)).trim();
+    return v === "" ? "—" : escapar(v);
+}
+
+
+function pintarFilas(standings){
+
+    const firma = timingFirma(standings,
+        ["position", "full_name", "number", "laps", "leader", "interval", "last_time", "best_time", "is_best_lap"]);
+
+    if (firma === firmaAnterior) return;
+    firmaAnterior = firma;
+
+    cuerpo.innerHTML = "";
+
+    standings.forEach((p, index) => {
+
+        const fila = document.createElement("tr");
+
+        const clases = [];
+        if (index === 0) clases.push("lider");
+        if (p.is_best_lap) clases.push("vuelta-rapida");
+        fila.className = clases.join(" ");
+
+        const logo = p.brand_logo
+            ? `<img src="${escapar(p.brand_logo)}" alt="${escapar(p.brand || "")}">`
+            : "";
+
+        /* El primero no tiene diferencia contra si mismo. */
+        const lider = index === 0 ? "—" : oVacio(p.leader);
+        const intervalo = index === 0 ? "—" : oVacio(p.interval);
+
+        fila.innerHTML = `
+            <td class="rs-pos">${escapar(p.position)}</td>
+            <td class="rs-dorsal"><span>${escapar(p.number)}</span></td>
+            <td class="rs-marca">${logo}</td>
+            <td class="rs-piloto">${escapar(p.full_name)}</td>
+            <td class="rs-equipo">${oVacio(p.brand)}</td>
+            <td class="rs-num tenue">${oVacio(p.laps)}</td>
+            <td class="rs-num">${lider}</td>
+            <td class="rs-num">${intervalo}</td>
+            <td class="rs-num tenue">${oVacio(p.last_time)}</td>
+            <td class="rs-best">${oVacio(p.best_time)}</td>
+        `;
+
+        cuerpo.appendChild(fila);
+    });
+}
+
+
+function pintarCabecera(d){
+
+    const poner = (id, texto) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = texto;
+    };
+
+    poner("evento", d.event || "—");
+    poner("tanda", d.heat || d.run_name || "—");
+    poner("grupo", d.group_name || d.group || "");
+    poner("vueltas", d.laps || "—");
+    poner("mejorTiempo", d.best_lap_time || "—");
+
+    /* "23 - JOSIMAR JEAN FRANCOIS": se parte para mostrar solo el nombre,
+       que el dorsal ya se ve en su columna. */
+    const mejor = (d.best_lap_by || "").split(" - ");
+    poner("mejorPiloto", mejor.length > 1 ? mejor.slice(1).join(" - ") : (d.best_lap_by || "—"));
+
+    /* La fecha del dia, en el formato que se usa en pantalla. */
+    const MESES = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+    const hoy = new Date();
+    poner("fecha", `${String(hoy.getDate()).padStart(2,"0")} ${MESES[hoy.getMonth()]} ${hoy.getFullYear()}`);
+
+    poner("pieIzq", d.track || "Autódromo Panamá");
+}
+
+
+function pintar(datos){
+
+    if (!datos) return;
+
+    pintarCabecera(datos);
+    pintarFilas(datos.standings || []);
+}
+
+
+/* ─── Ciclo de vida de CasparCG ─────────────────────────────── */
+
+function play(){
+
+    arrancarTiming({ limite: LIMITE, alRecibir: pintar });
+}
+
+
+function stop(){
+
+    detenerTiming();
+}
+
+
+function update(data){
+
+    try {
+        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
+
+        if (d.api) configurarTiming(d.api);
+
+        /* El rotulo se puede cambiar al vuelo: "Resultados Oficiales",
+           "Cuadro Final", lo que haga falta segun el momento. */
+        if (d.rotulo) {
+            const el = document.getElementById("rotulo");
+            if (el) el.textContent = d.rotulo;
+        }
+
+        if (d.limite) {
+            LIMITE = parseInt(d.limite, 10) || LIMITE;
+            firmaAnterior = null;
+            arrancarTiming({ limite: LIMITE, alRecibir: pintar });
+        }
+    } catch (e) {
+        /* Un UPDATE con basura no puede tumbar el grafico al aire. */
+    }
+}
+
+
+if (!window.__casparcg) {
+    play();
+}
+
+</script>
+
+</body>
+</html>

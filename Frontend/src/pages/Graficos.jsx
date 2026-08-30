@@ -4,7 +4,7 @@ import {
   SquareUser, Contact, ListOrdered, List, Crown, ArrowUpDown, LayoutGrid,
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
-  Wrench, Droplets, Ban,
+  Wrench, Droplets, Ban, Table2,
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
@@ -119,6 +119,14 @@ const MISCELANEOS = [
 ]
 
 // ─── Tótems: la clasificación en vivo ─────────────────────────
+// El cuadro de resultados va en su propia capa (70) porque ocupa la
+// pantalla: si compartiera capa con los tótems, sacarlo los tumbaría.
+const RESULTADOS = [
+  { id: 'resultados', label: 'Cuadro de Resultados', nombre: 'Cuadro de Resultados',
+    detalle: 'Tabla completa de la tanda con tiempos', Icon: Table2,
+    icon: 'text-violet-400', border: 'border-violet-500', bgActive: 'bg-violet-500/10', dot: 'bg-violet-400' },
+]
+
 const TOTEMS = [
   { id: 'totem-completo',  label: 'Tótem Completo',  nombre: 'Tótem Nombre Completo',
     detalle: 'Clasificación con el nombre completo',                  Icon: ListOrdered, ...ROJO },
@@ -134,8 +142,6 @@ const TOTEMS = [
 const FICHAS = [
   { id: 'ficha-corta',    label: 'Ficha Corta',    nombre: 'Ficha Corta',
     detalle: 'Datos básicos del piloto',                              Icon: SquareUser,  ...ROJO },
-  { id: 'ficha-completa', label: 'Ficha Completa', nombre: 'Ficha Completa',
-    detalle: 'Ficha completa del piloto',                             Icon: Contact,     ...ROJO },
 ]
 
 // ─── Grilla de partida ────────────────────────────────────────
@@ -189,7 +195,6 @@ const REQUIERE_DATOS = {
   'narrador':       'narrador',  // se escribe al momento, no se guarda
   'comentarista':   'narrador',  // mismo formulario, misma plantilla base
   'ficha-corta':    'piloto',    // sale del registro de pilotos
-  'ficha-completa': 'piloto',
 }
 
 // ─── Formulario en línea ──────────────────────────────────────
@@ -357,6 +362,7 @@ const SECCIONES = {
   grilla:      { titulo: 'Grilla',          grupo: 'grid',       capa: 40, items: GRILLAS },
   fichas:      { titulo: 'Fichas',          grupo: 'pilot',      capa: 50, items: FICHAS },
   miscelaneos: { titulo: 'Misceláneos',     grupo: 'misc',       capa: 60, items: MISCELANEOS },
+  resultados:  { titulo: 'Resultados',      grupo: 'results',    capa: 70, items: RESULTADOS },
 }
 
 // ─── Control de la tanda ───────────────────────────────
@@ -626,6 +632,7 @@ const TABS = [
     secciones: [
       SECCIONES.banderas,
       SECCIONES.totems,
+      SECCIONES.resultados,
     ],
   },
   { id: 'pilotos', titulo: 'Pilotos', secciones: [SECCIONES.fichas] },
