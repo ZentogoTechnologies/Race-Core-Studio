@@ -321,9 +321,14 @@ def paso_backend() -> bool:
         detalle("créalo con:  python -m venv Backend\\venv")
         return False
 
+    # El host sale del .env y no va clavado aqui: con 0.0.0.0 el backend
+    # atiende tambien a otras maquinas de la red, que es lo que hace falta
+    # cuando alguien opera la interfaz desde su propio equipo.
+    host = leer_env().get("API_HOST", "127.0.0.1")
+
     proceso = lanzar(
         [str(PYTHON_VENV), "-m", "uvicorn", "main:app",
-         "--host", "127.0.0.1", "--port", str(PUERTO_BACKEND)],
+         "--host", host, "--port", str(PUERTO_BACKEND)],
         BACKEND, "backend.log",
     )
     print("      arrancando", end="", flush=True)
