@@ -52,7 +52,16 @@ export default function MainLayout() {
 
   return (
     <div className="flex h-screen bg-[#0a0a0a] text-white font-sans overflow-hidden">
-      <aside className={`bg-[#141414] border-r border-neutral-800 transition-all duration-300 flex flex-col z-20 ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
+      {/* Se anima solo el ancho, que es lo único que cambia. Con
+          `transition-all` el navegador animaba todas las propiedades y
+          dejaba pintado un fotograma intermedio de la barra a la
+          izquierda: parecía que el menú salía duplicado. El
+          backdrop-filter de la cabecera crea una capa de composición al
+          lado y eso hacía que el rastro no se limpiara.
+
+          `transform-gpu` le da capa propia a la barra, para que se
+          repinte ella sola y no arrastre lo de al lado. */}
+      <aside className={`bg-[#141414] border-r border-neutral-800 transition-[width] duration-300 transform-gpu flex flex-col z-20 ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
         <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-800">
           {isSidebarOpen && (
             <span className="text-lg font-black italic tracking-wide text-white whitespace-nowrap">
