@@ -426,9 +426,20 @@ export default function VehiculosModule() {
             <input
               type="file" accept="image/*" multiple ref={inputFoto} className="hidden"
               onChange={e => {
-                const sitio = TOPE_FOTOS - fotos.length - nuevas.length
-                setNuevas(n => [...n, ...Array.from(e.target.files || []).slice(0, sitio)])
+                // Los archivos se leen aquí y no dentro del actualizador de
+                // estado. React ejecuta el actualizador más tarde, y para
+                // entonces la línea que limpia el input ya vació
+                // e.target.files: la lista llegaba vacía y no se subía nada.
+                const elegidos = Array.from(e.target.files || [])
+
+                // Se limpia para poder volver a elegir el mismo archivo:
+                // sin esto el onChange no se dispara la segunda vez.
                 e.target.value = ''
+
+                setNuevas(n => [
+                  ...n,
+                  ...elegidos.slice(0, TOPE_FOTOS - fotos.length - n.length),
+                ])
               }}
             />
           </div>
