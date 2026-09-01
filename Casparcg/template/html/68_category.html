@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Categoría</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/event.css">
+    <link rel="stylesheet" href="../css/category.css">
+
+</head>
+
+<body>
+
+    <div
+        class="overlay"
+        id="overlay">
+
+        <!-- LOGO DEL AUTÓDROMO -->
+
+        <div class="logo-box">
+
+            <img
+                id="logo"
+                src="../img/logo-cliente.png"
+                alt="">
+
+        </div>
+
+        <!-- NOMBRE Y SUBCATEGORÍAS -->
+
+        <div
+            class="info-panel"
+            id="categoryPanel">
+
+            <div class="content-section">
+
+                <div
+                    class="event-label"
+                    id="label">
+
+                    CATEGORÍA
+
+                </div>
+
+                <div
+                    class="event-name"
+                    id="categoryName">
+
+                    Nombre de la categoría
+
+                </div>
+
+                <!-- Las subcategorías que corren. Si no hay, la fila no se
+                     dibuja y la carta queda como la de TCR: solo el
+                     nombre entre los dos logos. -->
+                <div
+                    class="cat-subs"
+                    id="subsRow">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- LOGO DE LA CATEGORÍA -->
+
+        <div
+            class="event-logo"
+            id="categoryLogoBox">
+
+            <img
+                id="categoryLogo"
+                src=""
+                alt="">
+
+        </div>
+
+    </div>
+
+<script>
+
+/* ==========================================================================
+   CARTA DE CATEGORÍA
+
+   La misma barra de tres piezas que la de Evento: logo del autódromo,
+   nombre, logo del campeonato. Lo que cambia es que debajo del nombre
+   pueden ir las subcategorías que están corriendo.
+
+       TCR             ->  (AP)  TCR  (logo TCR)
+       Prospec Series  ->  (AP)  Prospec Series
+                                 Pro · Amateur · Equipos por Color   (logo PS)
+========================================================================== */
+
+
+const ANCHO_MIN  = 700;
+const ANCHO_MAX  = 1180;
+const RELLENO    = 70;      /* los 35px de padding a cada lado */
+const CUERPO_MAX = 58;
+const CUERPO_MIN = 34;
+
+
+function escapar(texto){
+
+    return String(texto == null ? "" : texto)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+
+function ajustarPanel(){
+
+    const panel   = document.getElementById("categoryPanel");
+    const seccion = document.querySelector(".content-section");
+    const nombre  = document.getElementById("categoryName");
+    const subs    = document.getElementById("subsRow");
+
+    if(!panel || !seccion || !nombre) return;
+
+    const DISPONIBLE = ANCHO_MAX - RELLENO;
+
+    /* Se parte siempre del cuerpo grande: si antes hubo un nombre largo,
+       el siguiente no tiene por qué heredar su letra pequeña. */
+    nombre.style.fontSize = CUERPO_MAX + "px";
+
+    /* Se mide con scrollWidth y no con el rectángulo: el max-width del
+       CSS recorta la caja y el rectángulo nunca pasaría del tope. */
+    let cuerpo = CUERPO_MAX;
+
+    while(nombre.scrollWidth > DISPONIBLE && cuerpo > CUERPO_MIN){
+        cuerpo -= 2;
+        nombre.style.fontSize = cuerpo + "px";
+    }
+
+    /* Manda la más ancha de las tres líneas: con pocas subcategorías el
+       nombre es la más larga, pero "Pro · Amateur · Equipos por Color"
+       puede pasarlo de largo. */
+    const etiqueta = document.getElementById("label");
+
+    const texto = Math.max(
+        nombre.scrollWidth,
+        subs ? subs.scrollWidth : 0,
+        etiqueta ? etiqueta.scrollWidth : 0);
+
+    const total = Math.min(
+        ANCHO_MAX,
+        Math.max(ANCHO_MIN, Math.ceil(texto) + RELLENO));
+
+    panel.style.setProperty("--panel-w", total + "px");
+}
+
+
+function update(data){
+
+    /* CasparCG 2.5 entrega el payload como texto JSON, no como objeto. */
+    if (typeof data === "string") {
+        try { data = JSON.parse(data); }
+        catch (e) { return; }
+    }
+
+
+    if(data.label !== undefined)
+        document.getElementById("label").textContent =
+            data.label.toUpperCase();
+
+    /* Tal cual está escrito: "GT Challenge" en versales pierde las
+       mayúsculas que sí distinguen algo. */
+    if(data.category !== undefined)
+        document.getElementById("categoryName").textContent =
+            data.category;
+
+    if(data.logo !== undefined)
+        document.getElementById("logo").src =
+            data.logo;
+
+    /* Las subcategorías. Sin ellas la fila se vacía en vez de quedarse
+       con las de la categoría anterior. */
+    if(data.subcategories !== undefined){
+
+        const fila = document.getElementById("subsRow");
+        const lista = Array.isArray(data.subcategories) ? data.subcategories : [];
+
+        fila.innerHTML = lista
+            .map(s => `<span class="cat-sub">${escapar(s)}</span>`)
+            .join('<span class="cat-sep">·</span>');
+
+        fila.style.display = lista.length ? "flex" : "none";
+    }
+
+    /* Logo del campeonato. Sin él se esconde el bloque entero en vez de
+       dejar un recuadro vacío al final de la barra. */
+    if(data.category_logo !== undefined){
+
+        const caja = document.getElementById("categoryLogoBox");
+        const img  = document.getElementById("categoryLogo");
+
+        if(data.category_logo){
+            img.src = data.category_logo;
+            caja.style.display = "flex";
+        } else {
+            img.removeAttribute("src");
+            caja.style.display = "none";
+        }
+    }
+
+    /* Después de escribir, no antes: el ancho depende del texto que
+       acaba de entrar. */
+    ajustarPanel();
+}
+
+
+function play(){
+
+    ajustarPanel();
+
+    const widget = document.getElementById("overlay");
+    const panel  = document.getElementById("categoryPanel");
+
+    widget.style.animation = "slideUp .5s ease forwards";
+
+    setTimeout(() => {
+        panel.style.animation = "expandPanel .6s ease forwards";
+    }, 500);
+}
+
+
+function stop(){
+
+    const widget = document.getElementById("overlay");
+    const panel  = document.getElementById("categoryPanel");
+
+    panel.style.animation = "collapsePanel .5s ease forwards";
+
+    setTimeout(() => {
+        widget.style.animation = "slideDown .5s ease forwards";
+    }, 500);
+}
+
+
+window.onload = function(){
+    play();
+};
+
+</script>
+
+</body>
+</html>

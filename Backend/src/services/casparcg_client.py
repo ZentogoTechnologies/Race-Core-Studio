@@ -79,6 +79,32 @@ class CasparCGClient:
         except Exception:
             pass
 
+    async def reconectar(self) -> dict:
+        """Tira la conexión y la vuelve a abrir.
+
+        El cliente ya reconecta solo cuando el socket se cae, pero eso
+        ocurre al mandar el siguiente comando y no antes. Cerrando y
+        volviendo a abrir CasparCG se queda una conexión que parece viva y
+        no lo está; esto la fuerza sin tener que reiniciar el backend.
+        """
+        async with self._lock:
+            await self._drop()
+
+            try:
+                await self._connect()
+            except CasparCGUnavailable as exc:
+                return {"ok": False, "detalle": str(exc)}
+
+            # No basta con que el socket abra: se pregunta algo para saber
+            # que del otro lado hay un CasparCG y no otra cosa.
+            try:
+                codigo, estado, _ = await self._send_once("VERSION")
+            except Exception as exc:
+                await self._drop()
+                return {"ok": False, "detalle": f"El puerto abre pero no responde AMCP ({exc})"}
+
+            return {"ok": True, "detalle": estado, "codigo": codigo}
+
     async def close(self) -> None:
         async with self._lock:
             await self._drop()

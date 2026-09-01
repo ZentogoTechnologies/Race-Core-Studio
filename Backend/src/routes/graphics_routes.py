@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional
 
 from config import settings
@@ -15,6 +15,7 @@ from src.services.casparcg_client import (
     CasparCGUnavailable,
     casparcg,
 )
+from src.services.auth_services import puede_escribir
 from src.services.graphics_services import LAYERS, build_pilot_payload, service
 
 graphics = APIRouter()
@@ -85,31 +86,61 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
 
         evento = await Event.find_one(Event.event_id == event_id)
         if evento is not None:
-            imagen = event_image_url(evento.image)
-
-            # Sin imagen propia se usa el logo de su categoría. Un evento
-            # como "GT Challenge de las Américas" corre GT Challenge, y ese
-            # logo es el que se espera ver: obligar a subir dos veces la
-            # misma imagen no aporta nada. Se recorren en el orden en que
-            # se eligieron y manda la primera que tenga logo.
-            if not imagen:
-                from src.models.categories_model import Category
-                from src.services.graphics_services import category_logo_url
-
-                for cid in (evento.category_ids or []):
-                    categoria = await Category.find_one(Category.category_id == cid)
-                    if categoria is not None and categoria.logo:
-                        imagen = category_logo_url(categoria.logo)
-                        if imagen:
-                            break
-
+            # Solo la imagen del propio evento. No se cae al logo de la
+            # categoría: esa tiene su propio gráfico, y mezclarlas hacía
+            # que un evento sin arte propio saliera con el del campeonato
+            # sin que nadie lo hubiera decidido.
             base = {
                 "event": evento.name,
                 # Se manda siempre, vacía incluida: omitirla dejaría en
                 # pantalla el logo del evento anterior.
-                "event_image": imagen,
+                "event_image": event_image_url(evento.image),
             }
             return {**base, **(data or {})}
+
+    # La carta de categoría: el nombre, las subcategorías que están
+    # corriendo en ese evento y el logo del campeonato.
+    if template.graphic_id == "categoria" and category_id is not None:
+        from src.models.categories_model import Category
+        from src.models.events_model import Event
+        from src.services.graphics_services import category_logo_url
+
+        categoria = await Category.find_one(Category.category_id == category_id)
+        if categoria is None:
+            raise HTTPException(404, f"No existe la categoría {category_id}")
+
+        # Las que de verdad tienen carros inscritos en este evento, no
+        # todas las declaradas: si en esta fecha no corre "Equipos por
+        # color", ponerla en el arte sería mentir.
+        nombres = []
+        if event_id is not None:
+            evento = await Event.find_one(Event.event_id == event_id)
+            if evento is not None:
+                ids = []
+                for ins in (evento.inscritos or []):
+                    if ins.category_id == category_id and ins.sub_category_id is not None:
+                        if ins.sub_category_id not in ids:
+                            ids.append(ins.sub_category_id)
+
+                # Se ordenan como están declaradas en la categoría, no por
+                # el orden en que alguien inscribió los carros.
+                nombres = [sc.sub_category_name
+                           for sc in categoria.sub_categories
+                           if sc.sub_category_id in ids]
+
+        # Sin evento o sin inscritos se muestran las declaradas: es lo que
+        # esa categoría corre normalmente.
+        if not nombres:
+            nombres = [sc.sub_category_name for sc in categoria.sub_categories]
+
+        base = {
+            "category": categoria.category_name,
+            "subcategories": nombres,
+            # Se manda siempre, vacío incluido, o al cambiar de categoría
+            # quedaría el logo de la anterior.
+            "category_logo": category_logo_url(categoria.logo),
+        }
+        return {**base, **(data or {})}
 
     if pilot_id is None:
         return data
@@ -176,6 +207,21 @@ async def get_state():
         channel=settings.CASPARCG_CHANNEL,
         on_air=service.on_air(),
     )
+
+
+@graphics.post("/reconnect", tags=["Graphics"], dependencies=[Depends(puede_escribir)])
+async def reconnect():
+    """
+    Fuerza la reconexión con CasparCG. Útil si se cerró y se volvió a abrir
+    """
+    resultado = await casparcg.reconectar()
+
+    return {
+        **resultado,
+        "connected": casparcg.is_connected,
+        "host": casparcg.host,
+        "port": casparcg.port,
+    }
 
 
 # ── Comandos ──────────────────────────────────────────────────

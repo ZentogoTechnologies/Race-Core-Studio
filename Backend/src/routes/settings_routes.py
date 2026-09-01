@@ -5,7 +5,9 @@ from pydantic import BaseModel
 
 from src.services.auth_services import puede_escribir
 from src.services.settings_services import (
-    guardar_ruta_timing, revisar_ruta, ruta_timing, xml_detectados,
+    guardar_logo_cliente, guardar_ruta_timing, logo_cliente_actual,
+    marcar_logo_cliente, restaurar_logo_fabrica, revisar_ruta, ruta_timing,
+    url_logo_cliente, xml_detectados,
 )
 from src.services.tracks_services import ruta_plantilla, trazados_service
 
@@ -27,6 +29,8 @@ async def leer_ajustes():
         "timing_xml_path": actual,
         "estado": revisar_ruta(actual),
         "detectados": xml_detectados(),
+        "client_logo": await logo_cliente_actual(),
+        "client_logo_url": url_logo_cliente(),
     }
 
 
@@ -158,3 +162,36 @@ async def borrar_trazado(trazado_id: int):
     Borra el trazado y su imagen, si no la usa ningún otro
     """
     return await trazados_service.borrar(trazado_id)
+
+
+# ======================================================================
+#  LOGO DEL CLIENTE
+#
+#  El del autódromo que usa el software. Las veintidós plantillas apuntan
+#  al mismo archivo, así que cambiarlo aquí lo cambia en todos los
+#  gráficos a la vez, sin tocar ninguna plantilla.
+# ======================================================================
+
+
+@ajustes.post("/logo", tags=["Settings"], dependencies=[Depends(puede_escribir)])
+async def subir_logo_cliente(archivo: UploadFile = File(...)):
+    """
+    Sube el logo del autódromo. Sale en todos los gráficos
+    """
+    contenido = await archivo.read()
+
+    guardar_logo_cliente(contenido, archivo.filename or "")
+    await marcar_logo_cliente(archivo.filename or "logo")
+
+    return {"ok": True, "client_logo_url": url_logo_cliente()}
+
+
+@ajustes.delete("/logo", tags=["Settings"], dependencies=[Depends(puede_escribir)])
+async def quitar_logo_cliente():
+    """
+    Vuelve al logo que trae el software
+    """
+    restaurar_logo_fabrica()
+    await marcar_logo_cliente(None)
+
+    return {"ok": True, "client_logo_url": url_logo_cliente()}

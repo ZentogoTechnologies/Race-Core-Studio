@@ -16,5 +16,10 @@ class Ajustes(Document):
     # usa la del .env, que sigue siendo el valor por defecto.
     timing_xml_path: Optional[str] = None
 
+    # Nombre del archivo que subió el cliente para su logo. El archivo en
+    # sí siempre se escribe en el mismo sitio, así que esto solo sirve para
+    # saber si hay uno puesto y poder mostrarlo en la interfaz.
+    client_logo: Optional[str] = None
+
     class Settings:
         name = "ajustes"

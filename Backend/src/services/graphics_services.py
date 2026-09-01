@@ -84,6 +84,7 @@ TEMPLATES: dict[str, Template] = {
         # ── Misceláneos (capa 60) ─────────────────────────────
         Template("circuito", "Circuito",       "misc", 60, "html/60_circuit_track", accepts_data=True),
         Template("evento",   "Evento",         "misc", 60, "html/61_event",         accepts_data=True),
+        Template("categoria", "Categoría",     "misc", 60, "html/68_category",      accepts_data=True),
         Template("narrador", "Narrador",       "misc", 60, "html/62_narrator",      accepts_data=True),
         Template("redes",    "Redes Sociales", "misc", 60, "html/63_social_media",  accepts_data=True),
         Template("clima",       "Clima",        "misc", 60, "html/65_weather",      accepts_data=True),

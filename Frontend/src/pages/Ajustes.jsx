@@ -1,8 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Loader2, CheckCircle2, AlertCircle, FolderSearch, Save, FlaskConical,
+  Upload, X, ImageIcon, Plug, Radio,
 } from 'lucide-react'
-import { guardarRutaXml, leerAjustes, probarRutaXml } from '../api/registro'
+import {
+  guardarRutaXml, leerAjustes, probarRutaXml, quitarLogoCliente,
+  subirLogoCliente, urlLogoCliente,
+} from '../api/registro'
+import { reconectarCasparcg } from '../api/graphics'
 import Trazados from '../components/settings/Trazados'
 import { useToast } from '../context/ToastContext'
 
@@ -15,6 +20,17 @@ export default function AjustesModule() {
   const [estado,    setEstado]    = useState(null)   // estado de la ruta aplicada
   const [prueba,    setPrueba]    = useState(null)   // resultado de "probar"
   const [detectados, setDetectados] = useState([])
+
+  // Logo del cliente. Se sube y se ve al momento: cambia en los 22
+  // gráficos a la vez porque todas las plantillas miran el mismo archivo.
+  const [logoUrl,   setLogoUrl]   = useState(null)
+  const [logoPropio, setLogoPropio] = useState(null)
+  const [subiendo,  setSubiendo]  = useState(false)
+  const inputLogo = useRef(null)
+
+  // Reconexión con CasparCG
+  const [reconectando, setReconectando] = useState(false)
+  const [conexion,     setConexion]     = useState(null)
   const [probando,  setProbando]  = useState(false)
   const [guardando, setGuardando] = useState(false)
 
@@ -26,6 +42,8 @@ export default function AjustesModule() {
         setAplicada(a.timing_xml_path || '')
         setEstado(a.estado)
         setDetectados(a.detectados || [])
+        setLogoUrl(a.client_logo_url || null)
+        setLogoPropio(a.client_logo || null)
       })
       .catch(err => toast.error('No se pudieron cargar los ajustes', err.message))
       .finally(() => setCargando(false))
@@ -61,6 +79,48 @@ export default function AjustesModule() {
       toast.error('No se pudo guardar', err.message)
     } finally {
       setGuardando(false)
+    }
+  }
+
+  const subirLogo = async (archivo) => {
+    if (!archivo) return
+    setSubiendo(true)
+    try {
+      const r = await subirLogoCliente(archivo)
+      setLogoUrl(r.client_logo_url)
+      setLogoPropio(archivo.name)
+      toast.exito('Logo actualizado', 'Sale en todos los gráficos')
+    } catch (err) {
+      toast.error('No se pudo subir el logo', err.message)
+    } finally {
+      setSubiendo(false)
+      if (inputLogo.current) inputLogo.current.value = ''
+    }
+  }
+
+  const restaurarLogo = async () => {
+    setSubiendo(true)
+    try {
+      const r = await quitarLogoCliente()
+      setLogoUrl(r.client_logo_url)
+      setLogoPropio(null)
+      toast.exito('Logo restaurado', 'Vuelve el que trae el software')
+    } catch (err) {
+      toast.error('No se pudo restaurar', err.message)
+    } finally {
+      setSubiendo(false)
+    }
+  }
+
+  const reconectar = async () => {
+    setReconectando(true)
+    setConexion(null)
+    try {
+      setConexion(await reconectarCasparcg())
+    } catch (err) {
+      setConexion({ ok: false, detalle: err.message })
+    } finally {
+      setReconectando(false)
     }
   }
 
@@ -187,6 +247,115 @@ export default function AjustesModule() {
           })}
           {detectados.length === 0 && (
             <p className="text-sm text-neutral-600">El servidor no encuentra ningún XML.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Logo del cliente. Va aquí y no en cada plantilla porque las 22
+          apuntan al mismo archivo: cambiarlo lo cambia en todos los
+          gráficos de una vez. */}
+      <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <ImageIcon size={17} className="text-neutral-500"/>
+          <h3 className="text-lg font-black italic text-white">LOGO DEL AUTÓDROMO</h3>
+        </div>
+        <p className="text-neutral-500 text-sm mb-5">
+          Sale en todos los gráficos: tótems, banderas, fichas y cartas. Se guarda
+          en PNG con transparencia, para que no salga con un recuadro blanco sobre
+          los paneles oscuros.
+        </p>
+
+        <div className="flex items-center gap-5">
+          {/* Fondo a cuadros para ver la transparencia del logo. */}
+          <div
+            className="w-32 h-24 rounded-lg border border-neutral-800 flex items-center justify-center overflow-hidden flex-shrink-0"
+            style={{
+              backgroundImage:
+                'linear-gradient(45deg,#1a1a1a 25%,transparent 25%),' +
+                'linear-gradient(-45deg,#1a1a1a 25%,transparent 25%),' +
+                'linear-gradient(45deg,transparent 75%,#1a1a1a 75%),' +
+                'linear-gradient(-45deg,transparent 75%,#1a1a1a 75%)',
+              backgroundSize: '14px 14px',
+              backgroundPosition: '0 0, 0 7px, 7px -7px, -7px 0',
+              backgroundColor: '#0a0a0a',
+            }}
+          >
+            {logoUrl
+              ? <img src={urlLogoCliente(logoUrl)} alt="" className="max-w-full max-h-full object-contain"/>
+              : <ImageIcon size={22} className="text-neutral-700"/>}
+          </div>
+
+          <div className="min-w-0">
+            <input
+              type="file" accept="image/*" ref={inputLogo} className="hidden"
+              onChange={e => {
+                const elegido = e.target.files?.[0] || null
+                subirLogo(elegido)
+              }}
+            />
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button" disabled={subiendo}
+                onClick={() => inputLogo.current?.click()}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 disabled:opacity-40 transition-colors font-bold text-sm"
+              >
+                {subiendo ? <Loader2 size={16} className="animate-spin"/> : <Upload size={16}/>}
+                CAMBIAR LOGO
+              </button>
+
+              {logoPropio && (
+                <button
+                  type="button" onClick={restaurarLogo} disabled={subiendo}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 disabled:opacity-40 transition-colors font-bold text-sm"
+                >
+                  <X size={16}/> RESTAURAR
+                </button>
+              )}
+            </div>
+
+            <p className="text-xs text-neutral-600 mt-2">
+              {logoPropio
+                ? `En uso: ${logoPropio}`
+                : 'Ahora mismo está el que trae el software.'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Reconexión con CasparCG. Hace falta porque el cliente solo se da
+          cuenta de que la conexión murió al mandar el siguiente comando:
+          si CasparCG se cerró y se abrió, parece viva y no lo está. */}
+      <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Plug size={17} className="text-neutral-500"/>
+          <h3 className="text-lg font-black italic text-white">CONEXIÓN CON CASPARCG</h3>
+        </div>
+        <p className="text-neutral-500 text-sm mb-5">
+          Si cerraste y volviste a abrir CasparCG, la conexión anterior se queda
+          colgada y el primer gráfico falla. Esto la fuerza sin reiniciar nada.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="button" onClick={reconectar} disabled={reconectando}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-40 transition-colors font-bold text-sm"
+          >
+            {reconectando ? <Loader2 size={16} className="animate-spin"/> : <Radio size={16}/>}
+            RECONECTAR
+          </button>
+
+          {conexion && (
+            <span className={`flex items-center gap-2 text-sm font-bold ${
+              conexion.ok ? 'text-green-400' : 'text-red-400'
+            }`}>
+              {conexion.ok
+                ? <CheckCircle2 size={16}/>
+                : <AlertCircle size={16}/>}
+              {conexion.ok
+                ? `Conectado a ${conexion.host}:${conexion.port}`
+                : conexion.detalle}
+            </span>
           )}
         </div>
       </div>

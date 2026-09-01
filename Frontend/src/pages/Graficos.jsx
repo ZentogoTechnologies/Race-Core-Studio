@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import SelectorCarrera from '../components/graphics/SelectorCarrera'
 import { useCarrera } from '../context/CarreraContext'
 import {
@@ -6,7 +6,7 @@ import {
   SquareUser, Contact, ListOrdered, Crown, ArrowUpDown, LayoutGrid,
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
-  Wrench, Droplets, Ban, Table2, Lock, Repeat,
+  Wrench, Droplets, Ban, Table2, Lock, Repeat, Tag,
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
@@ -116,6 +116,8 @@ const BANDERAS = [
 // cambia el rótulo que sale en el arte.
 const MISCELANEOS = [
   { id: 'evento',   label: 'Evento',   nombre: 'Evento',         detalle: 'Datos del evento en curso',   Icon: Calendar, ...ROJO },
+  { id: 'categoria', label: 'Categoría', nombre: 'Categoría',
+    detalle: 'Categoría y subcategorías que corren', Icon: Tag, ...ROJO },
   { id: 'circuito', label: 'Circuito', nombre: 'Circuito',       detalle: 'Imagen de la pista',          Icon: Map,      ...ROJO },
   { id: 'clima',    label: 'Clima',    nombre: 'Clima',          detalle: 'Condiciones de pista',        Icon: CloudSun, ...ROJO },
   { id: 'redes',    label: 'Redes',    nombre: 'Redes Sociales', detalle: 'Cuentas oficiales',           Icon: Share2,   ...ROJO },
@@ -202,6 +204,7 @@ const REQUIERE_DATOS = {
   'comentarista':   'narrador',  // mismo formulario, misma plantilla base
   'reportero':      'narrador',  // idem; cambia el rótulo del arte
   'ficha-corta':    'piloto',    // sale del registro de pilotos
+  'categoria':      'categoria',  // se elige cuál de las del evento
 }
 
 // ─── Formulario en línea ──────────────────────────────────────
@@ -209,10 +212,26 @@ function FormularioPersonal({
   item, tipo, pilotosRegistrados, categorias,
   narrador, setNarrador, pilotoId, setPilotoId,
   categoriaFicha, setCategoriaFicha,
+  categoriaCarta, setCategoriaCarta, carrera,
   alAire, ocupado, onMostrar, onOcultar,
 }) {
   const [busqueda, setBusqueda] = useState('')
   const [categoria, setCategoria] = useState(null)   // null = todas
+
+  // Solo las categorías del evento que se está graficando: en pista corren
+  // esas y no todas las que existen en la base.
+  const categoriasDelEvento = useMemo(() => {
+    const nombres = carrera?.categorias || []
+    return categorias.filter(c => nombres.includes(c.nombre))
+  }, [categorias, carrera])
+
+  // Las subcategorías de la elegida, resueltas desde los vehículos
+  // inscritos: son las que el backend va a mandar al arte.
+  const subcategoriasDeLaCarta = useMemo(() => {
+    if (categoriaCarta === null) return []
+    const cat = categorias.find(c => c.id === categoriaCarta)
+    return cat?.subcategorias || []
+  }, [categorias, categoriaCarta])
 
   // Solo se ofrecen las categorías que tienen pilotos cargados: no sirve
   // de nada un filtro que deja la lista vacía.
@@ -238,7 +257,9 @@ function FormularioPersonal({
 
   const listo = tipo === 'narrador'
     ? narrador.nombre.trim() !== ''
-    : pilotoId !== null && !faltaCategoria
+    : tipo === 'categoria'
+      ? categoriaCarta !== null
+      : pilotoId !== null && !faltaCategoria
 
   const inputClass = 'w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white'
 
@@ -248,7 +269,66 @@ function FormularioPersonal({
         {item.nombre}
       </p>
 
-      {tipo === 'narrador' ? (
+      {tipo === 'categoria' ? (
+        <div>
+          <label className="block text-neutral-400 text-xs mb-2 uppercase">
+            Categoría que está corriendo
+          </label>
+
+          {categoriasDelEvento.length === 0 ? (
+            <p className="text-sm text-neutral-600">
+              El evento seleccionado no tiene categorías inscritas.
+            </p>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {categoriasDelEvento.map(c => {
+                  const activa = categoriaCarta === c.id
+                  return (
+                    <button
+                      key={c.id} type="button"
+                      onClick={() => setCategoriaCarta(c.id)}
+                      className={`px-4 py-2 rounded-lg border text-sm font-bold transition-colors ${
+                        activa
+                          ? 'border-red-600 bg-red-600/15 text-red-400'
+                          : 'border-neutral-800 text-neutral-400 hover:border-neutral-600 hover:text-neutral-200'
+                      }`}
+                    >
+                      {c.nombre}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Las de la elegida, para ver antes de sacarla al aire qué
+                  va a salir debajo del nombre. */}
+              {categoriaCarta !== null && (
+                <div className="mt-4 border-t border-neutral-800 pt-3">
+                  <p className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2">
+                    Subcategorías que salen en el arte
+                  </p>
+                  {subcategoriasDeLaCarta.length === 0 ? (
+                    <p className="text-sm text-neutral-600">
+                      Ninguna. La carta saldrá solo con el nombre de la categoría.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {subcategoriasDeLaCarta.map(s => (
+                        <span
+                          key={s}
+                          className="px-3 py-1.5 rounded-full bg-neutral-800 text-neutral-200 text-xs font-bold uppercase tracking-wide"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      ) : tipo === 'narrador' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre</label>
@@ -754,6 +834,10 @@ export default function GraficosModule() {
   // Challenge con carros distintos, y la ficha tiene que decir cuál.
   const [categoriaFicha, setCategoriaFicha] = useState(null)
 
+  // Qué categoría se saca en la carta de Categoría. Se elige entre las del
+  // evento, no entre todas: en pista solo corren las inscritas.
+  const [categoriaCarta, setCategoriaCarta] = useState(null)
+
   // Qué comando está viajando al servidor y el último error que devolvió.
   const [pendiente, setPendiente] = useState(null)
   const [error,     setError]     = useState(null)
@@ -795,7 +879,11 @@ export default function GraficosModule() {
 
     getCategories()
       .then(lista => setCategorias(lista.map(c => ({
-        id: c.category_id, nombre: c.category_name,
+        id: c.category_id,
+        nombre: c.category_name,
+        // Para enseñar en el formulario qué va a salir en el arte antes de
+        // sacarlo. El backend recorta a las que corren en el evento.
+        subcategorias: (c.sub_categories || []).map(s => s.sub_category_name),
       }))))
       .catch(() => {})
   }, [])
@@ -902,6 +990,11 @@ export default function GraficosModule() {
   const datosDelForm = (item) => {
     const tipo = REQUIERE_DATOS[item.id]
     if (tipo === 'piloto') return { pilotId: pilotoId, categoryId: categoriaFicha }
+    // El evento acota qué subcategorías salen: solo las que tienen carros
+    // inscritos en esta fecha.
+    if (tipo === 'categoria') {
+      return { categoryId: categoriaCarta, eventId: carrera?.event_id }
+    }
     if (tipo === 'narrador') {
       return { data: { name: narrador.nombre, text: narrador.equipo } }
     }
@@ -1227,6 +1320,8 @@ export default function GraficosModule() {
             narrador={narrador}   setNarrador={setNarrador}
             pilotoId={pilotoId}   setPilotoId={setPilotoId}
             categoriaFicha={categoriaFicha} setCategoriaFicha={setCategoriaFicha}
+            categoriaCarta={categoriaCarta} setCategoriaCarta={setCategoriaCarta}
+            carrera={carrera}
             alAire={estaAlAire(itemDelForm)}
             ocupado={ocupado}
             onMostrar={() => {

@@ -110,6 +110,12 @@ export const clearGraphic = (graphicId) =>
 // Vacía el canal entero (CLEAR 1).
 export const clearAll = () => request('/clear-all', { method: 'POST' })
 
+// Fuerza la reconexión con CasparCG. El cliente reconecta solo cuando el
+// socket se cae, pero eso ocurre al mandar el siguiente comando: si
+// CasparCG se cerró y se volvió a abrir, la conexión parece viva y no lo
+// está hasta que algo falla al aire.
+export const reconectarCasparcg = () => request('/reconnect', { method: 'POST' })
+
 // ─── Consultas ────────────────────────────────────────────────
 
 export const getState = () => request('/state')

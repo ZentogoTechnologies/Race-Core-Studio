@@ -171,6 +171,19 @@ export const guardarRutaXml = (ruta) =>
   pedir('/settings/timing', { method: 'PUT', body: { timing_xml_path: ruta } })
 
 
+// ─── Logo del cliente ─────────────────────────────────────────────
+// El del autódromo que usa el software. Las plantillas apuntan todas al
+// mismo archivo, así que cambiarlo aquí lo cambia en los 22 gráficos.
+
+export const subirLogoCliente = (archivo) =>
+  subirArchivo('/settings/logo', archivo)
+
+export const quitarLogoCliente = () =>
+  pedir('/settings/logo', { method: 'DELETE' })
+
+export const urlLogoCliente = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
+
+
 // ─── Trazados ─────────────────────────────────────────────────
 // Un mismo recinto se corre de varias formas —pista corta, pista larga,
 // cuarto de milla— y cada una tiene su imagen. El gráfico de Circuito usa

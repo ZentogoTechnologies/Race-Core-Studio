@@ -99,6 +99,17 @@ app.mount(
     name="circuits",
 )
 
+# El logo del cliente vive dentro de la plantilla de CasparCG, que es
+# quien lo pinta al aire. La interfaz lo sirve desde aquí para poder
+# enseñarlo en Ajustes sin duplicar el archivo.
+from src.services.settings_services import LOGO_CLIENTE
+
+app.mount(
+    "/media/logo",
+    StaticFiles(directory=LOGO_CLIENTE.parent),
+    name="logo",
+)
+
 # Todo lo que toca la base o manda al aire exige un JWT válido. La
 # dependencia se declara aquí y no dentro de cada router para que la
 # política de acceso se lea de un vistazo en un solo lugar.

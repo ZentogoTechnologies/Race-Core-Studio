@@ -6,6 +6,8 @@ en cada lectura sería absurdo, así que el valor se mantiene en memoria y
 se refresca al arrancar y cada vez que alguien lo cambia.
 """
 
+import io
+import shutil
 from pathlib import Path
 from typing import Optional
 
@@ -21,6 +23,60 @@ CARPETAS_CANDIDATAS = [
     Path(__file__).resolve().parents[1] / "public",
 ]
 
+# ── Logo del cliente ──────────────────────────────────────────────
+#
+# Todas las plantillas apuntan a este archivo, así que cambiarlo cambia el
+# logo en los veintidós gráficos de una vez. Se escribe siempre en el mismo
+# sitio y en PNG, sea cual sea el formato que suban: así la ruta de las
+# plantillas es fija y no hay que tocarlas nunca más.
+
+RAIZ = Path(__file__).resolve().parents[3]
+
+LOGO_CLIENTE = RAIZ / "Casparcg" / "template" / "img" / "logo-cliente.png"
+
+# El de fábrica, que no se toca: es a donde se vuelve al quitar el suyo.
+LOGO_FABRICA = RAIZ / "Casparcg" / "template" / "img" / "logoap.png"
+
+
+def url_logo_cliente() -> str:
+    """Con qué versión pedirlo, para que el navegador no lo cachee."""
+    if not LOGO_CLIENTE.is_file():
+        return ""
+    return f"/media/logo/logo-cliente.png?v={int(LOGO_CLIENTE.stat().st_mtime)}"
+
+
+def guardar_logo_cliente(contenido: bytes, nombre: str) -> None:
+    """Escribe el logo subido en el sitio que miran las plantillas.
+
+    Se convierte a PNG con transparencia porque los gráficos lo ponen
+    sobre paneles oscuros: un JPG llegaría con su fondo blanco recortado
+    en un rectángulo y se vería como un parche.
+    """
+    from fastapi import HTTPException
+    from PIL import Image, UnidentifiedImageError
+
+    if not contenido:
+        raise HTTPException(400, "El archivo llegó vacío")
+
+    try:
+        imagen = Image.open(io.BytesIO(contenido))
+        imagen.load()
+    except (UnidentifiedImageError, OSError) as e:
+        raise HTTPException(400, f"'{nombre}' no se pudo leer como imagen ({e})")
+
+    LOGO_CLIENTE.parent.mkdir(parents=True, exist_ok=True)
+    imagen.convert("RGBA").save(LOGO_CLIENTE, format="PNG")
+
+
+def restaurar_logo_fabrica() -> None:
+    """Vuelve al logo que trae el software."""
+    from fastapi import HTTPException
+
+    if not LOGO_FABRICA.is_file():
+        raise HTTPException(500, "No encuentro el logo de fábrica para restaurarlo")
+
+    shutil.copyfile(LOGO_FABRICA, LOGO_CLIENTE)
+
 
 def ruta_timing() -> str:
     """La ruta que debe leerse ahora mismo."""
@@ -34,6 +90,22 @@ async def cargar_ajustes():
     doc = await Ajustes.find_one({})
     _ruta_timing = doc.timing_xml_path if doc else None
     return _ruta_timing
+
+
+async def marcar_logo_cliente(nombre: Optional[str]) -> None:
+    """Deja constancia de si hay un logo propio puesto."""
+    doc = await Ajustes.find_one({})
+    if doc is None:
+        doc = Ajustes(client_logo=nombre)
+        await doc.insert()
+    else:
+        doc.client_logo = nombre
+        await doc.save()
+
+
+async def logo_cliente_actual() -> Optional[str]:
+    doc = await Ajustes.find_one({})
+    return doc.client_logo if doc else None
 
 
 async def guardar_ruta_timing(ruta: Optional[str]) -> Optional[str]:
