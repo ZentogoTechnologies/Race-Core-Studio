@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Flag, Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Users, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Flag, Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Users, Loader2, ImagePlus, X } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
-import { categoriasApi, pilotosApi, vehiculosApi } from '../api/registro'
+import {
+  borrarFotoVehiculo, categoriasApi, pilotosApi, subirFotoVehiculo,
+  urlFotoVehiculo, vehiculosApi,
+} from '../api/registro'
 import { useListado } from '../hooks/useListado'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
@@ -76,13 +79,42 @@ export default function VehiculosModule() {
     return pilotos.filter(p => `${p.name} ${p.last_name}`.toLowerCase().includes(t))
   }, [pilotos, buscaPiloto])
 
+  // Las fotos no viajan en el JSON del vehículo sino como archivos, y en
+  // un alta todavía no hay id al que asociarlas: se guardan aquí y se
+  // suben en cuanto el vehículo existe.
+  const [fotos,  setFotos]  = useState([])   // ya guardadas: [{archivo, url}]
+  const [nuevas, setNuevas] = useState([])   // File elegidos, sin subir
+  const inputFoto = useRef(null)
+
+  const TOPE_FOTOS = 4
+
+  // Una foto ya guardada se borra en el acto, no al guardar: el vehículo
+  // ya existe y el archivo está en el servidor.
+  const quitarFotoGuardada = async (archivo) => {
+    try {
+      const v = await borrarFotoVehiculo(currentEditId, archivo)
+      setFotos((v.photos || []).map((a, i) => ({
+        archivo: a,
+        url: urlFotoVehiculo((v.photo_urls || [])[i]),
+      })))
+      lista.recargar()
+    } catch (err) {
+      toast.error('No se pudo quitar la foto', err.message)
+    }
+  }
+
+  const limpiarFotos = () => {
+    setFotos([]); setNuevas([])
+    if (inputFoto.current) inputFoto.current.value = ''
+  }
+
   const openAddForm = () => {
     setVehicleForm(EMPTY_VEHICLE); setCurrentEditId(null)
-    setBuscaPiloto(''); setIsFormOpen(true)
+    setBuscaPiloto(''); limpiarFotos(); setIsFormOpen(true)
   }
   const closeForm = () => {
     setIsFormOpen(false); setCurrentEditId(null)
-    setVehicleForm(EMPTY_VEHICLE); setBuscaPiloto('')
+    setVehicleForm(EMPTY_VEHICLE); setBuscaPiloto(''); limpiarFotos()
   }
   const handleFormToggle = () => isFormOpen ? closeForm() : openAddForm()
 
@@ -100,6 +132,14 @@ export default function VehiculosModule() {
     })
     setCurrentEditId(vehiculo.vehicle_id)
     setBuscaPiloto('')
+
+    setFotos((vehiculo.photos || []).map((archivo, i) => ({
+      archivo,
+      url: urlFotoVehiculo((vehiculo.photo_urls || [])[i]),
+    })))
+    setNuevas([])
+    if (inputFoto.current) inputFoto.current.value = ''
+
     setIsFormOpen(true)
   }
 
@@ -138,15 +178,29 @@ export default function VehiculosModule() {
     const etiqueta = `#${vehicleForm.number} ${vehicleForm.brand} ${vehicleForm.model}`.trim()
 
     try {
+      let id = currentEditId
+
       if (currentEditId) {
         await vehiculosApi.actualizar(currentEditId, cuerpo)
         toast.exito('Vehículo actualizado', etiqueta)
       } else {
         // Sin vehicle_id: lo asigna el backend. El dorsal (`number`) sí
         // lo escribe quien inscribe; esto era solo la clave interna.
-        await vehiculosApi.crear(cuerpo)
+        const creado = await vehiculosApi.crear(cuerpo)
+        id = creado.vehicle_id
         toast.exito('Vehículo creado', etiqueta)
       }
+
+      // Después de guardar porque en un alta el id no existe hasta ahora.
+      // Si falla una foto no se deshace el vehículo: se avisa y ya.
+      for (const archivo of nuevas) {
+        try {
+          await subirFotoVehiculo(id, archivo)
+        } catch (err) {
+          toast.error(`No se pudo subir ${archivo.name}`, err.message)
+        }
+      }
+
       closeForm()
       lista.recargar()
     } catch (err) {
@@ -255,6 +309,64 @@ export default function VehiculosModule() {
             </div>
           </div>
 
+          {/* Fotos del carro. Hasta cuatro; cuál se saca al aire se decide
+              al graficar, así que aquí no hay principal ni secundaria: es
+              una lista y el orden es el de subida. */}
+          <div className="mt-5 border-t border-neutral-800 pt-4">
+            <label className="block text-neutral-400 text-xs mb-2 uppercase">
+              Fotos del vehículo ({fotos.length + nuevas.length}/{TOPE_FOTOS})
+            </label>
+
+            <div className="flex flex-wrap gap-3 mb-3">
+              {fotos.map(f => (
+                <div key={f.archivo} className="relative w-28 h-20 rounded-lg overflow-hidden border border-neutral-800 bg-[#0a0a0a]">
+                  <img src={f.url} alt="" className="w-full h-full object-cover"/>
+                  <button
+                    type="button" onClick={() => quitarFotoGuardada(f.archivo)}
+                    className="absolute top-1 right-1 bg-black/70 rounded p-1 text-neutral-300 hover:text-red-500 transition-colors"
+                    title="Quitar esta foto"
+                  >
+                    <X size={12}/>
+                  </button>
+                </div>
+              ))}
+
+              {nuevas.map((archivo, i) => (
+                <div key={`nueva-${i}`} className="relative w-28 h-20 rounded-lg overflow-hidden border border-blue-600/50 bg-[#0a0a0a]">
+                  <img src={URL.createObjectURL(archivo)} alt="" className="w-full h-full object-cover"/>
+                  <span className="absolute bottom-0 inset-x-0 bg-blue-600/80 text-white text-[10px] font-bold text-center py-0.5">
+                    AL GUARDAR
+                  </span>
+                  <button
+                    type="button" onClick={() => setNuevas(n => n.filter((_, j) => j !== i))}
+                    className="absolute top-1 right-1 bg-black/70 rounded p-1 text-neutral-300 hover:text-red-500 transition-colors"
+                  >
+                    <X size={12}/>
+                  </button>
+                </div>
+              ))}
+
+              {fotos.length + nuevas.length < TOPE_FOTOS && (
+                <button
+                  type="button" onClick={() => inputFoto.current?.click()}
+                  className="w-28 h-20 rounded-lg border border-dashed border-neutral-700 text-neutral-500 hover:border-blue-500 hover:text-blue-400 transition-colors flex flex-col items-center justify-center gap-1"
+                >
+                  <ImagePlus size={18}/>
+                  <span className="text-[11px] font-bold">AÑADIR</span>
+                </button>
+              )}
+            </div>
+
+            <input
+              type="file" accept="image/*" multiple ref={inputFoto} className="hidden"
+              onChange={e => {
+                const sitio = TOPE_FOTOS - fotos.length - nuevas.length
+                setNuevas(n => [...n, ...Array.from(e.target.files || []).slice(0, sitio)])
+                e.target.value = ''
+              }}
+            />
+          </div>
+
           <div className="mt-5">
             <label className="block text-neutral-400 text-xs mb-2 uppercase">
               Pilotos ({vehicleForm.pilot_ids.length}/2)
@@ -266,20 +378,28 @@ export default function VehiculosModule() {
             />
             {/* Son más de cien pilotos: la caja se limita en alto y se
                 desplaza, si no el formulario se vuelve una lista infinita. */}
-            <div className="max-h-52 overflow-y-auto grid grid-cols-2 md:grid-cols-4 gap-2 p-1">
+            <div className="max-h-52 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 p-1">
               {pilotosFiltrados.map(piloto => {
                 const asignado = vehicleForm.pilot_ids.includes(piloto.pilot_id)
                 return (
                   <button
                     key={piloto.pilot_id} type="button"
                     onClick={() => alternarPiloto(piloto.pilot_id)}
-                    className={`px-3 py-2 rounded-lg text-xs font-bold border text-left truncate transition-colors ${
+                    className={`px-3 py-2 rounded-lg text-xs font-bold border text-left min-w-0 transition-colors ${
                       asignado
                         ? 'bg-red-600/15 border-red-600 text-red-400'
                         : 'border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
                     }`}
                   >
-                    {piloto.name}
+                    {/* Nombre y apellido, no solo el nombre: escribiendo
+                        "roberto" salían cuatro botones idénticos y no había
+                        forma de saber cuál era cuál. */}
+                    <span className="block truncate">{piloto.name}</span>
+                    <span className={`block truncate uppercase text-[11px] font-black tracking-wide ${
+                      asignado ? 'text-red-300' : 'text-neutral-400'
+                    }`}>
+                      {piloto.last_name}
+                    </span>
                   </button>
                 )
               })}

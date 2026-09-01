@@ -59,7 +59,6 @@ TEMPLATES: dict[str, Template] = {
 
         # ── Tótems (capa 20) ──────────────────────────────────
         Template("totem-completo",  "Tótem Nombre Completo", "totem", 20, "html/20_totem_fullname",  accepts_data=True),
-        Template("totem-corto",     "Tótem Nombre Corto",    "totem", 20, "html/21_totem_shortname", accepts_data=True),
         Template("totem-lider",     "Tótem al Líder",        "totem", 20, "html/22_totem_leader",    accepts_data=True),
         Template("totem-intervalo", "Tótem Intervalo",       "totem", 20, "html/23_totem_interval",  accepts_data=True),
 
@@ -212,17 +211,40 @@ def brand_logo_url(brand: str | None) -> str:
 # payload segun el destino. La logica vive aqui, en el backend, no en
 # el frontend: el boton solo manda el pilot_id.
 
-async def build_pilot_payload(graphic_id: str, pilot_id: int) -> dict:
+async def build_pilot_payload(
+    graphic_id: str,
+    pilot_id: int,
+    category_id: int | None = None,
+) -> dict:
     pilot = await Pilot.find_one(Pilot.pilot_id == pilot_id)
     if pilot is None:
         raise HTTPException(status_code=404, detail=f"Piloto {pilot_id} no encontrado")
 
     # El vehiculo guarda la relacion, asi que se busca por el DBRef.
-    vehicle = await Vehicle.find_one({"pilots.$id": pilot.id})
+    #
+    # Con `category_id` se acota a esa categoria. Hace falta porque hay
+    # pilotos que corren en varias: Dean Paquette esta en Prospec Series y
+    # en GT Challenge con carros distintos, y sin acotar salia el primero
+    # que devolviera Mongo, que no tiene por que ser el que se esta
+    # graficando.
+    filtro: dict = {"pilots.$id": pilot.id}
+    if category_id is not None:
+        filtro["category_id"] = category_id
+
+    vehicle = await Vehicle.find_one(filtro)
+
+    # Pedida una categoria en la que no tiene carro, se dice: mostrar el de
+    # otra categoria seria peor que no mostrar ninguno.
+    if vehicle is None and category_id is not None:
+        vehicle = None
 
     category = None
     if vehicle is not None:
         category = await Category.find_one(Category.category_id == vehicle.category_id)
+    elif category_id is not None:
+        # Sin carro, la categoria pedida se muestra igual: el piloto si
+        # pertenece a ella aunque no tenga maquina asignada.
+        category = await Category.find_one(Category.category_id == category_id)
 
     nombre = " ".join(x for x in (pilot.name, pilot.last_name) if x)
 
@@ -230,13 +252,17 @@ async def build_pilot_payload(graphic_id: str, pilot_id: int) -> dict:
     carro = " ".join(x for x in ((vehicle.brand if vehicle else None),
                                  (vehicle.model if vehicle else None)) if x)
 
-    # Si la categoria tiene subcategorias se muestra la del vehiculo.
+    # Categoria y subcategoria por separado. Antes la subcategoria pisaba a
+    # la categoria y solo se veia una de las dos, asi que en pantalla ponia
+    # "Gran Turismo 2" sin decir nunca que eso es GT Challenge.
     categoria = category.category_name if category else ""
+
+    subcategoria = ""
     if category and vehicle and vehicle.sub_category_id:
         sub = next((sc for sc in category.sub_categories
                     if sc.sub_category_id == vehicle.sub_category_id), None)
         if sub:
-            categoria = sub.sub_category_name
+            subcategoria = sub.sub_category_name
 
     # Siempre se mandan foto y logo, aunque sea el transparente: si se
     # omitieran, update() dejaría los del gráfico anterior en pantalla.
@@ -248,6 +274,7 @@ async def build_pilot_payload(graphic_id: str, pilot_id: int) -> dict:
             "pilot_name": nombre,
             "car_number": numero,
             "category": categoria,
+            "sub_category": subcategoria,
             "vehicle": carro,
             "team": pilot.team_brand or "",
             "country": pilot.nationality or "",

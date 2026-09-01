@@ -3,13 +3,33 @@ from typing import Optional
 from beanie.operators import In
 from src.models.vehicles_model import Vehicle
 from src.models.pilots_model import Pilot
+from pathlib import Path
+
 from src.models.categories_model import Category
+from src.services.imagenes_services import (
+    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+)
 from src.schemas.vehicles_schemas import VehicleCreate, VehicleUpdate, VehicleResponse
 from src.schemas.common_schemas import Page
 from src.services.pagination import (
     campo_orden, combinar, direccion, filtro_busqueda,
 )
 from fastapi import HTTPException
+
+# Backend/src/public/vehiculos, mirando desde Backend/src/services.
+CARPETA_FOTOS = Path(__file__).resolve().parents[1] / "public" / "vehiculos"
+
+RUTA_RELATIVA = "vehiculos"
+
+# Cuántas caben por carro. Se piden dos; se dejan cuatro para no tener que
+# tocar el modelo la primera vez que alguien quiera una más.
+TOPE_FOTOS = 4
+
+
+def url_foto_vehiculo(archivo: str) -> str:
+    """La ruta con la que el navegador y CasparCG piden la imagen."""
+    return f"/public/{RUTA_RELATIVA}/{archivo}"
+
 
 class VehicleService:
     async def _build_response(self, vehicle: Vehicle) -> VehicleResponse:
@@ -38,6 +58,8 @@ class VehicleService:
             brand=vehicle.brand,
             model=vehicle.model,
             color=vehicle.color,
+            photos=vehicle.photos or [],
+            photo_urls=[url_foto_vehiculo(f) for f in (vehicle.photos or [])],
             pilots=pilots_data,
             active_pilot_id=vehicle.active_pilot_id,
             category_id=vehicle.category_id,
@@ -191,3 +213,74 @@ class VehicleService:
             raise HTTPException(status_code=404, detail="Vehículo no encontrado")
         await vehicle.delete()
         return {"detail": "Vehículo eliminado"}
+
+    # ── Fotos ─────────────────────────────────────────────────────────
+
+    async def _obtener(self, vehicle_id: str) -> Vehicle:
+        vehicle = await Vehicle.find_one(Vehicle.vehicle_id == int(vehicle_id))
+        if not vehicle:
+            raise HTTPException(status_code=404, detail="Vehículo no encontrado")
+        return vehicle
+
+    def _hueco_libre(self, vehicle: Vehicle) -> int:
+        """El primer número de foto que no está ocupado.
+
+        Se busca hueco en vez de contar: al borrar la primera de dos, la
+        siguiente que suba debe volver a ocupar ese sitio y no llamarse
+        como la que ya existe.
+        """
+        usados = set()
+        for archivo in vehicle.photos or []:
+            trozo = Path(archivo).stem.rsplit("-", 1)[-1]
+            if trozo.isdigit():
+                usados.add(int(trozo))
+
+        for n in range(1, TOPE_FOTOS + 1):
+            if n not in usados:
+                return n
+
+        raise HTTPException(
+            400, f"Un vehículo admite hasta {TOPE_FOTOS} fotos. Borra una antes.")
+
+    async def _añadir(self, vehicle: Vehicle, destino: Path) -> VehicleResponse:
+        if destino.name not in (vehicle.photos or []):
+            vehicle.photos = [*(vehicle.photos or []), destino.name]
+            await vehicle.save()
+        return await self._build_response(vehicle)
+
+    async def subir_foto(self, vehicle_id: str, nombre: str, contenido: bytes) -> VehicleResponse:
+        vehicle = await self._obtener(vehicle_id)
+
+        if len(vehicle.photos or []) >= TOPE_FOTOS:
+            raise HTTPException(
+                400, f"Un vehículo admite hasta {TOPE_FOTOS} fotos. Borra una antes.")
+
+        base = CARPETA_FOTOS / f"{vehicle.vehicle_id}-{self._hueco_libre(vehicle)}"
+        destino = guardar_bytes(contenido, nombre, base)
+
+        return await self._añadir(vehicle, destino)
+
+    async def foto_por_ruta(self, vehicle_id: str, ruta: str) -> VehicleResponse:
+        vehicle = await self._obtener(vehicle_id)
+
+        if len(vehicle.photos or []) >= TOPE_FOTOS:
+            raise HTTPException(
+                400, f"Un vehículo admite hasta {TOPE_FOTOS} fotos. Borra una antes.")
+
+        base = CARPETA_FOTOS / f"{vehicle.vehicle_id}-{self._hueco_libre(vehicle)}"
+        destino = copiar_de_ruta(ruta, base)
+
+        return await self._añadir(vehicle, destino)
+
+    async def borrar_foto(self, vehicle_id: str, archivo: str) -> VehicleResponse:
+        vehicle = await self._obtener(vehicle_id)
+
+        if archivo not in (vehicle.photos or []):
+            raise HTTPException(404, f"El vehículo no tiene la foto {archivo}")
+
+        vehicle.photos = [f for f in vehicle.photos if f != archivo]
+        await vehicle.save()
+
+        borrar_si_sobra(CARPETA_FOTOS / archivo, CARPETA_FOTOS / "__ninguno__")
+
+        return await self._build_response(vehicle)

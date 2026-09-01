@@ -57,7 +57,19 @@
                             class="value"
                             id="category">
 
-                            V8
+                            GT Challenge
+
+                        </div>
+
+                        <!-- La subcategoría, debajo y más pequeña. Antes
+                             sustituía a la categoría, así que salía
+                             "Gran Turismo 2" sin decir nunca de qué
+                             campeonato era. -->
+                        <div
+                            class="subvalue"
+                            id="subCategory">
+
+                            Gran Turismo 2
 
                         </div>
 
@@ -154,6 +166,16 @@ function update(data){
     if(data.category !== undefined)
         document.getElementById("category").textContent =
             data.category;
+
+    /* Sin subcategoría la línea se esconde en vez de quedarse vacía: un
+       hueco en blanco bajo la categoría parece un fallo de carga. */
+    if(data.sub_category !== undefined){
+
+        const el = document.getElementById("subCategory");
+
+        el.textContent = data.sub_category;
+        el.style.display = data.sub_category ? "block" : "none";
+    }
 
     if(data.vehicle !== undefined)
         document.getElementById("vehicle").textContent =

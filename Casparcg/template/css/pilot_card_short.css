@@ -21,7 +21,7 @@
 
 .brand-panel{
     width:150px;
-    height:170px;
+    height:210px;
 
     flex-shrink:0;
 
@@ -38,13 +38,13 @@
 
 .brand-logo{
     max-width:130px;
-    max-height:90px;
+    max-height:112px;
     object-fit:contain;
 }
 
 .brand-panel img{
     max-width:100px;
-    max-height:100px;
+    max-height:126px;
 }
 
 /* ==================================================
@@ -53,7 +53,7 @@
 
 .pilot-panel{
     width:0;
-    height:170px;
+    height:210px;
 
     overflow:hidden;
     white-space:nowrap;
@@ -126,7 +126,9 @@
     align-items:baseline;
     gap:22px;
 
-    margin-bottom:14px;
+    /* Menos hueco entre el nombre y los datos: la subcategoría añadió una
+       línea y el bloque quedaba pegado al borde de abajo. */
+    margin-bottom:10px;
 }
 
 .pilot-name{
@@ -180,6 +182,20 @@
     line-height:1.1;
     letter-spacing: .5px;
     color:#fff;
+}
+
+/* La subcategoría cuelga de la categoría, no compite con ella: es una
+   precisión de la de arriba, no un dato del mismo rango. */
+.subvalue{
+    margin-top:2px;
+
+    font-family:"Rajdhani","Arial",sans-serif;
+    font-size:18px;
+    font-weight:600;
+    line-height:1.1;
+    letter-spacing: .5px;
+    color:#D50000;
+    text-transform:uppercase;
 }
 
 /* ==================================================

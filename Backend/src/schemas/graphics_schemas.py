@@ -16,6 +16,12 @@ class PlayRequest(BaseModel):
 
     graphic_id: str = Field(..., description="Id del gráfico, el mismo que usa el botón del frontend")
     pilot_id: Optional[int] = Field(None, description="Piloto con el que alimentar la plantilla")
+
+    # Desde qué categoría se está graficando al piloto. Solo importa cuando
+    # corre en varias con carros distintos: sin esto se tomaba un vehículo
+    # cualquiera de los suyos.
+    category_id: Optional[int] = Field(None, description="Categoría desde la que se grafica al piloto")
+
     data: Optional[dict[str, Any]] = Field(None, description="Datos que recibirá update() en la plantilla")
 
 
@@ -24,6 +30,11 @@ class UpdateRequest(BaseModel):
 
     graphic_id: str
     pilot_id: Optional[int] = None
+
+    # Desde qué categoría se está graficando al piloto. Solo importa
+    # cuando corre en varias con carros distintos: sin esto se tomaba un
+    # vehículo cualquiera de los suyos.
+    category_id: Optional[int] = None
     data: Optional[dict[str, Any]] = None
 
     @model_validator(mode="after")

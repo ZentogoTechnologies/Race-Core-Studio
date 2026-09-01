@@ -40,6 +40,9 @@ class VehicleResponse(BaseModel):
     model: Optional[str] = None
     color: Optional[str] = None
 
+    photos: List[str] = []        # nombres de archivo, en orden
+    photo_urls: List[str] = []    # las mismas, ya resueltas para <img>
+
     pilots: List[dict] = [] # [{"pilot_id": 1, "name": "Juan", "team_brand": "Zentogo"}]
     active_pilot_id: Optional[int] = None
     category_id: int

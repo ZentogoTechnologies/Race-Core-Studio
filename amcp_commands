@@ -11,7 +11,6 @@ CLEAR 1-10
 
 ### 1-20 TOTEM
 CG 1-20 ADD 1 "html/20_totem_fullname" 1
-CG 1-20 ADD 1 "html/21_totem_shortname" 1
 CG 1-20 ADD 1 "html/22_totem_leader" 1
 CG 1-20 ADD 1 "html/23_totem_interval" 1
 CLEAR 1-20

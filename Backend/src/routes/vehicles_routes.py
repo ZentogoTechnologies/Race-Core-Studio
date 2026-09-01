@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from pydantic import BaseModel
 from typing import Optional
 from src.services.vehicles_services import VehicleService
 from src.schemas.vehicles_schemas import VehicleCreate, VehicleUpdate, VehicleResponse
@@ -66,3 +67,44 @@ async def delete_vehicle(vehicle_id: str): # <- str no int
     if not deleted:
         raise HTTPException(status_code=404, detail="Vehículo no encontrado")
     return {"message": "Vehículo eliminado"}
+
+
+# ======================================================================
+#  FOTOS
+#
+#  Hasta cuatro por carro, en orden. Cuál sale al aire se decide al
+#  graficar —la grilla puede querer una y la ficha del piloto otra—, así
+#  que aquí solo se guardan y se listan.
+# ======================================================================
+
+
+class RutaFotoVehiculo(BaseModel):
+    ruta: str
+
+
+@vehicles.post("/{vehicle_id}/fotos", tags=["Vehicles"], response_model=VehicleResponse,
+               dependencies=[Depends(puede_escribir)])
+async def subir_foto_vehiculo(vehicle_id: str, archivo: UploadFile = File(...)):
+    """
+    Añade una foto del vehículo desde el navegador
+    """
+    contenido = await archivo.read()
+    return await service.subir_foto(vehicle_id, archivo.filename or "", contenido)
+
+
+@vehicles.put("/{vehicle_id}/fotos", tags=["Vehicles"], response_model=VehicleResponse,
+              dependencies=[Depends(puede_escribir)])
+async def foto_vehiculo_por_ruta(vehicle_id: str, datos: RutaFotoVehiculo):
+    """
+    Toma una foto de una ruta del servidor y la copia a public/vehiculos
+    """
+    return await service.foto_por_ruta(vehicle_id, datos.ruta)
+
+
+@vehicles.delete("/{vehicle_id}/fotos/{archivo}", tags=["Vehicles"], response_model=VehicleResponse,
+                 dependencies=[Depends(puede_escribir)])
+async def borrar_foto_vehiculo(vehicle_id: str, archivo: str):
+    """
+    Quita una de las fotos del vehículo
+    """
+    return await service.borrar_foto(vehicle_id, archivo)

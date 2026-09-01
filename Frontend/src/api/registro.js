@@ -106,6 +106,20 @@ export const subirFotoPiloto = (pilotId, archivo) =>
 export const borrarFotoPiloto = (pilotId) =>
   pedir(`/pilots/${pilotId}/foto`, { method: 'DELETE' })
 export const vehiculosApi  = recurso('/vehicles')
+
+// ─── Fotos del vehículo ───────────────────────────────────────
+// Hasta cuatro por carro, en orden. Cuál se saca al aire se decide al
+// graficar, así que aquí solo se suben, se listan y se borran.
+
+export const subirFotoVehiculo = (vehicleId, archivo) =>
+  subirArchivo(`/vehicles/${vehicleId}/fotos`, archivo)
+
+export const borrarFotoVehiculo = (vehicleId, archivo) =>
+  pedir(`/vehicles/${vehicleId}/fotos/${encodeURIComponent(archivo)}`, { method: 'DELETE' })
+
+// El backend ya devuelve photo_urls relativas al origen; esto las
+// completa para usarlas en un <img>.
+export const urlFotoVehiculo = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
 export const categoriasApi = recurso('/categories')
 
 // Solo responde al usuario dueño; a cualquier otro rol el backend le

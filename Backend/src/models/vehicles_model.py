@@ -14,6 +14,12 @@ class Vehicle(Document):
     model: Optional[str] = None # "911 GT3 Cup", "R1"
     color: Optional[str] = None
 
+    # Fotos del carro, en orden. Solo el nombre del archivo; viven en
+    # public/vehiculos. Es una lista y no dos campos con nombre porque
+    # cuál se saca al aire se decide al graficar, no al subirla: la grilla
+    # puede querer una y la ficha del piloto otra.
+    photos: List[str] = []
+
     pilots: List[Link[Pilot]] = [] # Hasta 2 pilotos. Sin principal
     active_pilot_id: Optional[int] = None # Cuál de los dos va manejando ahora mismo.
                                           # MyLaps no lo distingue: manda los dos nombres pegados.

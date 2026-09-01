@@ -11,12 +11,15 @@ import { useDisciplina } from '../context/DisciplinaContext'
 // Una sola tabla para el sidebar, el título de la cabecera y las rutas:
 // antes eran tres listas separadas que había que acordarse de tocar juntas.
 // `roles` limita quién ve la entrada; sin `roles`, la ve cualquiera.
+// El orden sigue cómo se arma una carrera: primero quién corre, después
+// con qué, después cuándo, y al final lo que se saca al aire. Lo de
+// administrar el sistema va aparte, abajo.
 const MODULOS = [
   { to: '/',           icon: <Home />,      label: 'Inicio',     titulo: 'Panel Principal' },
-  { to: '/eventos',    icon: <Calendar />,  label: 'Eventos',    titulo: 'Gestión de Eventos',    separar: true },
+  { to: '/pilotos',    icon: <Users />,     label: 'Pilotos',    titulo: 'Directorio de Pilotos', separar: true },
   { to: '/categorias', icon: <Tag />,       label: 'Categorías', titulo: 'Gestión de Categorías' },
-  { to: '/pilotos',    icon: <Users />,     label: 'Pilotos',    titulo: 'Directorio de Pilotos' },
   { to: '/vehiculos',  icon: <Car />,       label: 'Vehículos',  titulo: 'Directorio de Vehículos' },
+  { to: '/eventos',    icon: <Calendar />,  label: 'Eventos',    titulo: 'Gestión de Eventos' },
   { to: '/graficos',   icon: <BarChart3 />, label: 'Gráficos',   titulo: 'Gráficos' },
   { to: '/ajustes',    icon: <SlidersHorizontal />, label: 'Ajustes', titulo: 'Ajustes del Sistema',
     separar: true, roles: ['owner', 'admin'] },

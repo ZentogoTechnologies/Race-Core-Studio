@@ -66,17 +66,31 @@ async function request(path, { method = 'GET', body } = {}) {
 // Saca un gráfico al aire (CG ADD).
 // Para las fichas de piloto basta con `pilotId`: el backend arma el
 // payload desde la base. `data` es para campos sueltos (narrador, evento).
-export const playGraphic = (graphicId, { pilotId, data } = {}) =>
+export const playGraphic = (graphicId, { pilotId, categoryId, data } = {}) =>
   request('/play', {
     method: 'POST',
-    body: { graphic_id: graphicId, pilot_id: pilotId ?? null, data: data ?? null },
+    body: {
+      graphic_id: graphicId,
+      pilot_id: pilotId ?? null,
+      // Desde qué categoría se grafica al piloto, para los que corren
+      // en varias con carros distintos.
+      category_id: categoryId ?? null,
+      data: data ?? null,
+    },
   })
 
 // Refresca los datos de un gráfico ya al aire (CG UPDATE).
-export const updateGraphic = (graphicId, { pilotId, data } = {}) =>
+export const updateGraphic = (graphicId, { pilotId, categoryId, data } = {}) =>
   request('/update', {
     method: 'POST',
-    body: { graphic_id: graphicId, pilot_id: pilotId ?? null, data: data ?? null },
+    body: {
+      graphic_id: graphicId,
+      pilot_id: pilotId ?? null,
+      // Desde qué categoría se grafica al piloto, para los que corren
+      // en varias con carros distintos.
+      category_id: categoryId ?? null,
+      data: data ?? null,
+    },
   })
 
 // Limpia la capa de un grupo completo, p. ej. 'background' → CLEAR 1-10.

@@ -3,7 +3,7 @@ import SelectorCarrera from '../components/graphics/SelectorCarrera'
 import { useCarrera } from '../context/CarreraContext'
 import {
   Flag, Siren, CloudSun, Mic, Calendar, Share2, Map,
-  SquareUser, Contact, ListOrdered, List, Crown, ArrowUpDown, LayoutGrid,
+  SquareUser, Contact, ListOrdered, Crown, ArrowUpDown, LayoutGrid,
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
   Wrench, Droplets, Ban, Table2, Lock, Repeat,
@@ -137,8 +137,6 @@ const RESULTADOS = [
 const TOTEMS = [
   { id: 'totem-completo',  label: 'Tótem Completo',  nombre: 'Tótem Nombre Completo',
     detalle: 'Clasificación con el nombre completo',                  Icon: ListOrdered, ...ROJO },
-  { id: 'totem-corto',     label: 'Tótem Corto',     nombre: 'Tótem Nombre Corto',
-    detalle: 'Clasificación con el nombre abreviado',                 Icon: List,        ...ROJO },
   { id: 'totem-lider',     label: 'Tótem Líder',     nombre: 'Tótem al Líder',
     detalle: 'Diferencia de cada piloto contra el líder',             Icon: Crown,       ...ROJO },
   { id: 'totem-intervalo', label: 'Tótem Intervalo', nombre: 'Tótem Intervalo',
@@ -209,6 +207,7 @@ const REQUIERE_DATOS = {
 function FormularioPersonal({
   item, tipo, pilotosRegistrados, categorias,
   narrador, setNarrador, pilotoId, setPilotoId,
+  categoriaFicha, setCategoriaFicha,
   alAire, ocupado, onMostrar, onOcultar,
 }) {
   const [busqueda, setBusqueda] = useState('')
@@ -229,9 +228,16 @@ function FormularioPersonal({
   )
   const pilotoElegido = pilotosRegistrados.find(p => p.id === pilotoId) || null
 
+  // Con el piloto elegido pero sin categoría, la ficha saldría con un
+  // vehículo cualquiera de los suyos. Mejor no dejar sacarla.
+  const faltaCategoria =
+    pilotoElegido !== null &&
+    pilotoElegido.categorias.length > 1 &&
+    categoriaFicha === null
+
   const listo = tipo === 'narrador'
     ? narrador.nombre.trim() !== ''
-    : pilotoId !== null
+    : pilotoId !== null && !faltaCategoria
 
   const inputClass = 'w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white'
 
@@ -263,18 +269,52 @@ function FormularioPersonal({
           <label className="block text-neutral-400 text-xs mb-1 uppercase">Piloto</label>
 
           {pilotoElegido ? (
-            <div className="flex items-center justify-between gap-3 bg-[#0a0a0a] border border-red-600/40 rounded p-2">
-              <span className="text-white font-semibold text-sm truncate">
-                {pilotoElegido.nombre} <span className="uppercase">{pilotoElegido.apellido}</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => { setPilotoId(null); setBusqueda('') }}
-                className="text-neutral-400 hover:text-white text-xs font-bold flex-shrink-0"
-              >
-                CAMBIAR
-              </button>
-            </div>
+            <>
+              <div className="flex items-center justify-between gap-3 bg-[#0a0a0a] border border-red-600/40 rounded p-2">
+                <span className="text-white font-semibold text-sm truncate">
+                  {pilotoElegido.nombre} <span className="uppercase">{pilotoElegido.apellido}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => { setPilotoId(null); setCategoriaFicha(null); setBusqueda('') }}
+                  className="text-neutral-400 hover:text-white text-xs font-bold flex-shrink-0"
+                >
+                  CAMBIAR
+                </button>
+              </div>
+
+              {/* Un piloto que corre en varias categorías tiene un carro en
+                  cada una, y con él otra subcategoría. Sin preguntar, la
+                  ficha salía con el primer vehículo que devolviera la base,
+                  que no tiene por qué ser el de la carrera en curso. Con una
+                  sola categoría no se pregunta: ya quedó fijada al elegirlo. */}
+              {pilotoElegido.categorias.length > 1 && (
+                <div className="mt-3">
+                  <label className="block text-neutral-400 text-xs mb-2 uppercase">
+                    Corre en {pilotoElegido.categorias.length} categorías · elige cuál mostrar
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {pilotoElegido.categorias.map(cid => {
+                      const cat = categorias.find(c => c.id === cid)
+                      const activa = categoriaFicha === cid
+                      return (
+                        <button
+                          key={cid} type="button"
+                          onClick={() => setCategoriaFicha(cid)}
+                          className={`px-3 py-1.5 rounded-full border text-xs font-bold transition-colors ${
+                            activa
+                              ? 'border-red-600 bg-red-600/15 text-red-400'
+                              : 'border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
+                          }`}
+                        >
+                          {cat ? cat.nombre : `#${cid}`}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <>
               {/* Primero la categoría: acota la lista antes de buscar */}
@@ -325,7 +365,12 @@ function FormularioPersonal({
                   filtrados.map(p => (
                     <button
                       key={p.id} type="button"
-                      onClick={() => setPilotoId(p.id)}
+                      onClick={() => {
+                        setPilotoId(p.id)
+                        // Con una sola categoría no hay nada que preguntar:
+                        // se fija y el formulario queda listo de una vez.
+                        setCategoriaFicha(p.categorias.length === 1 ? p.categorias[0] : null)
+                      }}
                       className="w-full text-left px-3 py-2 text-sm text-neutral-300 hover:bg-neutral-800 hover:text-white transition-colors"
                     >
                       {p.nombre} <span className="uppercase">{p.apellido}</span>
@@ -697,6 +742,11 @@ export default function GraficosModule() {
   const [narrador,    setNarrador]    = useState({ nombre: '', equipo: '' })
   const [pilotoId,    setPilotoId]    = useState(null)
 
+  // Desde qué categoría se grafica al piloto. Solo se pregunta cuando
+  // corre en más de una: Dean Paquette está en Prospec Series y en GT
+  // Challenge con carros distintos, y la ficha tiene que decir cuál.
+  const [categoriaFicha, setCategoriaFicha] = useState(null)
+
   // Qué comando está viajando al servidor y el último error que devolvió.
   const [pendiente, setPendiente] = useState(null)
   const [error,     setError]     = useState(null)
@@ -823,7 +873,7 @@ export default function GraficosModule() {
   // Los gráficos con formulario mandan sus datos al sacarlos al aire.
   const datosDelForm = (item) => {
     const tipo = REQUIERE_DATOS[item.id]
-    if (tipo === 'piloto') return { pilotId: pilotoId }
+    if (tipo === 'piloto') return { pilotId: pilotoId, categoryId: categoriaFicha }
     if (tipo === 'narrador') {
       return { data: { name: narrador.nombre, text: narrador.equipo } }
     }
@@ -1086,6 +1136,7 @@ export default function GraficosModule() {
             categorias={categorias}
             narrador={narrador}   setNarrador={setNarrador}
             pilotoId={pilotoId}   setPilotoId={setPilotoId}
+            categoriaFicha={categoriaFicha} setCategoriaFicha={setCategoriaFicha}
             alAire={estaAlAire(itemDelForm)}
             ocupado={ocupado}
             onMostrar={() => {

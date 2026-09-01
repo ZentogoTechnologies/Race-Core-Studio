@@ -29,7 +29,8 @@ def _resolve(graphic_id: str):
     return template
 
 
-async def _payload(template, pilot_id: Optional[int], data: Optional[dict]) -> Optional[dict]:
+async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
+                   category_id: Optional[int] = None) -> Optional[dict]:
     """
     Arma los datos que recibirá la plantilla.
 
@@ -77,7 +78,7 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict]) -> O
     if pilot_id is None:
         return data
 
-    payload = await build_pilot_payload(template.graphic_id, pilot_id)
+    payload = await build_pilot_payload(template.graphic_id, pilot_id, category_id)
     if data:
         payload.update(data)
     return payload
@@ -153,7 +154,7 @@ async def play_graphic(request: PlayRequest):
     """
     template = _resolve(request.graphic_id)
 
-    data = await _payload(template, request.pilot_id, request.data)
+    data = await _payload(template, request.pilot_id, request.data, request.category_id)
 
     if data and not template.accepts_data:
         raise HTTPException(
@@ -182,7 +183,7 @@ async def update_graphic(request: UpdateRequest):
             detail=f"La plantilla '{template.graphic_id}' no recibe datos",
         )
 
-    data = await _payload(template, request.pilot_id, request.data)
+    data = await _payload(template, request.pilot_id, request.data, request.category_id)
 
     return await _run(
         service.update(template, data),
