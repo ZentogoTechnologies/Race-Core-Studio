@@ -19,6 +19,7 @@ service = UserService()
 async def get_users(
     search: Optional[str] = Query(None, description="Búsqueda parcial por nombre de usuario"),
     role: Optional[str] = Query(None, description="Filtrar por rol"),
+    active: Optional[bool] = Query(None, description="true solo activos, false solo inactivos, vacío todos"),
     sort_by: Optional[str] = Query(None, description="Campo por el que ordenar"),
     sort_dir: Optional[str] = Query("asc", description="asc o desc"),
     skip: int = Query(0, ge=0, description="Cuántos registros saltar"),
@@ -29,7 +30,7 @@ async def get_users(
     """
     return await service.get_users(
         search=search, role=role, sort_by=sort_by,
-        sort_dir=sort_dir, skip=skip, limit=limit,
+        sort_dir=sort_dir, skip=skip, limit=limit, active=active,
     )
 
 

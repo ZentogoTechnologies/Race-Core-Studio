@@ -94,9 +94,13 @@ class PilotService:
         sort_dir: Optional[str] = None,
         skip: int = 0,
         limit: Optional[int] = None,
+        is_active: Optional[bool] = None,
     ) -> Page[PilotResponse]:
         filtros = [
             {"discipline": discipline} if discipline else None,
+            # None es "todos"; True o False filtran. Se distingue de False
+            # a propósito: `if is_active` dejaría fuera a los inactivos.
+            {"is_active": is_active} if is_active is not None else None,
             filtro_busqueda(search, self.BUSCABLES),
         ]
 

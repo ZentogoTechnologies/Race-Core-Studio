@@ -22,6 +22,10 @@ class PilotUpdate(BaseModel):
     category_ids: Optional[List[int]] = None
     discipline: Optional[List[str]] = None
 
+    # Se da de baja en vez de borrarlo: un piloto que dejó de correr sigue
+    # apareciendo en los resultados de las tandas que ya se disputaron.
+    is_active: Optional[bool] = None
+
 class PilotResponse(BaseModel):
     id: str = Field(alias="_id")
     pilot_id: int

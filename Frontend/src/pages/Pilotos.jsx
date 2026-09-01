@@ -38,13 +38,21 @@ export default function PilotosModule() {
   // El filtro por categoría se manda al backend, no se aplica sobre la
   // página visible: filtrar aquí dejaría el total y las páginas mintiendo.
   const [categoriaFiltro, setCategoriaFiltro] = useState('')
-  // La disciplina viaja siempre; la categoría solo si se eligió una.
+
+  // '' = todos, 'true' = activos, 'false' = inactivos. Se guarda como
+  // texto porque sale de un <select>, y se manda tal cual: el backend lo
+  // interpreta y distingue false de "sin filtro".
+  const [estadoFiltro, setEstadoFiltro] = useState('')
+
+  // La disciplina viaja siempre; la categoría y el estado solo si se
+  // eligieron.
   const filtros = useMemo(
     () => ({
       discipline: disciplina,
       ...(categoriaFiltro ? { category_id: categoriaFiltro } : {}),
+      ...(estadoFiltro ? { is_active: estadoFiltro } : {}),
     }),
-    [disciplina, categoriaFiltro],
+    [disciplina, categoriaFiltro, estadoFiltro],
   )
 
   const lista = useListado(pilotosApi, { ordenInicial: 'last_name', filtros })
@@ -180,6 +188,20 @@ export default function PilotosModule() {
     }
   }
 
+  // Alta y baja sin borrar: un piloto que dejó de correr sigue apareciendo
+  // en los resultados de las tandas que ya se disputaron, así que borrarlo
+  // no es lo que se quiere casi nunca.
+  const alternarActivo = async (piloto) => {
+    const nombre = `${piloto.name} ${piloto.last_name}`.trim()
+    try {
+      await pilotosApi.actualizar(piloto.pilot_id, { is_active: !piloto.is_active })
+      lista.recargar()
+      toast.exito(piloto.is_active ? 'Piloto inactivo' : 'Piloto activo', nombre)
+    } catch (err) {
+      toast.error('No se pudo cambiar el estado', err.message)
+    }
+  }
+
   const confirmarBorrado = async () => {
     const piloto = porBorrar
     setPorBorrar(null)
@@ -220,6 +242,19 @@ export default function PilotosModule() {
           {categorias.map(c => (
             <option key={c.category_id} value={c.category_id}>{c.category_name}</option>
           ))}
+        </select>
+
+        {/* El estado se filtra en el backend como los demás: hacerlo sobre
+            la página visible dejaría el total y la paginación mintiendo. */}
+        <label className="text-xs uppercase tracking-wider text-neutral-500">Estado</label>
+        <select
+          value={estadoFiltro}
+          onChange={e => setEstadoFiltro(e.target.value)}
+          className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
+        >
+          <option value="">Todos</option>
+          <option value="true">Activos</option>
+          <option value="false">Inactivos</option>
         </select>
       </div>
 
@@ -382,11 +417,30 @@ export default function PilotosModule() {
                   </div>
                 </td>
                 <td className="p-4 text-right">
-                  <span className={`px-3 py-1 text-xs font-bold rounded-full ${
-                    piloto.is_active ? 'bg-green-500/10 text-green-500' : 'bg-neutral-700/30 text-neutral-500'
-                  }`}>
-                    {piloto.is_active ? 'ACTIVO' : 'INACTIVO'}
-                  </span>
+                  {/* La insignia es el interruptor: se pulsa y cambia. Antes
+                      solo informaba y no había forma de dar de baja a nadie
+                      salvo borrarlo. Sin permiso de escritura se queda como
+                      etiqueta, sin prometer algo que el backend rechazaría. */}
+                  {puedeEscribir ? (
+                    <button
+                      type="button"
+                      onClick={() => alternarActivo(piloto)}
+                      title={piloto.is_active ? 'Dar de baja' : 'Reactivar'}
+                      className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors ${
+                        piloto.is_active
+                          ? 'bg-green-500/10 text-green-500 border-green-600/40 hover:bg-green-500/20'
+                          : 'bg-neutral-700/30 text-neutral-500 border-neutral-700 hover:text-neutral-300 hover:border-neutral-500'
+                      }`}
+                    >
+                      {piloto.is_active ? 'ACTIVO' : 'INACTIVO'}
+                    </button>
+                  ) : (
+                    <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+                      piloto.is_active ? 'bg-green-500/10 text-green-500' : 'bg-neutral-700/30 text-neutral-500'
+                    }`}>
+                      {piloto.is_active ? 'ACTIVO' : 'INACTIVO'}
+                    </span>
+                  )}
                 </td>
                 {puedeEscribir && (
                   <td className="p-4 text-right whitespace-nowrap">

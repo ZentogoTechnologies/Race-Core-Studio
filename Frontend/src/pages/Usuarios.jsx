@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2,
   Shield, ShieldCheck, Eye, Crown,
@@ -53,7 +53,17 @@ function SortIcon({ columnKey, sortField, sortDirection, onSort }) {
 export default function UsuariosModule() {
   const toast = useToast()
   const { usuario } = useAuth()
-  const lista = useListado(usuariosApi, { ordenInicial: 'username' })
+  // '' = todos, 'true' = activos, 'false' = inactivos. Se filtra en el
+  // backend, no sobre la página visible: hacerlo aquí dejaría el total y
+  // la paginación mintiendo.
+  const [estadoFiltro, setEstadoFiltro] = useState('')
+
+  const filtros = useMemo(
+    () => (estadoFiltro ? { active: estadoFiltro } : {}),
+    [estadoFiltro],
+  )
+
+  const lista = useListado(usuariosApi, { ordenInicial: 'username', filtros })
 
   const [isFormOpen,    setIsFormOpen]    = useState(false)
   const [currentEditId, setCurrentEditId] = useState(null)
@@ -63,6 +73,19 @@ export default function UsuariosModule() {
 
   const editandoOwner = currentEditId && userForm.role === 'owner'
   const soyYo = (u) => u.user_id === usuario?.user_id
+
+  // Dar de baja en vez de borrar: el usuario desaparece del sistema pero
+  // se conserva quién hizo qué. Ni al dueño ni a uno mismo, que es lo
+  // mismo que ya impide el borrado: quedarse fuera de la aplicación.
+  const alternarActivo = async (u) => {
+    try {
+      await usuariosApi.actualizar(u.user_id, { active: !u.active })
+      lista.recargar()
+      toast.exito(u.active ? 'Usuario inactivo' : 'Usuario activo', u.username)
+    } catch (err) {
+      toast.error('No se pudo cambiar el estado', err.message)
+    }
+  }
 
   const openAddForm  = () => { setUserForm(EMPTY_USER); setCurrentEditId(null); setIsFormOpen(true) }
   const closeForm    = () => { setIsFormOpen(false); setCurrentEditId(null); setUserForm(EMPTY_USER) }
@@ -132,6 +155,19 @@ export default function UsuariosModule() {
         exportFileName="usuarios"
         exportColumnMap={{ username: 'Usuario', role: 'Rol', created_at: 'Creado', active: 'Activo' }}
       />
+
+      <div className="flex items-center gap-3 mb-4">
+        <label className="text-xs uppercase tracking-wider text-neutral-500">Estado</label>
+        <select
+          value={estadoFiltro}
+          onChange={e => setEstadoFiltro(e.target.value)}
+          className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
+        >
+          <option value="">Todos</option>
+          <option value="true">Activos</option>
+          <option value="false">Inactivos</option>
+        </select>
+      </div>
 
       {isFormOpen && (
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6">
@@ -255,11 +291,29 @@ export default function UsuariosModule() {
                   </td>
                   <td className="p-4 text-neutral-400 text-sm font-mono">{u.created_at}</td>
                   <td className="p-4 text-right">
-                    <span className={`px-3 py-1 text-xs font-bold rounded-full ${
-                      u.active ? 'bg-green-500/10 text-green-500' : 'bg-neutral-700/30 text-neutral-500'
-                    }`}>
-                      {u.active ? 'ACTIVO' : 'INACTIVO'}
-                    </span>
+                    {/* La insignia es el interruptor. Al dueño y a uno mismo
+                        se les deja como etiqueta: desactivarse a sí mismo
+                        cierra la puerta desde dentro. */}
+                    {!esOwner && !soyYo(u) ? (
+                      <button
+                        type="button"
+                        onClick={() => alternarActivo(u)}
+                        title={u.active ? 'Dar de baja' : 'Reactivar'}
+                        className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors ${
+                          u.active
+                            ? 'bg-green-500/10 text-green-500 border-green-600/40 hover:bg-green-500/20'
+                            : 'bg-neutral-700/30 text-neutral-500 border-neutral-700 hover:text-neutral-300 hover:border-neutral-500'
+                        }`}
+                      >
+                        {u.active ? 'ACTIVO' : 'INACTIVO'}
+                      </button>
+                    ) : (
+                      <span className={`px-3 py-1 text-xs font-bold rounded-full ${
+                        u.active ? 'bg-green-500/10 text-green-500' : 'bg-neutral-700/30 text-neutral-500'
+                      }`}>
+                        {u.active ? 'ACTIVO' : 'INACTIVO'}
+                      </span>
+                    )}
                   </td>
                   <td className="p-4 text-right whitespace-nowrap">
                     <button onClick={() => openEditForm(u)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>

@@ -28,6 +28,7 @@ class UserService:
         self,
         search: Optional[str] = None,
         role: Optional[str] = None,
+        active: Optional[bool] = None,
         sort_by: Optional[str] = None,
         sort_dir: Optional[str] = None,
         skip: int = 0,
@@ -35,6 +36,9 @@ class UserService:
     ) -> Page[UserResponse]:
         query = combinar(
             {"role": role} if role else None,
+            # None es "todos"; True o False filtran. Se distingue de False
+            # a propósito: `if active` dejaría fuera a los inactivos.
+            {"active": active} if active is not None else None,
             filtro_busqueda(search, self.BUSCABLES),
         )
 

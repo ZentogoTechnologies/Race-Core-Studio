@@ -14,6 +14,7 @@ async def get_pilots(
     discipline: Optional[str] = Query(None, description="Filtrar por disciplina: circuito o drag"),
     category_id: Optional[str] = Query(None, description="Filtrar pilotos de una categoría"), # <- str no int
     search: Optional[str] = Query(None, description="Búsqueda parcial, sin distinguir mayúsculas"),
+    is_active: Optional[bool] = Query(None, description="true solo activos, false solo inactivos, vacío todos"),
     sort_by: Optional[str] = Query(None, description="Campo por el que ordenar"),
     sort_dir: Optional[str] = Query("asc", description="asc o desc"),
     skip: int = Query(0, ge=0, description="Cuántos registros saltar"),
@@ -27,6 +28,7 @@ async def get_pilots(
     return await service.get_all_pilots(
         discipline=discipline, category_id=category_id, search=search,
         sort_by=sort_by, sort_dir=sort_dir, skip=skip, limit=limit,
+        is_active=is_active,
     )
 
 @pilots.post("/", tags=["Pilots"], response_model=PilotResponse, status_code=201, dependencies=[Depends(puede_escribir)])
