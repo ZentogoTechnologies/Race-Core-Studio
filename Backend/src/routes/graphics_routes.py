@@ -30,7 +30,8 @@ def _resolve(graphic_id: str):
 
 
 async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
-                   category_id: Optional[int] = None) -> Optional[dict]:
+                   category_id: Optional[int] = None,
+                   event_id: Optional[int] = None) -> Optional[dict]:
     """
     Arma los datos que recibirá la plantilla.
 
@@ -74,6 +75,23 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
 
         # Sin trazado dado de alta la plantilla se queda con lo suyo.
         return data
+
+    # El evento saca su nombre y su imagen de la base, igual que el clima
+    # y el circuito. La imagen no puede armarla el navegador: CasparCG abre
+    # la plantilla desde file:// y necesita una URL absoluta.
+    if template.graphic_id == "evento" and event_id is not None:
+        from src.models.events_model import Event
+        from src.services.graphics_services import event_image_url
+
+        evento = await Event.find_one(Event.event_id == event_id)
+        if evento is not None:
+            base = {
+                "event": evento.name,
+                # Se manda siempre, vacía incluida: omitirla dejaría en
+                # pantalla el logo del evento anterior.
+                "event_image": event_image_url(evento.image),
+            }
+            return {**base, **(data or {})}
 
     if pilot_id is None:
         return data
@@ -154,7 +172,8 @@ async def play_graphic(request: PlayRequest):
     """
     template = _resolve(request.graphic_id)
 
-    data = await _payload(template, request.pilot_id, request.data, request.category_id)
+    data = await _payload(template, request.pilot_id, request.data,
+                          request.category_id, request.event_id)
 
     if data and not template.accepts_data:
         raise HTTPException(
@@ -183,7 +202,8 @@ async def update_graphic(request: UpdateRequest):
             detail=f"La plantilla '{template.graphic_id}' no recibe datos",
         )
 
-    data = await _payload(template, request.pilot_id, request.data, request.category_id)
+    data = await _payload(template, request.pilot_id, request.data,
+                          request.category_id, request.event_id)
 
     return await _run(
         service.update(template, data),

@@ -57,6 +57,21 @@
 
         </div>
 
+        <!-- Logo del campeonato, fuera del panel a propósito. Dentro
+             competía con el texto por el ancho animado del panel y
+             acababa montándose encima. Aquí es un tercer bloque de la
+             barra: autódromo, nombre, evento. -->
+        <div
+            class="event-logo"
+            id="eventLogoBox">
+
+            <img
+                id="eventLogo"
+                src=""
+                alt="">
+
+        </div>
+
     </div>
 
 <script>
@@ -143,6 +158,22 @@ function update(data){
     if(data.logo !== undefined)
         document.getElementById("logo").src =
             data.logo;
+
+    /* La imagen del evento. Sin ella se esconde el bloque entero en vez
+       de dejar un recuadro vacío al final del panel. */
+    if(data.event_image !== undefined){
+
+        const caja = document.getElementById("eventLogoBox");
+        const img  = document.getElementById("eventLogo");
+
+        if(data.event_image){
+            img.src = data.event_image;
+            caja.style.display = "flex";
+        } else {
+            img.removeAttribute("src");
+            caja.style.display = "none";
+        }
+    }
 
     /* Después de escribir, no antes: el ancho depende del texto que
        acaba de entrar. */

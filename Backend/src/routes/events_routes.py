@@ -1,6 +1,7 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from pydantic import BaseModel
 
 from src.schemas.common_schemas import Page
 from src.schemas.events_schemas import (
@@ -98,3 +99,43 @@ async def delete_session(event_id: str, numero_orden: int):
     if not evento:
         raise HTTPException(status_code=404, detail="Event Not Found!")
     return evento
+
+
+# ======================================================================
+#  IMAGEN DEL EVENTO
+#
+#  Logo del campeonato o imagen alusiva. Sale en el gráfico de Evento, a
+#  la derecha del nombre, con el logo del autódromo al otro lado.
+# ======================================================================
+
+
+class RutaImagenEvento(BaseModel):
+    ruta: str
+
+
+@events.post("/{event_id}/imagen", tags=["Events"], response_model=EventResponse,
+             dependencies=[Depends(puede_escribir)])
+async def subir_imagen_evento(event_id: int, archivo: UploadFile = File(...)):
+    """
+    Sube la imagen del evento desde el navegador
+    """
+    contenido = await archivo.read()
+    return await service.subir_imagen(event_id, archivo.filename or "", contenido)
+
+
+@events.put("/{event_id}/imagen", tags=["Events"], response_model=EventResponse,
+            dependencies=[Depends(puede_escribir)])
+async def imagen_evento_por_ruta(event_id: int, datos: RutaImagenEvento):
+    """
+    Toma la imagen de una ruta del servidor y la copia a public/eventos
+    """
+    return await service.imagen_por_ruta(event_id, datos.ruta)
+
+
+@events.delete("/{event_id}/imagen", tags=["Events"], response_model=EventResponse,
+               dependencies=[Depends(puede_escribir)])
+async def borrar_imagen_evento(event_id: int):
+    """
+    Quita la imagen. El gráfico sale solo con el nombre
+    """
+    return await service.borrar_imagen(event_id)

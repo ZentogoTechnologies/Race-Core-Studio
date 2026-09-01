@@ -126,6 +126,18 @@ export const categoriasApi = recurso('/categories')
 // devuelve 403 aunque llame la ruta directamente.
 export const eventosApi    = recurso('/events')
 
+// ─── Imagen del evento ────────────────────────────────────────────
+// Logo del campeonato o imagen alusiva. Sale en el gráfico de Evento, a
+// la derecha del nombre, con el logo del autódromo al otro lado.
+
+export const subirImagenEvento = (eventId, archivo) =>
+  subirArchivo(`/events/${eventId}/imagen`, archivo)
+
+export const borrarImagenEvento = (eventId) =>
+  pedir(`/events/${eventId}/imagen`, { method: 'DELETE' })
+
+export const urlImagenEvento = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
+
 // Las sesiones no son un recurso aparte: viven dentro del evento y las
 // dos operaciones devuelven el evento entero ya recalculado, con el
 // nombre y el número que le tocó a la sesión nueva.

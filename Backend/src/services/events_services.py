@@ -3,6 +3,11 @@ from typing import Optional
 from fastapi import HTTPException
 
 from src.models.categories_model import Category
+from pathlib import Path
+
+from src.services.imagenes_services import (
+    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+)
 from src.models.events_model import Event, Inscrito, Sesion
 from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
@@ -12,6 +17,17 @@ from src.schemas.events_schemas import (
     InscritoIn, InscritoOut, SesionIn, SesionOut,
 )
 from src.services.pagination import campo_orden, combinar, direccion, filtro_busqueda
+
+
+# Backend/src/public/eventos, mirando desde Backend/src/services.
+CARPETA_IMAGENES = Path(__file__).resolve().parents[1] / "public" / "eventos"
+
+RUTA_RELATIVA = "eventos"
+
+
+def url_imagen_evento(archivo):
+    """La ruta con la que el navegador y CasparCG piden la imagen."""
+    return f"/public/{RUTA_RELATIVA}/{archivo}" if archivo else None
 
 
 class EventService:
@@ -95,6 +111,8 @@ class EventService:
             end_date=evento.end_date,
             discipline=evento.discipline,
             location=evento.location,
+            image=evento.image,
+            image_url=url_imagen_evento(evento.image),
             category_ids=evento.category_ids,
             categorias=[cats[c].category_name for c in evento.category_ids if c in cats],
             inscritos=inscritos,
@@ -398,4 +416,51 @@ class EventService:
         # que un gráfico ya emitido dejara de corresponder con la lista.
 
         await evento.save()
+        return await self._to_response(evento)
+
+    # ── Imagen del evento ─────────────────────────────────────────────
+
+    async def _evento(self, event_id: int) -> Event:
+        evento = await Event.find_one(Event.event_id == event_id)
+        if evento is None:
+            raise HTTPException(404, f"No existe el evento {event_id}")
+        return evento
+
+    async def _asignar_imagen(self, evento: Event, destino: Path) -> EventResponse:
+        anterior = (CARPETA_IMAGENES / evento.image) if evento.image else None
+
+        evento.image = destino.name
+        await evento.save()
+
+        borrar_si_sobra(anterior, destino)
+
+        return await self._to_response(evento)
+
+    async def subir_imagen(self, event_id: int, nombre: str, contenido: bytes) -> EventResponse:
+        """La que llega desde el navegador."""
+        evento = await self._evento(event_id)
+
+        # El archivo se llama como el id y no como el evento: renombrar un
+        # evento no debe dejar la imagen huérfana.
+        destino = guardar_bytes(contenido, nombre, CARPETA_IMAGENES / str(event_id))
+
+        return await self._asignar_imagen(evento, destino)
+
+    async def imagen_por_ruta(self, event_id: int, ruta: str) -> EventResponse:
+        """La que ya está en el disco del servidor."""
+        evento = await self._evento(event_id)
+
+        destino = copiar_de_ruta(ruta, CARPETA_IMAGENES / str(event_id))
+
+        return await self._asignar_imagen(evento, destino)
+
+    async def borrar_imagen(self, event_id: int) -> EventResponse:
+        evento = await self._evento(event_id)
+
+        if evento.image:
+            fichero = CARPETA_IMAGENES / evento.image
+            evento.image = None
+            await evento.save()
+            borrar_si_sobra(fichero, CARPETA_IMAGENES / "__ninguno__")
+
         return await self._to_response(evento)

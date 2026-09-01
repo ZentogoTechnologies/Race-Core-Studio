@@ -64,6 +64,11 @@ class Event(Document):
     discipline: str = "circuito"       # para el selector global
     location: Optional[str] = None
 
+    # Logo o imagen alusiva del evento. Solo el nombre del archivo; vive
+    # en public/eventos. Sale en el gráfico de Evento, a la derecha del
+    # nombre, con el logo del autódromo al otro lado.
+    image: Optional[str] = None
+
     category_ids: List[int] = []
     inscritos: List[Inscrito] = []
     sesiones: List[Sesion] = []

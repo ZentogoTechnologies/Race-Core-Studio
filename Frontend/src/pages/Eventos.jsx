@@ -1,14 +1,17 @@
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2,
-  CalendarDays, Car, ListOrdered, ArrowLeft, ArrowRight,
-} from 'lucide-react'
+  CalendarDays, Car, ListOrdered, ArrowLeft, ArrowRight, Upload, X, ImageIcon,
+}  from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import SesionesEvento from '../components/events/SesionesEvento'
 import SeleccionVehiculos from '../components/events/SeleccionVehiculos'
-import { categoriasApi, eventosApi, vehiculosApi } from '../api/registro'
+import {
+  borrarImagenEvento, categoriasApi, eventosApi, subirImagenEvento,
+  urlImagenEvento, vehiculosApi,
+} from '../api/registro'
 import { useListado } from '../hooks/useListado'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
@@ -81,8 +84,44 @@ export default function EventosModule() {
     [eventForm.category_ids, categorias],
   )
 
-  const openAddForm = () => { setEventForm(EMPTY_EVENT); setCurrentEditId(null); setPaso(1); setIsFormOpen(true) }
-  const closeForm = () => { setIsFormOpen(false); setCurrentEditId(null); setEventForm(EMPTY_EVENT); setPaso(1) }
+  // La imagen no viaja en el JSON del evento sino como archivo, y en un
+  // alta todavía no hay id al que asociarla: se guarda aquí y se sube en
+  // cuanto el evento existe.
+  const [imagen,       setImagen]       = useState(null)   // File sin subir
+  const [imagenActual, setImagenActual] = useState(null)   // ruta ya guardada
+  const inputImagen = useRef(null)
+
+  // La previa de lo elegido se revoca al cambiar, para no ir dejando
+  // URLs de objeto vivas en memoria.
+  const [previaImagen, setPreviaImagen] = useState(null)
+  useEffect(() => {
+    if (!imagen) { setPreviaImagen(null); return }
+    const url = URL.createObjectURL(imagen)
+    setPreviaImagen(url)
+    return () => URL.revokeObjectURL(url)
+  }, [imagen])
+
+  const vistaImagen = previaImagen || urlImagenEvento(imagenActual)
+
+  const limpiarImagen = () => {
+    setImagen(null); setImagenActual(null)
+    if (inputImagen.current) inputImagen.current.value = ''
+  }
+
+  const quitarImagen = async () => {
+    if (!currentEditId) { limpiarImagen(); return }
+    try {
+      await borrarImagenEvento(currentEditId)
+      limpiarImagen()
+      lista.recargar()
+      toast.exito('Imagen quitada', 'El gráfico saldrá solo con el nombre')
+    } catch (err) {
+      toast.error('No se pudo quitar la imagen', err.message)
+    }
+  }
+
+  const openAddForm = () => { setEventForm(EMPTY_EVENT); setCurrentEditId(null); setPaso(1); limpiarImagen(); setIsFormOpen(true) }
+  const closeForm = () => { setIsFormOpen(false); setCurrentEditId(null); setEventForm(EMPTY_EVENT); setPaso(1); limpiarImagen() }
   const handleFormToggle = () => isFormOpen ? closeForm() : openAddForm()
 
   const openEditForm = (ev) => {
@@ -96,6 +135,11 @@ export default function EventosModule() {
     })
     setCurrentEditId(ev.event_id)
     setPaso(1)
+
+    setImagen(null)
+    setImagenActual(ev.image_url || null)
+    if (inputImagen.current) inputImagen.current.value = ''
+
     setIsFormOpen(true)
   }
 
@@ -140,14 +184,27 @@ export default function EventosModule() {
     }
 
     try {
+      let id = currentEditId
+
       if (currentEditId) {
         await eventosApi.actualizar(currentEditId, cuerpo)
         toast.exito('Evento actualizado', eventForm.name)
       } else {
         // Sin event_id: lo asigna el servidor, igual que en categorías.
-        await eventosApi.crear({ ...cuerpo, discipline: disciplina })
+        const creado = await eventosApi.crear({ ...cuerpo, discipline: disciplina })
+        id = creado.event_id
         toast.exito('Evento creado', `${eventForm.name} · ${totalDias} día(s)`)
       }
+
+      // Después de guardar porque en un alta el id no existe hasta ahora.
+      if (imagen && id) {
+        try {
+          await subirImagenEvento(id, imagen)
+        } catch (err) {
+          toast.error('El evento se guardó, pero la imagen no', err.message)
+        }
+      }
+
       closeForm()
       lista.recargar()
     } catch (err) {
@@ -260,6 +317,53 @@ export default function EventosModule() {
               <input type="text" value={eventForm.location} placeholder="Autódromo Panamá"
                 onChange={e => setEventForm({ ...eventForm, location: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
+            </div>
+
+            {/* Logo del campeonato o imagen alusiva. En el gráfico sale a
+                la derecha del nombre, con el logo del autódromo al otro
+                lado: primero la casa, después la carrera. */}
+            <div className="md:col-span-4 flex items-center gap-4 border-t border-neutral-800 pt-4">
+              <div className="w-32 h-20 rounded-lg bg-[#0a0a0a] border border-neutral-800 overflow-hidden flex items-center justify-center flex-shrink-0">
+                {vistaImagen
+                  ? <img src={vistaImagen} alt="" className="w-full h-full object-contain"/>
+                  : <ImageIcon size={22} className="text-neutral-700"/>}
+              </div>
+
+              <div className="min-w-0">
+                <label className="block text-neutral-400 text-xs mb-2 uppercase">
+                  Imagen del evento
+                </label>
+
+                <input
+                  type="file" accept="image/*" ref={inputImagen} className="hidden"
+                  onChange={e => setImagen(e.target.files?.[0] || null)}
+                />
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button" onClick={() => inputImagen.current?.click()}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 transition-colors font-bold text-xs"
+                  >
+                    <Upload size={14}/>
+                    {vistaImagen ? 'CAMBIAR' : 'ELEGIR IMAGEN'}
+                  </button>
+
+                  {vistaImagen && (
+                    <button
+                      type="button" onClick={quitarImagen}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 transition-colors font-bold text-xs"
+                    >
+                      <X size={14}/> QUITAR
+                    </button>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-neutral-600 mt-2">
+                  {imagen
+                    ? 'Se sube al guardar el evento.'
+                    : 'Sale en el gráfico de Evento, junto al nombre.'}
+                </p>
+              </div>
             </div>
             <div className="md:col-span-2 flex items-end">
               <p className="text-sm text-neutral-500">

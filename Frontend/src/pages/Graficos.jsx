@@ -900,10 +900,16 @@ export default function GraficosModule() {
     // un valor escrito en la plantilla: si se cambia de carrera, el arte
     // tiene que cambiar con ella.
     if (item.id === 'evento' && carrera) {
-      // Solo el nombre. Las fechas se quedan en la cabecera del panel,
-      // que es donde hacen falta para no confundir dos ediciones; en el
-      // aire sobran y ensucian el arte.
-      alternar(item.id, { data: { event: carrera.nombre } })
+      // El nombre y, si el evento tiene una, su imagen. Las fechas se
+      // quedan en la cabecera del panel, que es donde hacen falta para no
+      // confundir dos ediciones; en el aire sobran y ensucian el arte.
+      //
+      // La imagen se manda siempre, vacía incluida: si se omitiera, al
+      // cambiar a un evento sin logo se quedaría el del anterior.
+      // Se manda el id y lo demás lo resuelve el backend. La imagen no se
+      // puede armar aquí: CasparCG abre la plantilla desde file:// y
+      // necesita una URL absoluta, que solo el servidor conoce.
+      alternar(item.id, { eventId: carrera.event_id })
       return
     }
 

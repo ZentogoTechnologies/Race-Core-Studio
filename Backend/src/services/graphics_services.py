@@ -183,6 +183,20 @@ def pilot_photo_url(pilot_id: int, photo: str | None = None) -> str:
     return _url(reserva) if reserva else ""
 
 
+def event_image_url(archivo: str | None) -> str:
+    """
+    Imagen del evento, absoluta y con versión.
+
+    Va por el mismo camino que la foto del piloto y el logo de marca: la
+    plantilla se abre desde file:// y una ruta relativa no resolvería.
+    """
+    if not archivo:
+        return ""
+
+    ruta = PUBLIC_DIR / "eventos" / archivo
+    return _url(ruta) if ruta.is_file() else ""
+
+
 def brand_logo_url(brand: str | None) -> str:
     """
     Logo de la marca, tolerante con el nombre del archivo.

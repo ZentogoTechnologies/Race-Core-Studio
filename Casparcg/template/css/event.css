@@ -71,6 +71,53 @@
    TEXTOS
 ================================================== */
 
+/* ==================================================
+   LOGO DEL EVENTO
+================================================== */
+
+.event-logo{
+
+    /* Oculto de fábrica: la mayoría de los eventos no tendrán imagen y
+       un recuadro vacío al final de la barra se ve como un fallo. */
+    display:none;
+
+    width:150px;
+
+    flex:0 0 auto;
+
+    /* Al mismo alto que el panel: centrado se quedaba más bajo y la
+       barra parecía partida en dos piezas distintas. */
+    align-self:stretch;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:12px 18px;
+
+    /* Fondo propio: al estar fuera del panel necesita el suyo para no
+       quedar flotando sobre el video. Se remata la esquina derecha, que
+       ahora es el final de la barra. */
+    background:#111111;
+
+    border-radius:0 12px 12px 0;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.4);
+}
+
+.event-logo img{
+
+    max-width:100%;
+    max-height:96px;
+
+    object-fit:contain;
+
+    /* Los logos llegan en fondos muy distintos; una sombra suave los
+       asienta sobre el panel oscuro sin alterarles el color. */
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
+}
+
+
 .event-label{
 
     font-size:22px;

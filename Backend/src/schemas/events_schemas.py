@@ -124,6 +124,9 @@ class EventResponse(BaseModel):
     discipline: str
     location: Optional[str] = None
 
+    image: Optional[str] = None        # nombre del archivo
+    image_url: Optional[str] = None    # ya resuelta para <img>
+
     category_ids: List[int] = []
     categorias: List[str] = []         # nombres, para la tabla
     inscritos: List[InscritoOut] = []

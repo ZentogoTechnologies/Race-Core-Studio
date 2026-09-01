@@ -41,6 +41,9 @@ export function CarreraProvider({ children }) {
       nombre: evento.name,
       start_date: evento.start_date,
       end_date: evento.end_date,
+      // Ruta ya resuelta por el backend; el gráfico de Evento la pinta a
+      // la derecha del nombre.
+      image_url: evento.image_url || null,
       categorias: evento.categorias || [],
       sesion: sesion
         ? {
