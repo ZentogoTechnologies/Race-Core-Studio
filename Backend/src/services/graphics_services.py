@@ -197,6 +197,21 @@ def event_image_url(archivo: str | None) -> str:
     return _url(ruta) if ruta.is_file() else ""
 
 
+def category_logo_url(archivo: str | None) -> str:
+    """
+    Logo de la categoría, absoluto y con versión.
+
+    Lo usa el gráfico de Evento cuando el evento no tiene imagen propia:
+    "GT Challenge de las Américas" corre la categoría GT Challenge, y su
+    logo es el que se espera ver en el banner.
+    """
+    if not archivo:
+        return ""
+
+    ruta = PUBLIC_DIR / "categorias" / archivo
+    return _url(ruta) if ruta.is_file() else ""
+
+
 def brand_logo_url(brand: str | None) -> str:
     """
     Logo de la marca, tolerante con el nombre del archivo.

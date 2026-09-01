@@ -81,7 +81,14 @@
        un recuadro vacío al final de la barra se ve como un fallo. */
     display:none;
 
-    width:150px;
+    /* El ancho lo pone la imagen. Con 150px fijos un logo apaisado como
+       el de GT Challenge —1321x380— quedaba reducido a una franja de 33px
+       de alto y no se leía. Ahora manda el alto y el ancho lo sigue, con
+       un tope para que un logo desmedido no se coma la barra. */
+    width:auto;
+
+    min-width:96px;
+    max-width:320px;
 
     flex:0 0 auto;
 
@@ -107,8 +114,12 @@
 
 .event-logo img{
 
-    max-width:100%;
-    max-height:96px;
+    /* Alto fijo y ancho libre: así un logo cuadrado y uno apaisado se ven
+       igual de grandes, que es lo que el ojo compara. */
+    height:78px;
+    width:auto;
+
+    max-width:284px;
 
     object-fit:contain;
 

@@ -85,11 +85,29 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
 
         evento = await Event.find_one(Event.event_id == event_id)
         if evento is not None:
+            imagen = event_image_url(evento.image)
+
+            # Sin imagen propia se usa el logo de su categoría. Un evento
+            # como "GT Challenge de las Américas" corre GT Challenge, y ese
+            # logo es el que se espera ver: obligar a subir dos veces la
+            # misma imagen no aporta nada. Se recorren en el orden en que
+            # se eligieron y manda la primera que tenga logo.
+            if not imagen:
+                from src.models.categories_model import Category
+                from src.services.graphics_services import category_logo_url
+
+                for cid in (evento.category_ids or []):
+                    categoria = await Category.find_one(Category.category_id == cid)
+                    if categoria is not None and categoria.logo:
+                        imagen = category_logo_url(categoria.logo)
+                        if imagen:
+                            break
+
             base = {
                 "event": evento.name,
                 # Se manda siempre, vacía incluida: omitirla dejaría en
                 # pantalla el logo del evento anterior.
-                "event_image": event_image_url(evento.image),
+                "event_image": imagen,
             }
             return {**base, **(data or {})}
 
