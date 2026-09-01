@@ -122,6 +122,17 @@ export const borrarFotoVehiculo = (vehicleId, archivo) =>
 export const urlFotoVehiculo = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
 export const categoriasApi = recurso('/categories')
 
+// ─── Logo de la categoría ─────────────────────────────────────────
+// El del campeonato: TCR, GT Challenge, Fórmula 1.
+
+export const subirLogoCategoria = (categoryId, archivo) =>
+  subirArchivo(`/categories/${categoryId}/logo`, archivo)
+
+export const borrarLogoCategoria = (categoryId) =>
+  pedir(`/categories/${categoryId}/logo`, { method: 'DELETE' })
+
+export const urlLogoCategoria = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
+
 // Solo responde al usuario dueño; a cualquier otro rol el backend le
 // devuelve 403 aunque llame la ruta directamente.
 export const eventosApi    = recurso('/events')

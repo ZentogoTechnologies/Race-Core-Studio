@@ -12,6 +12,8 @@ service = VehicleService()
 @vehicles.get("/", tags=["Vehicles"], response_model=Page[VehicleResponse])
 async def get_vehicles(
     discipline: Optional[str] = Query(None, description="Filtrar por disciplina: circuito o drag"),
+    sub_category_id: Optional[str] = Query(None, description="Filtrar por subcategoría dentro de la categoría"),
+    pilot: Optional[str] = Query(None, description="Nombre o apellido del piloto, parcial"),
     category_id: Optional[str] = Query(None, description="Filtrar por category_id"), # <- str no int
     search: Optional[str] = Query(None, description="Búsqueda parcial, sin distinguir mayúsculas"),
     sort_by: Optional[str] = Query(None, description="Campo por el que ordenar"),
@@ -27,6 +29,7 @@ async def get_vehicles(
     return await service.get_all_vehicles(
         discipline=discipline, category_id=category_id, search=search,
         sort_by=sort_by, sort_dir=sort_dir, skip=skip, limit=limit,
+        sub_category_id=sub_category_id, pilot=pilot,
     )
 
 @vehicles.post("/", tags=["Vehicles"], response_model=VehicleResponse, status_code=201, dependencies=[Depends(puede_escribir)])

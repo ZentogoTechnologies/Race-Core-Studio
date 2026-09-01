@@ -29,6 +29,9 @@ class CategoryResponse(BaseModel):
     sub_categories: List[SubCategoryEmbedded]
     description: Optional[str] = None
 
+    logo: Optional[str] = None        # nombre del archivo
+    logo_url: Optional[str] = None    # ya resuelta para <img>
+
     class Config:
         populate_by_name = True # para que acepte _id y lo mapee a id
         from_attributes = True # <- AGREGA ESTO. Permite convertir dicts a BaseModel

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
+from fastapi import UploadFile, File, APIRouter, Depends, HTTPException, Query
 from typing import Optional
 from src.services.categories_services import CategoryService
 from src.schemas.categories_schemas import CategoryCreate, CategoryUpdate, CategoryResponse
@@ -62,3 +63,44 @@ async def delete_category(category_id: str):
     if not deleted:
         raise HTTPException(status_code=404, detail="Category Not Found!")
     return {"message": "Category deleted"}
+
+
+# ======================================================================
+#  LOGO DE LA CATEGORÍA
+#
+#  El del campeonato: TCR, GT Challenge, Fórmula 1. El archivo va al disco
+#  y en la base queda solo su nombre, igual que las fotos de pilotos y las
+#  imágenes de eventos y trazados.
+# ======================================================================
+
+
+class RutaLogoCategoria(BaseModel):
+    ruta: str
+
+
+@categories.post("/{category_id}/logo", tags=["Categories"], response_model=CategoryResponse,
+                 dependencies=[Depends(puede_escribir)])
+async def subir_logo_categoria(category_id: int, archivo: UploadFile = File(...)):
+    """
+    Sube el logo de la categoría desde el navegador
+    """
+    contenido = await archivo.read()
+    return await service.subir_logo(category_id, archivo.filename or "", contenido)
+
+
+@categories.put("/{category_id}/logo", tags=["Categories"], response_model=CategoryResponse,
+                dependencies=[Depends(puede_escribir)])
+async def logo_categoria_por_ruta(category_id: int, datos: RutaLogoCategoria):
+    """
+    Toma el logo de una ruta del servidor y lo copia a public/categorias
+    """
+    return await service.logo_por_ruta(category_id, datos.ruta)
+
+
+@categories.delete("/{category_id}/logo", tags=["Categories"], response_model=CategoryResponse,
+                   dependencies=[Depends(puede_escribir)])
+async def borrar_logo_categoria(category_id: int):
+    """
+    Quita el logo de la categoría
+    """
+    return await service.borrar_logo(category_id)

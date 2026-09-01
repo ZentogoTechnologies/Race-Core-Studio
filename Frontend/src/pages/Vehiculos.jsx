@@ -35,14 +35,26 @@ export default function VehiculosModule() {
   const { disciplina } = useDisciplina()
 
   const [categoriaFiltro, setCategoriaFiltro] = useState('')
+  const [subFiltro,       setSubFiltro]       = useState('')
+  const [pilotoFiltro,    setPilotoFiltro]    = useState('')
 
-  // La disciplina viaja siempre; la categoría solo si se eligió una.
+  // Se escribe con retardo: sin esto cada tecla dispara una consulta y la
+  // tabla parpadea mientras se teclea un apellido.
+  const [pilotoDebounce, setPilotoDebounce] = useState('')
+  useEffect(() => {
+    const id = setTimeout(() => setPilotoDebounce(pilotoFiltro.trim()), 350)
+    return () => clearTimeout(id)
+  }, [pilotoFiltro])
+
+  // La disciplina viaja siempre; lo demás solo si se eligió.
   const filtros = useMemo(
     () => ({
       discipline: disciplina,
       ...(categoriaFiltro ? { category_id: categoriaFiltro } : {}),
+      ...(subFiltro ? { sub_category_id: subFiltro } : {}),
+      ...(pilotoDebounce ? { pilot: pilotoDebounce } : {}),
     }),
-    [disciplina, categoriaFiltro],
+    [disciplina, categoriaFiltro, subFiltro, pilotoDebounce],
   )
 
   const lista = useListado(vehiculosApi, { ordenInicial: 'number', filtros })
@@ -72,6 +84,17 @@ export default function VehiculosModule() {
     const cat = categorias.find(c => String(c.category_id) === String(vehicleForm.category_id))
     return cat?.sub_categories || []
   }, [categorias, vehicleForm.category_id])
+
+  // Las de la categoría elegida en el filtro. Son otras que las del
+  // formulario, que dependen de la categoría del vehículo que se edita.
+  const subcategoriasFiltro = useMemo(() => {
+    const cat = categorias.find(c => String(c.category_id) === String(categoriaFiltro))
+    return cat?.sub_categories || []
+  }, [categorias, categoriaFiltro])
+
+  // Cambiar de categoría deja huérfana la subcategoría elegida: pertenece
+  // a la anterior y filtraría por un id que ya no existe en esta.
+  useEffect(() => { setSubFiltro('') }, [categoriaFiltro])
 
   const pilotosFiltrados = useMemo(() => {
     const t = buscaPiloto.trim().toLowerCase()
@@ -239,7 +262,7 @@ export default function VehiculosModule() {
         exportColumnMap={{ vehicle_id: 'ID', number: 'Dorsal', brand: 'Marca', model: 'Modelo', category_name: 'Categoría' }}
       />
 
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
         <label className="text-xs uppercase tracking-wider text-neutral-500">Categoría</label>
         <select
           value={categoriaFiltro}
@@ -251,6 +274,49 @@ export default function VehiculosModule() {
             <option key={c.category_id} value={c.category_id}>{c.category_name}</option>
           ))}
         </select>
+
+        {/* Solo aparece si la categoría elegida tiene subcategorías: un
+            desplegable con una única opción vacía no dice nada. */}
+        {subcategoriasFiltro.length > 0 && (
+          <>
+            <label className="text-xs uppercase tracking-wider text-neutral-500">Subcategoría</label>
+            <select
+              value={subFiltro}
+              onChange={e => setSubFiltro(e.target.value)}
+              className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
+            >
+              <option value="">Todas</option>
+              {subcategoriasFiltro.map(sc => (
+                <option key={sc.sub_category_id} value={sc.sub_category_id}>
+                  {sc.sub_category_name}
+                </option>
+              ))}
+            </select>
+          </>
+        )}
+
+        {/* Buscar por piloto: se quiere saber qué corre alguien, y de paso
+            se ven sus categorías y subcategorías en la propia tabla. */}
+        <label className="text-xs uppercase tracking-wider text-neutral-500">Piloto</label>
+        <div className="relative">
+          <input
+            type="text"
+            value={pilotoFiltro}
+            onChange={e => setPilotoFiltro(e.target.value)}
+            placeholder="Nombre o apellido..."
+            className="bg-[#141414] border border-neutral-800 rounded-lg pl-3 pr-8 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600 w-52"
+          />
+          {pilotoFiltro && (
+            <button
+              type="button"
+              onClick={() => setPilotoFiltro('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
+              title="Quitar el filtro"
+            >
+              <X size={14}/>
+            </button>
+          )}
+        </div>
       </div>
 
       {isFormOpen && (

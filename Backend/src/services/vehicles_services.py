@@ -129,16 +129,49 @@ class VehicleService:
         sort_dir: Optional[str] = None,
         skip: int = 0,
         limit: Optional[int] = None,
+        sub_category_id: Optional[str] = None,
+        pilot: Optional[str] = None,
     ) -> Page[VehicleResponse]:
         filtros = [filtro_busqueda(search, self.BUSCABLES)]
 
-        # La disciplina vive en la categoría, no en el vehículo: primero se
-        # resuelven las categorías de esa disciplina y se filtra por sus ids.
+        # La disciplina vive en la categoría, no en el vehículo, así que se
+        # resuelve a la lista de categorías que le pertenecen.
+        ids_disciplina = None
         if discipline:
             categorias = await Category.find(Category.discipline == discipline).to_list()
-            filtros.append({"category_id": {"$in": [c.category_id for c in categorias]}})
-        elif category_id:
-            filtros.append({"category_id": int(category_id)})
+            ids_disciplina = [c.category_id for c in categorias]
+
+        # Antes esto era un elif de la disciplina, y como el frontend manda
+        # siempre la disciplina, elegir una categoría no filtraba nada: la
+        # rama no llegaba a ejecutarse. Ahora se aplican los dos.
+        if category_id:
+            cid = int(category_id)
+
+            # Una categoría que no es de esta disciplina no puede tener
+            # vehículos que cumplan las dos condiciones.
+            if ids_disciplina is not None and cid not in ids_disciplina:
+                return Page(items=[], total=0, skip=skip, limit=limit)
+
+            filtros.append({"category_id": cid})
+
+        elif ids_disciplina is not None:
+            filtros.append({"category_id": {"$in": ids_disciplina}})
+
+        if sub_category_id:
+            filtros.append({"sub_category_id": int(sub_category_id)})
+
+        # Por nombre de piloto. Se resuelven primero los pilotos que
+        # coinciden y se filtra por sus referencias: el vehículo guarda
+        # DBRefs, no nombres, así que no se puede buscar en él directamente.
+        if pilot and pilot.strip():
+            encontrados = await Pilot.find(
+                filtro_busqueda(pilot, ["name", "last_name"])
+            ).to_list()
+
+            if not encontrados:
+                return Page(items=[], total=0, skip=skip, limit=limit)
+
+            filtros.append({"pilots.$id": {"$in": [p.id for p in encontrados]}})
 
         query = combinar(*filtros)
 

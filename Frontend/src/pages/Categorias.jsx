@@ -1,9 +1,14 @@
-import { useMemo, useState } from 'react'
-import { Pencil, Trash2, Plus, X, ChevronUp, ChevronDown, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Pencil, Trash2, Plus, X, ChevronUp, ChevronDown, ChevronsUpDown, Loader2,
+  Upload, ImageIcon,
+} from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
-import { categoriasApi } from '../api/registro'
+import {
+  borrarLogoCategoria, categoriasApi, subirLogoCategoria, urlLogoCategoria,
+} from '../api/registro'
 import { useListado } from '../hooks/useListado'
 import { useToast } from '../context/ToastContext'
 import { useAuth } from '../context/AuthContext'
@@ -49,9 +54,53 @@ export default function CategoriasModule() {
   const [guardando,     setGuardando]     = useState(false)
   const [porBorrar,     setPorBorrar]     = useState(null)
 
-  const openAddForm  = () => { setCategoryForm(EMPTY_CATEGORY); setCurrentEditId(null); setIsFormOpen(true) }
-  const closeForm    = () => { setIsFormOpen(false); setCurrentEditId(null); setCategoryForm(EMPTY_CATEGORY) }
+  // El logo no viaja en el JSON de la categoría sino como archivo, y en un
+  // alta todavía no hay id al que asociarlo: se guarda aquí y se sube en
+  // cuanto la categoría existe.
+  const [logo,       setLogo]       = useState(null)   // File sin subir
+  const [logoActual, setLogoActual] = useState(null)   // ruta ya guardada
+  const inputLogo = useRef(null)
+
+  const [previaLogo, setPreviaLogo] = useState(null)
+  useEffect(() => {
+    if (!logo) { setPreviaLogo(null); return }
+    const url = URL.createObjectURL(logo)
+    setPreviaLogo(url)
+    return () => URL.revokeObjectURL(url)
+  }, [logo])
+
+  const vistaLogo = previaLogo || urlLogoCategoria(logoActual)
+
+  const limpiarLogo = () => {
+    setLogo(null); setLogoActual(null)
+    if (inputLogo.current) inputLogo.current.value = ''
+  }
+
+  const quitarLogo = async () => {
+    if (!currentEditId) { limpiarLogo(); return }
+    try {
+      await borrarLogoCategoria(currentEditId)
+      limpiarLogo()
+      lista.recargar()
+      toast.exito('Logo quitado', '')
+    } catch (err) {
+      toast.error('No se pudo quitar el logo', err.message)
+    }
+  }
+
+  const openAddForm  = () => { setCategoryForm(EMPTY_CATEGORY); setCurrentEditId(null); limpiarLogo(); setIsFormOpen(true) }
+  const closeForm    = () => { setIsFormOpen(false); setCurrentEditId(null); setCategoryForm(EMPTY_CATEGORY); limpiarLogo() }
   const handleFormToggle = () => isFormOpen ? closeForm() : openAddForm()
+
+  // Si falla el logo no se deshace la categoría: se avisa y ya, que
+  // reintentarlo es abrir y elegir el archivo otra vez.
+  const subirLogo = async (id) => {
+    try {
+      await subirLogoCategoria(id, logo)
+    } catch (err) {
+      toast.error('La categoría se guardó, pero el logo no', err.message)
+    }
+  }
 
   const openEditForm = (categoria) => {
     setCategoryForm({
@@ -60,6 +109,11 @@ export default function CategoriasModule() {
       sub_categories: categoria.sub_categories || [],
     })
     setCurrentEditId(categoria.category_id)
+
+    setLogo(null)
+    setLogoActual(categoria.logo_url || null)
+    if (inputLogo.current) inputLogo.current.value = ''
+
     setIsFormOpen(true)
   }
 
@@ -111,6 +165,7 @@ export default function CategoriasModule() {
           sub_categories: subs,
         })
         toast.exito('Categoría actualizada', categoryForm.category_name)
+        if (logo) await subirLogo(currentEditId)
       } else {
         // Sin category_id: lo pone el servidor. Calcularlo en el navegador
         // haría chocar a dos personas que abran el formulario a la vez.
@@ -121,6 +176,8 @@ export default function CategoriasModule() {
           sub_categories: subs,
         })
         toast.exito('Categoría creada', `${creada.category_name} · ${etiquetaDisciplina}`)
+        // Después de crear porque hasta ahora no había id al que asociarlo.
+        if (logo) await subirLogo(creada.category_id)
       }
       closeForm()
       lista.recargar()
@@ -176,6 +233,50 @@ export default function CategoriasModule() {
               onChange={e => setCategoryForm({ ...categoryForm, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
+          {/* Logo del campeonato: TCR, GT Challenge, Fórmula 1. Sale junto
+              al nombre en la tabla. */}
+          <div className="col-span-full flex items-center gap-4 border-t border-neutral-800 pt-4 mt-2">
+            <div className="w-20 h-20 rounded-lg bg-[#0a0a0a] border border-neutral-800 overflow-hidden flex items-center justify-center flex-shrink-0">
+              {vistaLogo
+                ? <img src={vistaLogo} alt="" className="w-full h-full object-contain"/>
+                : <ImageIcon size={22} className="text-neutral-700"/>}
+            </div>
+
+            <div className="min-w-0">
+              <label className="block text-neutral-400 text-xs mb-2 uppercase">
+                Logo de la categoría
+              </label>
+
+              <input
+                type="file" accept="image/*" ref={inputLogo} className="hidden"
+                onChange={e => setLogo(e.target.files?.[0] || null)}
+              />
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button" onClick={() => inputLogo.current?.click()}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 transition-colors font-bold text-xs"
+                >
+                  <Upload size={14}/>
+                  {vistaLogo ? 'CAMBIAR' : 'ELEGIR LOGO'}
+                </button>
+
+                {vistaLogo && (
+                  <button
+                    type="button" onClick={quitarLogo}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 transition-colors font-bold text-xs"
+                  >
+                    <X size={14}/> QUITAR
+                  </button>
+                )}
+              </div>
+
+              <p className="text-[11px] text-neutral-600 mt-2">
+                {logo ? 'Se sube al guardar la categoría.' : 'Sale junto al nombre en el listado.'}
+              </p>
+            </div>
+          </div>
+
           <div className="col-span-full mt-2">
             <div className="flex items-center justify-between mb-2">
               <label className="text-neutral-400 text-xs uppercase">
@@ -265,8 +366,22 @@ export default function CategoriasModule() {
             {!lista.cargando && !lista.error && lista.items.map(categoria => (
               <tr key={categoria.category_id} className="border-b border-neutral-800/50 hover:bg-neutral-800/30">
                 <td className="p-4">
-                  <p className="font-bold text-white italic">{categoria.category_name}</p>
-                  {categoria.description && <p className="text-xs text-neutral-500 mt-0.5">{categoria.description}</p>}
+                  <div className="flex items-center gap-3">
+                    {/* Sin logo no se deja el hueco: la fila se corre y se
+                        lee igual. Con hueco vacío parecería que falta algo
+                        en todas las categorías que no lo tienen. */}
+                    {categoria.logo_url && (
+                      <img
+                        src={urlLogoCategoria(categoria.logo_url)}
+                        alt=""
+                        className="w-10 h-10 object-contain flex-shrink-0"
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold text-white italic">{categoria.category_name}</p>
+                      {categoria.description && <p className="text-xs text-neutral-500 mt-0.5">{categoria.description}</p>}
+                    </div>
+                  </div>
                 </td>
                 <td className="p-4 text-neutral-400 text-sm">
                   {categoria.sub_categories?.length

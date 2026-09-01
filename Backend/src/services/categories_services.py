@@ -1,3 +1,8 @@
+from pathlib import Path
+
+from src.services.imagenes_services import (
+    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+)
 from src.models.categories_model import Category, SubCategoryEmbedded
 from src.models.vehicles_model import Vehicle
 from typing import Optional
@@ -8,6 +13,17 @@ from src.services.pagination import (
     campo_orden, combinar, direccion, filtro_busqueda,
 )
 from fastapi import HTTPException
+
+# Backend/src/public/categorias, mirando desde Backend/src/services.
+CARPETA_LOGOS = Path(__file__).resolve().parents[1] / "public" / "categorias"
+
+RUTA_RELATIVA = "categorias"
+
+
+def url_logo_categoria(archivo):
+    """La ruta con la que el navegador y CasparCG piden el logo."""
+    return f"/public/{RUTA_RELATIVA}/{archivo}" if archivo else None
+
 
 class CategoryService:
     def _to_response(self, category: Category) -> CategoryResponse:
@@ -23,7 +39,9 @@ class CategoryService:
             category_name=category.category_name,
             discipline=category.discipline,
             sub_categories=sub_cats_data, # <- ya son dicts
-            description=category.description
+            description=category.description,
+            logo=category.logo,
+            logo_url=url_logo_categoria(category.logo),
         )
 
     async def _siguiente_id(self) -> int:
@@ -169,3 +187,50 @@ class CategoryService:
             raise HTTPException(status_code=404, detail="Categoría no encontrada")
         await category.delete()
         return {"detail": "Categoría eliminada"}
+
+    # ── Logo de la categoría ──────────────────────────────────────────
+
+    async def _categoria(self, category_id: int) -> Category:
+        doc = await Category.find_one(Category.category_id == category_id)
+        if doc is None:
+            raise HTTPException(404, f"No existe la categoría {category_id}")
+        return doc
+
+    async def _asignar_logo(self, categoria: Category, destino: Path) -> CategoryResponse:
+        anterior = (CARPETA_LOGOS / categoria.logo) if categoria.logo else None
+
+        categoria.logo = destino.name
+        await categoria.save()
+
+        borrar_si_sobra(anterior, destino)
+
+        return self._to_response(categoria)
+
+    async def subir_logo(self, category_id: int, nombre: str, contenido: bytes) -> CategoryResponse:
+        """El que llega desde el navegador."""
+        categoria = await self._categoria(category_id)
+
+        # El archivo se llama como el id y no como la categoría: renombrar
+        # "TCR" a "TCR Panamá" no debe dejar el logo huérfano.
+        destino = guardar_bytes(contenido, nombre, CARPETA_LOGOS / str(category_id))
+
+        return await self._asignar_logo(categoria, destino)
+
+    async def logo_por_ruta(self, category_id: int, ruta: str) -> CategoryResponse:
+        """El que ya está en el disco del servidor."""
+        categoria = await self._categoria(category_id)
+
+        destino = copiar_de_ruta(ruta, CARPETA_LOGOS / str(category_id))
+
+        return await self._asignar_logo(categoria, destino)
+
+    async def borrar_logo(self, category_id: int) -> CategoryResponse:
+        categoria = await self._categoria(category_id)
+
+        if categoria.logo:
+            fichero = CARPETA_LOGOS / categoria.logo
+            categoria.logo = None
+            await categoria.save()
+            borrar_si_sobra(fichero, CARPETA_LOGOS / "__ninguno__")
+
+        return self._to_response(categoria)
