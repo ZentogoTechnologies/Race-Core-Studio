@@ -151,6 +151,12 @@ export const getCategories = () =>
 
 export const getLineup = () => pedirRegistro('/timing/lineup')
 
+// Clasificación en vivo, la misma que consumen los tótems. Se usa para
+// saber si el piloto con la vuelta rápida está entre los que se ven: si
+// no está, no hay dónde abrir su franja.
+export const getClasificacion = (limite = 20) =>
+  pedirRegistro(`/timing/current?limite=${limite}`)
+
 // Fija cuál de los dos pilotos de un carro compartido sale en el tótem.
 export const setDriver = (vehicleId, pilotId) =>
   request('/timing/driver', {

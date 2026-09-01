@@ -409,64 +409,142 @@
 /* ===================================
    VUELTA RÁPIDA
    ===================================
-   El morado es el código universal de la vuelta rápida en televisión: se
-   reconoce sin leer nada. Va sobre la fila entera y no solo en el número,
-   para que se distinga de un vistazo en una lista de veinte.
+   Ya no se pinta la fila de morado. Teñir una fila entera dice "aquí pasa
+   algo" pero no qué, y sobre veinte posiciones el bloque de color pesaba
+   más que la clasificación, que es lo que se viene a leer.
+
+   Ahora se marca con un cronómetro al final del nombre, y el dato se
+   despliega bajo su fila cuando se pide desde la interfaz. El morado se
+   reserva para el tiempo dentro de ese desplegable, que es donde
+   significa algo concreto.
 =================================== */
 
-.tf-fila.vuelta-rapida{
+.tf-crono{
 
-    background:var(--tf-morado-bg);
-}
+    display:inline-flex;
 
-.tf-fila.vuelta-rapida .tf-barra{
-
-    background:var(--tf-morado);
-}
-
-.tf-fila.vuelta-rapida .tf-dorsal{
-
-    background:rgba(183,45,255,.25);
-
-    color:#EFD8FF;
-}
-
-/* Si el líder es además quien tiene la vuelta rápida, manda el morado: el
-   oro ya se deduce de que va primero en la lista, el morado no. */
-.tf-fila.lider.vuelta-rapida{
-
-    background:var(--tf-morado-bg);
-}
-
-.tf-fila.lider.vuelta-rapida .tf-pos{
-
-    color:#EFD8FF;
-}
-
-.tf-fila.lider.vuelta-rapida .tf-barra{
-
-    background:var(--tf-morado);
-}
-
-/* Punto morado al final de la fila: refuerza el motivo del color cuando
-   el gráfico se ve pequeño en un monitor de control. */
-.tf-fila.vuelta-rapida .tf-nombre::after{
-
-    content:"";
-
-    display:inline-block;
-
-    width:7px;
-    height:7px;
+    align-items:center;
 
     margin-left:8px;
 
-    border-radius:50%;
-
-    background:var(--tf-morado);
-
     vertical-align:middle;
+
+    /* No se encoge con el nombre al abreviarse: es una marca, no una
+       letra, y tiene que seguir ahí en los dos estados. */
+    flex:0 0 auto;
 }
+
+.tf-crono svg{
+
+    width:15px;
+    height:15px;
+
+    display:block;
+
+    stroke:var(--tf-morado);
+
+    stroke-width:1.9;
+
+    stroke-linecap:round;
+
+    fill:none;
+
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,1));
+}
+
+
+/* ==========================================================================
+   DESPLEGABLE DE LA MEJOR VUELTA
+
+   Se abre bajo la fila del piloto que la tiene y empuja al resto hacia
+   abajo. Va con max-height y no con height porque el contenido no mide
+   siempre lo mismo —hay tandas sin número de vuelta— y una altura fija
+   dejaría un hueco o recortaría el texto.
+========================================================================== */
+
+.tf-mejor{
+
+    max-height:0;
+
+    overflow:hidden;
+
+    background:var(--tf-morado-bg);
+
+    transition:max-height .40s cubic-bezier(.4,0,.2,1);
+}
+
+.tf-torre.mejor-vuelta .tf-mejor{
+
+    max-height:46px;
+}
+
+.tf-mejor-caja{
+
+    display:flex;
+
+    align-items:baseline;
+
+    gap:12px;
+
+    /* Alineado con el nombre de las filas: posición, barra y logo suman
+       este margen, y así el tiempo no queda flotando bajo el dorsal. */
+    padding:7px 12px 7px 14px;
+
+    border-top:2px solid rgba(0,0,0,.35);
+}
+
+.tf-mejor-rotulo{
+
+    font-size:10px;
+
+    font-weight:900;
+
+    letter-spacing:1.8px;
+
+    text-transform:uppercase;
+
+    color:rgba(255,255,255,.62);
+
+    flex:0 0 auto;
+}
+
+.tf-mejor-tiempo{
+
+    font-size:19px;
+
+    font-weight:900;
+
+    color:var(--tf-morado);
+
+    font-variant-numeric:tabular-nums;
+
+    text-shadow:
+        0 1px 2px rgba(0,0,0,1),
+        0 0 8px rgba(0,0,0,.9);
+}
+
+.tf-mejor-dato{
+
+    font-size:12px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+    color:rgba(255,255,255,.78);
+
+    font-variant-numeric:tabular-nums;
+}
+
+/* Empuja la velocidad al borde derecho, para que las tres piezas no se
+   amontonen a la izquierda. */
+.tf-mejor-dato.derecha{
+
+    margin-left:auto;
+}
+
 
 /* ==========================================================================
    COLUMNA DE DIFERENCIA
@@ -515,10 +593,8 @@
     color:var(--tf-oro);
 }
 
-.tf-fila.vuelta-rapida .tf-dif{
-
-    background:rgba(183,45,255,.18);
-}
+/* La columna de diferencia tampoco se tiñe: la marca es el cronómetro.
+   Se deja el fondo de siempre. */
 
 
 /* ==========================================================================

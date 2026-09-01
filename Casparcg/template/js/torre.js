@@ -38,6 +38,10 @@ let torreConfig = {
     etiqueta: "",
     marca: true,
     dorsalIzquierda: false,
+
+    // Si el desplegable de la vuelta rápida está abierto. Lo manda la
+    // interfaz con un UPDATE; no se abre solo.
+    mejorVuelta: false,
 };
 
 let torreCuerpo = null;
@@ -121,6 +125,48 @@ function torreNombre(piloto){
 }
 
 
+/* Cronómetro al final del nombre del que tiene la vuelta rápida.
+
+   Va dibujado y no como carácter: los emojis de reloj se ven distintos en
+   cada máquina y no se pueden teñir. Este hereda el morado del CSS. */
+function torreCronometro(){
+
+    return '<span class="tf-crono">'
+        + '<svg viewBox="0 0 24 24">'
+        + '<circle cx="12" cy="14" r="7.5"/>'
+        + '<path d="M12 14V9.5"/>'
+        + '<path d="M12 14l3.4 2"/>'
+        + '<path d="M9.6 2.5h4.8"/>'
+        + '<path d="M12 2.5v4"/>'
+        + '</svg>'
+        + '</span>';
+}
+
+
+/* La franja que se abre bajo su fila. El número de vuelta y la velocidad
+   solo salen si el cronometraje los manda: en algunas tandas vienen
+   vacíos, y una etiqueta sin dato se lee como un fallo. */
+function torreFranjaMejor(piloto){
+
+    let html = '<div class="tf-mejor"><div class="tf-mejor-caja">';
+
+    html += '<span class="tf-mejor-rotulo">Mejor vuelta</span>';
+    html += `<span class="tf-mejor-tiempo">${torreEscapar(piloto.best_time || "--")}</span>`;
+
+    if (piloto.best_in_lap) {
+        html += `<span class="tf-mejor-dato">Vuelta ${torreEscapar(piloto.best_in_lap)}</span>`;
+    }
+
+    if (piloto.best_speed) {
+        html += `<span class="tf-mejor-dato derecha">${torreEscapar(piloto.best_speed)} km/h</span>`;
+    }
+
+    html += '</div></div>';
+
+    return html;
+}
+
+
 function torreProgramarCorto(){
 
     /* Se reprograma en cada repintado: si entra un piloto nuevo mientras
@@ -157,7 +203,8 @@ function torrePintarFilas(standings){
     /* Se redibuja solo si cambió algo. Repintar diez veces por segundo hace
        parpadear los logos, que son peticiones al backend. */
 
-    const campos = ["position", "full_name", "number", "is_best_lap"];
+    const campos = ["position", "full_name", "number", "is_best_lap",
+                    "best_time", "best_in_lap", "best_speed"];
     if (torreConfig.marca)   campos.push("brand_logo");
     if (torreConfig.columna) campos.push(torreConfig.columna);
 
@@ -197,7 +244,11 @@ function torrePintarFilas(standings){
             columnas += `<div class="tf-dorsal izquierda">${torreEscapar(piloto.number)}</div>`;
         }
 
-        columnas += `<div class="tf-nombre">${torreNombre(piloto)}</div>`;
+        /* El cronómetro va dentro de la caja del nombre para que quede
+           pegado a la última letra y se corra con ella al abreviarse. */
+        columnas += `<div class="tf-nombre">${torreNombre(piloto)}`
+                  + (piloto.is_best_lap ? torreCronometro() : "")
+                  + `</div>`;
 
         if (!torreConfig.dorsalIzquierda) {
             columnas += `<div class="tf-dorsal">${torreEscapar(piloto.number)}</div>`;
@@ -210,11 +261,24 @@ function torrePintarFilas(standings){
         fila.innerHTML = columnas;
 
         torreCuerpo.appendChild(fila);
+
+        /* La franja se pinta siempre cerrada, justo debajo de su fila. Al
+           abrirse empuja al resto hacia abajo, que es el efecto buscado:
+           no tapa a nadie, hace sitio. */
+        if (piloto.is_best_lap) {
+            const franja = document.createElement("div");
+            franja.innerHTML = torreFranjaMejor(piloto);
+            torreCuerpo.appendChild(franja.firstChild);
+        }
     });
 
     /* Las letras nacen enteras y se encogen después; si se pintaran ya
        encogidas no habría animación que ver. */
     torreProgramarCorto();
+
+    /* La franja se acaba de recrear, así que se le repone el estado: si
+       estaba abierta y entra un piloto nuevo, no debe cerrarse sola. */
+    torreElemento.classList.toggle("mejor-vuelta", torreConfig.mejorVuelta);
 }
 
 
@@ -300,6 +364,13 @@ function actualizarTorre(data){
         } else if (d.modo === "completo") {
             clearTimeout(torreTemporizador);
             torreElemento.classList.remove("corto");
+        }
+
+        /* Abre o cierra la franja de la vuelta rápida. Es un interruptor:
+           la interfaz manda true o false, no se cierra sola. */
+        if (d.mejor_vuelta !== undefined) {
+            torreConfig.mejorVuelta = Boolean(d.mejor_vuelta);
+            torreElemento.classList.toggle("mejor-vuelta", torreConfig.mejorVuelta);
         }
 
         if (d.limite) {

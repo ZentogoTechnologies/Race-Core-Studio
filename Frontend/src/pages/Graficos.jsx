@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
+  getClasificacion,
   getLineup, setDriver, getTimer, startTimer, pauseTimer, resetTimer,
   configTimer, lapTimer,
 } from '../api/graphics'
@@ -733,6 +734,12 @@ export default function GraficosModule() {
   // Una entrada por capa: { background, totem, flag, grid, pilot, misc }.
   // Las seis conviven al aire; tocar una no afecta a las demás.
   const [alAire,    setAlAire]    = useState({})
+
+  // Vuelta rápida: si el desplegable está abierto y quién la tiene. El
+  // piloto se consulta al cronometraje porque la franja solo puede
+  // abrirse bajo su fila, y a veces no está entre los que se ven.
+  const [mejorVuelta,   setMejorVuelta]   = useState(false)
+  const [rapido,        setRapido]        = useState(null)
   const { carrera, omitida, hayCarrera, limpiar } = useCarrera()
 
   const [activeTab, setActiveTab] = useState('general')
@@ -791,6 +798,27 @@ export default function GraficosModule() {
         id: c.category_id, nombre: c.category_name,
       }))))
       .catch(() => {})
+  }, [])
+
+  // Se refresca sola: la vuelta rápida cambia durante la tanda y el botón
+  // tiene que saber si el que la tiene sigue estando a la vista.
+  useEffect(() => {
+    let vivo = true
+
+    const mirar = () =>
+      getClasificacion(20)
+        .then(d => {
+          if (!vivo) return
+          const fila = (d.standings || []).find(p => p.is_best_lap)
+          setRapido(fila
+            ? { nombre: `${fila.name} ${fila.last_name}`.trim(), tiempo: fila.best_time }
+            : null)
+        })
+        .catch(() => { if (vivo) setRapido(null) })
+
+    mirar()
+    const id = setInterval(mirar, 8000)
+    return () => { vivo = false; clearInterval(id) }
   }, [])
 
   const recargarPista = () => {
@@ -879,6 +907,26 @@ export default function GraficosModule() {
     }
     return undefined
   }
+
+  // Abre o cierra la franja de la vuelta rápida en el tótem que esté al
+  // aire. Va por UPDATE y no por PLAY: el gráfico ya está puesto y solo
+  // se le cambia un dato, sin volver a montarlo.
+  const alternarMejorVuelta = () => {
+    const totem = alAire.totem
+    if (!totem) return
+
+    const abrir = !mejorVuelta
+
+    ejecutar('mejor-vuelta',
+      () => updateGraphic(totem, { data: { mejor_vuelta: abrir } }),
+      () => setMejorVuelta(abrir))
+  }
+
+  // Sacar un tótem de aire lo deja cerrado; si no, al volver a ponerlo el
+  // botón diría "abierta" y la franja estaría cerrada.
+  useEffect(() => {
+    if (!alAire.totem) setMejorVuelta(false)
+  }, [alAire.totem])
 
   // CLEAR del canal entero: vacía las seis capas de una vez.
   const sacarTodo = () =>
@@ -1089,6 +1137,42 @@ export default function GraficosModule() {
                   Limpiar
                 </button>
               </div>
+
+              {/* Vuelta rápida: solo en Tótems, que es donde se abre. La
+                  franja se despliega bajo la fila de quien la tiene, así
+                  que sin ese piloto a la vista no hay dónde ponerla y el
+                  botón se explica en vez de quedarse muerto. */}
+              {seccion.grupo === 'totem' && (
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={alternarMejorVuelta}
+                    disabled={!alAire.totem || !rapido || ocupado}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-[11px] uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                      mejorVuelta
+                        ? 'border-purple-500 bg-purple-500/15 text-purple-300'
+                        : 'border-neutral-700 text-neutral-300 hover:border-purple-500 hover:text-purple-300'
+                    }`}
+                  >
+                    {pendiente === 'mejor-vuelta'
+                      ? <Loader2 size={13} className="animate-spin" />
+                      : <Timer size={13} />}
+                    {mejorVuelta ? 'Ocultar mejor vuelta' : 'Mejor vuelta'}
+                  </button>
+
+                  <span className="text-[11px] text-neutral-500">
+                    {!alAire.totem
+                      ? 'Saca un tótem al aire para poder abrirla.'
+                      : !rapido
+                        ? 'Quien tiene la vuelta rápida no está entre los que se ven.'
+                        : <>
+                            <span className="text-purple-400 font-bold">{rapido.tiempo}</span>
+                            {' · '}
+                            <span className="uppercase">{rapido.nombre}</span>
+                          </>}
+                  </span>
+                </div>
+              )}
 
               <div className={GRID}>
                 {seccion.items.map(item => (

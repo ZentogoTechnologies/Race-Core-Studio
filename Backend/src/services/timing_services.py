@@ -543,6 +543,11 @@ async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> di
             "laps": (f.get("laps") or "").strip(),
             "last_time": (f.get("lasttime") or "").strip(),
             "best_time": (f.get("besttime") or "").strip(),
+            # En qué vuelta la hizo y a qué velocidad. MyLaps las manda por
+            # piloto; se aprovechan para el desplegable de la vuelta rápida,
+            # donde el tiempo solo dice la mitad de la historia.
+            "best_in_lap": (f.get("bestinlap") or "").strip(),
+            "best_speed": (f.get("bestspeed") or "").strip(),
             "brand": marca,
             "brand_logo": marca_logo,
         })
