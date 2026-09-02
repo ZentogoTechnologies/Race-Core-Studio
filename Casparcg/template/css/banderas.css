@@ -183,14 +183,22 @@
     box-shadow:0 2px 6px rgba(0,0,0,.45);
 }
 
-.coche{
+/* El coche de seguridad, con su barra de luces y las llantas. Va relleno
+   y no a línea: sobre el amarillo una silueta hueca no se lee. */
+.sc-carro{
 
-    width:58px;
+    width:56px;
 
     height:auto;
 
+    fill:#111111;
+
     flex:0 0 auto;
 }
+
+.sc-carro .sc-baliza{ fill:#D50000; }
+
+.sc-carro .sc-llanta{ fill:#E8BE03; }
 
 .rotulo{
 
