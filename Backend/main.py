@@ -163,13 +163,30 @@ class FrontendSPA(StaticFiles):
 
     async def get_response(self, path: str, scope):
         try:
-            return await super().get_response(path, scope)
+            respuesta = await super().get_response(path, scope)
         except StarletteHTTPException as e:
             # Starlette no devuelve un 404, lo lanza. Comprobar el código
             # de la respuesta no servía de nada: nunca llegaba a haberla.
             if e.status_code != 404:
                 raise
-            return await super().get_response("index.html", scope)
+            respuesta = await super().get_response("index.html", scope)
+            path = "index.html"
+
+        # El HTML no se cachea. index.html es el único archivo con nombre
+        # fijo: los demás llevan el hash del contenido y pueden guardarse
+        # para siempre. Sin esto el navegador se queda con el index viejo,
+        # que apunta al bundle viejo, y la interfaz sigue mostrando la
+        # versión anterior después de recompilar aunque el servidor ya
+        # tenga la nueva.
+        #
+        # Se mira el tipo de contenido y no la ruta: para la raíz el path
+        # que llega aquí no es "index.html" sino ".", y la comprobación
+        # por nombre no se cumplía nunca.
+        tipo = respuesta.headers.get("content-type", "")
+        if tipo.startswith("text/html"):
+            respuesta.headers["Cache-Control"] = "no-cache, must-revalidate"
+
+        return respuesta
 
 
 if FRONTEND_DIST.is_dir():
