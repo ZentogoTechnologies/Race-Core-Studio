@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Pilot Card Short</title>
 
+    <link rel="stylesheet" href="../css/animaciones.css">
     <link rel="stylesheet" href="../css/pilot_card_short.css">
 </head>
 
@@ -128,14 +129,14 @@ function play(){
         document.getElementById("pilotPanel");
 
     overlay.style.animation =
-        "slideUp .45s ease forwards";
+        "slideUp .5s ease forwards";
 
     setTimeout(() => {
 
         panel.style.animation =
-            "expandPanel .4s ease forwards";
+            "expandPanel .6s ease forwards";
 
-    },450);
+    },500);
 }
 
 function stop(){
@@ -147,14 +148,14 @@ function stop(){
         document.getElementById("pilotPanel");
 
     panel.style.animation =
-        "collapsePanel .35s ease forwards";
+        "collapsePanel .5s ease forwards";
 
     setTimeout(() => {
 
         overlay.style.animation =
-            "slideDown .45s ease forwards";
+            "slideDown .5s ease forwards";
 
-    },350);
+    },500);
 }
 
 /* SOLO PRUEBA */

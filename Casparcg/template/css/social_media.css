@@ -25,6 +25,9 @@
 
 #infoPanelSocialMedia{
 
+    /* Hasta aqui se abre el panel al entrar. */
+    --panel-w:460px;
+
     overflow:hidden;
 
     display:flex;
@@ -97,79 +100,3 @@
 /* ==================================================
    ANIMACIONES
 ================================================== */
-
-@keyframes slideUp{
-
-    from{
-
-        opacity:0;
-
-        transform:
-            translateX(-50%)
-            translateY(120px)
-            scale(.95);
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:
-            translateX(-50%)
-            translateY(0)
-            scale(1);
-    }
-}
-
-@keyframes slideDown{
-
-    from{
-
-        opacity:1;
-
-        transform:
-            translateX(-50%)
-            translateY(0)
-            scale(1);
-    }
-
-    to{
-
-        opacity:0;
-
-        transform:
-            translateX(-50%)
-            translateY(120px)
-            scale(.95);
-    }
-}
-
-@keyframes expandPanel{
-
-    from{
-
-        width:0;
-        opacity:0;
-    }
-
-    to{
-
-        width:460px;
-        opacity:1;
-    }
-}
-
-@keyframes collapsePanel{
-
-    from{
-
-        width:460px;
-        opacity:1;
-    }
-
-    to{
-
-        width:0;
-        opacity:0;
-    }
-}

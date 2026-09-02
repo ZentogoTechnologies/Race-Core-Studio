@@ -1,0 +1,119 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   ENTRADA Y SALIDA
+
+   Un solo sitio para como entran y salen las cartas inferiores: el evento,
+   la categoria, las redes, el narrador y sus dos companeros, la carta de
+   piloto y la de duelo. Antes cada plantilla llevaba su propia copia de
+   estos fotogramas, con tiempos y recorridos distintos, y al ponerlas una
+   detras de otra en el aire se notaba que no eran la misma familia.
+
+   El movimiento es el del clima, que es el que se tomo como bueno: la
+   carta sube desde abajo con el logo, y solo cuando ya esta puesta se
+   despliega el panel hacia la derecha. Salen al reves, el panel se recoge
+   primero y despues baja el conjunto.
+
+   El ancho al que se abre el panel lo pone cada carta en --panel-w, porque
+   una carta de piloto y una de redes no miden lo mismo. Lo unico que se
+   comparte es el gesto.
+========================================================================== */
+
+/* Estado de partida: fuera de cuadro y transparente. Sin esto la carta
+   asoma un fotograma antes de que arranque la animacion. */
+.overlay,
+.climate-short,
+.social-media,
+.pilot-short,
+.narrator{
+
+    opacity:0;
+
+    transform:translateX(-50%) translateY(250px) scale(1.25);
+}
+
+
+/* ── El conjunto sube ── */
+
+@keyframes slideUp{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(120px)
+            scale(.95);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+}
+
+@keyframes slideDown{
+
+    from{
+
+        opacity:1;
+
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:
+            translateX(-50%)
+            translateY(120px)
+            scale(.95);
+    }
+}
+
+
+/* ── El panel se despliega ──
+
+   Se abre hasta --panel-w y no hasta un numero fijo: el evento calcula el
+   suyo al vuelo segun lo que mida el nombre, y las demas lo declaran en su
+   propia hoja. El valor de reserva es el del clima, que fue el original. */
+
+@keyframes expandPanel{
+
+    from{
+
+        width:0;
+        opacity:0;
+    }
+
+    to{
+
+        width:var(--panel-w, 800px);
+        opacity:1;
+    }
+}
+
+@keyframes collapsePanel{
+
+    from{
+
+        width:var(--panel-w, 800px);
+        opacity:1;
+    }
+
+    to{
+
+        width:0;
+        opacity:0;
+    }
+}

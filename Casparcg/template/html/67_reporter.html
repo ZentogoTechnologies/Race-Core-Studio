@@ -8,6 +8,7 @@
     <title>Reportero</title>
 
     <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/animaciones.css">
     <link rel="stylesheet" href="../css/narrator.css">
 </head>
 
@@ -96,15 +97,30 @@
         ================================================================== */
 
         function play() {
-            const el = document.getElementById("narrator");
-            el.classList.remove("saliendo");
-            el.classList.add("entrando");
+
+            const widget = document.getElementById("narrator");
+            const panel  = document.querySelector(".narrator-info");
+
+            widget.style.animation = "slideUp .5s ease forwards";
+
+            /* El panel espera a que el conjunto termine de subir: si se
+               abren a la vez, el texto sale volando en diagonal en vez de
+               desplegarse desde el logo. */
+            setTimeout(() => {
+                panel.style.animation = "expandPanel .6s ease forwards";
+            }, 500);
         }
 
         function stop() {
-            const el = document.getElementById("narrator");
-            el.classList.remove("entrando");
-            el.classList.add("saliendo");
+
+            const widget = document.getElementById("narrator");
+            const panel  = document.querySelector(".narrator-info");
+
+            panel.style.animation = "collapsePanel .5s ease forwards";
+
+            setTimeout(() => {
+                widget.style.animation = "slideDown .5s ease forwards";
+            }, 500);
         }
 
         window.onload = play;

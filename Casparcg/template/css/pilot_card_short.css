@@ -9,7 +9,7 @@
     left:50%;
     bottom:40px;
 
-    transform:translateX(-50%) translateY(250px);
+    /* La posicion de partida y el centrado los pone animaciones.css. */
 
     display:flex;
     align-items:center;
@@ -52,6 +52,9 @@
 ================================================== */
 
 .pilot-panel{
+    /* Hasta aqui se abre el panel al entrar. */
+    --panel-w:910px;
+
     width:0;
     height:186px;
 
@@ -202,51 +205,3 @@
    precisión de la de arriba, no un dato del mismo rango. */
 /* .subvalue se retiró: la subcategoría pasó a bloque propio con su
    etiqueta, en la primera fila. */
-
-/* ==================================================
-   ANIMACIONES
-================================================== */
-
-@keyframes slideUp{
-    from{
-        transform:translateX(-50%) translateY(250px);
-        opacity:0;
-    }
-
-    to{
-        transform:translateX(-50%) translateY(0);
-        opacity:1;
-    }
-}
-
-@keyframes slideDown{
-    from{
-        transform:translateX(-50%) translateY(0);
-        opacity:1;
-    }
-
-    to{
-        transform:translateX(-50%) translateY(250px);
-        opacity:0;
-    }
-}
-
-@keyframes expandPanel{
-    from{
-        width:0;
-    }
-
-    to{
-        width: 910px;
-    }
-}
-
-@keyframes collapsePanel{
-    from{
-        width: 910px;
-    }
-
-    to{
-        width:0;
-    }
-}
