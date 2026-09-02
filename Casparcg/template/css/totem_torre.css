@@ -471,6 +471,60 @@
 
 
 /* ==========================================================================
+   COLUMNA DE DIFERENCIA
+
+   Solo la usan los tótems al líder y de intervalo. Va con fondo propio y
+   pegada al borde derecho, como en la torre de televisión: el ojo salta
+   del nombre al hueco sin recorrer la fila entera.
+
+   Se perdió al reescribir la sección de las franjas —estaba justo entre
+   medias— y sin ella la columna se quedaba sin ancho ni fondo: el tiempo
+   salía encogido contra el borde y en gris.
+========================================================================== */
+
+.tf-dif{
+
+    width:78px;
+
+    /* flex:0 0 auto o el nombre se la come: con flex-shrink por defecto
+       la columna cedía sitio y el tiempo quedaba partido. */
+    flex:0 0 auto;
+
+    align-self:stretch;
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+
+    padding:0 11px 0 6px;
+
+    background:rgba(0,0,0,.34);
+
+    font-size:14px;
+    font-weight:900;
+
+    color:#FFFFFF;
+
+    font-variant-numeric:tabular-nums;
+
+    text-shadow:
+        0 1px 2px rgba(0,0,0,1),
+        0 0 6px rgba(0,0,0,.9);
+}
+
+/* El primero no tiene contra quién medirse: en su fila la columna dice de
+   qué diferencia se está hablando, y por eso va en texto y no en cifra. */
+.tf-fila.lider .tf-dif{
+
+    font-size:10px;
+
+    letter-spacing:1.4px;
+
+    color:var(--tf-oro);
+}
+
+
+/* ==========================================================================
    FRANJAS DE TIEMPOS
 
    Se abren bajo la fila de un piloto y empujan al resto hacia abajo. La
