@@ -15,10 +15,8 @@
         <img src="../img/logo-cliente.png" alt="">
     </div>
 
-    <div class="bandera-panel sin-texto" id="panel">
-        <div class="bandera-caja">
-            <span class="trapo azul"></span>
-        </div>
+    <div class="bandera-panel azul" id="panel">
+        <div class="bandera-caja"></div>
     </div>
 
 </div>
@@ -28,14 +26,14 @@
 /* ==========================================================================
    BANDERA AZUL
 
-   Todas las banderas comparten esqueleto y hoja de estilo: lo único que
-   cambia es el trapo que se dibuja.
+   El panel entero es la bandera: se despliega desde el logo y ocupa el
+   resto de la franja con su color o su dibujo.
 
-   Van sin texto a propósito. Una bandera se reconoce por su dibujo, y el
-   rótulo repetía lo que ya se ve; el safety car es la excepción, porque
-   ahí no hay una bandera reglamentaria que lo identifique.
+   Va sin texto. Una bandera se reconoce por su diseño y el rótulo repetía
+   lo que ya se ve. El safety car es la excepción, porque ahí no hay una
+   bandera reglamentaria que lo identifique.
 
-   Miden lo mismo que la torre porque se dibujan sobre su cabecera: la
+   Mide lo mismo que la torre porque se dibuja sobre su cabecera: la
    medida sale de torre_medidas.css, que es de donde la toma el tótem.
 ========================================================================== */
 
@@ -48,15 +46,12 @@ function stop(){
 }
 
 function update(data){
-    /* Solo el safety car lleva texto, así que solo él lo acepta al vuelo. */
+    /* Solo el safety car lleva rótulo, así que solo él lo acepta al vuelo. */
     try {
         const d = typeof data === "string" ? JSON.parse(data) : (data || {});
+        const rotulo = document.querySelector(".rotulo");
 
-        const nombre  = document.querySelector(".bandera-nombre");
-        const sentido = document.querySelector(".bandera-sentido");
-
-        if (d.nombre  && nombre)  nombre.textContent  = d.nombre;
-        if (d.sentido && sentido) sentido.textContent = d.sentido;
+        if (d.texto && rotulo) rotulo.textContent = d.texto;
     } catch (e) { /* un UPDATE con basura no puede tumbar el gráfico */ }
 }
 

@@ -15,14 +15,8 @@
         <img src="../img/logo-cliente.png" alt="">
     </div>
 
-    <div class="bandera-panel" id="panel">
-        <div class="bandera-caja">
-            <span class="trapo amarilla safety"><svg viewBox="0 0 48 22"><path d="M4 15h40M8 15c0-5 4-8 10-8h10c5 0 8 3 11 8" fill="none" stroke="#1a1a1a" stroke-width="2.4"/><circle cx="14" cy="16" r="3.2" fill="#1a1a1a"/><circle cx="34" cy="16" r="3.2" fill="#1a1a1a"/></svg></span>
-            <span class="bandera-texto">
-                <span class="bandera-nombre">Safety car</span>
-                <span class="bandera-sentido">Coche de seguridad en pista</span>
-            </span>
-        </div>
+    <div class="bandera-panel amarilla" id="panel">
+        <div class="bandera-caja"><svg class="coche" viewBox="0 0 48 22"><path d="M4 15h40M8 15c0-5 4-8 10-8h10c5 0 8 3 11 8" fill="none" stroke="#141414" stroke-width="2.4"/><circle cx="14" cy="16" r="3.2" fill="#141414"/><circle cx="34" cy="16" r="3.2" fill="#141414"/></svg><span class="rotulo">Safety car</span></div>
     </div>
 
 </div>
@@ -32,14 +26,14 @@
 /* ==========================================================================
    SAFETY CAR
 
-   Todas las banderas comparten esqueleto y hoja de estilo: lo único que
-   cambia es el trapo que se dibuja.
+   El panel entero es la bandera: se despliega desde el logo y ocupa el
+   resto de la franja con su color o su dibujo.
 
-   Van sin texto a propósito. Una bandera se reconoce por su dibujo, y el
-   rótulo repetía lo que ya se ve; el safety car es la excepción, porque
-   ahí no hay una bandera reglamentaria que lo identifique.
+   Va sin texto. Una bandera se reconoce por su diseño y el rótulo repetía
+   lo que ya se ve. El safety car es la excepción, porque ahí no hay una
+   bandera reglamentaria que lo identifique.
 
-   Miden lo mismo que la torre porque se dibujan sobre su cabecera: la
+   Mide lo mismo que la torre porque se dibuja sobre su cabecera: la
    medida sale de torre_medidas.css, que es de donde la toma el tótem.
 ========================================================================== */
 
@@ -52,15 +46,12 @@ function stop(){
 }
 
 function update(data){
-    /* Solo el safety car lleva texto, así que solo él lo acepta al vuelo. */
+    /* Solo el safety car lleva rótulo, así que solo él lo acepta al vuelo. */
     try {
         const d = typeof data === "string" ? JSON.parse(data) : (data || {});
+        const rotulo = document.querySelector(".rotulo");
 
-        const nombre  = document.querySelector(".bandera-nombre");
-        const sentido = document.querySelector(".bandera-sentido");
-
-        if (d.nombre  && nombre)  nombre.textContent  = d.nombre;
-        if (d.sentido && sentido) sentido.textContent = d.sentido;
+        if (d.texto && rotulo) rotulo.textContent = d.texto;
     } catch (e) { /* un UPDATE con basura no puede tumbar el gráfico */ }
 }
 
