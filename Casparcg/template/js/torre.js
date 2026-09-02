@@ -42,6 +42,10 @@ let torreConfig = {
     // Si el desplegable de la vuelta rápida está abierto. Lo manda la
     // interfaz con un UPDATE; no se abre solo.
     mejorVuelta: false,
+
+    // Dorsal de un segundo piloto del que también se abre su franja, en
+    // verde. Sirve para comparar dos tiempos en pantalla a la vez.
+    comparar: null,
 };
 
 let torreCuerpo = null;
@@ -143,23 +147,25 @@ function torreCronometro(){
 }
 
 
-/* La franja que se abre bajo su fila. El número de vuelta y la velocidad
-   solo salen si el cronometraje los manda: en algunas tandas vienen
-   vacíos, y una etiqueta sin dato se lee como un fallo. */
-function torreFranjaMejor(piloto){
+/* La franja que se abre bajo la fila de un piloto: su mejor vuelta y la
+   última, nada más. Se quitaron el número de vuelta y la velocidad porque
+   lo que se compara en pantalla son los dos tiempos.
 
-    let html = '<div class="tf-mejor"><div class="tf-mejor-caja">';
+   `verde` la pinta en el color del segundo piloto, el que se elige a mano
+   para comparar contra el de la vuelta rápida. */
+function torreFranja(piloto, verde){
 
-    html += '<span class="tf-mejor-rotulo">Mejor vuelta</span>';
-    html += `<span class="tf-mejor-tiempo">${torreEscapar(piloto.best_time || "--")}</span>`;
+    const clase = verde ? "tf-franja verde" : "tf-franja";
 
-    if (piloto.best_in_lap) {
-        html += `<span class="tf-mejor-dato">Vuelta ${torreEscapar(piloto.best_in_lap)}</span>`;
-    }
+    let html = `<div class="${clase}"><div class="tf-franja-caja">`;
 
-    if (piloto.best_speed) {
-        html += `<span class="tf-mejor-dato derecha">${torreEscapar(piloto.best_speed)} km/h</span>`;
-    }
+    html += `<span class="tf-franja-dorsal">${torreEscapar(piloto.number)}</span>`;
+
+    html += '<span class="tf-franja-rotulo">Mejor</span>';
+    html += `<span class="tf-franja-tiempo">${torreEscapar(piloto.best_time || "--")}</span>`;
+
+    html += '<span class="tf-franja-rotulo derecha">Última</span>';
+    html += `<span class="tf-franja-tiempo tenue">${torreEscapar(piloto.last_time || "--")}</span>`;
 
     html += '</div></div>';
 
@@ -204,7 +210,7 @@ function torrePintarFilas(standings){
        parpadear los logos, que son peticiones al backend. */
 
     const campos = ["position", "full_name", "number", "is_best_lap",
-                    "best_time", "best_in_lap", "best_speed"];
+                    "best_time", "last_time"];
     if (torreConfig.marca)   campos.push("brand_logo");
     if (torreConfig.columna) campos.push(torreConfig.columna);
 
@@ -244,15 +250,19 @@ function torrePintarFilas(standings){
             columnas += `<div class="tf-dorsal izquierda">${torreEscapar(piloto.number)}</div>`;
         }
 
-        /* El cronómetro va dentro de la caja del nombre para que quede
-           pegado a la última letra y se corra con ella al abreviarse. */
-        columnas += `<div class="tf-nombre">${torreNombre(piloto)}`
-                  + (piloto.is_best_lap ? torreCronometro() : "")
-                  + `</div>`;
+        columnas += `<div class="tf-nombre">${torreNombre(piloto)}</div>`;
 
         if (!torreConfig.dorsalIzquierda) {
             columnas += `<div class="tf-dorsal">${torreEscapar(piloto.number)}</div>`;
         }
+
+        /* El cronómetro va después del dorsal y no pegado al nombre: ahí
+           quedaba a media fila, en un sitio distinto según lo largo que
+           fuera el apellido, y al abreviarse se movía. En columna propia
+           siempre cae en la misma vertical. */
+        columnas += `<div class="tf-crono-col">`
+                  + (piloto.is_best_lap ? torreCronometro() : "")
+                  + `</div>`;
 
         if (torreConfig.columna) {
             columnas += `<div class="tf-dif">${torreEscapar(torreDiferencia(piloto, index))}</div>`;
@@ -262,13 +272,22 @@ function torrePintarFilas(standings){
 
         torreCuerpo.appendChild(fila);
 
-        /* La franja se pinta siempre cerrada, justo debajo de su fila. Al
-           abrirse empuja al resto hacia abajo, que es el efecto buscado:
-           no tapa a nadie, hace sitio. */
+        /* Las franjas se pintan siempre cerradas, justo debajo de su fila.
+           Al abrirse empujan al resto hacia abajo, que es el efecto
+           buscado: no tapan a nadie, hacen sitio.
+
+           Un mismo piloto puede llevar las dos —tiene la vuelta rápida y
+           además se eligió para comparar—; se dibujan una tras otra. */
+        const caja = document.createElement("div");
+
         if (piloto.is_best_lap) {
-            const franja = document.createElement("div");
-            franja.innerHTML = torreFranjaMejor(piloto);
-            torreCuerpo.appendChild(franja.firstChild);
+            caja.innerHTML = torreFranja(piloto, false);
+            torreCuerpo.appendChild(caja.firstChild);
+        }
+
+        if (torreConfig.comparar && String(piloto.number) === String(torreConfig.comparar)) {
+            caja.innerHTML = torreFranja(piloto, true);
+            torreCuerpo.appendChild(caja.firstChild);
         }
     });
 
@@ -279,6 +298,7 @@ function torrePintarFilas(standings){
     /* La franja se acaba de recrear, así que se le repone el estado: si
        estaba abierta y entra un piloto nuevo, no debe cerrarse sola. */
     torreElemento.classList.toggle("mejor-vuelta", torreConfig.mejorVuelta);
+    torreElemento.classList.toggle("comparando", Boolean(torreConfig.comparar));
 }
 
 
@@ -371,6 +391,17 @@ function actualizarTorre(data){
         if (d.mejor_vuelta !== undefined) {
             torreConfig.mejorVuelta = Boolean(d.mejor_vuelta);
             torreElemento.classList.toggle("mejor-vuelta", torreConfig.mejorVuelta);
+    torreElemento.classList.toggle("comparando", Boolean(torreConfig.comparar));
+        }
+
+        /* El segundo piloto. Llega su dorsal para abrirla, o null para
+           cerrarla. Hay que repintar: la franja verde cuelga de una fila
+           distinta según a quién se haya elegido. */
+        if (d.comparar !== undefined) {
+            torreConfig.comparar = d.comparar || null;
+            torreElemento.classList.toggle("comparando", Boolean(torreConfig.comparar));
+            torreFirma = null;
+            torrePintar(timingUltimo());
         }
 
         if (d.limite) {

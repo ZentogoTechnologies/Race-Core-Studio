@@ -820,6 +820,12 @@ export default function GraficosModule() {
   // abrirse bajo su fila, y a veces no está entre los que se ven.
   const [mejorVuelta,   setMejorVuelta]   = useState(false)
   const [rapido,        setRapido]        = useState(null)
+
+  // Segundo piloto, el de la franja verde. Se elige de los que están en
+  // pista para poder comparar su vuelta contra la del que tiene la rápida.
+  const [comparar,      setComparar]      = useState(null)   // dorsal
+  const [enPista,       setEnPista]       = useState([])
+  const [listaAbierta,  setListaAbierta]  = useState(false)
   const { carrera, omitida, hayCarrera, limpiar } = useCarrera()
 
   const [activeTab, setActiveTab] = useState('general')
@@ -897,12 +903,20 @@ export default function GraficosModule() {
       getClasificacion(20)
         .then(d => {
           if (!vivo) return
-          const fila = (d.standings || []).find(p => p.is_best_lap)
+          const filas = d.standings || []
+
+          const fila = filas.find(p => p.is_best_lap)
           setRapido(fila
             ? { nombre: `${fila.name} ${fila.last_name}`.trim(), tiempo: fila.best_time }
             : null)
+
+          setEnPista(filas.map(p => ({
+            dorsal: p.number,
+            nombre: `${p.name} ${p.last_name}`.trim(),
+            mejor: p.best_time,
+          })))
         })
-        .catch(() => { if (vivo) setRapido(null) })
+        .catch(() => { if (vivo) { setRapido(null); setEnPista([]) } })
 
     mirar()
     const id = setInterval(mirar, 8000)
@@ -1015,10 +1029,23 @@ export default function GraficosModule() {
       () => setMejorVuelta(abrir))
   }
 
-  // Sacar un tótem de aire lo deja cerrado; si no, al volver a ponerlo el
-  // botón diría "abierta" y la franja estaría cerrada.
+  // Abre la franja verde bajo el piloto elegido, o la cierra mandando
+  // null. Va por UPDATE, igual que la de la vuelta rápida.
+  const elegirComparado = (dorsal) => {
+    const totem = alAire.totem
+    if (!totem) return
+
+    setListaAbierta(false)
+
+    ejecutar('comparar',
+      () => updateGraphic(totem, { data: { comparar: dorsal } }),
+      () => setComparar(dorsal))
+  }
+
+  // Sacar un tótem de aire deja las dos franjas cerradas; si no, al volver
+  // a ponerlo los botones dirían "abierta" y estarían cerradas.
   useEffect(() => {
-    if (!alAire.totem) setMejorVuelta(false)
+    if (!alAire.totem) { setMejorVuelta(false); setComparar(null); setListaAbierta(false) }
   }, [alAire.totem])
 
   // CLEAR del canal entero: vacía las seis capas de una vez.
@@ -1253,9 +1280,54 @@ export default function GraficosModule() {
                     {mejorVuelta ? 'Ocultar mejor vuelta' : 'Mejor vuelta'}
                   </button>
 
+                  {/* Segundo piloto, para comparar dos tiempos a la vez. Se
+                      elige de los que están en pista: la franja cuelga de su
+                      fila, así que tiene que estar a la vista. */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => comparar
+                        ? elegirComparado(null)
+                        : setListaAbierta(a => !a)}
+                      disabled={!alAire.totem || enPista.length === 0 || ocupado}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-[11px] uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                        comparar
+                          ? 'border-emerald-400 bg-emerald-400/15 text-emerald-300'
+                          : 'border-neutral-700 text-neutral-300 hover:border-emerald-400 hover:text-emerald-300'
+                      }`}
+                    >
+                      {pendiente === 'comparar'
+                        ? <Loader2 size={13} className="animate-spin" />
+                        : <Timer size={13} />}
+                      {comparar ? `Ocultar #${comparar}` : 'Comparar piloto'}
+                    </button>
+
+                    {listaAbierta && !comparar && (
+                      <div className="absolute z-30 mt-2 w-72 max-h-64 overflow-y-auto bg-[#141414] border border-neutral-700 rounded-lg shadow-xl">
+                        {enPista.map(p => (
+                          <button
+                            key={p.dorsal} type="button"
+                            onClick={() => elegirComparado(p.dorsal)}
+                            className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-neutral-800 transition-colors"
+                          >
+                            <span className="inline-flex items-center justify-center min-w-[34px] px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-300 text-[11px] font-black font-mono">
+                              {p.dorsal}
+                            </span>
+                            <span className="flex-1 min-w-0 text-sm text-neutral-200 truncate uppercase">
+                              {p.nombre}
+                            </span>
+                            <span className="text-[11px] font-bold text-emerald-400 font-mono">
+                              {p.mejor}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <span className="text-[11px] text-neutral-500">
                     {!alAire.totem
-                      ? 'Saca un tótem al aire para poder abrirla.'
+                      ? 'Saca un tótem al aire para poder abrirlas.'
                       : !rapido
                         ? 'Quien tiene la vuelta rápida no está entre los que se ven.'
                         : <>
