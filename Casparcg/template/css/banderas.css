@@ -8,8 +8,11 @@
    el tótem. Cambiar el ancho de la torre las mueve a las dos.
 
    Cada bandera muestra el trapo de verdad —los cuadros del damero, la
-   diagonal, el círculo naranja, las rayas— y no solo un panel de color
-   con el nombre. Un panel amarillo dice "pasa algo", el dibujo dice qué.
+   diagonal, el círculo naranja, las rayas— y nada más: una bandera se
+   reconoce por su dibujo y el rótulo repetía lo que ya se ve.
+
+   El safety car es la excepción y sí lleva texto: ahí no hay una bandera
+   reglamentaria que lo identifique, solo un coche dibujado.
 ========================================================================== */
 
 .bandera-barra{
@@ -115,6 +118,25 @@
     gap:11px;
 
     padding:0 13px;
+}
+
+/* Sin texto el trapo es todo el contenido, así que se centra y crece
+   hasta llenar la franja. Dejarlo pequeño a un lado, con el resto del
+   panel vacío, se leería como que falta algo. */
+.bandera-panel.sin-texto .bandera-caja{
+
+    justify-content:center;
+
+    padding:9px 13px;
+}
+
+.bandera-panel.sin-texto .trapo{
+
+    width:auto;
+
+    height:100%;
+
+    aspect-ratio:3 / 2;
 }
 
 .bandera-texto{

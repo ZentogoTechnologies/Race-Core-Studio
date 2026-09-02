@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Bandera de penalizacin</title>
+    <title>Bandera de penalizacion</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/torre_medidas.css">
     <link rel="stylesheet" href="../css/banderas.css">
@@ -15,13 +15,9 @@
         <img src="../img/logo-cliente.png" alt="">
     </div>
 
-    <div class="bandera-panel" id="panel">
+    <div class="bandera-panel sin-texto" id="panel">
         <div class="bandera-caja">
             <span class="trapo negra"><span class="circulo"></span></span>
-            <span class="bandera-texto">
-                <span class="bandera-nombre">Bandera de penalizaci&oacute;n</span>
-                <span class="bandera-sentido">Auto con da&ntilde;os, debe ir a los pits</span>
-            </span>
         </div>
     </div>
 
@@ -30,12 +26,14 @@
 <script>
 
 /* ==========================================================================
-   BANDERA DE PENALIZACIN
+   BANDERA DE PENALIZACION
 
    Todas las banderas comparten esqueleto y hoja de estilo: lo único que
-   cambia es el trapo que se dibuja y el texto. Antes cada una llevaba su
-   propio panel de color con el nombre encima, sin el dibujo ni el
-   significado.
+   cambia es el trapo que se dibuja.
+
+   Van sin texto a propósito. Una bandera se reconoce por su dibujo, y el
+   rótulo repetía lo que ya se ve; el safety car es la excepción, porque
+   ahí no hay una bandera reglamentaria que lo identifique.
 
    Miden lo mismo que la torre porque se dibujan sobre su cabecera: la
    medida sale de torre_medidas.css, que es de donde la toma el tótem.
@@ -50,13 +48,15 @@ function stop(){
 }
 
 function update(data){
-    /* Se acepta cambiar el texto al vuelo, por si hace falta matizar algo
-       en directo: {"sentido":"..."} */
+    /* Solo el safety car lleva texto, así que solo él lo acepta al vuelo. */
     try {
         const d = typeof data === "string" ? JSON.parse(data) : (data || {});
 
-        if (d.nombre)  document.querySelector(".bandera-nombre").textContent  = d.nombre;
-        if (d.sentido) document.querySelector(".bandera-sentido").textContent = d.sentido;
+        const nombre  = document.querySelector(".bandera-nombre");
+        const sentido = document.querySelector(".bandera-sentido");
+
+        if (d.nombre  && nombre)  nombre.textContent  = d.nombre;
+        if (d.sentido && sentido) sentido.textContent = d.sentido;
     } catch (e) { /* un UPDATE con basura no puede tumbar el gráfico */ }
 }
 
