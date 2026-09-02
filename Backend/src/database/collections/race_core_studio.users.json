@@ -1,0 +1,57 @@
+[
+  {
+    "_id": {
+      "$oid": "6a925e0fd35a7242e5ebe0ba"
+    },
+    "user_id": "5bf17713-2ff7-4def-ac68-aa0f24507f6f",
+    "username": "zentogotech",
+    "password": "$2b$12$EL9bs5swzV3yWvLDRozaM.HdT7q9vPIw7waegA6eruDKeGyj/TGBu",
+    "role": "owner",
+    "created_at": "28/08/2026",
+    "active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a926c998d9f7b2d6b010b68"
+    },
+    "user_id": "0a54c45e-2351-40f6-a252-8cd12573389a",
+    "username": "test",
+    "password": "$2b$12$l3OGaMKc2HFGm03IKYb3POcKTxdPjhWi.RjQbjZTUeugne5P5zq.i",
+    "role": "standard",
+    "created_at": "29/08/2026",
+    "active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a926ca18d9f7b2d6b010b69"
+    },
+    "user_id": "a76f4f35-47f7-4cc2-8992-cfd718dec15b",
+    "username": "admin",
+    "password": "$2b$12$dD4VzJAP7.gjEraLAWkTGeAhK6LBtg7/R7FczdO0AjREUplGyVwiW",
+    "role": "admin",
+    "created_at": "29/08/2026",
+    "active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94e9bcccf0fc1797366393"
+    },
+    "user_id": "4899a154-eeaa-4830-96d5-8ece65d41afa",
+    "username": "Roberto Reyna",
+    "password": "$2b$12$e4BdTBNi1iQ3J9/Yo0XxAeQTqlsBbZJPjDjRD4oNJq2OsYFy5vfP6",
+    "role": "admin",
+    "created_at": "30/08/2026",
+    "active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94f18eccf0fc1797366395"
+    },
+    "user_id": "249ae824-4ca2-4cb8-9b60-09150508de3b",
+    "username": "Jose Espinoza",
+    "password": "$2b$12$QX.c9FQM1E51A1W9TosC2OICFMyW1JO5LXAxSPuiGpNR2K9.zj4Oe",
+    "role": "admin",
+    "created_at": "30/08/2026",
+    "active": true
+  }
+]

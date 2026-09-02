@@ -1,0 +1,2466 @@
+[
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e29"
+    },
+    "vehicle_id": 1,
+    "number": 1,
+    "brand": "Renault",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb64539f"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "1",
+    "photos": []
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e2a"
+    },
+    "vehicle_id": 2,
+    "number": 14,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "CELESTE",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc62520146239296dec"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "14"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e2b"
+    },
+    "vehicle_id": 3,
+    "number": 11,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "AMARILLO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc62520146239296ded"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "11"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e2c"
+    },
+    "vehicle_id": 4,
+    "number": 4,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "AZUL",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dee"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "4"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e2d"
+    },
+    "vehicle_id": 5,
+    "number": 21,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "MORADO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296def"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "21"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e2e"
+    },
+    "vehicle_id": 6,
+    "number": 25,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "NARANJA",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df0"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "25"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e2f"
+    },
+    "vehicle_id": 7,
+    "number": 69,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "ROJO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df3"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "69"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e30"
+    },
+    "vehicle_id": 8,
+    "number": 91,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "VERDE",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df7"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df8"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": 13,
+    "display_number": "91"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e31"
+    },
+    "vehicle_id": 9,
+    "number": 17,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "AMARILLO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df9"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "17"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e32"
+    },
+    "vehicle_id": 10,
+    "number": 13,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "VERDE",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dfa"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "13"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e33"
+    },
+    "vehicle_id": 11,
+    "number": 74,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "MORADO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dfb"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "74"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e34"
+    },
+    "vehicle_id": 12,
+    "number": 60,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "ROSADO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dfc"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "60"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e35"
+    },
+    "vehicle_id": 13,
+    "number": 10,
+    "brand": "Toyota",
+    "model": "COROLLA",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dfd"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dfe"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "010"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e36"
+    },
+    "vehicle_id": 14,
+    "number": 79,
+    "brand": "Honda",
+    "model": "CIVIC SI",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dff"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "79"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e37"
+    },
+    "vehicle_id": 15,
+    "number": 28,
+    "brand": "Mazda",
+    "model": "6",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e00"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "28"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e38"
+    },
+    "vehicle_id": 16,
+    "number": 88,
+    "brand": "Acura",
+    "model": "INTEGRA TYPE R",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e01"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "88"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e39"
+    },
+    "vehicle_id": 17,
+    "number": 288,
+    "brand": "Honda",
+    "model": "EP3 BTCC",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e04"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "288"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e3a"
+    },
+    "vehicle_id": 18,
+    "number": 26,
+    "brand": "Honda",
+    "model": "CIVIC",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e05"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "26"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e3b"
+    },
+    "vehicle_id": 19,
+    "number": 118,
+    "brand": "Acura",
+    "model": "INTEGRA",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e06"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e07"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "118"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e3c"
+    },
+    "vehicle_id": 20,
+    "number": 84,
+    "brand": "Nissan",
+    "model": "TIIDA",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e08"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "84"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e3d"
+    },
+    "vehicle_id": 21,
+    "number": 133,
+    "brand": "Honda",
+    "model": "INTEGRA TYPE R",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e09"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 6,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "133"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e3e"
+    },
+    "vehicle_id": 22,
+    "number": 25,
+    "brand": "Honda",
+    "model": "CIVIC EG",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e0a"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 6,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "25"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e3f"
+    },
+    "vehicle_id": 23,
+    "number": 71,
+    "brand": "Honda",
+    "model": "CIVIC",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e0b"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 6,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "71"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e40"
+    },
+    "vehicle_id": 24,
+    "number": 8,
+    "brand": "Honda",
+    "model": "CIVIC EG",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e0c"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 6,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "8"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e41"
+    },
+    "vehicle_id": 25,
+    "number": 29,
+    "brand": "Honda",
+    "model": "CIVIC EG",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e0d"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 6,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "29"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e42"
+    },
+    "vehicle_id": 26,
+    "number": 88,
+    "brand": "Nissan",
+    "model": "350Z",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e0e"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "88"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e43"
+    },
+    "vehicle_id": 27,
+    "number": 19,
+    "brand": "Honda",
+    "model": "CIVIC SI",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e10"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "19"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e44"
+    },
+    "vehicle_id": 28,
+    "number": 2,
+    "brand": "Honda",
+    "model": "CIVIC",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e11"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e25"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": 39,
+    "display_number": "2",
+    "photos": []
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e45"
+    },
+    "vehicle_id": 29,
+    "number": 73,
+    "brand": "Honda",
+    "model": "CIVIC SI",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e12"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "73"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e46"
+    },
+    "vehicle_id": 30,
+    "number": 26,
+    "brand": "Honda",
+    "model": "CIVIC FG2",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e13"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "26"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e47"
+    },
+    "vehicle_id": 31,
+    "number": 24,
+    "brand": "Bmw",
+    "model": "135I",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e14"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "24"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e48"
+    },
+    "vehicle_id": 32,
+    "number": 66,
+    "brand": "Subaru",
+    "model": "BRZ",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e15"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "66"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e49"
+    },
+    "vehicle_id": 33,
+    "number": 37,
+    "brand": "Hyundai",
+    "model": "VELOSTER",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e16"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e1f"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": 53,
+    "display_number": "37"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e4a"
+    },
+    "vehicle_id": 34,
+    "number": 17,
+    "brand": "Mini Cooper",
+    "model": "JCW R56",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e17"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "17"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e4b"
+    },
+    "vehicle_id": 35,
+    "number": 12,
+    "brand": "Bmw",
+    "model": "M135I",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e18"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "12"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e4c"
+    },
+    "vehicle_id": 36,
+    "number": 44,
+    "brand": "Nissan",
+    "model": "ALMERA",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e19"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "044"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e4d"
+    },
+    "vehicle_id": 37,
+    "number": 22,
+    "brand": "Bmw",
+    "model": "M135I",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e1b"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e23"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": 57,
+    "display_number": "22"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e4e"
+    },
+    "vehicle_id": 38,
+    "number": 53,
+    "brand": "Mini Cooper",
+    "model": "S R53",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e1c"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "53"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e4f"
+    },
+    "vehicle_id": 39,
+    "number": 31,
+    "brand": "Honda",
+    "model": "CIVIC SI",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e1d"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "31"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e50"
+    },
+    "vehicle_id": 40,
+    "number": 13,
+    "brand": "Bmw",
+    "model": "E46 330",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e1e"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "13"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e51"
+    },
+    "vehicle_id": 41,
+    "number": 30,
+    "brand": "Honda",
+    "model": "CIVIC K24",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e20"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "30"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e52"
+    },
+    "vehicle_id": 42,
+    "number": 51,
+    "brand": "Honda",
+    "model": "CIVIC EG",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e21"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "51"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e53"
+    },
+    "vehicle_id": 43,
+    "number": 29,
+    "brand": "Lotus",
+    "model": "ELISE",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e22"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "29"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e54"
+    },
+    "vehicle_id": 44,
+    "number": 34,
+    "brand": "Honda",
+    "model": "SI",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e24"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "34"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e55"
+    },
+    "vehicle_id": 45,
+    "number": 14,
+    "brand": "Honda",
+    "model": "CIVIC SI",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e26"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "14"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e56"
+    },
+    "vehicle_id": 46,
+    "number": 8,
+    "brand": "Honda",
+    "model": "CIVIC EK TYPE R",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e27"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "8"
+  },
+  {
+    "_id": {
+      "$oid": "6a899cc72520146239296e57"
+    },
+    "vehicle_id": 47,
+    "number": 32,
+    "brand": "Suzuki",
+    "model": "SWIFT SPORT",
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e28"
+        }
+      }
+    ],
+    "category_id": 3,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "32"
+  },
+  {
+    "_id": {
+      "$oid": "6a89a1ed99e3a3c98da27950"
+    },
+    "vehicle_id": 48,
+    "number": 12,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "NARANJA",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df1"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "12"
+  },
+  {
+    "_id": {
+      "$oid": "6a89a1ed99e3a3c98da27951"
+    },
+    "vehicle_id": 49,
+    "number": 88,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "ROJO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df2"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "88"
+  },
+  {
+    "_id": {
+      "$oid": "6a89a1ed99e3a3c98da27952"
+    },
+    "vehicle_id": 50,
+    "number": 8,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "CELESTE",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296df4"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "8"
+  },
+  {
+    "_id": {
+      "$oid": "6a89a1ee99e3a3c98da27954"
+    },
+    "vehicle_id": 51,
+    "number": 72,
+    "brand": "Changan",
+    "model": "ALSVIN",
+    "color": "AZUL",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89a1ed99e3a3c98da27953"
+        }
+      }
+    ],
+    "category_id": 6,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "72"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453c8"
+    },
+    "vehicle_id": 52,
+    "number": 46,
+    "brand": "Lamborghini",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb645398"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "46"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453c9"
+    },
+    "vehicle_id": 53,
+    "number": 51,
+    "brand": "Lamborghini",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb645399"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "51"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453ca"
+    },
+    "vehicle_id": 54,
+    "number": 59,
+    "brand": "Lamborghini",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb64539a"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "59"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453cb"
+    },
+    "vehicle_id": 55,
+    "number": 44,
+    "brand": "Audi",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb64539b"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb64539c"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 1,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "44"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453cc"
+    },
+    "vehicle_id": 56,
+    "number": 3,
+    "brand": "Mc Laren",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb64539d"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb64539e"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": 69,
+    "display_number": "3"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453ce"
+    },
+    "vehicle_id": 58,
+    "number": 49,
+    "brand": "Lamborghini",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb6453a0"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb6453a1"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "49"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453cf"
+    },
+    "vehicle_id": 59,
+    "number": 7,
+    "brand": "Lamborghini",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb6453a2"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "7"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d0"
+    },
+    "vehicle_id": 60,
+    "number": 13,
+    "brand": "Porsche",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296dfa"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "13"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d1"
+    },
+    "vehicle_id": 61,
+    "number": 91,
+    "brand": "Porsche",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb6453a3"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453a4"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "91"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d2"
+    },
+    "vehicle_id": 62,
+    "number": 96,
+    "brand": "Porsche",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453a5"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "96"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d3"
+    },
+    "vehicle_id": 63,
+    "number": 69,
+    "brand": "Porsche",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453a6"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453a7"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "69"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d4"
+    },
+    "vehicle_id": 64,
+    "number": 16,
+    "brand": "Hyundai",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453a8"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "16"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d5"
+    },
+    "vehicle_id": 65,
+    "number": 570,
+    "brand": "Mitsubishi",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453a9"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "570"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d6"
+    },
+    "vehicle_id": 66,
+    "number": 73,
+    "brand": "Honda",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453aa"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "73"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d7"
+    },
+    "vehicle_id": 67,
+    "number": 95,
+    "brand": "Chevrolet",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e22"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "95"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d8"
+    },
+    "vehicle_id": 68,
+    "number": 29,
+    "brand": "Aston Martin",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453ab"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "29"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453d9"
+    },
+    "vehicle_id": 69,
+    "number": 24,
+    "brand": "Hyundai",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453ac"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453ad"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 2,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "24"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453da"
+    },
+    "vehicle_id": 70,
+    "number": 43,
+    "brand": "Lexus",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453ae"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 5,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "43",
+    "photos": [
+      "70-1.jpg"
+    ]
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453db"
+    },
+    "vehicle_id": 71,
+    "number": 17,
+    "brand": "Chevrolet",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453af"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 5,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "17"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453dc"
+    },
+    "vehicle_id": 72,
+    "number": 88,
+    "brand": "Chevrolet",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e0e"
+        }
+      }
+    ],
+    "category_id": 2,
+    "sub_category_id": 5,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "88"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453dd"
+    },
+    "vehicle_id": 73,
+    "number": 44,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b0"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 5,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "44"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453de"
+    },
+    "vehicle_id": 74,
+    "number": 92,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b1"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "92"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453df"
+    },
+    "vehicle_id": 75,
+    "number": 44,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e19"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "044"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e0"
+    },
+    "vehicle_id": 76,
+    "number": 2,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e11"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "2"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e1"
+    },
+    "vehicle_id": 77,
+    "number": 72,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b2"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "72"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e2"
+    },
+    "vehicle_id": 78,
+    "number": 31,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b3"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "31"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e3"
+    },
+    "vehicle_id": 79,
+    "number": 4,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b4"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 6,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "04"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e4"
+    },
+    "vehicle_id": 80,
+    "number": 1111,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc72520146239296e02"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "1111"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e5"
+    },
+    "vehicle_id": 81,
+    "number": 33,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b5"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "33"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e6"
+    },
+    "vehicle_id": 82,
+    "number": 69,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b6"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "69"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e7"
+    },
+    "vehicle_id": 83,
+    "number": 924,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b7"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "924"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e8"
+    },
+    "vehicle_id": 84,
+    "number": 58,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b8"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "58"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453e9"
+    },
+    "vehicle_id": 85,
+    "number": 145,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453b9"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "145"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453ea"
+    },
+    "vehicle_id": 86,
+    "number": 1820,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453ba"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 3,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "1820"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453eb"
+    },
+    "vehicle_id": 87,
+    "number": 777,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453bb"
+        }
+      }
+    ],
+    "category_id": 5,
+    "sub_category_id": 6,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "777"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453ec"
+    },
+    "vehicle_id": 88,
+    "number": 23,
+    "brand": null,
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453bc"
+        }
+      }
+    ],
+    "category_id": 4,
+    "sub_category_id": 4,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "23"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453ed"
+    },
+    "vehicle_id": 89,
+    "number": 41,
+    "brand": "Audi",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453bd"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "41"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453ee"
+    },
+    "vehicle_id": 90,
+    "number": 22,
+    "brand": "Cupra",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453be"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "22"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453ef"
+    },
+    "vehicle_id": 91,
+    "number": 69,
+    "brand": "Hyundai",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453bf"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "69"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453f0"
+    },
+    "vehicle_id": 92,
+    "number": 47,
+    "brand": "Honda",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c0"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c1"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": 105,
+    "display_number": "47"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453f1"
+    },
+    "vehicle_id": 93,
+    "number": 3,
+    "brand": "Hyundai",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c2"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c3"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "3"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453f2"
+    },
+    "vehicle_id": 94,
+    "number": 12,
+    "brand": "Hyundai",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c4"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "12"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453f3"
+    },
+    "vehicle_id": 95,
+    "number": 83,
+    "brand": "Honda",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c5"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "83"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453f4"
+    },
+    "vehicle_id": 96,
+    "number": 33,
+    "brand": "Hyundai",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8aaca23fec6eb64539c"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "33"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453f5"
+    },
+    "vehicle_id": 97,
+    "number": 48,
+    "brand": "Honda",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c6"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "48"
+  },
+  {
+    "_id": {
+      "$oid": "6a89f8abca23fec6eb6453f6"
+    },
+    "vehicle_id": 98,
+    "number": 42,
+    "brand": "Hyundai",
+    "model": null,
+    "color": null,
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a89f8abca23fec6eb6453c7"
+        }
+      }
+    ],
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true,
+    "active_pilot_id": null,
+    "display_number": "42"
+  },
+  {
+    "_id": {
+      "$oid": "6a94bfdc4f06f1f08ec8ccc5"
+    },
+    "vehicle_id": 99,
+    "number": 23,
+    "display_number": "23",
+    "brand": "AUDI",
+    "model": "A5",
+    "color": "ROSADO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a94bf3a4f06f1f08ec8ccc4"
+        }
+      }
+    ],
+    "active_pilot_id": null,
+    "category_id": 2,
+    "sub_category_id": 4,
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94f314ccf0fc1797366399"
+    },
+    "vehicle_id": 100,
+    "number": 17,
+    "display_number": "17",
+    "brand": "rush",
+    "model": "rush",
+    "color": "verde",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a94f288ccf0fc1797366397"
+        }
+      }
+    ],
+    "active_pilot_id": null,
+    "category_id": 7,
+    "sub_category_id": null,
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94f79bccf0fc179736639b"
+    },
+    "vehicle_id": 101,
+    "number": 69,
+    "display_number": "69",
+    "brand": "Honda",
+    "model": "Cívic Type R",
+    "color": "Blanco ",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a94f6e4ccf0fc179736639a"
+        }
+      }
+    ],
+    "active_pilot_id": null,
+    "category_id": 1,
+    "sub_category_id": null,
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94fdceccf0fc179736639e"
+    },
+    "vehicle_id": 102,
+    "number": 7,
+    "display_number": "7",
+    "brand": "CHANGAN",
+    "model": "ALSVIN",
+    "color": "ROSADO",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a899cc62520146239296deb"
+        }
+      },
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a94f288ccf0fc1797366397"
+        }
+      }
+    ],
+    "active_pilot_id": null,
+    "category_id": 6,
+    "sub_category_id": 2,
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a950225ccf0fc17973663a2"
+    },
+    "vehicle_id": 103,
+    "number": 0,
+    "display_number": "0",
+    "brand": "Honda",
+    "model": "Civic EG",
+    "color": "Rosado",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a9501d3ccf0fc17973663a1"
+        }
+      }
+    ],
+    "active_pilot_id": null,
+    "category_id": 9,
+    "sub_category_id": 2,
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a96696d3526d37448cc9988"
+    },
+    "vehicle_id": 104,
+    "number": 23,
+    "display_number": "23",
+    "brand": "Changan",
+    "model": "Alsvin",
+    "color": "Rosado",
+    "pilots": [
+      {
+        "$ref": "pilots",
+        "$id": {
+          "$oid": "6a94bf3a4f06f1f08ec8ccc4"
+        }
+      }
+    ],
+    "active_pilot_id": null,
+    "category_id": 6,
+    "sub_category_id": 2,
+    "is_active": true
+  }
+]

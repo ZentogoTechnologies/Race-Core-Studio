@@ -1,103 +1,196 @@
-[{
-  "_id": {
-    "$oid": "6a80077e989732b6737e7e19"
+[
+  {
+    "_id": {
+      "$oid": "6a80077e989732b6737e7e19"
+    },
+    "category_id": 1,
+    "category_name": "TCR",
+    "discipline": "circuito",
+    "description": null,
+    "sub_categories": [],
+    "logo": "1.png"
   },
-  "category_id": 1,
-  "category_name": "TCR",
-  "discipline": "circuito",
-  "description": "",
-  "sub_categories": []
-},
-{
-  "_id": {
-    "$oid": "6a80077e989732b6737e7e1a"
+  {
+    "_id": {
+      "$oid": "6a80077e989732b6737e7e1a"
+    },
+    "category_id": 2,
+    "category_name": "GT Challenge",
+    "discipline": "circuito",
+    "description": "GT Challenge",
+    "sub_categories": [
+      {
+        "sub_category_id": 1,
+        "sub_category_name": "GTS"
+      },
+      {
+        "sub_category_id": 2,
+        "sub_category_name": "GTS Jr"
+      },
+      {
+        "sub_category_id": 3,
+        "sub_category_name": "GTS Light"
+      },
+      {
+        "sub_category_id": 4,
+        "sub_category_name": "GTS Turbo"
+      },
+      {
+        "sub_category_id": 5,
+        "sub_category_name": "V8"
+      }
+    ],
+    "logo": "2.webp"
   },
-  "category_id": 2,
-  "category_name": "GT Challenge",
-  "discipline": "circuito",
-  "description": "GT Challenge",
-  "sub_categories": []
-},
-{
-  "_id": {
-    "$oid": "6a80077e989732b6737e7e1b"
+  {
+    "_id": {
+      "$oid": "6a80077e989732b6737e7e1b"
+    },
+    "category_id": 3,
+    "category_name": "Street Legal",
+    "discipline": "circuito",
+    "description": "",
+    "sub_categories": [
+      {
+        "sub_category_id": 1,
+        "sub_category_name": "Street Legal A"
+      },
+      {
+        "sub_category_id": 2,
+        "sub_category_name": "Street Legal B"
+      },
+      {
+        "sub_category_id": 3,
+        "sub_category_name": "Street Legal C"
+      }
+    ]
   },
-  "category_id": 3,
-  "category_name": "Street Legal",
-  "discipline": "circuito",
-  "description": "",
-  "sub_categories": [
-    {
-      "sub_category_id": 1,
-      "sub_category_name": "Street Legal A"
+  {
+    "_id": {
+      "$oid": "6a80077e989732b6737e7e1c"
     },
-    {
-      "sub_category_id": 2,
-      "sub_category_name": "Street Legal B"
-    },
-    {
-      "sub_category_id": 3,
-      "sub_category_name": "Street Legal C"
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "6a80077e989732b6737e7e1c"
+    "category_id": 4,
+    "category_name": "Super Turismo",
+    "discipline": "circuito",
+    "description": "Super Turismo",
+    "sub_categories": [
+      {
+        "sub_category_id": 1,
+        "sub_category_name": "Super Turismo 1"
+      },
+      {
+        "sub_category_id": 2,
+        "sub_category_name": "Super Turismo 2"
+      },
+      {
+        "sub_category_id": 3,
+        "sub_category_name": "Super Turismo 3"
+      },
+      {
+        "sub_category_id": 4,
+        "sub_category_name": "Super Turismo 4"
+      }
+    ]
   },
-  "category_id": 4,
-  "category_name": "Super Turismo",
-  "discipline": "circuito",
-  "description": "Super Turismo",
-  "sub_categories": [
-    {
-      "sub_category_id": 1,
-      "sub_category_name": "Super Turismo 1"
+  {
+    "_id": {
+      "$oid": "6a80077e989732b6737e7e1d"
     },
-    {
-      "sub_category_id": 2,
-      "sub_category_name": "Super Turismo 2"
-    },
-    {
-      "sub_category_id": 3,
-      "sub_category_name": "Super Turismo 3"
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "6a80077e989732b6737e7e1d"
+    "category_id": 5,
+    "category_name": "Gran Turismo",
+    "discipline": "circuito",
+    "description": "Gran Turismo",
+    "sub_categories": [
+      {
+        "sub_category_id": 1,
+        "sub_category_name": "Gran Turismo 1"
+      },
+      {
+        "sub_category_id": 2,
+        "sub_category_name": "Gran Turismo 2"
+      },
+      {
+        "sub_category_id": 3,
+        "sub_category_name": "Gran Turismo 3"
+      },
+      {
+        "sub_category_id": 4,
+        "sub_category_name": "Gran Turismo 4"
+      },
+      {
+        "sub_category_id": 5,
+        "sub_category_name": "Gran Turismo A"
+      },
+      {
+        "sub_category_id": 6,
+        "sub_category_name": "Gran Turismo B"
+      },
+      {
+        "sub_category_id": 7,
+        "sub_category_name": "Gran Turismo C"
+      }
+    ]
   },
-  "category_id": 5,
-  "category_name": "Gran Turismo",
-  "discipline": "circuito",
-  "description": "Gran Turismo",
-  "sub_categories": [
-    {
-      "sub_category_id": 1,
-      "sub_category_name": "Gran Turismo 1"
+  {
+    "_id": {
+      "$oid": "6a80077e989732b6737e7e1e"
     },
-    {
-      "sub_category_id": 2,
-      "sub_category_name": "Gran Turismo 2"
-    },
-    {
-      "sub_category_id": 3,
-      "sub_category_name": "Gran Turismo 3"
-    },
-    {
-      "sub_category_id": 4,
-      "sub_category_name": "Gran Turismo 4"
-    }
-  ]
-},
-{
-  "_id": {
-    "$oid": "6a80077e989732b6737e7e1e"
+    "category_id": 6,
+    "category_name": "Prospec Series",
+    "discipline": "circuito",
+    "description": "Mono Marca",
+    "sub_categories": [
+      {
+        "sub_category_id": 1,
+        "sub_category_name": "Pro"
+      },
+      {
+        "sub_category_id": 2,
+        "sub_category_name": "Amateur"
+      },
+      {
+        "sub_category_id": 3,
+        "sub_category_name": "Equipos Color"
+      }
+    ]
   },
-  "category_id": 6,
-  "category_name": "Mono Marca",
-  "discipline": "circuito",
-  "description": "Mono Marca",
-  "sub_categories": []
-}]
+  {
+    "_id": {
+      "$oid": "6a94f24cccf0fc1797366396"
+    },
+    "category_id": 7,
+    "category_name": "Rush",
+    "discipline": "circuito",
+    "sub_categories": [],
+    "description": "Monoplaza"
+  },
+  {
+    "_id": {
+      "$oid": "6a94f957ccf0fc179736639c"
+    },
+    "category_id": 8,
+    "category_name": "Moto Velocidad",
+    "discipline": "circuito",
+    "sub_categories": [],
+    "description": "Carreras de Moto "
+  },
+  {
+    "_id": {
+      "$oid": "6a9501a6ccf0fc17973663a0"
+    },
+    "category_id": 9,
+    "category_name": "DragWar",
+    "discipline": "drag",
+    "sub_categories": [
+      {
+        "sub_category_id": 1,
+        "sub_category_name": "Llantas de Calle - Low Prep"
+      },
+      {
+        "sub_category_id": 2,
+        "sub_category_name": "Llantas Slick"
+      }
+    ],
+    "description": "Abierto"
+  }
+]

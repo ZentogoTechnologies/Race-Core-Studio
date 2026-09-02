@@ -1,0 +1,50 @@
+[
+  {
+    "_id": {
+      "$oid": "6a946c1e518c15cc06b6dca3"
+    },
+    "trazado_id": 1,
+    "name": "Autódromo Panamá",
+    "variante": "Pista corta",
+    "discipline": "circuito",
+    "length_km": 2.5,
+    "image": "1-autodromo-panama.jpg",
+    "activo": false
+  },
+  {
+    "_id": {
+      "$oid": "6a946c1e518c15cc06b6dca5"
+    },
+    "trazado_id": 3,
+    "name": "Autódromo Panamá",
+    "variante": "Pista larga",
+    "discipline": "circuito",
+    "length_km": 3.6,
+    "image": "3-autodromo-panama.png",
+    "activo": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94eff0ccf0fc1797366394"
+    },
+    "trazado_id": 4,
+    "name": "Autodromo Panama",
+    "variante": "Drag",
+    "discipline": "drag",
+    "length_km": 0.4,
+    "image": "4-autodromo-panama.png",
+    "activo": false
+  },
+  {
+    "_id": {
+      "$oid": "6a978aed56cb02ae3f612b22"
+    },
+    "trazado_id": 5,
+    "name": "Autódromo Panamá",
+    "variante": "Karting",
+    "discipline": "circuito",
+    "length_km": null,
+    "image": "5-autodromo-panama.png",
+    "activo": false
+  }
+]

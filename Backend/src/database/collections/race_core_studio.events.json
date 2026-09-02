@@ -1,0 +1,1238 @@
+[
+  {
+    "_id": {
+      "$oid": "6a9443211470f46585a146b8"
+    },
+    "event_id": 1,
+    "name": "Prospec Series",
+    "start_date": "2026-08-20",
+    "end_date": "2026-08-22",
+    "discipline": "circuito",
+    "location": "Autódromo Panamá",
+    "category_ids": [
+      5,
+      6,
+      3,
+      4,
+      1
+    ],
+    "inscritos": [
+      {
+        "vehicle_id": 73,
+        "pilot_ids": [
+          88
+        ],
+        "category_id": 5,
+        "sub_category_id": 5
+      },
+      {
+        "vehicle_id": 79,
+        "pilot_ids": [
+          92
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 24,
+        "pilot_ids": [
+          34
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 22,
+        "pilot_ids": [
+          32
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 25,
+        "pilot_ids": [
+          35
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 23,
+        "pilot_ids": [
+          33
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 21,
+        "pilot_ids": [
+          31
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 87,
+        "pilot_ids": [
+          99
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 35,
+        "pilot_ids": [
+          46
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 40,
+        "pilot_ids": [
+          52
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 45,
+        "pilot_ids": [
+          60
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 34,
+        "pilot_ids": [
+          45
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 37,
+        "pilot_ids": [
+          49,
+          57
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 31,
+        "pilot_ids": [
+          42
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 30,
+        "pilot_ids": [
+          41
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 43,
+        "pilot_ids": [
+          56
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 41,
+        "pilot_ids": [
+          54
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 47,
+        "pilot_ids": [
+          62
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 33,
+        "pilot_ids": [
+          53,
+          44
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 42,
+        "pilot_ids": [
+          55
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 38,
+        "pilot_ids": [
+          50
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 29,
+        "pilot_ids": [
+          40
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 26,
+        "pilot_ids": [
+          36
+        ],
+        "category_id": 3,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 28,
+        "pilot_ids": [
+          39,
+          59
+        ],
+        "category_id": 3,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 46,
+        "pilot_ids": [
+          61
+        ],
+        "category_id": 3,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 27,
+        "pilot_ids": [
+          38
+        ],
+        "category_id": 3,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 39,
+        "pilot_ids": [
+          51
+        ],
+        "category_id": 3,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 44,
+        "pilot_ids": [
+          58
+        ],
+        "category_id": 3,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 36,
+        "pilot_ids": [
+          47
+        ],
+        "category_id": 3,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 32,
+        "pilot_ids": [
+          43
+        ],
+        "category_id": 3,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 76,
+        "pilot_ids": [
+          39
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 18,
+        "pilot_ids": [
+          27
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 15,
+        "pilot_ids": [
+          22
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 78,
+        "pilot_ids": [
+          91
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 81,
+        "pilot_ids": [
+          93
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 75,
+        "pilot_ids": [
+          47
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 84,
+        "pilot_ids": [
+          96
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 14,
+        "pilot_ids": [
+          21
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 20,
+        "pilot_ids": [
+          30
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 16,
+        "pilot_ids": [
+          23
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 85,
+        "pilot_ids": [
+          97
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 17,
+        "pilot_ids": [
+          26
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 80,
+        "pilot_ids": [
+          24
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 86,
+        "pilot_ids": [
+          98
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      }
+    ],
+    "sesiones": [],
+    "is_active": true,
+    "image": "1.png"
+  },
+  {
+    "_id": {
+      "$oid": "6a946fcd18ab986d1130326c"
+    },
+    "event_id": 2,
+    "name": "500 Km de Panamá",
+    "start_date": "2026-06-04",
+    "end_date": "2026-06-06",
+    "discipline": "circuito",
+    "location": "Autódromo Panamá",
+    "category_ids": [
+      2
+    ],
+    "inscritos": [
+      {
+        "vehicle_id": 55,
+        "pilot_ids": [
+          67,
+          68
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 52,
+        "pilot_ids": [
+          64
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 53,
+        "pilot_ids": [
+          65
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 54,
+        "pilot_ids": [
+          66
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 64,
+        "pilot_ids": [
+          80
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 69,
+        "pilot_ids": [
+          84,
+          85
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 68,
+        "pilot_ids": [
+          83
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 66,
+        "pilot_ids": [
+          82
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 67,
+        "pilot_ids": [
+          56
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 65,
+        "pilot_ids": [
+          81
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 59,
+        "pilot_ids": [
+          74
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 60,
+        "pilot_ids": [
+          16
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 58,
+        "pilot_ids": [
+          72,
+          73
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 63,
+        "pilot_ids": [
+          78,
+          79
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 61,
+        "pilot_ids": [
+          75,
+          76
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 62,
+        "pilot_ids": [
+          77
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 1,
+        "pilot_ids": [
+          71
+        ],
+        "category_id": 2,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 56,
+        "pilot_ids": [
+          69,
+          70
+        ],
+        "category_id": 2,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 71,
+        "pilot_ids": [
+          87
+        ],
+        "category_id": 2,
+        "sub_category_id": 5
+      },
+      {
+        "vehicle_id": 70,
+        "pilot_ids": [
+          86
+        ],
+        "category_id": 2,
+        "sub_category_id": 5
+      },
+      {
+        "vehicle_id": 72,
+        "pilot_ids": [
+          36
+        ],
+        "category_id": 2,
+        "sub_category_id": 5
+      },
+      {
+        "vehicle_id": 99,
+        "pilot_ids": [
+          113
+        ],
+        "category_id": 2,
+        "sub_category_id": 4
+      }
+    ],
+    "sesiones": [],
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94fbd3ccf0fc179736639d"
+    },
+    "event_id": 3,
+    "name": "prueba",
+    "start_date": "2026-09-03",
+    "end_date": "2026-09-05",
+    "discipline": "circuito",
+    "location": "ap",
+    "category_ids": [
+      6,
+      7
+    ],
+    "inscritos": [
+      {
+        "vehicle_id": 4,
+        "pilot_ids": [
+          4
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 50,
+        "pilot_ids": [
+          10
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 3,
+        "pilot_ids": [
+          3
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 48,
+        "pilot_ids": [
+          7
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 10,
+        "pilot_ids": [
+          16
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 2,
+        "pilot_ids": [
+          2
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 9,
+        "pilot_ids": [
+          15
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 5,
+        "pilot_ids": [
+          5
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 6,
+        "pilot_ids": [
+          6
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 12,
+        "pilot_ids": [
+          18
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 7,
+        "pilot_ids": [
+          9
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 51,
+        "pilot_ids": [
+          63
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 11,
+        "pilot_ids": [
+          17
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 49,
+        "pilot_ids": [
+          8
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 8,
+        "pilot_ids": [
+          13,
+          14
+        ],
+        "category_id": 6,
+        "sub_category_id": null
+      }
+    ],
+    "sesiones": [],
+    "is_active": true
+  },
+  {
+    "_id": {
+      "$oid": "6a94ffdbccf0fc179736639f"
+    },
+    "event_id": 4,
+    "name": "GT Challenge de las Américas",
+    "start_date": "2026-03-12",
+    "end_date": "2026-03-14",
+    "discipline": "circuito",
+    "location": "Autódromo Panamá",
+    "category_ids": [
+      2,
+      4,
+      5,
+      1
+    ],
+    "inscritos": [
+      {
+        "vehicle_id": 55,
+        "pilot_ids": [
+          68
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 52,
+        "pilot_ids": [
+          64
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 53,
+        "pilot_ids": [
+          65
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 54,
+        "pilot_ids": [
+          66
+        ],
+        "category_id": 2,
+        "sub_category_id": 1
+      },
+      {
+        "vehicle_id": 64,
+        "pilot_ids": [
+          80
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 69,
+        "pilot_ids": [
+          84
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 68,
+        "pilot_ids": [
+          83
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 66,
+        "pilot_ids": [
+          82
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 67,
+        "pilot_ids": [
+          56
+        ],
+        "category_id": 2,
+        "sub_category_id": 2
+      },
+      {
+        "vehicle_id": 60,
+        "pilot_ids": [
+          16
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 58,
+        "pilot_ids": [
+          72,
+          73
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 63,
+        "pilot_ids": [
+          78,
+          79
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 62,
+        "pilot_ids": [
+          77
+        ],
+        "category_id": 2,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 1,
+        "pilot_ids": [
+          71
+        ],
+        "category_id": 2,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 56,
+        "pilot_ids": [
+          69,
+          70
+        ],
+        "category_id": 2,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 99,
+        "pilot_ids": [
+          113
+        ],
+        "category_id": 2,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 71,
+        "pilot_ids": [
+          87
+        ],
+        "category_id": 2,
+        "sub_category_id": 5
+      },
+      {
+        "vehicle_id": 70,
+        "pilot_ids": [
+          86
+        ],
+        "category_id": 2,
+        "sub_category_id": 5
+      },
+      {
+        "vehicle_id": 76,
+        "pilot_ids": [
+          39
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 18,
+        "pilot_ids": [
+          27
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 15,
+        "pilot_ids": [
+          22
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 78,
+        "pilot_ids": [
+          91
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 81,
+        "pilot_ids": [
+          93
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 75,
+        "pilot_ids": [
+          47
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 84,
+        "pilot_ids": [
+          96
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 14,
+        "pilot_ids": [
+          21
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 20,
+        "pilot_ids": [
+          30
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 16,
+        "pilot_ids": [
+          23
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 85,
+        "pilot_ids": [
+          97
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 17,
+        "pilot_ids": [
+          26
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 80,
+        "pilot_ids": [
+          24
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 86,
+        "pilot_ids": [
+          98
+        ],
+        "category_id": 4,
+        "sub_category_id": 3
+      },
+      {
+        "vehicle_id": 13,
+        "pilot_ids": [
+          19,
+          20
+        ],
+        "category_id": 4,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 88,
+        "pilot_ids": [
+          100
+        ],
+        "category_id": 4,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 82,
+        "pilot_ids": [
+          94
+        ],
+        "category_id": 4,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 77,
+        "pilot_ids": [
+          90
+        ],
+        "category_id": 4,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 74,
+        "pilot_ids": [
+          89
+        ],
+        "category_id": 4,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 19,
+        "pilot_ids": [
+          28,
+          29
+        ],
+        "category_id": 4,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 83,
+        "pilot_ids": [
+          95
+        ],
+        "category_id": 4,
+        "sub_category_id": 4
+      },
+      {
+        "vehicle_id": 73,
+        "pilot_ids": [
+          88
+        ],
+        "category_id": 5,
+        "sub_category_id": 5
+      },
+      {
+        "vehicle_id": 79,
+        "pilot_ids": [
+          92
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 24,
+        "pilot_ids": [
+          34
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 22,
+        "pilot_ids": [
+          32
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 25,
+        "pilot_ids": [
+          35
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 23,
+        "pilot_ids": [
+          33
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 21,
+        "pilot_ids": [
+          31
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 87,
+        "pilot_ids": [
+          99
+        ],
+        "category_id": 5,
+        "sub_category_id": 6
+      },
+      {
+        "vehicle_id": 93,
+        "pilot_ids": [
+          106,
+          107
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 94,
+        "pilot_ids": [
+          108
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 90,
+        "pilot_ids": [
+          102
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 96,
+        "pilot_ids": [
+          68
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 89,
+        "pilot_ids": [
+          101
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 92,
+        "pilot_ids": [
+          105
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 98,
+        "pilot_ids": [
+          111
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 97,
+        "pilot_ids": [
+          110
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 91,
+        "pilot_ids": [
+          103
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 101,
+        "pilot_ids": [
+          116
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      },
+      {
+        "vehicle_id": 95,
+        "pilot_ids": [
+          109
+        ],
+        "category_id": 1,
+        "sub_category_id": null
+      }
+    ],
+    "sesiones": [],
+    "is_active": true,
+    "image": "4.webp"
+  },
+  {
+    "_id": {
+      "$oid": "6a950295ccf0fc17973663a3"
+    },
+    "event_id": 5,
+    "name": "DragWar",
+    "start_date": "2026-09-19",
+    "end_date": "2026-09-19",
+    "discipline": "drag",
+    "location": "Autódromo Panamá",
+    "category_ids": [
+      9
+    ],
+    "inscritos": [
+      {
+        "vehicle_id": 103,
+        "pilot_ids": [
+          117
+        ],
+        "category_id": 9,
+        "sub_category_id": 2
+      }
+    ],
+    "sesiones": [],
+    "is_active": true
+  }
+]
