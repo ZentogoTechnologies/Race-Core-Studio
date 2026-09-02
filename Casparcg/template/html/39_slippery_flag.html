@@ -2,37 +2,67 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Estado de la Carrera</title>
-
+    <title>Bandera a rayas</title>
     <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/totem_names.css">
-    <link rel="stylesheet" href="../css/flags.css">
+    <link rel="stylesheet" href="../css/torre_medidas.css">
+    <link rel="stylesheet" href="../css/banderas.css">
 </head>
-
 <body>
 
-<div class="leaderboard">
+<div class="bandera-barra" id="barra">
 
-    <div class="lb-header">
+    <div class="bandera-logo">
+        <img src="../img/logo-cliente.png" alt="">
+    </div>
 
-        <div class="lb-logo">
-            <img src="../img/logo-cliente.png" alt="Autódromo Panamá">
+    <div class="bandera-panel" id="panel">
+        <div class="bandera-caja">
+            <span class="trapo rayas"></span>
+            <span class="bandera-texto">
+                <span class="bandera-nombre">Bandera a rayas</span>
+                <span class="bandera-sentido">Poca adherencia en el circuito</span>
+            </span>
         </div>
-
-       <div class="lb-info-slippery">
-
-            <div class="lb-heat flag">
-                <span class="status-title"></span>
-                <span class="status-value">SLIPPERY</span>
-            </div>
-
-        </div>
-
     </div>
 
 </div>
 
-<script src="../js/flags.js"></script>
+<script>
+
+/* ==========================================================================
+   BANDERA A RAYAS
+
+   Todas las banderas comparten esqueleto y hoja de estilo: lo único que
+   cambia es el trapo que se dibuja y el texto. Antes cada una llevaba su
+   propio panel de color con el nombre encima, sin el dibujo ni el
+   significado.
+
+   Miden lo mismo que la torre porque se dibujan sobre su cabecera: la
+   medida sale de torre_medidas.css, que es de donde la toma el tótem.
+========================================================================== */
+
+function play(){
+    document.getElementById("panel").classList.add("abierta");
+}
+
+function stop(){
+    document.getElementById("panel").classList.remove("abierta");
+}
+
+function update(data){
+    /* Se acepta cambiar el texto al vuelo, por si hace falta matizar algo
+       en directo: {"sentido":"..."} */
+    try {
+        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
+
+        if (d.nombre)  document.querySelector(".bandera-nombre").textContent  = d.nombre;
+        if (d.sentido) document.querySelector(".bandera-sentido").textContent = d.sentido;
+    } catch (e) { /* un UPDATE con basura no puede tumbar el gráfico */ }
+}
+
+if (!window.__casparcg) { play(); }
+
+</script>
 
 </body>
 </html>

@@ -1,0 +1,251 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   BANDERAS
+
+   Se dibujan sobre la cabecera de la torre, así que miden lo mismo que
+   ella: las medidas salen de torre_medidas.css, que es de donde las toma
+   el tótem. Cambiar el ancho de la torre las mueve a las dos.
+
+   Cada bandera muestra el trapo de verdad —los cuadros del damero, la
+   diagonal, el círculo naranja, las rayas— y no solo un panel de color
+   con el nombre. Un panel amarillo dice "pasa algo", el dibujo dice qué.
+========================================================================== */
+
+.bandera-barra{
+
+    position:absolute;
+
+    top:var(--tf-margen, 34px);
+    left:var(--tf-margen, 34px);
+
+    /* max-content y no un ancho fijo: el panel se despliega desde cero y
+       con ancho fijo el fondo oscuro asomaría antes de que salga. */
+    width:max-content;
+
+    display:flex;
+
+    border-radius:6px;
+
+    overflow:hidden;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+
+    font-family:"Titillium Web","Segoe UI",Arial,sans-serif;
+}
+
+
+/* ===================================
+   LOGO DEL CLIENTE
+=================================== */
+
+.bandera-logo{
+
+    width:var(--tf-logo-ancho, 103px);
+
+    height:var(--tf-cabecera-alto, 70px);
+
+    flex:0 0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:var(--tf-logo, rgba(0,0,0,.74));
+
+    position:relative;
+}
+
+/* Filo rojo a la izquierda, la misma firma que lleva la torre. */
+.bandera-logo::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0; top:0; bottom:0;
+
+    width:5px;
+
+    background:var(--tf-acento, #D50000);
+}
+
+.bandera-logo img{
+
+    width:var(--tf-logo-img, 75px);
+
+    height:auto;
+}
+
+
+/* ===================================
+   PANEL
+=================================== */
+
+.bandera-panel{
+
+    width:0;
+
+    height:var(--tf-cabecera-alto, 70px);
+
+    flex:0 0 auto;
+
+    overflow:hidden;
+
+    background:#0d0e11;
+
+    transition:width .45s cubic-bezier(.22,.61,.36,1);
+}
+
+.bandera-panel.abierta{
+
+    width:var(--tf-panel-bandera, 289px);
+}
+
+.bandera-caja{
+
+    width:var(--tf-panel-bandera, 289px);
+
+    height:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:11px;
+
+    padding:0 13px;
+}
+
+.bandera-texto{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    gap:3px;
+
+    min-width:0;
+}
+
+.bandera-nombre{
+
+    /* 13px y no 16: el panel mide lo que la cabecera de la torre y
+       "Bandera negra y blanca" no entraba, se cortaba a media palabra. */
+    font-size:13px;
+
+    font-weight:900;
+
+    letter-spacing:.4px;
+
+    text-transform:uppercase;
+
+    color:#FFFFFF;
+
+    line-height:1.05;
+}
+
+/* El significado en pequeño debajo: es lo que hace falta cuando alguien
+   no se sabe las banderas de memoria, que es casi todo el público. */
+.bandera-sentido{
+
+    font-size:10px;
+
+    font-weight:600;
+
+    letter-spacing:.2px;
+
+    color:rgba(255,255,255,.62);
+
+    line-height:1.15;
+}
+
+
+/* ==========================================================================
+   EL TRAPO
+
+   Cada una con su diseño real. Van dibujadas con degradados y no con
+   imágenes: pesan cero, escalan sin perder filo y se pueden retocar sin
+   volver a exportar nada.
+========================================================================== */
+
+.trapo{
+
+    width:46px;
+    height:32px;
+
+    flex:0 0 auto;
+
+    border-radius:3px;
+
+    /* Un filo claro las despega del panel oscuro; sin él la negra
+       desaparecía contra el fondo. */
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,.22),
+        0 2px 6px rgba(0,0,0,.6);
+
+    position:relative;
+
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.trapo.verde   { background:#00A03B; }
+.trapo.amarilla{ background:#F5C400; }
+.trapo.roja    { background:#E00711; }
+.trapo.blanca  { background:#F4F4F4; }
+.trapo.azul    { background:#0B57A4; }
+.trapo.negra   { background:#141414; }
+
+/* Damero. Dos degradados cruzados a 45 grados dan el tablero sin una
+   sola imagen; el tamaño del cuadro es la mitad del paso. */
+.trapo.cuadros{
+
+    background-color:#FFFFFF;
+
+    background-image:
+        linear-gradient(45deg,  #111 25%, transparent 25%, transparent 75%, #111 75%),
+        linear-gradient(45deg,  #111 25%, transparent 25%, transparent 75%, #111 75%);
+
+    background-size:13px 13px;
+
+    background-position:0 0, 6.5px 6.5px;
+}
+
+/* Rayas verticales rojas y amarillas: poca adherencia. */
+.trapo.rayas{
+
+    background:repeating-linear-gradient(
+        90deg,
+        #E00711 0,   #E00711 8px,
+        #F5C400 8px, #F5C400 16px);
+}
+
+/* Partida en diagonal, blanca arriba y negra abajo. */
+.trapo.diagonal{
+
+    background:linear-gradient(45deg, #141414 0%, #141414 50%, #F4F4F4 50%, #F4F4F4 100%);
+}
+
+/* El círculo naranja de la de penalización. */
+.trapo .circulo{
+
+    width:18px;
+    height:18px;
+
+    border-radius:50%;
+
+    background:#F08A24;
+}
+
+.trapo.safety svg{
+
+    width:38px;
+
+    height:auto;
+}

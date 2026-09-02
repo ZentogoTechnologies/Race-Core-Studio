@@ -73,6 +73,9 @@ TEMPLATES: dict[str, Template] = {
         Template("bandera-negra",    "Bandera Negra",      "flag", 30, "html/37_black_flag"),
         Template("bandera-mecanica", "Problema Mecánico",  "flag", 30, "html/38_meatball_flag"),
         Template("pista-resbaladiza","Pista Resbaladiza",  "flag", 30, "html/39_slippery_flag"),
+        # La negra y blanca faltaba: es la llamada de atención previa a la
+        # negra, y sin ella no se puede avisar sin descalificar.
+        Template("bandera-advertencia","Llamada de Atención", "flag", 30, "html/3A_warning_flag"),
 
         # ── Grilla de partida (capa 40) ───────────────────────
         Template("grilla",      "Grilla de Partida",   "grid", 40, "html/40_starting_grid_names", accepts_data=True),

@@ -88,26 +88,30 @@ const BACKGROUNDS = [
 
 // ─── Banderas: en orden de carrera, cada una con su color ─────
 const BANDERAS = [
-  { id: 'bandera-verde',    label: 'Verde',      nombre: 'Bandera Verde',      detalle: 'Pista habilitada',            Icon: Flag,
+  { id: 'bandera-verde',    label: 'Verde',      nombre: 'Bandera Verde',      detalle: 'El peligro ha pasado',            Icon: Flag,
     icon: 'text-green-500',  border: 'border-green-500',  bgActive: 'bg-green-500/10',  dot: 'bg-green-500' },
-  { id: 'bandera-amarilla', label: 'Amarilla',   nombre: 'Bandera Amarilla',   detalle: 'Precaución en pista',         Icon: Flag,
+  { id: 'bandera-amarilla', label: 'Amarilla',   nombre: 'Bandera Amarilla',   detalle: 'Peligro en la pista',         Icon: Flag,
     icon: 'text-yellow-400', border: 'border-yellow-400', bgActive: 'bg-yellow-400/10', dot: 'bg-yellow-400' },
   { id: 'safety-car',       label: 'Safety Car', nombre: 'Safety Car',         detalle: 'Coche de seguridad en pista', Icon: Siren,
     icon: 'text-orange-400', border: 'border-orange-500', bgActive: 'bg-orange-500/10', dot: 'bg-orange-400' },
-  { id: 'pista-resbaladiza', label: 'Resbaladiza', nombre: 'Pista Resbaladiza', detalle: 'Aceite o agua en pista',    Icon: Droplets,
+  { id: 'pista-resbaladiza', label: 'Resbaladiza', nombre: 'Pista Resbaladiza', detalle: 'Poca adherencia en el circuito',    Icon: Droplets,
     icon: 'text-amber-400',  border: 'border-amber-500',  bgActive: 'bg-amber-500/10',  dot: 'bg-amber-400' },
-  { id: 'bandera-azul',     label: 'Azul',       nombre: 'Bandera Azul',       detalle: 'Ceder el paso al líder',      Icon: Flag,
+  { id: 'bandera-azul',     label: 'Azul',       nombre: 'Bandera Azul',       detalle: 'Ceder el paso al que viene rápido',      Icon: Flag,
     icon: 'text-blue-500',   border: 'border-blue-500',   bgActive: 'bg-blue-500/10',   dot: 'bg-blue-500' },
-  { id: 'bandera-mecanica', label: 'Mecánico',   nombre: 'Problema Mecánico',  detalle: 'El piloto debe entrar a boxes', Icon: Wrench,
+  { id: 'bandera-mecanica', label: 'Mecánico',   nombre: 'Problema Mecánico',  detalle: 'Auto con daños, debe ir a los pits', Icon: Wrench,
     icon: 'text-orange-500', border: 'border-orange-600', bgActive: 'bg-orange-600/10', dot: 'bg-orange-500' },
-  { id: 'bandera-negra',    label: 'Negra',      nombre: 'Bandera Negra',      detalle: 'Piloto descalificado',        Icon: Ban,
+  { id: 'bandera-negra',    label: 'Negra',      nombre: 'Bandera Negra',      detalle: 'Descalificación a un piloto',        Icon: Ban,
     icon: 'text-neutral-400', border: 'border-neutral-500', bgActive: 'bg-neutral-500/10', dot: 'bg-neutral-400' },
-  { id: 'bandera-roja',     label: 'Roja',       nombre: 'Bandera Roja',       detalle: 'Carrera detenida',            Icon: Flag,
+  { id: 'bandera-roja',     label: 'Roja',       nombre: 'Bandera Roja',       detalle: 'Sesión detenida por peligro',            Icon: Flag,
     icon: 'text-red-500',    border: 'border-red-600',    bgActive: 'bg-red-600/10',    dot: 'bg-red-500' },
-  { id: 'bandera-blanca',   label: 'Blanca',     nombre: 'Bandera Blanca',     detalle: 'Última vuelta',                Icon: Flag,
+  { id: 'bandera-blanca',   label: 'Blanca',     nombre: 'Bandera Blanca',     detalle: 'Hay un vehículo lento en pista',                Icon: Flag,
     icon: 'text-zinc-100',   border: 'border-zinc-200',   bgActive: 'bg-zinc-100/10',   dot: 'bg-zinc-100' },
-  { id: 'bandera-cuadros',  label: 'Cuadros',    nombre: 'Bandera de Cuadros', detalle: 'Fin de carrera',              Icon: CheckeredFlag,
+  { id: 'bandera-cuadros',  label: 'Cuadros',    nombre: 'Bandera de Cuadros', detalle: 'Fin de la carrera o sesión',              Icon: CheckeredFlag,
     icon: 'text-white',      border: 'border-white',      bgActive: 'bg-white/10',      dot: 'bg-white' },
+  // La llamada de atención: el aviso previo a la negra. Faltaba, y sin
+  // ella no hay forma de advertir a un piloto sin descalificarlo.
+  { id: 'bandera-advertencia', label: 'Atención', nombre: 'Llamada de Atención', detalle: 'Aviso por maniobra peligrosa', Icon: AlertTriangle,
+    icon: 'text-zinc-300',   border: 'border-zinc-400',   bgActive: 'bg-zinc-400/10',   dot: 'bg-zinc-300' },
 ]
 
 // ─── Misceláneos ──────────────────────────────────────────────
