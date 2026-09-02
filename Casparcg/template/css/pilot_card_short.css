@@ -21,7 +21,7 @@
 
 .brand-panel{
     width:150px;
-    height:210px;
+    height:186px;
 
     flex-shrink:0;
 
@@ -38,13 +38,13 @@
 
 .brand-logo{
     max-width:130px;
-    max-height:112px;
+    max-height:96px;
     object-fit:contain;
 }
 
 .brand-panel img{
     max-width:100px;
-    max-height:126px;
+    max-height:108px;
 }
 
 /* ==================================================
@@ -53,7 +53,7 @@
 
 .pilot-panel{
     width:0;
-    height:210px;
+    height:186px;
 
     overflow:hidden;
     white-space:nowrap;
@@ -73,7 +73,7 @@
     min-width:690px;
     max-width:690px;
 
-    padding:20px 35px;
+    padding:14px 32px;
 
     display:flex;
     flex-direction:column;
@@ -128,12 +128,12 @@
 
     /* Menos hueco entre el nombre y los datos: la subcategoría añadió una
        línea y el bloque quedaba pegado al borde de abajo. */
-    margin-bottom:10px;
+    margin-bottom:8px;
 }
 
 .pilot-name{
     font-family:"Impact","Arial Black",sans-serif;
-    font-size:37px;
+    font-size:33px;
     font-weight:400;
     letter-spacing: 1px;
     text-transform:uppercase;
@@ -143,7 +143,7 @@
 
 .car-number{
     font-family:"Impact","Arial Black",sans-serif;
-    font-size:46px;
+    font-size:41px;
     font-weight:400;
     line-height:1;
 
@@ -174,7 +174,7 @@
     margin-bottom:2px;
 
     font-family:"Rajdhani","Arial",sans-serif;
-    font-size:11px;
+    font-size:10px;
     font-weight:600;
     text-transform:uppercase;
     letter-spacing: .8px;
@@ -183,7 +183,7 @@
 
 .value{
     font-family:"Rajdhani","Arial",sans-serif;
-    font-size:19px;
+    font-size:17px;
     font-weight:700;
     line-height:1.1;
     letter-spacing: .5px;

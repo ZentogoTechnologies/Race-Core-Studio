@@ -267,7 +267,10 @@ function FormularioPersonal({
     ? narrador.nombre.trim() !== ''
     : tipo === 'categoria'
       ? categoriaCarta !== null
-      : pilotoId !== null && !faltaCategoria
+      // El duelo necesita a los dos: con uno solo no hay nada que comparar.
+      : tipo === 'duelo'
+        ? pilotoId !== null && pilotoRival !== null
+        : pilotoId !== null && !faltaCategoria
 
   const inputClass = 'w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white'
 
@@ -335,6 +338,43 @@ function FormularioPersonal({
               )}
             </>
           )}
+        </div>
+      ) : tipo === 'duelo' ? (
+        /* Dos desplegables, uno al lado del otro. La carta enfrenta a dos
+           pilotos, y no basta con saber quiénes son: hay que poder decir
+           cuál sale a la izquierda y cuál a la derecha, porque en pantalla
+           no es lo mismo. */
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            /* El rival va primero porque su foto es la que sale a la
+               izquierda: la carta conserva el formato de la de piloto, con
+               el titular y su foto a la derecha. Los rótulos siguen a lo
+               que se ve en pantalla, no al orden interno. */
+            { lado: 'Izquierda', valor: pilotoRival, poner: setPilotoRival, otro: pilotoId    },
+            { lado: 'Derecha',   valor: pilotoId,    poner: setPilotoId,    otro: pilotoRival },
+          ].map(({ lado, valor, poner, otro }) => (
+            <div key={lado}>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">
+                {lado}
+              </label>
+              <select
+                value={valor ?? ''}
+                onChange={e => poner(e.target.value === '' ? null : Number(e.target.value))}
+                className={inputClass}
+              >
+                <option value="">Elige un piloto...</option>
+                {pilotosRegistrados
+                  /* Fuera el que ya está en el otro lado: enfrentar a
+                     alguien consigo mismo no dice nada. */
+                  .filter(pi => pi.id !== otro)
+                  .map(pi => (
+                    <option key={pi.id} value={pi.id}>
+                      {pi.nombre} {pi.apellido}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          ))}
         </div>
       ) : tipo === 'narrador' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
