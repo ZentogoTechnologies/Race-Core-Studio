@@ -25,6 +25,9 @@ class PlayRequest(BaseModel):
     # Para el gráfico de Evento: el nombre y la imagen salen de la base.
     event_id: Optional[int] = Field(None, description="Evento que se está graficando")
 
+    # Segundo piloto de la carta VS. Solo lo usa ese gráfico.
+    pilot_id_2: Optional[int] = Field(None, description="Segundo piloto, para la carta VS")
+
     data: Optional[dict[str, Any]] = Field(None, description="Datos que recibirá update() en la plantilla")
 
 
@@ -39,6 +42,7 @@ class UpdateRequest(BaseModel):
     # vehículo cualquiera de los suyos.
     category_id: Optional[int] = None
     event_id: Optional[int] = None
+    pilot_id_2: Optional[int] = None
     data: Optional[dict[str, Any]] = None
 
     @model_validator(mode="after")

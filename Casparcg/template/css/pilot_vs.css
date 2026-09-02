@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   CARTA VS
+
+   Hereda de pilot_card_short.css: mismas medidas, mismo sitio en pantalla
+   y misma animación que la carta del piloto. Aquí solo va lo que cambia.
+
+   El hueco del logo de la marca lo ocupa la foto del rival. No hay palabra
+   "VS": la carta se explica sola con las dos caras enfrentadas.
+========================================================================== */
+
+/* La foto del rival llena la caja que antes tenía el logo, que llevaba
+   aire alrededor porque un logo necesita respirar y un retrato no. */
+.brand-panel.vs-foto{
+
+    padding:0;
+
+    overflow:hidden;
+}
+
+.brand-panel.vs-foto img{
+
+    width:100%;
+    height:100%;
+
+    max-width:none;
+    max-height:none;
+
+    object-fit:cover;
+
+    /* Encuadre a la cabeza: los retratos vienen de cuerpo entero y
+       centrados dejarían la cara fuera. */
+    object-position:top center;
+}
+
+/* La foto del piloto se deja donde la pone la carta normal. Moverla al
+   borde derecho la sacaba fuera del panel: su caja no llega hasta ahí.
+   Lo que sí hace falta es acotarle el ancho, porque en la carta VS el
+   texto ocupa menos y un retrato ancho se le montaba encima. */
+.pilot-short.vs .pilot-photo{
+
+    width:210px;
+
+    /* Desplazada a la derecha del centro: en la carta VS el texto llega
+       más lejos que en la del piloto y el retrato le caía encima, tapando
+       los dorsales. */
+    transform:translateX(calc(-50% + 250px));
+
+    object-fit:cover;
+    object-position:top center;
+
+    /* Se difumina por la izquierda para que no corte en seco sobre el
+       fondo del panel. */
+    mask-image:linear-gradient(90deg, transparent 0%, #000 26%);
+    -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 26%);
+}

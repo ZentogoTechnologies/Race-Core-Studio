@@ -82,7 +82,9 @@ TEMPLATES: dict[str, Template] = {
         Template("grilla-fotos", "Grilla con Fotos",    "grid", 40, "html/41_starting_grid_foto",  accepts_data=True),
 
         # ── Fichas de piloto (capa 50) ────────────────────────
-        Template("ficha-corta",    "Ficha Corta",    "pilot", 50, "html/51_pilot_card_short",    accepts_data=True),
+        Template("ficha-corta",    "Carta",          "pilot", 50, "html/51_pilot_card_short",    accepts_data=True),
+        # Dos pilotos frente a frente: nombre, dorsal y foto, nada más.
+        Template("carta-vs",       "Carta VS",       "pilot", 50, "html/52_pilot_vs",            accepts_data=True),
 
         # ── Misceláneos (capa 60) ─────────────────────────────
         Template("circuito", "Circuito",       "misc", 60, "html/60_circuit_track", accepts_data=True),
@@ -394,3 +396,31 @@ class GraphicsService:
 
 
 service = GraphicsService()
+
+
+async def build_vs_payload(pilot_a: int, pilot_b: int) -> dict:
+    """
+    Los dos pilotos de la carta VS.
+
+    Solo nombre, apellido, dorsal y foto: es un gráfico de presentación.
+    El dorsal sale del vehículo, que es donde vive; si el piloto no tiene
+    carro asignado se manda vacío en vez de inventarlo.
+    """
+
+    async def uno(pilot_id: int, sufijo: str) -> dict:
+        pilot = await Pilot.find_one(Pilot.pilot_id == pilot_id)
+        if pilot is None:
+            raise HTTPException(404, f"Piloto {pilot_id} no encontrado")
+
+        vehicle = await Vehicle.find_one({"pilots.$id": pilot.id})
+
+        return {
+            f"name_{sufijo}": pilot.name or "",
+            f"last_name_{sufijo}": pilot.last_name or "",
+            f"number_{sufijo}": str(vehicle.number) if vehicle else "",
+            # Siempre se manda, vacía incluida: omitirla dejaría la foto
+            # del piloto anterior en pantalla.
+            f"photo_{sufijo}": pilot_photo_url(pilot.pilot_id, pilot.photo),
+        }
+
+    return {**await uno(pilot_a, "a"), **await uno(pilot_b, "b")}

@@ -152,7 +152,9 @@ const TOTEMS = [
 
 // ─── Fichas de piloto ─────────────────────────────────────────
 const FICHAS = [
-  { id: 'ficha-corta',    label: 'Ficha Corta',    nombre: 'Ficha Corta',
+  { id: 'carta-vs',       label: 'Carta VS',      nombre: 'Carta VS',
+    detalle: 'Dos pilotos frente a frente', Icon: ArrowUpDown, ...ROJO },
+  { id: 'ficha-corta',    label: 'Carta',         nombre: 'Carta del Piloto',
     detalle: 'Datos básicos del piloto',                              Icon: SquareUser,  ...ROJO },
 ]
 
@@ -208,6 +210,7 @@ const REQUIERE_DATOS = {
   'comentarista':   'narrador',  // mismo formulario, misma plantilla base
   'reportero':      'narrador',  // idem; cambia el rótulo del arte
   'ficha-corta':    'piloto',    // sale del registro de pilotos
+  'carta-vs':       'duelo',     // dos pilotos enfrentados
   'categoria':      'categoria',  // se elige cuál de las del evento
 }
 
@@ -216,6 +219,7 @@ function FormularioPersonal({
   item, tipo, pilotosRegistrados, categorias,
   narrador, setNarrador, pilotoId, setPilotoId,
   categoriaFicha, setCategoriaFicha,
+  pilotoRival, setPilotoRival,
   categoriaCarta, setCategoriaCarta, carrera,
   alAire, ocupado, onMostrar, onOcultar,
 }) {
@@ -844,6 +848,10 @@ export default function GraficosModule() {
   // Challenge con carros distintos, y la ficha tiene que decir cuál.
   const [categoriaFicha, setCategoriaFicha] = useState(null)
 
+  // El rival de la carta VS. Es un segundo piloto y no un modo del
+  // primero, así que va en su propio estado.
+  const [pilotoRival, setPilotoRival] = useState(null)
+
   // Qué categoría se saca en la carta de Categoría. Se elige entre las del
   // evento, no entre todas: en pista solo corren las inscritas.
   const [categoriaCarta, setCategoriaCarta] = useState(null)
@@ -1008,6 +1016,7 @@ export default function GraficosModule() {
   const datosDelForm = (item) => {
     const tipo = REQUIERE_DATOS[item.id]
     if (tipo === 'piloto') return { pilotId: pilotoId, categoryId: categoriaFicha }
+    if (tipo === 'duelo')  return { pilotId: pilotoId, pilotId2: pilotoRival }
     // El evento acota qué subcategorías salen: solo las que tienen carros
     // inscritos en esta fecha.
     if (tipo === 'categoria') {
@@ -1396,6 +1405,7 @@ export default function GraficosModule() {
             narrador={narrador}   setNarrador={setNarrador}
             pilotoId={pilotoId}   setPilotoId={setPilotoId}
             categoriaFicha={categoriaFicha} setCategoriaFicha={setCategoriaFicha}
+            pilotoRival={pilotoRival} setPilotoRival={setPilotoRival}
             categoriaCarta={categoriaCarta} setCategoriaCarta={setCategoriaCarta}
             carrera={carrera}
             alAire={estaAlAire(itemDelForm)}

@@ -133,7 +133,7 @@
 
 .pilot-name{
     font-family:"Impact","Arial Black",sans-serif;
-    font-size:46px;
+    font-size:37px;
     font-weight:400;
     letter-spacing: 1px;
     text-transform:uppercase;
@@ -143,7 +143,7 @@
 
 .car-number{
     font-family:"Impact","Arial Black",sans-serif;
-    font-size:58px;
+    font-size:46px;
     font-weight:400;
     line-height:1;
 
@@ -154,9 +154,15 @@
    INFORMACIÓN
 ================================================== */
 
+/* Dos filas en vez de una. Con todo en una sola, la subcategoría no
+   cabía y se salía por el borde de abajo de la carta. */
 .info-row{
     display:flex;
-    gap:30px;
+    gap:22px;
+}
+
+.info-row.segunda{
+    margin-top:7px;
 }
 
 .info-block{
@@ -168,35 +174,34 @@
     margin-bottom:2px;
 
     font-family:"Rajdhani","Arial",sans-serif;
-    font-size:16px;
+    font-size:11px;
     font-weight:600;
     text-transform:uppercase;
-    letter-spacing: 1px;
+    letter-spacing: .8px;
     color:#bdbdbd;
 }
 
 .value{
     font-family:"Rajdhani","Arial",sans-serif;
-    font-size:26px;
+    font-size:19px;
     font-weight:700;
     line-height:1.1;
     letter-spacing: .5px;
     color:#fff;
+
+    white-space:nowrap;
+}
+
+/* La subcategoría en el rojo del canal: precisa a la categoría y conviene
+   distinguirla de un vistazo. */
+.value.acento{
+    color:#FF3B45;
 }
 
 /* La subcategoría cuelga de la categoría, no compite con ella: es una
    precisión de la de arriba, no un dato del mismo rango. */
-.subvalue{
-    margin-top:2px;
-
-    font-family:"Rajdhani","Arial",sans-serif;
-    font-size:18px;
-    font-weight:600;
-    line-height:1.1;
-    letter-spacing: .5px;
-    color:#D50000;
-    text-transform:uppercase;
-}
+/* .subvalue se retiró: la subcategoría pasó a bloque propio con su
+   etiqueta, en la primera fila. */
 
 /* ==================================================
    ANIMACIONES

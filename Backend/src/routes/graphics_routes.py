@@ -32,7 +32,8 @@ def _resolve(graphic_id: str):
 
 async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
                    category_id: Optional[int] = None,
-                   event_id: Optional[int] = None) -> Optional[dict]:
+                   event_id: Optional[int] = None,
+                   pilot_id_2: Optional[int] = None) -> Optional[dict]:
     """
     Arma los datos que recibirá la plantilla.
 
@@ -142,6 +143,16 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
         }
         return {**base, **(data or {})}
 
+    # La carta VS necesita dos pilotos, así que tiene su propio armador.
+    if template.graphic_id == "carta-vs":
+        if pilot_id is None or pilot_id_2 is None:
+            raise HTTPException(400, "La carta VS necesita dos pilotos")
+
+        from src.services.graphics_services import build_vs_payload
+
+        base = await build_vs_payload(pilot_id, pilot_id_2)
+        return {**base, **(data or {})}
+
     if pilot_id is None:
         return data
 
@@ -237,7 +248,8 @@ async def play_graphic(request: PlayRequest):
     template = _resolve(request.graphic_id)
 
     data = await _payload(template, request.pilot_id, request.data,
-                          request.category_id, request.event_id)
+                          request.category_id, request.event_id,
+                          request.pilot_id_2)
 
     if data and not template.accepts_data:
         raise HTTPException(
@@ -267,7 +279,8 @@ async def update_graphic(request: UpdateRequest):
         )
 
     data = await _payload(template, request.pilot_id, request.data,
-                          request.category_id, request.event_id)
+                          request.category_id, request.event_id,
+                          request.pilot_id_2)
 
     return await _run(
         service.update(template, data),

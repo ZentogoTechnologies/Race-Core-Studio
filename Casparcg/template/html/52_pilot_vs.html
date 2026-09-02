@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carta VS</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/pilot_card_short.css">
+    <link rel="stylesheet" href="../css/pilot_vs.css">
+</head>
+<body>
+
+    <div class="pilot-short vs" id="pilotShort">
+
+        <!-- Donde la carta del piloto lleva el logo de la marca va aquí la
+             foto del rival: el hueco ya existe y así las dos cartas miden
+             y se colocan igual. -->
+        <div class="brand-panel vs-foto">
+            <img id="fotoB" src="" alt="">
+        </div>
+
+        <div class="pilot-panel" id="pilotPanel">
+
+            <div class="content-section">
+
+                <div class="name-row">
+                    <div class="pilot-name" id="nombreA">DEAN PAQUETTE</div>
+                    <div class="car-number" id="dorsalA">#13</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-block">
+                        <div class="label">RIVAL</div>
+                        <div class="value" id="nombreB">LUIS ARIAS</div>
+                    </div>
+                    <div class="info-block">
+                        <div class="label">DORSAL</div>
+                        <div class="value acento" id="dorsalB">#69</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <img id="fotoA" class="pilot-photo" src="" alt="">
+
+        </div>
+
+    </div>
+
+<script>
+
+/* ==========================================================================
+   CARTA VS
+
+   Dos pilotos frente a frente, con el mismo formato y las mismas medidas
+   que la carta del piloto: comparte su hoja de estilo y solo cambia lo
+   justo. La foto del rival ocupa el hueco del logo de la marca, que en
+   este gráfico no hace falta.
+
+   Solo nombre, apellido y dorsal de cada uno. Sin la palabra "VS": la
+   carta ya se explica sola con las dos caras enfrentadas.
+
+   El backend arma el payload y resuelve las fotos a URL absoluta, que es
+   lo que necesita CasparCG abriendo la plantilla desde file://.
+========================================================================== */
+
+function poner(id, valor){
+    const el = document.getElementById(id);
+    if (el && valor !== undefined) el.textContent = valor;
+}
+
+function ponerFoto(id, url){
+    const el = document.getElementById(id);
+    if (!el || url === undefined) return;
+
+    /* Sin foto se esconde en vez de dejar un roto. */
+    if (url) {
+        el.src = url;
+        el.style.visibility = "visible";
+    } else {
+        el.removeAttribute("src");
+        el.style.visibility = "hidden";
+    }
+}
+
+function nombreCompleto(nombre, apellido){
+    return [nombre, apellido].filter(Boolean).join(" ").toUpperCase();
+}
+
+function update(data){
+    try {
+        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
+
+        if (d.name_a !== undefined || d.last_name_a !== undefined) {
+            poner("nombreA", nombreCompleto(d.name_a, d.last_name_a));
+        }
+        if (d.number_a !== undefined) poner("dorsalA", d.number_a ? "#" + d.number_a : "");
+        ponerFoto("fotoA", d.photo_a);
+
+        if (d.name_b !== undefined || d.last_name_b !== undefined) {
+            poner("nombreB", nombreCompleto(d.name_b, d.last_name_b));
+        }
+        if (d.number_b !== undefined) poner("dorsalB", d.number_b ? "#" + d.number_b : "");
+        ponerFoto("fotoB", d.photo_b);
+    } catch (e) { /* un UPDATE con basura no puede tumbar el gráfico */ }
+}
+
+function play(){
+    const widget = document.getElementById("pilotShort");
+    widget.style.animation = "slideUp .5s ease forwards";
+
+    setTimeout(() => {
+        document.getElementById("pilotPanel").style.animation =
+            "expandPanel .6s ease forwards";
+    }, 500);
+}
+
+function stop(){
+    document.getElementById("pilotPanel").style.animation =
+        "collapsePanel .5s ease forwards";
+
+    setTimeout(() => {
+        document.getElementById("pilotShort").style.animation =
+            "slideDown .5s ease forwards";
+    }, 500);
+}
+
+if (!window.__casparcg) { play(); }
+
+</script>
+
+</body>
+</html>

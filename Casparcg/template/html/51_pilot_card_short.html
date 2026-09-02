@@ -48,80 +48,35 @@
                 <div class="info-row">
 
                     <div class="info-block">
-
-                        <div class="label">
-                            CATEGORÍA
-                        </div>
-
-                        <div
-                            class="value"
-                            id="category">
-
-                            GT Challenge
-
-                        </div>
-
-                        <!-- La subcategoría, debajo y más pequeña. Antes
-                             sustituía a la categoría, así que salía
-                             "Gran Turismo 2" sin decir nunca de qué
-                             campeonato era. -->
-                        <div
-                            class="subvalue"
-                            id="subCategory">
-
-                            Gran Turismo 2
-
-                        </div>
-
+                        <div class="label">CATEGORÍA</div>
+                        <div class="value" id="category">GT Challenge</div>
                     </div>
 
                     <div class="info-block">
-
-                        <div class="label">
-                            VEHÍCULO
-                        </div>
-
-                        <div
-                            class="value"
-                            id="vehicle">
-
-                            Lexus V8
-
-                        </div>
-
+                        <div class="label">SUBCATEGORÍA</div>
+                        <div class="value acento" id="subCategory">GTS Light</div>
                     </div>
 
                     <div class="info-block">
+                        <div class="label">VEHÍCULO</div>
+                        <div class="value" id="vehicle">Porsche</div>
+                    </div>
 
-                        <div class="label">
-                            EQUIPO
-                        </div>
+                </div>
 
-                        <div
-                            class="value"
-                            id="team">
+                <div class="info-row segunda">
 
-                            Gazoo Racing
-
-                        </div>
-
+                    <div class="info-block">
+                        <div class="label">EQUIPO</div>
+                        <div class="value" id="team">VERDE</div>
                     </div>
 
                     <div class="info-block">
-
-                        <div class="label">
-                            PAÍS
-                        </div>
-
-                        <div
-                            class="value"
-                            id="country">
-
-                            RD
-
-                        </div>
-
+                        <div class="label">PAÍS</div>
+                        <div class="value" id="country">Canada</div>
                     </div>
+
+                </div>
 
                 </div>
 
@@ -167,14 +122,14 @@ function update(data){
         document.getElementById("category").textContent =
             data.category;
 
-    /* Sin subcategoría la línea se esconde en vez de quedarse vacía: un
-       hueco en blanco bajo la categoría parece un fallo de carga. */
+    /* Sin subcategoría el bloque entero se esconde, etiqueta incluida:
+       una etiqueta sin dato se lee como un fallo de carga. */
     if(data.sub_category !== undefined){
 
         const el = document.getElementById("subCategory");
 
-        el.textContent = data.sub_category;
-        el.style.display = data.sub_category ? "block" : "none";
+        el.textContent = data.sub_category || "";
+        el.closest(".info-block").style.display = data.sub_category ? "flex" : "none";
     }
 
     if(data.vehicle !== undefined)
