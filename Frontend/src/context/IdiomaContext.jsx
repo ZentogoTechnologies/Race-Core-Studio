@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { elegirIdioma as guardarEnServidor, listarIdiomas } from '../api/registro'
 import { fijarIdioma, idiomaDeAhora } from '../i18n'
+import { useAuth } from './AuthContext'
 
 /* ==========================================================================
    IDIOMA
@@ -20,17 +21,25 @@ const IdiomaContext = createContext({ idioma: 'es', idiomas: [], cambiar: async 
 
 export function IdiomaProvider({ children }) {
 
+  const { usuario } = useAuth()
+
   const [idioma, setIdioma] = useState(idiomaDeAhora())
   const [idiomas, setIdiomas] = useState([])
 
+  /* Se piden al entrar y no al montar. Este proveedor envuelve tambien la
+     pantalla de acceso, y la lista de idiomas exige un token: pidiendola
+     antes del login devolvia 401, el catch la dejaba vacia y ya no se
+     volvia a intentar. El selector de Ajustes salia sin opciones. */
   useEffect(() => {
+    if (!usuario) return
+
     listarIdiomas()
       .then(r => {
         setIdiomas(r.idiomas || [])
         if (r.actual) { fijarIdioma(r.actual); setIdioma(r.actual) }
       })
       .catch(() => {})   // sin backend, se queda en español
-  }, [])
+  }, [usuario])
 
   const cambiar = async (id) => {
     await guardarEnServidor(id)
