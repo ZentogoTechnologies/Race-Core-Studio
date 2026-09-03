@@ -22,12 +22,17 @@
             <div class="tf-grupo" id="grupo">STREET LEGAL</div>
             <div class="tf-sub">
                 <span class="tf-heat" id="heat">HEAT 1</span>
-                <span class="tf-reloj">
-                    <span class="tf-reloj-etiqueta" id="relojEtiqueta">TIME</span><span id="reloj">0:00</span>
-                </span>
             </div>
         </div>
 
+    </div>
+
+    <!-- El reloj en su propia franja, entre la cabecera y la primera
+         posicion. Compartiendo linea con la tanda quedaba en cuerpo
+         pequeño, y es el dato que mas se mira de todo el totem. -->
+    <div class="tf-reloj-banda">
+        <span class="tf-reloj-etiqueta" id="relojEtiqueta" data-t="totem.tiempo">TIME</span>
+        <span class="tf-reloj-valor" id="reloj">0:00</span>
     </div>
 
     <div class="tf-estado" id="estado"></div>

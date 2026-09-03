@@ -184,24 +184,83 @@
     font-weight:900;
 }
 
-.tf-reloj{
+/* ===================================
+   FRANJA DEL RELOJ
+   ===================================
+   Entre la cabecera y la primera posicion. Antes el reloj compartia linea
+   con la tanda, en cuerpo pequeño, y es el dato que mas se mira de todo el
+   totem: cuanto queda de carrera.
 
-    color:#FFFFFF;
+   Mide una fila y media. Lo justo para que el numero pueda ser grande sin
+   que la franja compita con la cabecera ni empuje la clasificacion fuera
+   de cuadro. */
 
-    font-weight:700;
+.tf-reloj-banda{
 
-    font-variant-numeric:tabular-nums;
+    --tf-reloj-alto: calc(var(--tf-alto-fila) * 1.5);
 
-    margin-left:auto;
+    height:var(--tf-reloj-alto);
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:0 14px;
+
+    background:var(--tf-reloj-bg, rgba(8,10,14,.92));
+
+    border-top:2px solid rgba(0,0,0,.35);
+}
+
+/* Filo rojo a la izquierda, la misma firma que llevan la cabecera y las
+   cartas. */
+.tf-reloj-banda::before{
+
+    content:"";
+
+    width:5px;
+
+    align-self:stretch;
+
+    margin:6px 2px 6px -6px;
+
+    background:var(--tf-acento, #D50000);
+
+    border-radius:3px;
 }
 
 .tf-reloj-etiqueta{
 
-    color:rgba(255,255,255,.45);
+    font-size:13px;
+    font-weight:800;
 
-    font-weight:700;
+    letter-spacing:2px;
 
-    margin-right:4px;
+    text-transform:uppercase;
+
+    color:rgba(255,255,255,.5);
+}
+
+.tf-reloj-valor{
+
+    /* El numero se lleva la franja: es a lo que se mira. */
+    font-size:calc(var(--tf-reloj-alto) * 0.62);
+
+    font-weight:900;
+
+    line-height:1;
+
+    color:#FFFFFF;
+
+    /* Cifras de ancho fijo: sin esto el reloj baila de sitio cada vez que
+       cambia un digito. */
+    font-variant-numeric:tabular-nums;
+
+    margin-left:auto;
+
+    text-shadow:1px 2px 0 rgba(0,0,0,.5);
 }
 
 /* ===================================
@@ -800,13 +859,31 @@
 
 /* ── 3. El cuerpo, hacia abajo ── */
 
-.tf-torre.entrando .tf-cuerpo{
+.tf-torre.entrando .tf-cuerpo,
+.tf-torre.entrando .tf-reloj-banda{
 
     max-height:0;
 
     overflow:hidden;
 
     transition:max-height var(--tf-ent-cuerpo) cubic-bezier(.22,.61,.36,1);
+}
+
+/* La franja del reloj baja con el arte y no con la cabecera: es parte de
+   lo que se despliega, no del banner. */
+.tf-torre.entrando .tf-reloj-banda{
+
+    padding-top:0;
+    padding-bottom:0;
+
+    border-top-width:0;
+}
+
+.tf-torre.fase-cuerpo .tf-reloj-banda{
+
+    max-height:var(--tf-reloj-alto);
+
+    border-top-width:2px;
 }
 
 /* Un tope generoso y no la altura exacta: las filas las pinta el script y
