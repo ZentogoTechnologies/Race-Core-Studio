@@ -171,10 +171,10 @@ function torreFranja(piloto, verde){
 
     html += `<span class="tf-franja-dorsal">${torreEscapar(piloto.number)}</span>`;
 
-    html += '<span class="tf-franja-rotulo">Mejor</span>';
+    html += `<span class="tf-franja-rotulo">${T("totem.mejor", "Mejor")}</span>`;
     html += `<span class="tf-franja-tiempo">${torreEscapar(piloto.best_time || "--")}</span>`;
 
-    html += '<span class="tf-franja-rotulo derecha">Última</span>';
+    html += `<span class="tf-franja-rotulo derecha">${T("totem.ultima", "Última")}</span>`;
     html += `<span class="tf-franja-tiempo tenue">${torreEscapar(piloto.last_time || "--")}</span>`;
 
     html += '</div></div>';
@@ -193,16 +193,35 @@ function torreFranja(piloto, verde){
    cuantas filas se hayan pintado, y eso solo se sabe al terminar.
 ========================================================================== */
 
-const TF_FASES = {
-    logo:     120,   // deja respirar antes de empezar
-    cabecera: 560,   // cuando el logo ha terminado su barrido
-    cuerpo:   1020,  // con la cabecera ya entera
-    nombres:  1400,  // con el hueco abierto
+/* Lo que dura cada fase, en milisegundos. Tienen que ser los mismos
+   numeros que las variables --tf-ent-* del CSS: alli mandan la duracion de
+   la transicion y aqui el momento en que arranca la siguiente. */
+const TF_DURACION = {
+    logo:     1500,
+    cabecera: 1000,
+    cuerpo:   1500,
+    nombres:  1000,
 };
 
-/* Lo que tarda cada fila en seguir a la anterior. Corto a proposito: con
-   veinte filas, un paso largo convierte la entrada en una espera. */
-const TF_PASO_FILA = 45;
+/* Cada fase empieza cuando termina la anterior. Se calcula y no se
+   escribe a mano para que cambiar una duracion no obligue a recalcular
+   las tres siguientes. */
+const TF_FASES = {
+    logo:     0,
+    cabecera: TF_DURACION.logo,
+    cuerpo:   TF_DURACION.logo + TF_DURACION.cabecera,
+    nombres:  TF_DURACION.logo + TF_DURACION.cabecera + TF_DURACION.cuerpo,
+};
+
+/* Lo que tarda una fila en seguir a la anterior. No es fijo: el reparto
+   sale de que todas esten dentro del segundo que dura la fase, sean cinco
+   o sean veinte. */
+const TF_FILA_ANIM = 280;
+
+function tfPasoFila(filas){
+    if (filas <= 1) return 0;
+    return Math.max(0, (TF_DURACION.nombres - TF_FILA_ANIM) / (filas - 1));
+}
 
 
 function torreCancelarEntrada(){
@@ -215,9 +234,12 @@ function torreEscalonarFilas(){
 
     /* El retraso se pone aqui y no en el CSS porque depende de la posicion
        de cada fila, y las filas las pinta el script. */
-    torreCuerpo.querySelectorAll(".tf-fila").forEach((fila, i) => {
+    const filas = torreCuerpo.querySelectorAll(".tf-fila");
+    const paso = tfPasoFila(filas.length);
+
+    filas.forEach((fila, i) => {
         Array.from(fila.children).forEach(hijo => {
-            hijo.style.animationDelay = (i * TF_PASO_FILA) + "ms";
+            hijo.style.animationDelay = Math.round(i * paso) + "ms";
         });
     });
 }
@@ -226,7 +248,6 @@ function torreEscalonarFilas(){
 function torreArrancarEntrada(){
 
     if (torreEntrada.hecha || torreEntrada.corriendo) return;
-    if (!torreCuerpo.querySelector(".tf-fila")) return;   // aun sin datos
 
     torreEntrada.corriendo = true;
 
@@ -247,8 +268,7 @@ function torreArrancarEntrada(){
     /* Al terminar se retiran todas las clases: la entrada deja de existir
        y el totem queda como estaba, sin transiciones colgando que le
        compliquen la vida a los repintados. */
-    const filas = torreCuerpo.querySelectorAll(".tf-fila").length;
-    const total = TF_FASES.nombres + filas * TF_PASO_FILA + 400;
+    const total = TF_FASES.nombres + TF_DURACION.nombres + 150;
 
     torreEntrada.relojes.push(setTimeout(() => {
         torreElemento.classList.remove(
@@ -262,7 +282,11 @@ function torreArrancarEntrada(){
         /* La primera vez que hay filas se arma la entrada; la cuenta para
        encoger los nombres la arranca ella al terminar. Despues, cada
        repintado la reprograma como siempre. */
-    if (!torreEntrada.hecha) {
+    if (torreEntrada.corriendo) {
+        /* Las filas acaban de nacer en mitad de la entrada: se les reparte
+           el retraso para que entren escalonadas como el resto. */
+        torreEscalonarFilas();
+    } else if (!torreEntrada.hecha) {
         torreArrancarEntrada();
     } else {
         torreProgramarCorto();
@@ -468,6 +492,12 @@ function arrancarTorre(opciones){
     if (!torreConfig.marca) torreElemento.classList.add("sin-marca");
 
     arrancarTiming({ limite: torreConfig.limite, alRecibir: torrePintar });
+
+    /* La entrada empieza al salir al aire y no al llegar los datos: el
+       logo y la cabecera no dependen del cronometraje, y hacerlos esperar
+       dejaba un hueco muerto entre pulsar el boton y ver algo. Va aquí,
+       con torreElemento ya resuelto. */
+    torreArrancarEntrada();
 }
 
 

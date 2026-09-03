@@ -5,6 +5,8 @@
     <title>Grilla de Partida</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/grilla.css">
+    <script src="../js/idioma_activo.js"></script>
+    <script src="../js/i18n.js"></script>
 </head>
 <body>
 
@@ -127,7 +129,7 @@ function pintarPaso(){
         puntos += `<span class="gr-punto${i === pagina ? " activo" : ""}"></span>`;
 
     paso.innerHTML = `<span class="gr-rango">${desde} – ${hasta}`
-                   + `<span class="gr-total"> de ${parrilla.length}</span></span>`
+                   + `<span class="gr-total"> ${T("grilla.de", "de")} ${parrilla.length}</span></span>`
                    + `<span class="gr-puntos">${puntos}</span>`;
 }
 

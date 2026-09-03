@@ -7,6 +7,7 @@ se refresca al arrancar y cada vez que alguien lo cambia.
 """
 
 import io
+import json
 import shutil
 from pathlib import Path
 from typing import Optional
@@ -305,3 +306,77 @@ async def guardar_fuente(tipografia_id: str) -> str:
     await ajustes.save()
 
     return tipografia_id
+
+
+# ── Idioma ────────────────────────────────────────────────────────
+#
+# Las traducciones del arte viven en Casparcg/template/i18n/*.json, que es
+# lo que se edita. Pero CasparCG abre las plantillas con file://, donde
+# fetch() de un JSON está bloqueado por CORS: la plantilla no puede leerlo
+# por su cuenta. Así que al elegir idioma se vuelca el JSON en un .js, que
+# sí se puede cargar con un <script src>. Mismo truco que con la
+# tipografía, y por la misma razón.
+
+CARPETA_TEXTOS = RAIZ / "Casparcg" / "template" / "i18n"
+
+JS_IDIOMA = RAIZ / "Casparcg" / "template" / "js" / "idioma_activo.js"
+
+IDIOMAS = [
+    {"id": "es", "nombre": "Español",   "listo": True},
+    {"id": "en", "nombre": "English",   "listo": True},
+    {"id": "pt", "nombre": "Português", "listo": False},
+    {"id": "fr", "nombre": "Français",  "listo": False},
+    {"id": "it", "nombre": "Italiano",  "listo": False},
+]
+
+IDIOMAS_POR_ID = {i["id"]: i for i in IDIOMAS}
+
+CABECERA_JS = """/* Lo reescribe el backend al cambiar el idioma en Ajustes. No se edita
+   a mano: el cambio se perderia en cuanto alguien tocara el selector.
+   Las traducciones se editan en template/i18n/*.json. */
+
+"""
+
+
+def textos_de(idioma: str) -> dict:
+    """Las traducciones del arte para ese idioma."""
+    archivo = CARPETA_TEXTOS / f"{idioma}.json"
+    if not archivo.is_file():
+        return {}
+    return json.loads(archivo.read_text(encoding="utf-8"))
+
+
+def _escribir_js(idioma: str) -> None:
+    """Deja el idioma elegido donde las plantillas puedan cargarlo."""
+    textos = json.dumps(textos_de(idioma), ensure_ascii=False, indent=4)
+    JS_IDIOMA.write_text(
+        CABECERA_JS + "window.TEXTOS = " + textos + ";" + chr(10),
+        encoding="utf-8",
+    )
+
+
+async def idioma_actual() -> str:
+    """El idioma puesto; español si no hay ninguno o el guardado ya no existe."""
+    ajustes = await Ajustes.find_one()
+    elegido = ajustes.idioma if ajustes else None
+    listos = {i["id"] for i in IDIOMAS if i["listo"]}
+    return elegido if elegido in listos else "es"
+
+
+async def guardar_idioma(idioma: str) -> str:
+    """Guarda el idioma y vuelca sus textos para las plantillas."""
+    info = IDIOMAS_POR_ID.get(idioma)
+    if info is None:
+        raise ValueError(f"Idioma desconocido: {idioma}")
+    if not info["listo"]:
+        raise ValueError(f"El idioma {info['nombre']} todavía no está traducido")
+
+    _escribir_js(idioma)
+
+    ajustes = await Ajustes.find_one()
+    if ajustes is None:
+        ajustes = Ajustes()
+    ajustes.idioma = idioma
+    await ajustes.save()
+
+    return idioma

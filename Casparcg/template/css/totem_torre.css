@@ -724,9 +724,18 @@
    corriendo —el grupo y la tanda—, luego el sitio donde van a caber los
    nombres, y por ultimo los nombres.
 
-   Cada fase se dispara desde el script, que es quien sabe cuando estan
-   pintadas las filas. Aqui solo se declaran los estados.
+   Los tiempos de cada fase se declaran aqui como variables y el script
+   solo dispara las clases: asi las duraciones y los relevos salen del
+   mismo sitio y no pueden quedarse desfasados entre si.
 ========================================================================== */
+
+.tf-torre{
+
+    --tf-ent-logo:     1.5s;   /* el logo se descubre */
+    --tf-ent-cabecera: 1s;     /* la cabecera se abre hacia la derecha */
+    --tf-ent-cuerpo:   1.5s;   /* el arte baja */
+    --tf-ent-nombres:  1s;     /* lo que tardan en estar todos los nombres */
+}
 
 /* Mientras entra, la caja no puede tener fondo propio: se veria el panel
    entero antes de que se despliegue nada. */
@@ -738,13 +747,15 @@
 
 /* ── 1. El logo, de izquierda a derecha ── */
 
+/* La cabecera arranca del ancho del logo y no de cero: lo que se descubre
+   en esta fase es el logo, no la cabecera. */
 .tf-torre.entrando .tf-cabecera{
 
-    width:0;
+    width:var(--tf-logo-ancho);
 
     overflow:hidden;
 
-    transition:width .42s cubic-bezier(.22,.61,.36,1);
+    transition:width var(--tf-ent-cabecera) cubic-bezier(.22,.61,.36,1);
 }
 
 /* Ancho fijo por dentro: si la cabecera se encogiera con su caja, el
@@ -755,9 +766,27 @@
     flex:0 0 auto;
 }
 
-.tf-torre.fase-logo .tf-cabecera{
+/* El barrido se hace con una mascara y no con el ancho de la caja: asi el
+   logo se descubre de izquierda a derecha sin encogerse ni estirarse. */
+.tf-torre.entrando .tf-logo{
 
-    width:var(--tf-logo-ancho);
+    -webkit-mask-image:linear-gradient(90deg, #000 0 50%, transparent 50% 100%);
+    mask-image:linear-gradient(90deg, #000 0 50%, transparent 50% 100%);
+
+    -webkit-mask-size:200% 100%;
+    mask-size:200% 100%;
+
+    -webkit-mask-position:100% 0;
+    mask-position:100% 0;
+
+    transition:mask-position var(--tf-ent-logo) cubic-bezier(.22,.61,.36,1),
+               -webkit-mask-position var(--tf-ent-logo) cubic-bezier(.22,.61,.36,1);
+}
+
+.tf-torre.fase-logo .tf-logo{
+
+    -webkit-mask-position:0 0;
+    mask-position:0 0;
 }
 
 
@@ -777,7 +806,7 @@
 
     overflow:hidden;
 
-    transition:max-height .45s cubic-bezier(.22,.61,.36,1);
+    transition:max-height var(--tf-ent-cuerpo) cubic-bezier(.22,.61,.36,1);
 }
 
 /* Un tope generoso y no la altura exacta: las filas las pinta el script y
@@ -804,7 +833,7 @@
 
 .tf-torre.fase-nombres .tf-fila > *{
 
-    animation:tfFilaEntra .30s ease forwards;
+    animation:tfFilaEntra .28s ease forwards;
 }
 
 @keyframes tfFilaEntra{

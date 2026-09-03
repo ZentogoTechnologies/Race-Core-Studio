@@ -26,5 +26,9 @@ class Ajustes(Document):
     # cuál está puesta sin tener que leer el CSS.
     font_graficos: Optional[str] = None
 
+    # En qué idioma salen la interfaz y los rótulos de los gráficos. Los
+    # datos —nombres, equipos, marcas— no se traducen: son nombres propios.
+    idioma: Optional[str] = None
+
     class Settings:
         name = "ajustes"

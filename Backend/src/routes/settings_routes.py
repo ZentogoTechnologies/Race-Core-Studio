@@ -5,7 +5,8 @@ from pydantic import BaseModel
 
 from src.services.auth_services import puede_escribir
 from src.services.settings_services import (
-    TIPOGRAFIAS, fuente_actual, guardar_fuente,
+    IDIOMAS, TIPOGRAFIAS, fuente_actual, guardar_fuente,
+    guardar_idioma, idioma_actual, textos_de,
     guardar_logo_cliente, guardar_ruta_timing, logo_cliente_actual,
     marcar_logo_cliente, restaurar_logo_fabrica, revisar_ruta, ruta_timing,
     url_logo_cliente, xml_detectados,
@@ -225,3 +226,35 @@ async def elegir_fuente(tipografia_id: str):
         raise HTTPException(status_code=404, detail=str(e))
 
     return {"ok": True, "actual": elegida}
+
+
+# ── Idioma ────────────────────────────────────────────────────────
+
+@ajustes.get("/idiomas", tags=["Settings"])
+async def listar_idiomas():
+    """Los idiomas y cuál está puesto."""
+    return {"actual": await idioma_actual(), "idiomas": IDIOMAS}
+
+
+@ajustes.get("/idiomas/{idioma}/textos", tags=["Settings"])
+async def textos_del_idioma(idioma: str):
+    """Las traducciones de la interfaz para ese idioma.
+
+    El panel las pide al arrancar; los gráficos no pasan por aquí, que
+    leen el archivo que el backend les deja escrito.
+    """
+    textos = textos_de(idioma)
+    if not textos:
+        raise HTTPException(status_code=404, detail=f"Sin traducción para {idioma}")
+    return textos
+
+
+@ajustes.put("/idiomas/{idioma}", dependencies=[Depends(puede_escribir)], tags=["Settings"])
+async def elegir_idioma(idioma: str):
+    """Cambia el idioma de la interfaz y del arte a la vez."""
+    try:
+        elegido = await guardar_idioma(idioma)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return {"ok": True, "actual": elegido}
