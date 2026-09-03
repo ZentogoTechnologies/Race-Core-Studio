@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { useState } from 'react'
 import { Search, Plus, X, Download, Loader2 } from 'lucide-react'
 import { exportToJSON } from '../../utils/exportJSON'
@@ -46,7 +47,7 @@ export default function ModuleHeader({
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 w-5 h-5" />
         <input
           type="text"
-          placeholder={`Buscar ${entityName}...`}
+          placeholder={`${t('Buscar')} ${t(entityName)}...`}
           value={searchText}
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full bg-[#141414] border border-neutral-800 text-white pl-10 pr-4 py-2.5 rounded-lg focus:outline-none focus:border-red-600 transition-colors"
@@ -60,7 +61,7 @@ export default function ModuleHeader({
           className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold text-sm whitespace-nowrap"
         >
           {exportando ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
-          EXPORTAR
+          {t('EXPORTAR')}
         </button>
         {puedeCrear && (
           <button
@@ -68,7 +69,7 @@ export default function ModuleHeader({
             className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors whitespace-nowrap"
           >
             {isFormOpen ? <X size={20} /> : <Plus size={20} />}
-            {isFormOpen ? 'CANCELAR' : addButtonLabel}
+            {isFormOpen ? t('CANCELAR') : t(addButtonLabel)}
           </button>
         )}
       </div>

@@ -416,7 +416,7 @@ export default function EventosModule() {
                   Vehículos que corren ({eventForm.inscritos.length})
                 </label>
                 <p className="text-xs text-neutral-600">
-                  Se elige categoría por categoría, y dentro por subcategoría.
+                  {t('Se elige categoría por categoría, y dentro por subcategoría.')}
                 </p>
               </div>
 

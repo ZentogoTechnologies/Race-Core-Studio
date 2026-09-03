@@ -394,7 +394,7 @@ function FormularioPersonal({
 
           {categoriasDelEvento.length === 0 ? (
             <p className="text-sm text-neutral-600">
-              El evento seleccionado no tiene categorías inscritas.
+              {t('El evento seleccionado no tiene categorías inscritas.')}
             </p>
           ) : (
             <>
@@ -426,7 +426,7 @@ function FormularioPersonal({
                   </p>
                   {subcategoriasDeLaCarta.length === 0 ? (
                     <p className="text-sm text-neutral-600">
-                      Ninguna. La carta saldrá solo con el nombre de la categoría.
+                      {t('Ninguna. La carta saldrá solo con el nombre de la categoría.')}
                     </p>
                   ) : (
                     <div className="flex flex-wrap gap-2">
@@ -748,7 +748,7 @@ function PilotosEnPista({ carros, cargando, error, ocupado, onElegir, onRecargar
       <div className="flex items-center justify-between gap-4 mb-3">
         <h3 className="flex items-center gap-2 text-neutral-400 text-[11px] font-bold uppercase tracking-wider">
           <Users size={13} />
-          Quién va manejando
+          {t('Quién va manejando')}
           {carros.length > 0 && (
             <span className="text-neutral-600 normal-case">
               {carros.length} carros en pista
@@ -763,7 +763,7 @@ function PilotosEnPista({ carros, cargando, error, ocupado, onElegir, onRecargar
           {cargando
             ? <Loader2 size={13} className="animate-spin" />
             : <RefreshCw size={13} />}
-          Recargar
+          {t('Recargar')}
         </button>
       </div>
 
@@ -1254,7 +1254,7 @@ export default function GraficosModule() {
             {pendiente === 'sacar-todo'
               ? <Loader2 size={16} className="animate-spin" />
               : <PowerOff size={16} />}
-            SACAR TODO DE AIRE
+            {t('SACAR TODO DE AIRE')}
           </button>
         </div>
       </div>
@@ -1331,7 +1331,7 @@ export default function GraficosModule() {
                   {pendiente === `limpiar-${seccion.grupo}`
                     ? <Loader2 size={13} className="animate-spin" />
                     : <Eraser size={13} />}
-                  Limpiar
+                  {t('Limpiar')}
                 </button>
               </div>
 

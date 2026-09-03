@@ -228,7 +228,7 @@ export default function Trazados() {
             className="flex items-center gap-2 bg-white text-black font-bold py-2.5 px-5 rounded-lg hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm"
           >
             {creando ? <Loader2 size={16} className="animate-spin"/> : <Plus size={16}/>}
-            CREAR TRAZADO
+            {t('CREAR TRAZADO')}
           </button>
         </form>
       )}
@@ -338,7 +338,7 @@ export default function Trazados() {
                         className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 disabled:opacity-40 transition-colors font-bold text-sm"
                       >
                         {trabajando ? <Loader2 size={16} className="animate-spin"/> : <Upload size={16}/>}
-                        ELEGIR IMAGEN
+                        {t('ELEGIR IMAGEN')}
                       </button>
                     </div>
 

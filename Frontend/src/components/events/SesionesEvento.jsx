@@ -176,14 +176,14 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
 
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-neutral-600">
-                    El número lo asigna el sistema según lo que ya lleve la categoría.
+                    {t('El número lo asigna el sistema según lo que ya lleve la categoría.')}
                   </p>
                   <button
                     onClick={guardar} disabled={!valido || guardando}
                     className="bg-white text-black font-bold py-2 px-6 rounded text-sm hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
                   >
                     {guardando && <Loader2 size={14} className="animate-spin"/>}
-                    AGREGAR
+                    {t('AGREGAR')}
                   </button>
                 </div>
               </div>

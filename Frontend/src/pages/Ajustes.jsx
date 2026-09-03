@@ -364,14 +364,14 @@ export default function AjustesModule() {
             className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-bold text-sm whitespace-nowrap"
           >
             {probando ? <Loader2 size={16} className="animate-spin"/> : <FlaskConical size={16}/>}
-            PROBAR
+            {t('PROBAR')}
           </button>
           <button
             onClick={guardar} disabled={guardando || sinCambios}
             className="flex items-center justify-center gap-2 bg-white text-black font-bold py-2.5 px-5 rounded-lg hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm whitespace-nowrap"
           >
             {guardando ? <Loader2 size={16} className="animate-spin"/> : <Save size={16}/>}
-            APLICAR
+            {t('APLICAR')}
           </button>
         </div>
 
@@ -379,7 +379,7 @@ export default function AjustesModule() {
             nombre del archivo y nunca su ruta en disco, y quien lee el XML
             es el backend, que puede estar en otra máquina. */}
         <p className="text-xs text-neutral-600 mb-5">
-          Es una ruta del servidor donde corre el backend, no de tu equipo.
+          {t('Es una ruta del servidor donde corre el backend, no de tu equipo.')}
         </p>
 
         <div className="space-y-3">
@@ -394,7 +394,7 @@ export default function AjustesModule() {
           <h3 className="text-lg font-black italic text-white">{t('ARCHIVOS DETECTADOS')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-4">
-          XML que el servidor alcanza ahora mismo. Pulsa uno para ponerlo en el campo de arriba.
+          {t('XML que el servidor alcanza ahora mismo. Pulsa uno para ponerlo en el campo de arriba.')}
         </p>
 
         <div className="flex flex-col gap-2">
@@ -451,7 +451,7 @@ export default function AjustesModule() {
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-40 transition-colors font-bold text-sm"
           >
             {reconectando ? <Loader2 size={16} className="animate-spin"/> : <Radio size={16}/>}
-            RECONECTAR
+            {t('RECONECTAR')}
           </button>
 
           {conexion && (
@@ -523,7 +523,7 @@ export default function AjustesModule() {
                 className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 disabled:opacity-40 transition-colors font-bold text-sm"
               >
                 {subiendo ? <Loader2 size={16} className="animate-spin"/> : <Upload size={16}/>}
-                CAMBIAR LOGO
+                {t('CAMBIAR LOGO')}
               </button>
 
               {logoPropio && (

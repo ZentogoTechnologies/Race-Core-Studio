@@ -43,7 +43,7 @@ export default function DisciplinaGate() {
           </h1>
           <p className="text-neutral-500 text-sm">
             {usuario ? `Hola, ${usuario.username}. ` : ''}
-            Elige la disciplina. Puedes cambiarla después desde el menú.
+            {t('Elige la disciplina. Puedes cambiarla después desde el menú.')}
           </p>
         </div>
 

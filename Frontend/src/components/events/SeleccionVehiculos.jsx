@@ -125,7 +125,7 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
   if (categorias.length === 0) {
     return (
       <p className="text-sm text-neutral-600 py-4">
-        Vuelve al paso anterior y elige al menos una categoría.
+        {t('Vuelve al paso anterior y elige al menos una categoría.')}
       </p>
     )
   }

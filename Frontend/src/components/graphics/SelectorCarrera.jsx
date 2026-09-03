@@ -57,7 +57,7 @@ export default function SelectorCarrera() {
           ¿QUÉ VAS A GRAFICAR?
         </h2>
         <p className="text-neutral-500 text-sm">
-          Elige el evento y, si quieres, la tanda concreta. Puedes cambiarlo después.
+          {t('Elige el evento y, si quieres, la tanda concreta. Puedes cambiarlo después.')}
         </p>
       </div>
 
@@ -73,7 +73,7 @@ export default function SelectorCarrera() {
             {t('No hay eventos registrados en esta disciplina.')}
           </p>
           <p className="text-neutral-600 text-xs mt-1">
-            Créalos desde el módulo de Eventos, o continúa sin carrera.
+            {t('Créalos desde el módulo de Eventos, o continúa sin carrera.')}
           </p>
         </div>
       )}

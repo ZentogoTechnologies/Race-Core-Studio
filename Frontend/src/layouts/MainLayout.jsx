@@ -87,7 +87,7 @@ export default function MainLayout() {
             <>
               <span className="flex-1 text-left">
                 <span className="block text-[10px] uppercase tracking-wider text-neutral-500">{t('Disciplina')}</span>
-                <span className="block text-sm font-bold text-neutral-200">{etiquetaDisciplina}</span>
+                <span className="block text-sm font-bold text-neutral-200">{t(etiquetaDisciplina)}</span>
               </span>
               <Repeat size={14} className="text-neutral-600 group-hover:text-red-500 transition-colors" />
             </>

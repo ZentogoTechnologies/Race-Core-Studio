@@ -199,7 +199,7 @@ export default function UsuariosModule() {
 
             {editandoOwner ? (
               <p className="text-sm text-neutral-500 bg-[#0a0a0a] border border-neutral-800 rounded p-3">
-                El rol de dueño no se cambia desde aquí. Se asigna con el script
+                {t('El rol de dueño no se cambia desde aquí. Se asigna con el script')}
                 <span className="text-neutral-300 font-mono"> seed_admin.py</span>.
               </p>
             ) : currentEditId === usuario?.user_id ? (

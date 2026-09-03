@@ -12,7 +12,7 @@ export default function EventSelectionScreen({ onSelectEvent }) {
           {t('SELECCIONA LA MODALIDAD')}
         </h2>
         <p className="text-neutral-400">
-          Elige el tipo de evento que deseas gestionar en esta sesión.
+          {t('Elige el tipo de evento que deseas gestionar en esta sesión.')}
         </p>
       </div>
 
@@ -28,7 +28,7 @@ export default function EventSelectionScreen({ onSelectEvent }) {
             {t('DRAG RACING')}
           </h3>
           <p className="text-neutral-400 relative z-10">
-            Gestión de 1/4 de milla, tiempos de reacción y llaves de eliminación.
+            {t('Gestión de 1/4 de milla, tiempos de reacción y llaves de eliminación.')}
           </p>
         </button>
 
@@ -43,7 +43,7 @@ export default function EventSelectionScreen({ onSelectEvent }) {
             {t('CIRCUITO')}
           </h3>
           <p className="text-neutral-400 relative z-10">
-            Gestión de carreras de pista, vueltas, clasificaciones y endurance.
+            {t('Gestión de carreras de pista, vueltas, clasificaciones y endurance.')}
           </p>
         </button>
       </div>

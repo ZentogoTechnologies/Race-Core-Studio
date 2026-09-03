@@ -119,7 +119,7 @@ export default function HomeModule() {
           </div>
           <h3 className="text-2xl font-black italic mb-2">{t('RACE CORE STUDIO DETENIDO')}</h3>
           <p className="text-neutral-400 text-sm mb-6">
-            MongoDB sigue corriendo: es un servicio de Windows y no se detiene desde aquí.
+            {t('MongoDB sigue corriendo: es un servicio de Windows y no se detiene desde aquí.')}
           </p>
 
           <div className="flex flex-col gap-2 mb-6">
@@ -171,7 +171,7 @@ export default function HomeModule() {
             className="flex items-center gap-2 px-5 py-3 rounded-xl border border-green-600/40 bg-green-600/5 text-green-400 hover:bg-green-600/15 hover:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-sm whitespace-nowrap flex-shrink-0"
           >
             {exportando ? <Loader2 size={18} className="animate-spin"/> : <Download size={18} />}
-            EXPORTAR TODO
+            {t('EXPORTAR TODO')}
           </button>
         </div>
 
@@ -200,7 +200,7 @@ export default function HomeModule() {
           <div>
             <p className="text-white font-bold text-sm mb-1">{t('Detener Race Core Studio')}</p>
             <p className="text-neutral-500 text-sm">
-              Cierra CasparCG, el frontend y el backend. La base de datos sigue corriendo.
+              {t('Cierra CasparCG, el frontend y el backend. La base de datos sigue corriendo.')}
             </p>
           </div>
 
@@ -233,7 +233,7 @@ export default function HomeModule() {
               <div>
                 <h3 className="font-bold text-white">{t('Detener Race Core Studio')}</h3>
                 <p className="text-sm text-neutral-400 mt-1">
-                  Si hay algo al aire, sale de pantalla en el momento.
+                  {t('Si hay algo al aire, sale de pantalla en el momento.')}
                 </p>
               </div>
             </div>
