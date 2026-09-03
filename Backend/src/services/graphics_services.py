@@ -431,10 +431,12 @@ async def build_grid_payload(limite: int = 30) -> dict:
         for fila in datos.get("standings", [])
     ]
 
-    # El logo que se haya subido en Ajustes; si no hay ninguno, el de
-    # fábrica que ya trae la plantilla.
-    from src.services.settings_services import url_logo_cliente
-
+    # El logo no viaja en el payload. url_logo_cliente() devuelve una ruta
+    # relativa a la raíz ("/media/logo/..."), y CasparCG abre las
+    # plantillas con file://, donde eso apunta a la raíz del disco y la
+    # imagen no carga nunca. La plantilla apunta directamente a
+    # img/logo-cliente.png, que es el archivo que Ajustes sobrescribe al
+    # subir uno nuevo: es como lo resuelven el evento y el narrador.
     return {
         "title": "Grilla de Partida",
         # El evento en curso según MyLaps, que es el que se está corriendo.
@@ -442,7 +444,6 @@ async def build_grid_payload(limite: int = 30) -> dict:
         # group_name y no group: MyLaps antepone el número de grupo
         # ("5 - STREET LEGAL") y en el arte solo interesa el nombre.
         "category": datos.get("group_name", ""),
-        "logo": url_logo_cliente(),
         "drivers": pilotos,
     }
 
