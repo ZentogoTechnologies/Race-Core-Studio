@@ -302,7 +302,11 @@ function torreProgramarCorto(){
 
     clearTimeout(torreTemporizador);
 
-    if (torreConfig.retraso <= 0) {
+    /* Con la columna de tiempos abierta los nombres van cortos y se quedan
+       cortos. Volver a estirarlos cada vez que se pulsa al lider o al
+       intervalo obligaba a esperar otros siete segundos para leer lo que
+       se acababa de pedir, que es justo el tiempo. */
+    if (torreConfig.retraso <= 0 || torreConfig.columna) {
         torreElemento.classList.add("corto");
         return;
     }
@@ -592,6 +596,10 @@ function actualizarTorre(data){
 
             torreFirma = null;
             torrePintar(timingUltimo());
+
+            /* Se reevalua aqui: al abrir la columna deja los nombres
+               cortos, y al cerrarla vuelve a regir el retraso de siempre. */
+            torreProgramarCorto();
         }
 
         if (d.limite) {

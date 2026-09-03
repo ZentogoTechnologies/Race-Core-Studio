@@ -262,10 +262,10 @@
 
 .tf-reloj-valor{
 
-    /* El mismo cuerpo que los nombres de la clasificacion: el reloj y los
-       pilotos son datos del mismo rango y leerlos con la misma letra hace
-       que el totem se lea como una pieza y no como dos. */
-    font-size:15px;
+    /* Del orden de los nombres de la clasificacion, un punto por encima:
+       el reloj y los pilotos son datos del mismo rango, pero el reloj es
+       uno solo y aguanta algo mas de peso sin desequilibrar la pieza. */
+    font-size:17px;
 
     font-weight:900;
 
