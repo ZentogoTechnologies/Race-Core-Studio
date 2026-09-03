@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useEffect, useState } from 'react'
 import { Calendar, Tag, Users, Car, Download, Loader2, Power, AlertTriangle } from 'lucide-react'
 import { exportAllToJSON } from '../utils/exportJSON'
@@ -116,7 +117,7 @@ export default function HomeModule() {
           <div className="bg-red-600/10 w-fit p-3 rounded-lg text-red-500 mb-5">
             <Power size={26} />
           </div>
-          <h3 className="text-2xl font-black italic mb-2">RACE CORE STUDIO DETENIDO</h3>
+          <h3 className="text-2xl font-black italic mb-2">{t('RACE CORE STUDIO DETENIDO')}</h3>
           <p className="text-neutral-400 text-sm mb-6">
             MongoDB sigue corriendo: es un servicio de Windows y no se detiene desde aquí.
           </p>
@@ -157,9 +158,9 @@ export default function HomeModule() {
 
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2 relative z-10">
           <div>
-            <h3 className="text-3xl font-black italic mb-2">PANEL DE CONTROL</h3>
+            <h3 className="text-3xl font-black italic mb-2">{t('PANEL DE CONTROL')}</h3>
             <p className="text-neutral-400">
-              Mostrando <span className="text-red-400 font-bold">{etiqueta}</span>.
+              {t('Mostrando')} <span className="text-red-400 font-bold">{etiqueta}</span>.
               Selecciona un módulo del menú para administrar los registros.
             </p>
           </div>
@@ -185,7 +186,7 @@ export default function HomeModule() {
       <div className="bg-[#141414] border border-neutral-800 rounded-xl px-6 py-4 flex items-center gap-3">
         <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
         <p className="text-neutral-400 text-sm">
-          <span className="text-white font-semibold">EXPORTAR TODO</span> genera un único archivo{' '}
+          <span className="text-white font-semibold">{t('EXPORTAR TODO')}</span> genera un único archivo{' '}
           <span className="text-green-400 font-semibold">.json</span> con una sección por modulo:
           Eventos, Categorías, Pilotos y Vehículos.
         </p>
@@ -197,7 +198,7 @@ export default function HomeModule() {
       {puedeEscribir && (
         <div className="bg-[#141414] border border-red-900/40 rounded-xl px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <p className="text-white font-bold text-sm mb-1">Detener Race Core Studio</p>
+            <p className="text-white font-bold text-sm mb-1">{t('Detener Race Core Studio')}</p>
             <p className="text-neutral-500 text-sm">
               Cierra CasparCG, el frontend y el backend. La base de datos sigue corriendo.
             </p>
@@ -230,7 +231,7 @@ export default function HomeModule() {
             <div className="flex items-start gap-3 mb-4">
               <AlertTriangle className="text-red-500 flex-shrink-0 mt-0.5" size={22} />
               <div>
-                <h3 className="font-bold text-white">Detener Race Core Studio</h3>
+                <h3 className="font-bold text-white">{t('Detener Race Core Studio')}</h3>
                 <p className="text-sm text-neutral-400 mt-1">
                   Si hay algo al aire, sale de pantalla en el momento.
                 </p>
@@ -238,13 +239,13 @@ export default function HomeModule() {
             </div>
 
             <div className="bg-[#0a0a0a] border border-neutral-800 rounded-lg px-4 py-3 mb-5 text-sm">
-              <p className="text-neutral-300 mb-2 font-semibold">Se detienen:</p>
+              <p className="text-neutral-300 mb-2 font-semibold">{t('Se detienen:')}</p>
               <ul className="text-neutral-500 space-y-1 mb-3">
                 <li>· CasparCG — el servidor de gráficos</li>
                 <li>· Frontend — este panel</li>
                 <li>· Backend — el API</li>
               </ul>
-              <p className="text-neutral-300 font-semibold">Sigue corriendo:</p>
+              <p className="text-neutral-300 font-semibold">{t('Sigue corriendo:')}</p>
               <p className="text-neutral-500">· MongoDB — no se pierde ningún dato</p>
             </div>
 
@@ -253,7 +254,7 @@ export default function HomeModule() {
                 onClick={() => setConfirmando(false)}
                 className="px-5 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold text-sm"
               >
-                CANCELAR
+                {t('CANCELAR')}
               </button>
               <button
                 onClick={detenerTodo}

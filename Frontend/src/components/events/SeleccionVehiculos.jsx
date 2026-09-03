@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { useMemo, useState } from 'react'
 import { Check, CheckSquare, ChevronRight, Layers, Square, User } from 'lucide-react'
 
@@ -231,7 +232,7 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
               )}
 
               {grupo.carros.length === 0 ? (
-                <p className="text-xs text-neutral-700 pl-6 py-1">Sin vehículos en esta subcategoría.</p>
+                <p className="text-xs text-neutral-700 pl-6 py-1">{t('Sin vehículos en esta subcategoría.')}</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {grupo.carros.map(v => {

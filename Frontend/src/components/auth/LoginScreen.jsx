@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { User, Shield, Loader2 } from 'lucide-react'
@@ -61,7 +62,7 @@ export default function LoginScreen() {
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label className="block text-neutral-400 text-xs font-bold mb-2 uppercase tracking-wider">
-              Usuario
+              {t('Usuario')}
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 w-5 h-5" />

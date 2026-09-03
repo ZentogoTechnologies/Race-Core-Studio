@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import { DisciplinaProvider } from './context/DisciplinaContext'
 import { CarreraProvider } from './context/CarreraContext'
+import { IdiomaProvider } from './context/IdiomaContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import RoleRoute from './components/auth/RoleRoute'
 import DisciplinaGate from './components/shared/DisciplinaGate'
@@ -23,6 +24,7 @@ export default function App() {
       <AuthProvider>
         {/* Los avisos van por fuera de la guarda: un error de sesión
             expirada tiene que poder mostrarse también en el login. */}
+        <IdiomaProvider>
         <ToastProvider>
           <DisciplinaProvider>
             <CarreraProvider>
@@ -64,6 +66,7 @@ export default function App() {
             </CarreraProvider>
           </DisciplinaProvider>
         </ToastProvider>
+        </IdiomaProvider>
       </AuthProvider>
     </BrowserRouter>
   )

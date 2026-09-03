@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useMemo, useState } from 'react'
 import {
   Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2,
@@ -157,15 +158,15 @@ export default function UsuariosModule() {
       />
 
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-xs uppercase tracking-wider text-neutral-500">Estado</label>
+        <label className="text-xs uppercase tracking-wider text-neutral-500">{t('Estado')}</label>
         <select
           value={estadoFiltro}
           onChange={e => setEstadoFiltro(e.target.value)}
           className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
         >
-          <option value="">Todos</option>
-          <option value="true">Activos</option>
-          <option value="false">Inactivos</option>
+          <option value="">{t('Todos')}</option>
+          <option value="true">{t('Activos')}</option>
+          <option value="false">{t('Inactivos')}</option>
         </select>
       </div>
 
@@ -173,7 +174,7 @@ export default function UsuariosModule() {
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Usuario</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Usuario')}</label>
               <input
                 required type="text" minLength={3} value={userForm.username}
                 autoComplete="off"
@@ -194,7 +195,7 @@ export default function UsuariosModule() {
           </div>
 
           <div className="mt-5">
-            <label className="block text-neutral-400 text-xs mb-2 uppercase">Rol</label>
+            <label className="block text-neutral-400 text-xs mb-2 uppercase">{t('Rol')}</label>
 
             {editandoOwner ? (
               <p className="text-sm text-neutral-500 bg-[#0a0a0a] border border-neutral-800 rounded p-3">
@@ -228,7 +229,7 @@ export default function UsuariosModule() {
           </div>
 
           <div className="flex justify-end gap-3 mt-5">
-            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">CANCELAR</button>
+            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">{t('CANCELAR')}</button>
             <button type="submit" disabled={guardando}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
@@ -242,11 +243,11 @@ export default function UsuariosModule() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-neutral-900 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
-              <th className="p-4 font-bold"><span className="flex items-center">Usuario <SortIcon columnKey="username" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Rol <SortIcon columnKey="role" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Creado <SortIcon columnKey="created_at" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold text-right">Estado</th>
-              <th className="p-4 font-bold text-right">Acciones</th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Usuario')} <SortIcon columnKey="username" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Rol')} <SortIcon columnKey="role" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Creado')} <SortIcon columnKey="created_at" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold text-right">{t('Estado')}</th>
+              <th className="p-4 font-bold text-right">{t('Acciones')}</th>
             </tr>
           </thead>
           <tbody>

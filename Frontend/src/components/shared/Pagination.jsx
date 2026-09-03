@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const TAMANOS = [10, 25, 50, 100]
@@ -30,7 +31,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
         <span>
           {total === 0
             ? 'Sin resultados'
-            : <>Mostrando <span className="text-neutral-300 font-bold">{desde}–{hasta}</span> de <span className="text-neutral-300 font-bold">{total}</span></>}
+            : <>{t('Mostrando')} <span className="text-neutral-300 font-bold">{desde}–{hasta}</span> de <span className="text-neutral-300 font-bold">{total}</span></>}
         </span>
         <select
           value={limit}

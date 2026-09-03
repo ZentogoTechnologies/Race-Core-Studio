@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { useEffect, useRef, useState } from 'react'
 import {
   Check, ImageIcon, Loader2, Map, Plus, Trash2, Upload, X,
@@ -153,7 +154,7 @@ export default function Trazados() {
       <div className="flex items-start justify-between gap-4 mb-1">
         <div className="flex items-center gap-2">
           <Map size={17} className="text-neutral-500"/>
-          <h3 className="text-lg font-black italic text-white">TRAZADOS DE PISTA</h3>
+          <h3 className="text-lg font-black italic text-white">{t('TRAZADOS DE PISTA')}</h3>
         </div>
         <button
           type="button"

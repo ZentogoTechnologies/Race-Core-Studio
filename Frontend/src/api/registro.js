@@ -198,6 +198,13 @@ export const urlImagenTrazado = (imagen) =>
 // Las tipografías empaquetadas con el software. La URL que devuelve cada
 // una apunta a /media/fonts, que sirve los mismos archivos que usan las
 // plantillas: así el panel enseña exactamente la letra que va a salir.
+// El idioma vale para la interfaz y para los gráficos: al cambiarlo, el
+// backend reescribe además el archivo de textos que leen las plantillas.
+export const listarIdiomas = () => pedir('/settings/idiomas')
+
+export const elegirIdioma = (id) =>
+  pedir(`/settings/idiomas/${id}`, { method: 'PUT' })
+
 export const listarFuentes = () => pedir('/settings/fuentes')
 
 export const elegirFuente = (id) =>

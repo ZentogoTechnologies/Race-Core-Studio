@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2, Upload, User, X } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
@@ -232,13 +233,13 @@ export default function PilotosModule() {
       />
 
       <div className="flex items-center gap-3 mb-4">
-        <label className="text-xs uppercase tracking-wider text-neutral-500">Categoría</label>
+        <label className="text-xs uppercase tracking-wider text-neutral-500">{t('Categoría')}</label>
         <select
           value={categoriaFiltro}
           onChange={e => setCategoriaFiltro(e.target.value)}
           className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
         >
-          <option value="">Todas</option>
+          <option value="">{t('Todas')}</option>
           {categorias.map(c => (
             <option key={c.category_id} value={c.category_id}>{c.category_name}</option>
           ))}
@@ -246,40 +247,40 @@ export default function PilotosModule() {
 
         {/* El estado se filtra en el backend como los demás: hacerlo sobre
             la página visible dejaría el total y la paginación mintiendo. */}
-        <label className="text-xs uppercase tracking-wider text-neutral-500">Estado</label>
+        <label className="text-xs uppercase tracking-wider text-neutral-500">{t('Estado')}</label>
         <select
           value={estadoFiltro}
           onChange={e => setEstadoFiltro(e.target.value)}
           className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
         >
-          <option value="">Todos</option>
-          <option value="true">Activos</option>
-          <option value="false">Inactivos</option>
+          <option value="">{t('Todos')}</option>
+          <option value="true">{t('Activos')}</option>
+          <option value="false">{t('Inactivos')}</option>
         </select>
       </div>
 
       {isFormOpen && (
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Nombre')}</label>
             <input required type="text" value={pilotForm.name}
               onChange={e => setPilotForm({ ...pilotForm, name: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Apellido</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Apellido')}</label>
             <input required type="text" value={pilotForm.last_name}
               onChange={e => setPilotForm({ ...pilotForm, last_name: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Nacionalidad</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Nacionalidad')}</label>
             <input type="text" value={pilotForm.nationality} placeholder="Panama"
               onChange={e => setPilotForm({ ...pilotForm, nationality: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Equipo</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Equipo')}</label>
             <input type="text" value={pilotForm.team_brand}
               onChange={e => setPilotForm({ ...pilotForm, team_brand: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
@@ -293,7 +294,7 @@ export default function PilotosModule() {
             </div>
 
             <div className="min-w-0">
-              <label className="block text-neutral-400 text-xs mb-2 uppercase">Foto del piloto</label>
+              <label className="block text-neutral-400 text-xs mb-2 uppercase">{t('Foto del piloto')}</label>
 
               <input
                 type="file" accept="image/*" ref={inputFoto} className="hidden"
@@ -330,7 +331,7 @@ export default function PilotosModule() {
           </div>
 
           <div className="col-span-full">
-            <label className="block text-neutral-400 text-xs mb-2 uppercase">Categorías</label>
+            <label className="block text-neutral-400 text-xs mb-2 uppercase">{t('Categorías')}</label>
             <div className="flex flex-wrap gap-2">
               {categorias.map(c => {
                 const activa = pilotForm.category_ids.includes(c.category_id)
@@ -352,7 +353,7 @@ export default function PilotosModule() {
           </div>
 
           <div className="col-span-full flex justify-end gap-3 mt-2">
-            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">CANCELAR</button>
+            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">{t('CANCELAR')}</button>
             <button type="submit" disabled={guardando}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
@@ -366,12 +367,12 @@ export default function PilotosModule() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-neutral-900 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
-              <th className="p-4 font-bold"><span className="flex items-center">Piloto <SortIcon columnKey="last_name" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Nacionalidad <SortIcon columnKey="nationality" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Equipo <SortIcon columnKey="team_brand" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold">Categorías</th>
-              <th className="p-4 font-bold text-right">Estado</th>
-              {puedeEscribir && <th className="p-4 font-bold text-right">Acciones</th>}
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Piloto')} <SortIcon columnKey="last_name" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Nacionalidad')} <SortIcon columnKey="nationality" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Equipo')} <SortIcon columnKey="team_brand" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold">{t('Categorías')}</th>
+              <th className="p-4 font-bold text-right">{t('Estado')}</th>
+              {puedeEscribir && <th className="p-4 font-bold text-right">{t('Acciones')}</th>}
             </tr>
           </thead>
           <tbody>

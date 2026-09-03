@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Flag, Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Users, Loader2, ImagePlus, X } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
@@ -263,13 +264,13 @@ export default function VehiculosModule() {
       />
 
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <label className="text-xs uppercase tracking-wider text-neutral-500">Categoría</label>
+        <label className="text-xs uppercase tracking-wider text-neutral-500">{t('Categoría')}</label>
         <select
           value={categoriaFiltro}
           onChange={e => setCategoriaFiltro(e.target.value)}
           className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
         >
-          <option value="">Todas</option>
+          <option value="">{t('Todas')}</option>
           {categorias.map(c => (
             <option key={c.category_id} value={c.category_id}>{c.category_name}</option>
           ))}
@@ -279,13 +280,13 @@ export default function VehiculosModule() {
             desplegable con una única opción vacía no dice nada. */}
         {subcategoriasFiltro.length > 0 && (
           <>
-            <label className="text-xs uppercase tracking-wider text-neutral-500">Subcategoría</label>
+            <label className="text-xs uppercase tracking-wider text-neutral-500">{t('Subcategoría')}</label>
             <select
               value={subFiltro}
               onChange={e => setSubFiltro(e.target.value)}
               className="bg-[#141414] border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600"
             >
-              <option value="">Todas</option>
+              <option value="">{t('Todas')}</option>
               {subcategoriasFiltro.map(sc => (
                 <option key={sc.sub_category_id} value={sc.sub_category_id}>
                   {sc.sub_category_name}
@@ -297,7 +298,7 @@ export default function VehiculosModule() {
 
         {/* Buscar por piloto: se quiere saber qué corre alguien, y de paso
             se ven sus categorías y subcategorías en la propia tabla. */}
-        <label className="text-xs uppercase tracking-wider text-neutral-500">Piloto</label>
+        <label className="text-xs uppercase tracking-wider text-neutral-500">{t('Piloto')}</label>
         <div className="relative">
           <input
             type="text"
@@ -323,46 +324,46 @@ export default function VehiculosModule() {
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Dorsal</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Dorsal')}</label>
               <input required type="number" min="0" value={vehicleForm.number}
                 onChange={e => setVehicleForm({ ...vehicleForm, number: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Dorsal en pantalla</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Dorsal en pantalla')}</label>
               <input type="text" value={vehicleForm.display_number} placeholder={vehicleForm.number || 'igual al dorsal'}
                 onChange={e => setVehicleForm({ ...vehicleForm, display_number: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Color</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Color')}</label>
               <input type="text" value={vehicleForm.color}
                 onChange={e => setVehicleForm({ ...vehicleForm, color: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Marca</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Marca')}</label>
               <input required type="text" value={vehicleForm.brand}
                 onChange={e => setVehicleForm({ ...vehicleForm, brand: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Modelo</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Modelo')}</label>
               <input type="text" value={vehicleForm.model}
                 onChange={e => setVehicleForm({ ...vehicleForm, model: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Categoría</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Categoría')}</label>
               <select required value={vehicleForm.category_id}
                 onChange={e => setVehicleForm({ ...vehicleForm, category_id: e.target.value, sub_category_id: '' })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white">
-                <option value="">Seleccionar...</option>
+                <option value="">{t('Seleccionar...')}</option>
                 {categorias.map(c => <option key={c.category_id} value={c.category_id}>{c.category_name}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Subcategoría</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Subcategoría')}</label>
               <select value={vehicleForm.sub_category_id}
                 disabled={subcategorias.length === 0}
                 onChange={e => setVehicleForm({ ...vehicleForm, sub_category_id: e.target.value })}
@@ -418,7 +419,7 @@ export default function VehiculosModule() {
                   className="w-28 h-20 rounded-lg border border-dashed border-neutral-700 text-neutral-500 hover:border-blue-500 hover:text-blue-400 transition-colors flex flex-col items-center justify-center gap-1"
                 >
                   <ImagePlus size={18}/>
-                  <span className="text-[11px] font-bold">AÑADIR</span>
+                  <span className="text-[11px] font-bold">{t('AÑADIR')}</span>
                 </button>
               )}
             </div>
@@ -481,13 +482,13 @@ export default function VehiculosModule() {
                 )
               })}
               {pilotosFiltrados.length === 0 && (
-                <p className="col-span-full text-sm text-neutral-600 py-3">Ningún piloto coincide.</p>
+                <p className="col-span-full text-sm text-neutral-600 py-3">{t('Ningún piloto coincide.')}</p>
               )}
             </div>
           </div>
 
           <div className="flex justify-end gap-3 mt-5">
-            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">CANCELAR</button>
+            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">{t('CANCELAR')}</button>
             <button type="submit" disabled={guardando}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
@@ -501,11 +502,11 @@ export default function VehiculosModule() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-neutral-900 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
-              <th className="p-4 font-bold"><span className="flex items-center">Dorsal <SortIcon columnKey="number" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Vehículo <SortIcon columnKey="brand" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Categoría <SortIcon columnKey="category_id" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold">Pilotos</th>
-              {puedeEscribir && <th className="p-4 font-bold text-right">Acciones</th>}
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Dorsal')} <SortIcon columnKey="number" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Vehículo')} <SortIcon columnKey="brand" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Categoría')} <SortIcon columnKey="category_id" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold">{t('Pilotos')}</th>
+              {puedeEscribir && <th className="p-4 font-bold text-right">{t('Acciones')}</th>}
             </tr>
           </thead>
           <tbody>
@@ -533,7 +534,7 @@ export default function VehiculosModule() {
                   </span>
                 </td>
                 <td className="p-4">
-                  <p className="font-bold text-white">{vehiculo.brand || <span className="text-neutral-600">Sin marca</span>}</p>
+                  <p className="font-bold text-white">{vehiculo.brand || <span className="text-neutral-600">{t('Sin marca')}</span>}</p>
                   <p className="text-xs text-neutral-500">{vehiculo.model || '—'}{vehiculo.color ? ` · ${vehiculo.color}` : ''}</p>
                 </td>
                 <td className="p-4 text-neutral-300 text-sm">
@@ -551,7 +552,7 @@ export default function VehiculosModule() {
                         ))}
                       </div>
                     )
-                    : <span className="text-neutral-600">Sin piloto</span>}
+                    : <span className="text-neutral-600">{t('Sin piloto')}</span>}
                 </td>
                 {puedeEscribir && (
                   <td className="p-4 text-right whitespace-nowrap">

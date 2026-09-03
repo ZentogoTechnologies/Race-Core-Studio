@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useEffect, useRef, useState } from 'react'
 import {
   Loader2, CheckCircle2, AlertCircle, FolderSearch, Save, FlaskConical,
@@ -10,6 +11,7 @@ import {
 import { reconectarCasparcg } from '../api/graphics'
 import Trazados from '../components/settings/Trazados'
 import { useToast } from '../context/ToastContext'
+import { useIdioma } from '../context/IdiomaContext'
 
 
 // ─── Pestañas ─────────────────────────────────────────────────
@@ -19,23 +21,13 @@ const PESTANAS = [
   { id: 'imagenes',   nombre: 'Imágenes',   Icon: ImageIcon },
 ]
 
-// Los idiomas previstos. De momento solo se sirve español; los demás se
-// listan para que se vea hacia dónde va y no como un desplegable de uno
-// que parece roto.
-const IDIOMAS = [
-  { id: 'es', nombre: 'Español',   listo: true  },
-  { id: 'en', nombre: 'English',   listo: false },
-  { id: 'pt', nombre: 'Português', listo: false },
-  { id: 'fr', nombre: 'Français',  listo: false },
-  { id: 'it', nombre: 'Italiano',  listo: false },
-]
-
 // ─── Generales ────────────────────────────────────────────────
 function Generales() {
 
   const { toast } = useToast()
 
-  const [idioma,   setIdioma]   = useState('es')
+  const { idioma, idiomas, cambiar: cambiarIdioma } = useIdioma()
+
   const [fuentes,  setFuentes]  = useState([])
   const [actual,   setActual]   = useState(null)
   const [guardando, setGuardando] = useState(null)
@@ -83,19 +75,22 @@ function Generales() {
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
         <div className="flex items-center gap-2 mb-1">
           <Languages size={17} className="text-neutral-500"/>
-          <h3 className="text-lg font-black italic text-white">IDIOMA</h3>
+          <h3 className="text-lg font-black italic text-white">{t('IDIOMA')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
-          El de la interfaz y el de los rótulos de los gráficos. Por ahora solo
-          está el español; los demás quedan listados para saber qué viene.
+          Cambia la interfaz y los rótulos de los gráficos a la vez. Los datos
+          —nombres, equipos, marcas— no se traducen: son nombres propios.
         </p>
 
         <select
           value={idioma}
-          onChange={e => setIdioma(e.target.value)}
+          onChange={async e => {
+            try { await cambiarIdioma(e.target.value) }
+            catch (err) { toast(err.message || 'No se pudo cambiar el idioma', 'error') }
+          }}
           className="w-full sm:w-72 bg-[#0a0a0a] border border-neutral-800 rounded p-2.5 focus:border-red-600 focus:outline-none text-white"
         >
-          {IDIOMAS.map(l => (
+          {idiomas.map(l => (
             <option key={l.id} value={l.id} disabled={!l.listo}>
               {l.nombre}{l.listo ? '' : ' — próximamente'}
             </option>
@@ -106,7 +101,7 @@ function Generales() {
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
         <div className="flex items-center gap-2 mb-1">
           <Type size={17} className="text-neutral-500"/>
-          <h3 className="text-lg font-black italic text-white">TIPOGRAFÍA DE LOS GRÁFICOS</h3>
+          <h3 className="text-lg font-black italic text-white">{t('TIPOGRAFÍA DE LOS GRÁFICOS')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
           La letra con la que salen al aire los tótems, las banderas, las cartas y
@@ -347,7 +342,7 @@ export default function AjustesModule() {
         {pestana === 'conexiones' && (
           <>
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
-        <h3 className="text-lg font-black italic text-white mb-1">CRONOMETRAJE</h3>
+        <h3 className="text-lg font-black italic text-white mb-1">{t('CRONOMETRAJE')}</h3>
         <p className="text-neutral-500 text-sm mb-5">
           Archivo que MyLaps reescribe con la clasificación en vivo. El backend lo relee
           varias veces por segundo mientras hay una tanda en pista.
@@ -396,7 +391,7 @@ export default function AjustesModule() {
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
         <div className="flex items-center gap-2 mb-1">
           <FolderSearch size={17} className="text-neutral-500"/>
-          <h3 className="text-lg font-black italic text-white">ARCHIVOS DETECTADOS</h3>
+          <h3 className="text-lg font-black italic text-white">{t('ARCHIVOS DETECTADOS')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-4">
           XML que el servidor alcanza ahora mismo. Pulsa uno para ponerlo en el campo de arriba.
@@ -432,7 +427,7 @@ export default function AjustesModule() {
             )
           })}
           {detectados.length === 0 && (
-            <p className="text-sm text-neutral-600">El servidor no encuentra ningún XML.</p>
+            <p className="text-sm text-neutral-600">{t('El servidor no encuentra ningún XML.')}</p>
           )}
         </div>
       </div>
@@ -443,7 +438,7 @@ export default function AjustesModule() {
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
         <div className="flex items-center gap-2 mb-1">
           <Plug size={17} className="text-neutral-500"/>
-          <h3 className="text-lg font-black italic text-white">CONEXIÓN CON CASPARCG</h3>
+          <h3 className="text-lg font-black italic text-white">{t('CONEXIÓN CON CASPARCG')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
           Si cerraste y volviste a abrir CasparCG, la conexión anterior se queda
@@ -484,7 +479,7 @@ export default function AjustesModule() {
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
         <div className="flex items-center gap-2 mb-1">
           <ImageIcon size={17} className="text-neutral-500"/>
-          <h3 className="text-lg font-black italic text-white">LOGO DEL AUTÓDROMO</h3>
+          <h3 className="text-lg font-black italic text-white">{t('LOGO DEL AUTÓDROMO')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
           Sale en todos los gráficos: tótems, banderas, fichas y cartas. Se guarda

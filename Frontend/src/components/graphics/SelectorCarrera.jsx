@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { useEffect, useState } from 'react'
 import {
   CalendarDays, ChevronRight, Loader2, SkipForward, Timer, Flag, Trophy, Radio,
@@ -181,7 +182,7 @@ export default function SelectorCarrera() {
           AVANZAR SIN CARRERA SELECCIONADA
         </button>
         <p className="text-xs text-neutral-600 text-center mt-2">
-          Solo quedará disponible la pestaña <span className="text-neutral-400 font-bold">General</span>:
+          Solo quedará disponible la pestaña <span className="text-neutral-400 font-bold">{t('General')}</span>:
           fondos y misceláneos. Carrera, Pilotos y Grilla necesitan saber qué se está corriendo.
         </p>
       </div>

@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useEffect, useMemo, useState } from 'react'
 import SelectorCarrera from '../components/graphics/SelectorCarrera'
 import { useCarrera } from '../context/CarreraContext'
@@ -268,7 +269,7 @@ function SelectorPiloto({
             onClick={() => { onQuitar(); setBusqueda('') }}
             className="text-neutral-400 hover:text-white text-xs font-bold flex-shrink-0"
           >
-            CAMBIAR
+            {t('CAMBIAR')}
           </button>
         </div>
       ) : (
@@ -304,7 +305,7 @@ function SelectorPiloto({
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16} />
             <input
-              type="text" value={busqueda} placeholder="Buscar piloto..."
+              type="text" value={busqueda} placeholder={t('Buscar piloto...')}
               onChange={e => setBusqueda(e.target.value)}
               className={`${CLASE_CAMPO} pl-9`}
             />
@@ -316,7 +317,7 @@ function SelectorPiloto({
                 No hay pilotos registrados todavía.
               </p>
             ) : filtrados.length === 0 ? (
-              <p className="p-3 text-neutral-500 text-sm">Sin coincidencias.</p>
+              <p className="p-3 text-neutral-500 text-sm">{t('Sin coincidencias.')}</p>
             ) : (
               filtrados.map(p => (
                 <button
@@ -473,14 +474,14 @@ function FormularioPersonal({
       ) : tipo === 'narrador' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Nombre')}</label>
             <input
               type="text" value={narrador.nombre} className={inputClass}
               onChange={e => setNarrador({ ...narrador, nombre: e.target.value })}
             />
           </div>
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Equipo / Canal</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Equipo / Canal')}</label>
             <input
               type="text" value={narrador.equipo} className={inputClass}
               onChange={e => setNarrador({ ...narrador, equipo: e.target.value })}
@@ -541,7 +542,7 @@ function FormularioPersonal({
           className="flex items-center gap-2 px-5 py-2 rounded border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 hover:bg-red-600/10 transition-all font-bold text-sm disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-neutral-700 disabled:hover:text-neutral-300 disabled:hover:bg-transparent"
         >
           <EyeOff size={16} />
-          OCULTAR
+          {t('OCULTAR')}
         </button>
         <button
           type="button" onClick={onMostrar} disabled={!listo || ocupado}
@@ -1188,7 +1189,7 @@ export default function GraficosModule() {
         <div className="min-w-0">
           {hayCarrera ? (
             <>
-              <p className="text-[11px] uppercase tracking-wider text-neutral-500">Graficando</p>
+              <p className="text-[11px] uppercase tracking-wider text-neutral-500">{t('Graficando')}</p>
               {/* Con las fechas se distingue un evento de otro del mismo
                   nombre: dos Prospec Series del mismo año, o el del año
                   pasado. Solo el nombre no basta. */}
@@ -1204,7 +1205,7 @@ export default function GraficosModule() {
             </>
           ) : (
             <>
-              <p className="text-[11px] uppercase tracking-wider text-amber-500">Sin carrera seleccionada</p>
+              <p className="text-[11px] uppercase tracking-wider text-amber-500">{t('Sin carrera seleccionada')}</p>
               <p className="text-sm text-amber-200/80">
                 Solo está disponible la pestaña General.
               </p>
@@ -1233,7 +1234,7 @@ export default function GraficosModule() {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 min-w-0 flex-1">
               {capasAlAire.length === 0 ? (
                 <p className="text-base font-black italic text-neutral-600">
-                  NADA AL AIRE
+                  {t('NADA AL AIRE')}
                 </p>
               ) : (
                 capasAlAire.map(({ seccion, item }) => (

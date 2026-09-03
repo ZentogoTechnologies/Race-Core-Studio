@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { AlertTriangle } from 'lucide-react'
 
 /**
@@ -44,7 +45,7 @@ export default function ConfirmDialog({
             onClick={onCancelar}
             className="px-5 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold text-sm"
           >
-            CANCELAR
+            {t('CANCELAR')}
           </button>
           <button
             onClick={onConfirmar}

@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Pencil, Trash2, Plus, X, ChevronUp, ChevronDown, ChevronsUpDown, Loader2,
@@ -222,13 +223,13 @@ export default function CategoriasModule() {
       {isFormOpen && (
         <form onSubmit={handleSave} className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Nombre')}</label>
             <input required type="text" value={categoryForm.category_name}
               onChange={e => setCategoryForm({ ...categoryForm, category_name: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
           <div>
-            <label className="block text-neutral-400 text-xs mb-1 uppercase">Descripción</label>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Descripción')}</label>
             <input type="text" value={categoryForm.description}
               onChange={e => setCategoryForm({ ...categoryForm, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
@@ -324,7 +325,7 @@ export default function CategoriasModule() {
           </div>
 
           <div className="col-span-full flex justify-end gap-3 mt-2">
-            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">CANCELAR</button>
+            <button type="button" onClick={closeForm} className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">{t('CANCELAR')}</button>
             <button type="submit" disabled={guardando}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
@@ -341,9 +342,9 @@ export default function CategoriasModule() {
               {/* Ni el ID ni la disciplina se muestran: el ID es interno y
                   la disciplina ya la fija el selector global, así que la
                   columna repetiría el mismo valor en todas las filas. */}
-              <th className="p-4 font-bold"><span className="flex items-center">Categoría <SortIcon columnKey="category_name" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold">Subcategorías</th>
-              {puedeEscribir && <th className="p-4 font-bold text-right">Acciones</th>}
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Categoría')} <SortIcon columnKey="category_name" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold">{t('Subcategorías')}</th>
+              {puedeEscribir && <th className="p-4 font-bold text-right">{t('Acciones')}</th>}
             </tr>
           </thead>
           <tbody>

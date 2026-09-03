@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { useState } from 'react'
 import { Plus, X, Timer, Flag, Trophy, Loader2 } from 'lucide-react'
 import { agregarSesion, quitarSesion } from '../../api/registro'
@@ -189,7 +190,7 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
             )}
 
             {delDia.length === 0 ? (
-              <p className="px-4 py-3 text-sm text-neutral-600">Sin sesiones programadas.</p>
+              <p className="px-4 py-3 text-sm text-neutral-600">{t('Sin sesiones programadas.')}</p>
             ) : (
               <div className="divide-y divide-neutral-800/50">
                 {delDia.map(s => (

@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2,
@@ -294,26 +295,26 @@ export default function EventosModule() {
           <>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Nombre del evento</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Nombre del evento')}</label>
               <input required type="text" value={eventForm.name}
                 onChange={e => setEventForm({ ...eventForm, name: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Fecha de inicio</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Fecha de inicio')}</label>
               <input required type="date" value={eventForm.start_date}
                 onChange={e => setEventForm({ ...eventForm, start_date: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Fecha final</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Fecha final')}</label>
               <input required type="date" value={eventForm.end_date}
                 min={eventForm.start_date || undefined}
                 onChange={e => setEventForm({ ...eventForm, end_date: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">Sede</label>
+              <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Sede')}</label>
               <input type="text" value={eventForm.location} placeholder="Autódromo Panamá"
                 onChange={e => setEventForm({ ...eventForm, location: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
@@ -368,7 +369,7 @@ export default function EventosModule() {
             <div className="md:col-span-2 flex items-end">
               <p className="text-sm text-neutral-500">
                 {totalDias > 0
-                  ? <>Duración: <span className="text-white font-bold">{totalDias} día{totalDias > 1 ? 's' : ''}</span></>
+                  ? <>{t('Duración:')} <span className="text-white font-bold">{totalDias} día{totalDias > 1 ? 's' : ''}</span></>
                   : 'Elige las dos fechas para ver la duración.'}
               </p>
             </div>
@@ -401,7 +402,7 @@ export default function EventosModule() {
                 )
               })}
               {categorias.length === 0 && (
-                <p className="text-sm text-neutral-600">No hay categorías en esta disciplina.</p>
+                <p className="text-sm text-neutral-600">{t('No hay categorías en esta disciplina.')}</p>
               )}
             </div>
           </div>
@@ -432,7 +433,7 @@ export default function EventosModule() {
           <div className="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-neutral-800">
             <button type="button" onClick={closeForm}
               className="px-6 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold">
-              CANCELAR
+              {t('CANCELAR')}
             </button>
 
             <div className="flex items-center gap-3">
@@ -486,12 +487,12 @@ export default function EventosModule() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-neutral-900 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
-              <th className="p-4 font-bold"><span className="flex items-center">Evento <SortIcon columnKey="name" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold"><span className="flex items-center">Fechas <SortIcon columnKey="start_date" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
-              <th className="p-4 font-bold">Categorías</th>
-              <th className="p-4 font-bold text-right">Inscritos</th>
-              <th className="p-4 font-bold text-right">Programa</th>
-              {puedeEscribir && <th className="p-4 font-bold text-right">Acciones</th>}
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Evento')} <SortIcon columnKey="name" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold"><span className="flex items-center">{t('Fechas')} <SortIcon columnKey="start_date" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
+              <th className="p-4 font-bold">{t('Categorías')}</th>
+              <th className="p-4 font-bold text-right">{t('Inscritos')}</th>
+              <th className="p-4 font-bold text-right">{t('Programa')}</th>
+              {puedeEscribir && <th className="p-4 font-bold text-right">{t('Acciones')}</th>}
             </tr>
           </thead>
           <tbody>
