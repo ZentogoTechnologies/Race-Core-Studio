@@ -72,7 +72,7 @@
        claro el borde translúcido se confunde con la pista. */
     box-shadow:0 4px 22px rgba(0,0,0,.55);
 
-    font-family:"Titillium Web", "Segoe UI", Arial, sans-serif;
+    font-family:var(--fuente-graficos);
 }
 
 /* ===================================

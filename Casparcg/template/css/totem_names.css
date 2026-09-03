@@ -520,7 +520,7 @@
 
     margin-bottom:4px;
 
-    font-family:"Rajdhani","Arial",sans-serif;
+    font-family:var(--fuente-graficos);
     font-size:12px;
     font-weight:600;
 

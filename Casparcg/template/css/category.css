@@ -25,7 +25,7 @@
 
 .cat-sub{
 
-    font-family:"Rajdhani","Titillium Web","Segoe UI",Arial,sans-serif;
+    font-family:var(--fuente-graficos);
 
     font-size:23px;
 

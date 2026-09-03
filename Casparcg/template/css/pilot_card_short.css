@@ -135,7 +135,7 @@
 }
 
 .pilot-name{
-    font-family:"Impact","Arial Black",sans-serif;
+    font-family:var(--fuente-graficos);
     font-size:33px;
     font-weight:400;
     letter-spacing: 1px;
@@ -145,7 +145,7 @@
 }
 
 .car-number{
-    font-family:"Impact","Arial Black",sans-serif;
+    font-family:var(--fuente-graficos);
     font-size:41px;
     font-weight:400;
     line-height:1;
@@ -176,7 +176,7 @@
 .label{
     margin-bottom:2px;
 
-    font-family:"Rajdhani","Arial",sans-serif;
+    font-family:var(--fuente-graficos);
     font-size:10px;
     font-weight:600;
     text-transform:uppercase;
@@ -185,7 +185,7 @@
 }
 
 .value{
-    font-family:"Rajdhani","Arial",sans-serif;
+    font-family:var(--fuente-graficos);
     font-size:17px;
     font-weight:700;
     line-height:1.1;

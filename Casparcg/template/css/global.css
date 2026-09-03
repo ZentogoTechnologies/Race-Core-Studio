@@ -1,14 +1,20 @@
 @charset "UTF-8";
 
+@import url("tipografia.css");
+
 /* ==========================================================================
    1. RESET GENERAL
    ========================================================================== */
 
+/* Sin !important y desde una sola variable. El !important sobre el
+   selector universal ganaba a todas las reglas de las demas hojas, asi que
+   las fuentes que pedian el totem o las cartas nunca llegaban a aplicarse
+   y nadie se daba cuenta. */
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:"Rajdhani","Arial",sans-serif !important;
+    font-family:var(--fuente-graficos);
 }
 
 body{

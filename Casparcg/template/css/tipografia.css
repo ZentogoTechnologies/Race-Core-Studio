@@ -1,0 +1,58 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   TIPOGRAFIA DE LOS GRAFICOS
+
+   Un solo sitio donde se decide con que letra sale todo al aire.
+
+   Antes cada hoja declaraba la suya: unas pedian Rajdhani, otras Titillium
+   Web, la carta de piloto pedia Impact para el nombre y el dorsal. Nada de
+   eso se veia. global.css forzaba Rajdhani con !important sobre el
+   selector universal, que gana a todas las demas reglas, y Rajdhani no
+   esta instalada en la maquina ni se carga desde ningun sitio. Resultado:
+   todos los graficos salian en Arial sin que nadie lo hubiera decidido.
+
+   Las fuentes van empaquetadas con el software y no instaladas en Windows.
+   El arte tiene que verse igual en el autodromo de al lado, y alli nadie
+   va a instalar tipografias a mano antes de una carrera.
+========================================================================== */
+
+/* Cuando esten los archivos en fonts/ se descomenta este bloque y la letra
+   pasa a ser la de verdad en cualquier maquina, sin instalar nada.
+
+@font-face{
+    font-family:"Titillium Web";
+    src:url("../fonts/TitilliumWeb-Regular.woff2") format("woff2");
+    font-weight:400;
+    font-display:block;
+}
+@font-face{
+    font-family:"Titillium Web";
+    src:url("../fonts/TitilliumWeb-SemiBold.woff2") format("woff2");
+    font-weight:600;
+    font-display:block;
+}
+@font-face{
+    font-family:"Titillium Web";
+    src:url("../fonts/TitilliumWeb-Bold.woff2") format("woff2");
+    font-weight:700;
+    font-display:block;
+}
+@font-face{
+    font-family:"Titillium Web";
+    src:url("../fonts/TitilliumWeb-Black.woff2") format("woff2");
+    font-weight:900;
+    font-display:block;
+}
+
+*/
+
+:root{
+
+    /* La que se quiere. Cambiar esta linea cambia los veintidos graficos.
+
+       El respaldo no es decorativo: si la fuente no carga, Segoe UI y
+       Arial son lo unico seguro en cualquier Windows, y mas vale un
+       grafico en Arial que uno en la letra por defecto del sistema. */
+    --fuente-graficos: "Titillium Web", "Segoe UI", Arial, sans-serif;
+}
