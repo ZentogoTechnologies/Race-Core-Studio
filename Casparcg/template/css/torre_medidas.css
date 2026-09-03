@@ -27,13 +27,13 @@
        torre. Es lo único que no se redujo: aquí van el grupo, la tanda y
        el reloj, y sobre esta misma franja se dibujan las banderas. Con
        51px entraba todo, pero había que fijarse para leerlo. */
-    --tf-cabecera-alto:  70px;
+    --tf-cabecera-alto:  81px;
 
     /* Caja del logo del autódromo, a la izquierda de la cabecera. Es la
        parte que la bandera tiene que hacer coincidir para que el corte
        entre el logo y el color caiga en el mismo sitio. */
-    --tf-logo-ancho:     103px;
-    --tf-logo-img:       75px;
+    --tf-logo-ancho:     118px;
+    --tf-logo-img:       86px;
 
     /* Lo que le queda a la bandera después del logo. Se deriva en vez de
        escribirse para que no pueda quedarse desfasada del ancho. */

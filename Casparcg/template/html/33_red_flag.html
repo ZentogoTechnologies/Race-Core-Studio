@@ -40,7 +40,18 @@
 ========================================================================== */
 
 function play(){
-    document.getElementById("panel").classList.add("abierta");
+
+    const panel = document.getElementById("panel");
+
+    /* Dos fotogramas antes de abrir. Si la clase se pone en el mismo en
+       que se pinta el panel, el navegador no tiene un estado de partida
+       desde el que animar y la bandera aparece de golpe en vez de
+       descubrirse de izquierda a derecha. */
+    panel.classList.remove("abierta");
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        panel.classList.add("abierta");
+    }));
 }
 
 function stop(){
