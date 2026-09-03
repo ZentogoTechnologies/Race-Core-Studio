@@ -1212,7 +1212,7 @@ export default function GraficosModule() {
   const sinTotem = (item) =>
     (item.id === 'totem-lider' || item.id === 'totem-intervalo') && !alAire.totem
 
-  const alAireEn = (tab) = itemsDe(tab).find(estaAlAire) || null
+  const alAireEn = (tab) => itemsDe(tab).find(estaAlAire) || null
 
   // Lo que hay al aire, de la capa de atrás a la de adelante.
   const capasAlAire = GRUPOS
