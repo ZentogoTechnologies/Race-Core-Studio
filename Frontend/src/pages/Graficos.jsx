@@ -214,6 +214,127 @@ const REQUIERE_DATOS = {
   'categoria':      'categoria',  // se elige cuál de las del evento
 }
 
+// Clase de los campos de texto del panel. Vive fuera del componente porque
+// la usan tanto el formulario como el selector de pilotos.
+const CLASE_CAMPO =
+  'w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white'
+
+// ─── Selector de piloto ───────────────────────────────────────
+// Filtro por categoría, buscador y lista. Se usa tal cual en la carta del
+// piloto y dos veces en la carta VS: con 117 pilotos, un desplegable suelto
+// obliga a recorrer la lista entera, y acotar por categoría deja a mano los
+// pocos que de verdad corren esa tanda.
+function SelectorPiloto({
+  etiqueta, pilotos, categorias, valor, onElegir, onQuitar, excluir = null,
+}) {
+  const [busqueda,  setBusqueda]  = useState('')
+  const [categoria, setCategoria] = useState(null)   // null = todas
+
+  // El que ya está en el otro lado no se ofrece: enfrentar a alguien
+  // consigo mismo no dice nada.
+  const disponibles = excluir === null
+    ? pilotos
+    : pilotos.filter(p => p.id !== excluir)
+
+  // Solo las categorías que tienen pilotos: no sirve un filtro que deja la
+  // lista vacía.
+  const conPilotos = categorias.filter(c =>
+    disponibles.some(p => p.categorias.includes(c.id))
+  )
+
+  const porCategoria = categoria === null
+    ? disponibles
+    : disponibles.filter(p => p.categorias.includes(categoria))
+
+  const filtrados = porCategoria.filter(p =>
+    `${p.nombre} ${p.apellido}`.toLowerCase().includes(busqueda.toLowerCase())
+  )
+
+  const elegido = pilotos.find(p => p.id === valor) || null
+
+  return (
+    <div>
+      <label className="block text-neutral-400 text-xs mb-1 uppercase">
+        {etiqueta}
+      </label>
+
+      {elegido ? (
+        <div className="flex items-center justify-between gap-3 bg-[#0a0a0a] border border-red-600/40 rounded p-2">
+          <span className="text-white font-semibold text-sm truncate">
+            {elegido.nombre} <span className="uppercase">{elegido.apellido}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => { onQuitar(); setBusqueda('') }}
+            className="text-neutral-400 hover:text-white text-xs font-bold flex-shrink-0"
+          >
+            CAMBIAR
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Primero la categoría: acota la lista antes de buscar */}
+          {conPilotos.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-3">
+              {[{ id: null, nombre: 'Todas' }, ...conPilotos].map(c => {
+                const activa = categoria === c.id
+                const cuantos = c.id === null
+                  ? disponibles.length
+                  : disponibles.filter(p => p.categorias.includes(c.id)).length
+                return (
+                  <button
+                    key={c.id ?? 'todas'} type="button"
+                    onClick={() => { setCategoria(c.id); setBusqueda('') }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-colors ${
+                      activa
+                        ? 'border-red-600 bg-red-600/15 text-white'
+                        : 'border-neutral-800 bg-[#0a0a0a] text-neutral-400 hover:border-neutral-600 hover:text-neutral-200'
+                    }`}
+                  >
+                    {c.nombre}
+                    <span className={activa ? 'text-red-400' : 'text-neutral-600'}>
+                      {cuantos}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16} />
+            <input
+              type="text" value={busqueda} placeholder="Buscar piloto..."
+              onChange={e => setBusqueda(e.target.value)}
+              className={`${CLASE_CAMPO} pl-9`}
+            />
+          </div>
+
+          <div className="mt-2 max-h-44 overflow-y-auto rounded border border-neutral-800 divide-y divide-neutral-800/60">
+            {disponibles.length === 0 ? (
+              <p className="p-3 text-neutral-500 text-sm">
+                No hay pilotos registrados todavía.
+              </p>
+            ) : filtrados.length === 0 ? (
+              <p className="p-3 text-neutral-500 text-sm">Sin coincidencias.</p>
+            ) : (
+              filtrados.map(p => (
+                <button
+                  key={p.id} type="button"
+                  onClick={() => onElegir(p)}
+                  className="w-full text-left px-3 py-2 text-sm text-neutral-300 hover:bg-neutral-800 hover:text-white transition-colors"
+                >
+                  {p.nombre} <span className="uppercase">{p.apellido}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 // ─── Formulario en línea ──────────────────────────────────────
 function FormularioPersonal({
   item, tipo, pilotosRegistrados, categorias,
@@ -223,9 +344,6 @@ function FormularioPersonal({
   categoriaCarta, setCategoriaCarta, carrera,
   alAire, ocupado, onMostrar, onOcultar,
 }) {
-  const [busqueda, setBusqueda] = useState('')
-  const [categoria, setCategoria] = useState(null)   // null = todas
-
   // Solo las categorías del evento que se está graficando: en pista corren
   // esas y no todas las que existen en la base.
   const categoriasDelEvento = useMemo(() => {
@@ -241,19 +359,6 @@ function FormularioPersonal({
     return cat?.subcategorias || []
   }, [categorias, categoriaCarta])
 
-  // Solo se ofrecen las categorías que tienen pilotos cargados: no sirve
-  // de nada un filtro que deja la lista vacía.
-  const categoriasConPilotos = categorias.filter(c =>
-    pilotosRegistrados.some(p => p.categorias.includes(c.id))
-  )
-
-  const porCategoria = categoria === null
-    ? pilotosRegistrados
-    : pilotosRegistrados.filter(p => p.categorias.includes(categoria))
-
-  const filtrados = porCategoria.filter(p =>
-    `${p.nombre} ${p.apellido}`.toLowerCase().includes(busqueda.toLowerCase())
-  )
   const pilotoElegido = pilotosRegistrados.find(p => p.id === pilotoId) || null
 
   // Con el piloto elegido pero sin categoría, la ficha saldría con un
@@ -272,7 +377,7 @@ function FormularioPersonal({
         ? pilotoId !== null && pilotoRival !== null
         : pilotoId !== null && !faltaCategoria
 
-  const inputClass = 'w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white'
+  const inputClass = CLASE_CAMPO
 
   return (
     <div className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mt-4">
@@ -340,41 +445,28 @@ function FormularioPersonal({
           )}
         </div>
       ) : tipo === 'duelo' ? (
-        /* Dos desplegables, uno al lado del otro. La carta enfrenta a dos
-           pilotos, y no basta con saber quiénes son: hay que poder decir
-           cuál sale a la izquierda y cuál a la derecha, porque en pantalla
-           no es lo mismo. */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[
-            /* El rival va primero porque su foto es la que sale a la
-               izquierda: la carta conserva el formato de la de piloto, con
-               el titular y su foto a la derecha. Los rótulos siguen a lo
-               que se ve en pantalla, no al orden interno. */
-            { lado: 'Izquierda', valor: pilotoRival, poner: setPilotoRival, otro: pilotoId    },
-            { lado: 'Derecha',   valor: pilotoId,    poner: setPilotoId,    otro: pilotoRival },
-          ].map(({ lado, valor, poner, otro }) => (
-            <div key={lado}>
-              <label className="block text-neutral-400 text-xs mb-1 uppercase">
-                {lado}
-              </label>
-              <select
-                value={valor ?? ''}
-                onChange={e => poner(e.target.value === '' ? null : Number(e.target.value))}
-                className={inputClass}
-              >
-                <option value="">Elige un piloto...</option>
-                {pilotosRegistrados
-                  /* Fuera el que ya está en el otro lado: enfrentar a
-                     alguien consigo mismo no dice nada. */
-                  .filter(pi => pi.id !== otro)
-                  .map(pi => (
-                    <option key={pi.id} value={pi.id}>
-                      {pi.nombre} {pi.apellido}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          ))}
+        /* Dos buscadores, uno al lado del otro. La carta enfrenta a dos
+           pilotos y hay que poder decir cuál sale a la izquierda y cuál a
+           la derecha, porque en pantalla no es lo mismo.
+
+           El rival va primero porque su foto es la que se dibuja a la
+           izquierda: los rótulos siguen a lo que se ve, no al orden
+           interno del payload. */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <SelectorPiloto
+            etiqueta="Izquierda"
+            pilotos={pilotosRegistrados} categorias={categorias}
+            valor={pilotoRival} excluir={pilotoId}
+            onElegir={p => setPilotoRival(p.id)}
+            onQuitar={() => setPilotoRival(null)}
+          />
+          <SelectorPiloto
+            etiqueta="Derecha"
+            pilotos={pilotosRegistrados} categorias={categorias}
+            valor={pilotoId} excluir={pilotoRival}
+            onElegir={p => setPilotoId(p.id)}
+            onQuitar={() => setPilotoId(null)}
+          />
         </div>
       ) : tipo === 'narrador' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,119 +487,48 @@ function FormularioPersonal({
         </div>
       ) : (
         <div>
-          <label className="block text-neutral-400 text-xs mb-1 uppercase">Piloto</label>
+          <SelectorPiloto
+            etiqueta="Piloto"
+            pilotos={pilotosRegistrados} categorias={categorias}
+            valor={pilotoId}
+            onElegir={p => {
+              setPilotoId(p.id)
+              // Con una sola categoría no hay nada que preguntar: se fija
+              // y el formulario queda listo de una vez.
+              setCategoriaFicha(p.categorias.length === 1 ? p.categorias[0] : null)
+            }}
+            onQuitar={() => { setPilotoId(null); setCategoriaFicha(null) }}
+          />
 
-          {pilotoElegido ? (
-            <>
-              <div className="flex items-center justify-between gap-3 bg-[#0a0a0a] border border-red-600/40 rounded p-2">
-                <span className="text-white font-semibold text-sm truncate">
-                  {pilotoElegido.nombre} <span className="uppercase">{pilotoElegido.apellido}</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => { setPilotoId(null); setCategoriaFicha(null); setBusqueda('') }}
-                  className="text-neutral-400 hover:text-white text-xs font-bold flex-shrink-0"
-                >
-                  CAMBIAR
-                </button>
-              </div>
-
-              {/* Un piloto que corre en varias categorías tiene un carro en
-                  cada una, y con él otra subcategoría. Sin preguntar, la
-                  ficha salía con el primer vehículo que devolviera la base,
-                  que no tiene por qué ser el de la carrera en curso. Con una
-                  sola categoría no se pregunta: ya quedó fijada al elegirlo. */}
-              {pilotoElegido.categorias.length > 1 && (
-                <div className="mt-3">
-                  <label className="block text-neutral-400 text-xs mb-2 uppercase">
-                    Corre en {pilotoElegido.categorias.length} categorías · elige cuál mostrar
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {pilotoElegido.categorias.map(cid => {
-                      const cat = categorias.find(c => c.id === cid)
-                      const activa = categoriaFicha === cid
-                      return (
-                        <button
-                          key={cid} type="button"
-                          onClick={() => setCategoriaFicha(cid)}
-                          className={`px-3 py-1.5 rounded-full border text-xs font-bold transition-colors ${
-                            activa
-                              ? 'border-red-600 bg-red-600/15 text-red-400'
-                              : 'border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
-                          }`}
-                        >
-                          {cat ? cat.nombre : `#${cid}`}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* Primero la categoría: acota la lista antes de buscar */}
-              {categoriasConPilotos.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {[{ id: null, nombre: 'Todas' }, ...categoriasConPilotos].map(c => {
-                    const activa = categoria === c.id
-                    const cuantos = c.id === null
-                      ? pilotosRegistrados.length
-                      : pilotosRegistrados.filter(p => p.categorias.includes(c.id)).length
-                    return (
-                      <button
-                        key={c.id ?? 'todas'} type="button"
-                        onClick={() => { setCategoria(c.id); setBusqueda('') }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-colors ${
-                          activa
-                            ? 'border-red-600 bg-red-600/15 text-white'
-                            : 'border-neutral-800 bg-[#0a0a0a] text-neutral-400 hover:border-neutral-600 hover:text-neutral-200'
-                        }`}
-                      >
-                        {c.nombre}
-                        <span className={activa ? 'text-red-400' : 'text-neutral-600'}>
-                          {cuantos}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={16} />
-                <input
-                  type="text" value={busqueda} placeholder="Buscar piloto..."
-                  onChange={e => setBusqueda(e.target.value)}
-                  className={`${inputClass} pl-9`}
-                />
-              </div>
-
-              <div className="mt-2 max-h-44 overflow-y-auto rounded border border-neutral-800 divide-y divide-neutral-800/60">
-                {pilotosRegistrados.length === 0 ? (
-                  <p className="p-3 text-neutral-500 text-sm">
-                    No hay pilotos registrados todavía.
-                  </p>
-                ) : filtrados.length === 0 ? (
-                  <p className="p-3 text-neutral-500 text-sm">Sin coincidencias.</p>
-                ) : (
-                  filtrados.map(p => (
+          {/* Un piloto que corre en varias categorías tiene un carro en
+              cada una, y con él otra subcategoría. Sin preguntar, la ficha
+              salía con el primer vehículo que devolviera la base, que no
+              tiene por qué ser el de la carrera en curso. */}
+          {pilotoElegido && pilotoElegido.categorias.length > 1 && (
+            <div className="mt-3">
+              <label className="block text-neutral-400 text-xs mb-2 uppercase">
+                Corre en {pilotoElegido.categorias.length} categorías · elige cuál mostrar
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {pilotoElegido.categorias.map(cid => {
+                  const cat = categorias.find(c => c.id === cid)
+                  const activa = categoriaFicha === cid
+                  return (
                     <button
-                      key={p.id} type="button"
-                      onClick={() => {
-                        setPilotoId(p.id)
-                        // Con una sola categoría no hay nada que preguntar:
-                        // se fija y el formulario queda listo de una vez.
-                        setCategoriaFicha(p.categorias.length === 1 ? p.categorias[0] : null)
-                      }}
-                      className="w-full text-left px-3 py-2 text-sm text-neutral-300 hover:bg-neutral-800 hover:text-white transition-colors"
+                      key={cid} type="button"
+                      onClick={() => setCategoriaFicha(cid)}
+                      className={`px-3 py-1.5 rounded-full border text-xs font-bold transition-colors ${
+                        activa
+                          ? 'border-red-600 bg-red-600/15 text-red-400'
+                          : 'border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
+                      }`}
                     >
-                      {p.nombre} <span className="uppercase">{p.apellido}</span>
+                      {cat ? cat.nombre : `#${cid}`}
                     </button>
-                  ))
-                )}
+                  )
+                })}
               </div>
-            </>
+            </div>
           )}
         </div>
       )}

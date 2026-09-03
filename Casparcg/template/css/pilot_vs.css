@@ -3,55 +3,264 @@
 /* ==========================================================================
    CARTA VS
 
-   Hereda de pilot_card_short.css: mismas medidas, mismo sitio en pantalla
-   y misma animación que la carta del piloto. Aquí solo va lo que cambia.
-
-   El hueco del logo de la marca lo ocupa la foto del rival. No hay palabra
-   "VS": la carta se explica sola con las dos caras enfrentadas.
+   Dos pilotos en espejo. Cada lado lleva la foto en el extremo y, pegados
+   a ella, el nombre con el dorsal arriba y el carro debajo. En medio queda
+   un hueco que separa a los dos sin necesidad de escribir "VS".
 ========================================================================== */
 
-/* La foto del rival llena la caja que antes tenía el logo, que llevaba
-   aire alrededor porque un logo necesita respirar y un retrato no. */
-.brand-panel.vs-foto{
+.vs-card{
 
-    padding:0;
+    position:absolute;
+
+    left:50%;
+    bottom:40px;
+
+    display:flex;
+    align-items:center;
+
+    height:196px;
+
+    border-radius:10px;
 
     overflow:hidden;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+
+    font-family:"Titillium Web","Segoe UI",Arial,sans-serif;
+
+    background:url("../img/fondo.jpg") center/cover no-repeat;
 }
 
-.brand-panel.vs-foto img{
+/* Filo rojo en los dos extremos: la firma de la familia, aqui tambien en
+   espejo para que ningun lado pese mas que el otro. */
+.vs-card::before,
+.vs-card::after{
+
+    content:"";
+
+    position:absolute;
+    top:0; bottom:0;
+
+    width:10px;
+
+    background:#FF0000;
+
+    z-index:5;
+}
+
+.vs-card::before{ left:0; }
+.vs-card::after { right:0; }
+
+
+/* ===================================
+   UN LADO
+=================================== */
+
+.vs-lado{
+
+    display:flex;
+    align-items:center;
+
+    height:100%;
+}
+
+/* El derecho es el izquierdo del reves: se invierte el orden de la foto y
+   los datos, y el texto se alinea al otro borde. */
+.vs-lado.der{
+
+    flex-direction:row-reverse;
+}
+
+
+/* ── Foto ── */
+
+.vs-foto{
+
+    width:150px;
+    height:100%;
+
+    flex:0 0 auto;
+
+    background:#000;
+
+    overflow:hidden;
+
+    position:relative;
+    z-index:2;
+}
+
+.vs-foto img{
 
     width:100%;
     height:100%;
 
-    max-width:none;
-    max-height:none;
-
     object-fit:cover;
 
-    /* Encuadre a la cabeza: los retratos vienen de cuerpo entero y
-       centrados dejarían la cara fuera. */
+    /* Los retratos vienen de medio cuerpo: encuadrando arriba la cara
+       queda donde tiene que quedar. */
     object-position:top center;
 }
 
-/* La foto del piloto se deja donde la pone la carta normal. Moverla al
-   borde derecho la sacaba fuera del panel: su caja no llega hasta ahí.
-   Lo que sí hace falta es acotarle el ancho, porque en la carta VS el
-   texto ocupa menos y un retrato ancho se le montaba encima. */
-.pilot-short.vs .pilot-photo{
 
-    width:210px;
+/* ── Datos ── */
 
-    /* Desplazada a la derecha del centro: en la carta VS el texto llega
-       más lejos que en la del piloto y el retrato le caía encima, tapando
-       los dorsales. */
-    transform:translateX(calc(-50% + 250px));
+.vs-datos{
 
-    object-fit:cover;
-    object-position:top center;
+    padding:0 26px;
 
-    /* Se difumina por la izquierda para que no corte en seco sobre el
-       fondo del panel. */
-    mask-image:linear-gradient(90deg, transparent 0%, #000 26%);
-    -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 26%);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    gap:6px;
+
+    min-width:300px;
+}
+
+.vs-lado.der .vs-datos{
+
+    align-items:flex-end;
+
+    text-align:right;
+}
+
+
+.vs-nombre-fila{
+
+    display:flex;
+    align-items:baseline;
+
+    gap:14px;
+
+    white-space:nowrap;
+}
+
+.vs-lado.der .vs-nombre-fila{
+
+    flex-direction:row-reverse;
+}
+
+.vs-nombre{
+
+    font-size:30px;
+    font-weight:800;
+
+    line-height:1;
+
+    color:#FFFFFF;
+
+    text-transform:uppercase;
+
+    text-shadow:2px 2px 0 rgba(0,0,0,.55);
+}
+
+.vs-dorsal{
+
+    font-size:34px;
+    font-weight:900;
+
+    line-height:1;
+
+    color:#FF3B45;
+
+    text-shadow:2px 2px 0 rgba(0,0,0,.55);
+}
+
+
+.vs-carro{
+
+    font-size:18px;
+    font-weight:600;
+
+    line-height:1.15;
+
+    color:#D9D9D9;
+
+    text-transform:uppercase;
+
+    letter-spacing:.4px;
+
+    white-space:nowrap;
+
+    text-shadow:1px 1px 0 rgba(0,0,0,.5);
+}
+
+/* La marca manda sobre el modelo: es lo que se reconoce de un vistazo. */
+.vs-carro .marca{
+
+    color:#FFFFFF;
+
+    font-weight:800;
+}
+
+
+/* ===================================
+   EL HUECO DEL MEDIO
+=================================== */
+
+.vs-centro{
+
+    width:90px;
+
+    flex:0 0 auto;
+
+    align-self:stretch;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* Una raya fina, no un rotulo: separa los dos lados sin escribir nada. */
+.vs-centro span{
+
+    width:2px;
+    height:108px;
+
+    background:linear-gradient(180deg,
+        transparent 0%,
+        rgba(255,255,255,.42) 22%,
+        rgba(255,255,255,.42) 78%,
+        transparent 100%);
+}
+
+
+/* ===================================
+   TIEMPOS
+
+   La vuelta rapida y la ultima, una debajo de la otra y con el mismo
+   tratamiento que la linea del carro: el rotulo en blanco y en negrita,
+   como la marca, y el tiempo detras mas apagado, como el modelo. Las tres
+   lineas se leen entonces como una sola ficha y no como tres cosas
+   distintas apiladas.
+=================================== */
+
+.vs-tiempo{
+
+    font-size:18px;
+    font-weight:600;
+
+    line-height:1.15;
+
+    color:#D9D9D9;
+
+    text-transform:uppercase;
+
+    letter-spacing:.4px;
+
+    white-space:nowrap;
+
+    text-shadow:1px 1px 0 rgba(0,0,0,.5);
+
+    /* Cifras de ancho fijo: sin esto los tiempos de los dos lados no
+       quedan alineados y la comparacion se lee peor. */
+    font-variant-numeric:tabular-nums;
+}
+
+/* El rotulo hace de marca. */
+.vs-tiempo .rotulo{
+
+    color:#FFFFFF;
+
+    font-weight:800;
 }

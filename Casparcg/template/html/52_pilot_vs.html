@@ -5,128 +5,103 @@
     <title>Carta VS</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/animaciones.css">
-    <link rel="stylesheet" href="../css/pilot_card_short.css">
     <link rel="stylesheet" href="../css/pilot_vs.css">
 </head>
 <body>
 
-    <div class="pilot-short vs" id="pilotShort">
+    <div class="vs-card" id="vsCard">
 
-        <!-- Donde la carta del piloto lleva el logo de la marca va aquí la
-             foto del rival: el hueco ya existe y así las dos cartas miden
-             y se colocan igual. -->
-        <div class="brand-panel vs-foto">
-            <img id="fotoB" src="" alt="">
+        <div class="vs-lado izq">
+            <div class="vs-foto"><img id="fotoA" src="" alt=""></div>
+            <div class="vs-datos">
+                <div class="vs-nombre-fila">
+                    <span class="vs-nombre" id="nombreA">ROBERTO REYNA</span>
+                    <span class="vs-dorsal" id="dorsalA">#17</span>
+                </div>
+                <div class="vs-carro" id="carroA">
+                    <span class="marca">HONDA</span> CIVIC TYPE R
+                </div>
+                <div class="vs-tiempo">
+                    <span class="rotulo">Mejor</span> <span id="mejorA">1:23.456</span>
+                </div>
+                <div class="vs-tiempo">
+                    <span class="rotulo">Última</span> <span id="ultimaA">1:24.902</span>
+                </div>
+            </div>
         </div>
 
-        <div class="pilot-panel" id="pilotPanel">
+        <div class="vs-centro"><span></span></div>
 
-            <div class="content-section">
-
-                <div class="name-row">
-                    <div class="pilot-name" id="nombreA">DEAN PAQUETTE</div>
-                    <div class="car-number" id="dorsalA">#13</div>
+        <div class="vs-lado der">
+            <div class="vs-foto"><img id="fotoB" src="" alt=""></div>
+            <div class="vs-datos">
+                <div class="vs-nombre-fila">
+                    <span class="vs-nombre" id="nombreB">LUIS MOTO MOTO</span>
+                    <span class="vs-dorsal" id="dorsalB">#69</span>
                 </div>
-
-                <div class="info-row">
-                    <div class="info-block">
-                        <div class="label">RIVAL</div>
-                        <div class="value" id="nombreB">LUIS ARIAS</div>
-                    </div>
-                    <div class="info-block">
-                        <div class="label">DORSAL</div>
-                        <div class="value acento" id="dorsalB">#69</div>
-                    </div>
+                <div class="vs-carro" id="carroB">
+                    <span class="marca">TOYOTA</span> COROLLA GR
                 </div>
-
+                <div class="vs-tiempo">
+                    <span class="rotulo">Mejor</span> <span id="mejorB">1:23.918</span>
+                </div>
+                <div class="vs-tiempo">
+                    <span class="rotulo">Última</span> <span id="ultimaB">1:24.115</span>
+                </div>
             </div>
-
-            <img id="fotoA" class="pilot-photo" src="" alt="">
-
         </div>
 
     </div>
 
 <script>
+function txt(id,v){ const e=document.getElementById(id); if(e&&v!==undefined) e.textContent=v; }
 
-/* ==========================================================================
-   CARTA VS
-
-   Dos pilotos frente a frente, con el mismo formato y las mismas medidas
-   que la carta del piloto: comparte su hoja de estilo y solo cambia lo
-   justo. La foto del rival ocupa el hueco del logo de la marca, que en
-   este gráfico no hace falta.
-
-   Solo nombre, apellido y dorsal de cada uno. Sin la palabra "VS": la
-   carta ya se explica sola con las dos caras enfrentadas.
-
-   El backend arma el payload y resuelve las fotos a URL absoluta, que es
-   lo que necesita CasparCG abriendo la plantilla desde file://.
-========================================================================== */
-
-function poner(id, valor){
-    const el = document.getElementById(id);
-    if (el && valor !== undefined) el.textContent = valor;
+function carro(id, marca, modelo){
+    const e=document.getElementById(id); if(!e) return;
+    const m=(marca||"").toUpperCase(), mo=(modelo||"").toUpperCase();
+    e.innerHTML = m ? `<span class="marca">${m}</span> ${mo}` : mo;
 }
 
-function ponerFoto(id, url){
-    const el = document.getElementById(id);
-    if (!el || url === undefined) return;
-
-    /* Sin foto se esconde en vez de dejar un roto. */
-    if (url) {
-        el.src = url;
-        el.style.visibility = "visible";
-    } else {
-        el.removeAttribute("src");
-        el.style.visibility = "hidden";
-    }
+function foto(id,url){
+    const e=document.getElementById(id); if(!e||url===undefined) return;
+    if(url){ e.src=url; e.style.visibility="visible"; }
+    else   { e.removeAttribute("src"); e.style.visibility="hidden"; }
 }
 
-function nombreCompleto(nombre, apellido){
-    return [nombre, apellido].filter(Boolean).join(" ").toUpperCase();
-}
+function nombre(n,a){ return [n,a].filter(Boolean).join(" ").toUpperCase(); }
 
 function update(data){
-    try {
-        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
-
-        if (d.name_a !== undefined || d.last_name_a !== undefined) {
-            poner("nombreA", nombreCompleto(d.name_a, d.last_name_a));
+    try{
+        const d = typeof data==="string" ? JSON.parse(data) : (data||{});
+        for(const s of ["a","b"]){
+            const S=s.toUpperCase();
+            if(d["name_"+s]!==undefined||d["last_name_"+s]!==undefined)
+                txt("nombre"+S, nombre(d["name_"+s], d["last_name_"+s]));
+            if(d["number_"+s]!==undefined)
+                txt("dorsal"+S, d["number_"+s] ? "#"+d["number_"+s] : "");
+            if(d["brand_"+s]!==undefined||d["model_"+s]!==undefined)
+                carro("carro"+S, d["brand_"+s], d["model_"+s]);
+            /* Sin cronometraje se pone un guion y no se deja en blanco:
+               un hueco vacio parece que la carta se rompio. */
+            if(d["best_time_"+s]!==undefined) txt("mejor"+S, d["best_time_"+s] || "--");
+            if(d["last_time_"+s]!==undefined) txt("ultima"+S, d["last_time_"+s] || "--");
+            foto("foto"+S, d["photo_"+s]);
         }
-        if (d.number_a !== undefined) poner("dorsalA", d.number_a ? "#" + d.number_a : "");
-        ponerFoto("fotoA", d.photo_a);
-
-        if (d.name_b !== undefined || d.last_name_b !== undefined) {
-            poner("nombreB", nombreCompleto(d.name_b, d.last_name_b));
-        }
-        if (d.number_b !== undefined) poner("dorsalB", d.number_b ? "#" + d.number_b : "");
-        ponerFoto("fotoB", d.photo_b);
-    } catch (e) { /* un UPDATE con basura no puede tumbar el gráfico */ }
+    }catch(e){}
 }
 
+/* La carta entra entera: aqui no hay un panel que se despliegue desde un
+   logo, los dos lados pesan lo mismo. */
 function play(){
-    const widget = document.getElementById("pilotShort");
-    widget.style.animation = "slideUp .5s ease forwards";
-
-    setTimeout(() => {
-        document.getElementById("pilotPanel").style.animation =
-            "expandPanel .6s ease forwards";
-    }, 500);
+    const c=document.getElementById("vsCard");
+    c.style.transform="translateX(-50%)";
+    c.style.animation="slideUp .5s ease forwards";
 }
-
 function stop(){
-    document.getElementById("pilotPanel").style.animation =
-        "collapsePanel .5s ease forwards";
-
-    setTimeout(() => {
-        document.getElementById("pilotShort").style.animation =
-            "slideDown .5s ease forwards";
-    }, 500);
+    document.getElementById("vsCard").style.animation="slideDown .5s ease forwards";
 }
 
-if (!window.__casparcg) { play(); }
-
+if(!window.__casparcg){ play(); }
 </script>
 
 </body>

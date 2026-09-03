@@ -402,10 +402,32 @@ async def build_vs_payload(pilot_a: int, pilot_b: int) -> dict:
     """
     Los dos pilotos de la carta VS.
 
-    Solo nombre, apellido, dorsal y foto: es un gráfico de presentación.
-    El dorsal sale del vehículo, que es donde vive; si el piloto no tiene
-    carro asignado se manda vacío en vez de inventarlo.
+    Nombre, apellido, dorsal y foto de cada uno, más su carro y sus dos
+    tiempos: la mejor vuelta y la última. El nombre dice quiénes son y los
+    tiempos dicen cómo van, que es para lo que sirve enfrentarlos.
+
+    El dorsal y el carro salen del vehículo, que es donde viven; si el
+    piloto no tiene carro asignado se manda vacío en vez de inventarlo.
     """
+
+    # Los tiempos vienen del cronometraje en vivo, no de la base. Se piden
+    # una sola vez para los dos: obtener_clasificacion() lee y parsea el
+    # XML entero, y hacerlo dos veces por carta es leerlo de más.
+    # El import va aquí dentro y no arriba a propósito: timing_services ya
+    # importa este módulo para el logo de la marca, y hacerlo al revés en
+    # la cabecera cierra el círculo y revienta el arranque.
+    from src.services.timing_services import obtener_clasificacion
+
+    try:
+        # Un límite alto y no el de la torre: los dos pilotos de la carta
+        # pueden ir en mitad de la tabla, y con el límite corto no
+        # aparecerían en la lista y se quedarían sin tiempos.
+        clasificacion = await obtener_clasificacion(limite=500)
+        vueltas = {f["number"]: f for f in clasificacion.get("standings", [])}
+    except Exception:
+        # Sin MyLaps la carta sale igual, solo que sin tiempos: es un
+        # gráfico de presentación y tiene que poder usarse en seco.
+        vueltas = {}
 
     async def uno(pilot_id: int, sufijo: str) -> dict:
         pilot = await Pilot.find_one(Pilot.pilot_id == pilot_id)
@@ -414,12 +436,23 @@ async def build_vs_payload(pilot_a: int, pilot_b: int) -> dict:
 
         vehicle = await Vehicle.find_one({"pilots.$id": pilot.id})
 
+        dorsal = str(vehicle.number) if vehicle else ""
+
+        # Se cruza por dorsal y no por piloto: cuando dos pilotos comparten
+        # carro, MyLaps cronometra el carro, así que el dorsal es lo único
+        # que ata una fila del XML con esta carta.
+        fila = vueltas.get(dorsal, {})
+
         return {
             f"name_{sufijo}": pilot.name or "",
             f"last_name_{sufijo}": pilot.last_name or "",
-            f"number_{sufijo}": str(vehicle.number) if vehicle else "",
-            # Siempre se manda, vacía incluida: omitirla dejaría la foto
-            # del piloto anterior en pantalla.
+            f"number_{sufijo}": dorsal,
+            f"brand_{sufijo}": (vehicle.brand or "") if vehicle else "",
+            f"model_{sufijo}": (vehicle.model or "") if vehicle else "",
+            # Siempre se mandan, vacíos incluidos: omitirlos dejaría en
+            # pantalla los datos del piloto anterior.
+            f"best_time_{sufijo}": fila.get("best_time", ""),
+            f"last_time_{sufijo}": fila.get("last_time", ""),
             f"photo_{sufijo}": pilot_photo_url(pilot.pilot_id, pilot.photo),
         }
 
