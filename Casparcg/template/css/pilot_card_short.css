@@ -21,7 +21,7 @@
 
 .brand-panel{
     width:150px;
-    height:186px;
+    height:167px;
 
     flex-shrink:0;
 
@@ -38,13 +38,13 @@
 
 .brand-logo{
     max-width:130px;
-    max-height:96px;
+    max-height:86px;
     object-fit:contain;
 }
 
 .brand-panel img{
     max-width:100px;
-    max-height:108px;
+    max-height:97px;
 }
 
 /* ==================================================
@@ -56,7 +56,7 @@
     --panel-w:910px;
 
     width:0;
-    height:186px;
+    height:167px;
 
     overflow:hidden;
     white-space:nowrap;
