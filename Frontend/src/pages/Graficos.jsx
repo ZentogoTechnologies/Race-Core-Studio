@@ -449,23 +449,25 @@ function FormularioPersonal({
            pilotos y hay que poder decir cuál sale a la izquierda y cuál a
            la derecha, porque en pantalla no es lo mismo.
 
-           El rival va primero porque su foto es la que se dibuja a la
-           izquierda: los rótulos siguen a lo que se ve, no al orden
-           interno del payload. */
+           pilotoId es el que la plantilla dibuja a la izquierda y
+           pilotoRival el de la derecha. Iba al reves de cuando la carta
+           tenia un titular a la derecha y el rival de acompañante; con el
+           diseño en espejo los dos lados pesan igual y el orden es el
+           natural. */
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <SelectorPiloto
             etiqueta="Izquierda"
             pilotos={pilotosRegistrados} categorias={categorias}
-            valor={pilotoRival} excluir={pilotoId}
-            onElegir={p => setPilotoRival(p.id)}
-            onQuitar={() => setPilotoRival(null)}
+            valor={pilotoId} excluir={pilotoRival}
+            onElegir={p => setPilotoId(p.id)}
+            onQuitar={() => setPilotoId(null)}
           />
           <SelectorPiloto
             etiqueta="Derecha"
             pilotos={pilotosRegistrados} categorias={categorias}
-            valor={pilotoId} excluir={pilotoRival}
-            onElegir={p => setPilotoId(p.id)}
-            onQuitar={() => setPilotoId(null)}
+            valor={pilotoRival} excluir={pilotoId}
+            onElegir={p => setPilotoRival(p.id)}
+            onQuitar={() => setPilotoRival(null)}
           />
         </div>
       ) : tipo === 'narrador' ? (
