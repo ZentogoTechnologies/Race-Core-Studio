@@ -37,7 +37,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
           value={limit}
           onChange={e => onCambiarTamano(Number(e.target.value))}
           className="bg-[#0a0a0a] border border-neutral-800 rounded px-2 py-1 text-neutral-300 focus:outline-none focus:border-red-600"
-          aria-label="Registros por página"
+          aria-label={t('Registros por página')}
         >
           {TAMANOS.map(n => <option key={n} value={n}>{n} por página</option>)}
         </select>
@@ -48,7 +48,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
           onClick={() => irA(paginaActual - 1)}
           disabled={paginaActual <= 1}
           className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
-          aria-label="Página anterior"
+          aria-label={t('Página anterior')}
         >
           <ChevronLeft size={16} />
         </button>
@@ -72,7 +72,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
           onClick={() => irA(paginaActual + 1)}
           disabled={paginaActual >= totalPaginas}
           className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
-          aria-label="Página siguiente"
+          aria-label={t('Página siguiente')}
         >
           <ChevronRight size={16} />
         </button>

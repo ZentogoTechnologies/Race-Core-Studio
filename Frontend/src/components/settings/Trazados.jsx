@@ -304,7 +304,7 @@ export default function Trazados() {
                           ? 'border-blue-500 text-blue-400'
                           : 'border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
                       }`}
-                      title="Imagen del trazado"
+                      title={t('Imagen del trazado')}
                     >
                       <ImageIcon size={15}/>
                     </button>
@@ -312,7 +312,7 @@ export default function Trazados() {
                     <button
                       type="button" onClick={() => borrar(t)} disabled={trabajando}
                       className="p-2 rounded border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 disabled:opacity-40 transition-colors"
-                      title="Borrar trazado"
+                      title={t('Borrar trazado')}
                     >
                       {trabajando ? <Loader2 size={15} className="animate-spin"/> : <Trash2 size={15}/>}
                     </button>

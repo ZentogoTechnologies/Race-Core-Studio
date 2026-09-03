@@ -340,7 +340,7 @@ export default function UsuariosModule() {
 
       <ConfirmDialog
         abierto={Boolean(porBorrar)}
-        titulo="Eliminar usuario"
+        titulo={t('Eliminar usuario')}
         mensaje={porBorrar ? `Se va a eliminar la cuenta ${porBorrar.username}.` : ''}
         onCancelar={() => setPorBorrar(null)}
         onConfirmar={confirmarBorrado}

@@ -304,7 +304,7 @@ export default function VehiculosModule() {
             type="text"
             value={pilotoFiltro}
             onChange={e => setPilotoFiltro(e.target.value)}
-            placeholder="Nombre o apellido..."
+            placeholder={t('Nombre o apellido...')}
             className="bg-[#141414] border border-neutral-800 rounded-lg pl-3 pr-8 py-2 text-sm text-neutral-300 focus:outline-none focus:border-red-600 w-52"
           />
           {pilotoFiltro && (
@@ -312,7 +312,7 @@ export default function VehiculosModule() {
               type="button"
               onClick={() => setPilotoFiltro('')}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-white"
-              title="Quitar el filtro"
+              title={t('Quitar el filtro')}
             >
               <X size={14}/>
             </button>
@@ -391,7 +391,7 @@ export default function VehiculosModule() {
                   <button
                     type="button" onClick={() => quitarFotoGuardada(f.archivo)}
                     className="absolute top-1 right-1 bg-black/70 rounded p-1 text-neutral-300 hover:text-red-500 transition-colors"
-                    title="Quitar esta foto"
+                    title={t('Quitar esta foto')}
                   >
                     <X size={12}/>
                   </button>
@@ -450,7 +450,7 @@ export default function VehiculosModule() {
               Pilotos ({vehicleForm.pilot_ids.length}/2)
             </label>
             <input
-              type="text" value={buscaPiloto} placeholder="Filtrar pilotos..."
+              type="text" value={buscaPiloto} placeholder={t('Filtrar pilotos...')}
               onChange={e => setBuscaPiloto(e.target.value)}
               className="w-full md:w-72 mb-3 bg-[#0a0a0a] border border-neutral-800 rounded p-2 text-sm focus:border-red-600 focus:outline-none text-white"
             />
@@ -575,7 +575,7 @@ export default function VehiculosModule() {
 
       <ConfirmDialog
         abierto={Boolean(porBorrar)}
-        titulo="Eliminar vehículo"
+        titulo={t('Eliminar vehículo')}
         mensaje={porBorrar ? `Se va a eliminar el #${porBorrar.number} ${porBorrar.brand || ''}.` : ''}
         onCancelar={() => setPorBorrar(null)}
         onConfirmar={confirmarBorrado}

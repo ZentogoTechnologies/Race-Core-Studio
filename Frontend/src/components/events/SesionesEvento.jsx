@@ -203,7 +203,7 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
                       <button
                         onClick={() => borrar(s)}
                         className="p-1.5 rounded text-neutral-600 hover:text-red-500 hover:bg-red-500/10 transition-colors"
-                        aria-label="Quitar sesión"
+                        aria-label={t('Quitar sesión')}
                       >
                         <X size={14}/>
                       </button>

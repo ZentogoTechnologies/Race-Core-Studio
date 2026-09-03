@@ -307,14 +307,14 @@ export default function CategoriasModule() {
                     </span>
                     <input
                       type="text" value={sub.sub_category_name}
-                      placeholder="Nombre de la subcategoría"
+                      placeholder={t('Nombre de la subcategoría')}
                       onChange={e => renombrarSub(sub.sub_category_id, e.target.value)}
                       className="flex-1 bg-[#0a0a0a] border border-neutral-800 rounded p-2 text-sm focus:border-red-600 focus:outline-none text-white"
                     />
                     <button
                       type="button" onClick={() => quitarSub(sub.sub_category_id)}
                       className="p-2 rounded-lg text-neutral-500 hover:text-red-500 hover:bg-red-500/10 transition-colors flex-shrink-0"
-                      aria-label="Quitar subcategoría"
+                      aria-label={t('Quitar subcategoría')}
                     >
                       <X size={15}/>
                     </button>
@@ -410,7 +410,7 @@ export default function CategoriasModule() {
 
       <ConfirmDialog
         abierto={Boolean(porBorrar)}
-        titulo="Eliminar categoría"
+        titulo={t('Eliminar categoría')}
         mensaje={porBorrar ? `Se va a eliminar ${porBorrar.category_name}.` : ''}
         onCancelar={() => setPorBorrar(null)}
         onConfirmar={confirmarBorrado}

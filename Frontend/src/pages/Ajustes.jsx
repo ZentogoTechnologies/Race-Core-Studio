@@ -383,8 +383,8 @@ export default function AjustesModule() {
         </p>
 
         <div className="space-y-3">
-          <Diagnostico r={prueba} titulo="Prueba (sin aplicar)" />
-          {!prueba && <Diagnostico r={estado} titulo="Ruta en uso" />}
+          <Diagnostico r={prueba} titulo={t('Prueba (sin aplicar)')} />
+          {!prueba && <Diagnostico r={estado} titulo={t('Ruta en uso')} />}
         </div>
       </div>
 

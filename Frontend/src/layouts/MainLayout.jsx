@@ -79,7 +79,7 @@ export default function MainLayout() {
             qué una tabla salió vacía. */}
         <button
           onClick={cambiarDisciplina}
-          title="Cambiar de disciplina"
+          title={t('Cambiar de disciplina')}
           className={`mx-3 mt-4 flex items-center gap-2 rounded-lg border border-neutral-800 hover:border-red-600/60 bg-[#0a0a0a] transition-colors group ${isSidebarOpen ? 'px-3 py-2.5' : 'p-2.5 justify-center'}`}
         >
           <IconoDisciplina size={16} className="text-red-500 flex-shrink-0" />
@@ -102,7 +102,7 @@ export default function MainLayout() {
                   deja abrir un módulo en otra pestaña con clic derecho. */}
               <NavLink to={m.to} end={m.to === '/'}>
                 {({ isActive }) => (
-                  <NavItem icon={m.icon} label={m.label} isActive={isActive} isOpen={isSidebarOpen} />
+                  <NavItem icon={m.icon} label={t(m.label)} isActive={isActive} isOpen={isSidebarOpen} />
                 )}
               </NavLink>
             </div>

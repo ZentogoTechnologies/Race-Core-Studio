@@ -1268,7 +1268,7 @@ export default function GraficosModule() {
             type="button"
             onClick={() => setError(null)}
             className="text-red-400 hover:text-white flex-shrink-0"
-            aria-label="Cerrar aviso"
+            aria-label={t('Cerrar aviso')}
           >
             <X size={16} />
           </button>

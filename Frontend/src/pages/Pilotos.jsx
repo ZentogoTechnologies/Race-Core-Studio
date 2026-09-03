@@ -464,7 +464,7 @@ export default function PilotosModule() {
 
       <ConfirmDialog
         abierto={Boolean(porBorrar)}
-        titulo="Eliminar piloto"
+        titulo={t('Eliminar piloto')}
         mensaje={porBorrar ? `Se va a eliminar ${porBorrar.name} ${porBorrar.last_name}.` : ''}
         onCancelar={() => setPorBorrar(null)}
         onConfirmar={confirmarBorrado}

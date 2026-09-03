@@ -176,10 +176,10 @@ export default function HomeModule() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 relative z-10">
-          <StatCard icon={<Calendar />} title="Eventos"    count={totales.e} cargando={cargando} />
-          <StatCard icon={<Tag />}      title="Categorías" count={totales.c} cargando={cargando} />
-          <StatCard icon={<Users />}    title="Pilotos"    count={totales.p} cargando={cargando} />
-          <StatCard icon={<Car />}      title="Vehículos"  count={totales.v} cargando={cargando} />
+          <StatCard icon={<Calendar />} title={t('Eventos')}    count={totales.e} cargando={cargando} />
+          <StatCard icon={<Tag />}      title={t('Categorías')} count={totales.c} cargando={cargando} />
+          <StatCard icon={<Users />}    title={t('Pilotos')}    count={totales.p} cargando={cargando} />
+          <StatCard icon={<Car />}      title={t('Vehículos')}  count={totales.v} cargando={cargando} />
         </div>
       </div>
 

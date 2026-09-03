@@ -589,7 +589,7 @@ export default function EventosModule() {
 
       <ConfirmDialog
         abierto={Boolean(porBorrar)}
-        titulo="Eliminar evento"
+        titulo={t('Eliminar evento')}
         mensaje={porBorrar ? `Se va a eliminar ${porBorrar.name} con sus ${porBorrar.total_sesiones} sesión(es).` : ''}
         onCancelar={() => setPorBorrar(null)}
         onConfirmar={confirmarBorrado}
