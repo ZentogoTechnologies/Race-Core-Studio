@@ -916,6 +916,11 @@ export default function GraficosModule() {
   // primero, así que va en su propio estado.
   const [pilotoRival, setPilotoRival] = useState(null)
 
+  /* Qué columna de tiempos tiene abierta el tótem: 'leader', 'interval' o
+     ninguna. No es un gráfico aparte —el tótem al aire es siempre el
+     completo—, así que se lleva aquí y no en `alAire`. */
+  const [columnaTotem, setColumnaTotem] = useState(null)
+
   // Qué categoría se saca en la carta de Categoría. Se elige entre las del
   // evento, no entre todas: en pista solo corren las inscritas.
   const [categoriaCarta, setCategoriaCarta] = useState(null)
@@ -935,7 +940,15 @@ export default function GraficosModule() {
   const [errorPista,    setErrorPista]    = useState(null)
 
   // Está activo si su capa lo tiene al aire.
-  const estaAlAire = (item) => alAire[GRUPO_DE[item.id]] === item.id
+  const estaAlAire = (item) => {
+    /* Al líder y al intervalo ya no son gráficos propios: son una columna
+       del tótem. Lo que los marca como activos es tener su columna
+       abierta, no ocupar la capa. */
+    if (item.id === 'totem-lider')     return columnaTotem === 'leader'
+    if (item.id === 'totem-intervalo') return columnaTotem === 'interval'
+
+    return alAire[GRUPO_DE[item.id]] === item.id
+  }
   const hayAlgoAlAire = Object.values(alAire).some(Boolean)
   const ocupado = pendiente !== null
 
@@ -1073,6 +1086,12 @@ export default function GraficosModule() {
   }
 
   // Limpia solo esa capa: CLEAR 1-<capa>. Las demás siguen al aire.
+  /* Si el tótem se va, su columna se va con él: dejarla marcada haría que
+     al volver a sacarlo apareciera activa sin estarlo. */
+  useEffect(() => {
+    if (!alAire.totem && columnaTotem !== null) setColumnaTotem(null)
+  }, [alAire.totem, columnaTotem])
+
   const limpiarGrupo = (grupo) =>
     ejecutar(`limpiar-${grupo}`, () => clearGroup(grupo), () => marcar(grupo, null))
 
@@ -1158,6 +1177,27 @@ export default function GraficosModule() {
       return
     }
 
+    /* Al líder y al intervalo no son gráficos: son una columna del tótem
+       que ya está al aire. Mandan un UPDATE en vez de cargar otra
+       plantilla, así la cabecera no parpadea, los nombres no se reescriben
+       y no se pierde la cuenta de los siete segundos.
+
+       Son excluyentes entre sí, y volver a pulsar el que está abierto lo
+       cierra. */
+    const COLUMNA = { 'totem-lider': 'leader', 'totem-intervalo': 'interval' }
+
+    if (COLUMNA[item.id]) {
+      const totem = alAire.totem
+      if (!totem) return                    // el botón está deshabilitado
+
+      const cual = COLUMNA[item.id]
+      const abrir = columnaTotem === cual ? null : cual
+
+      return ejecutar(item.id,
+        () => updateGraphic(totem, { data: { columna: abrir } }),
+        () => setColumnaTotem(abrir))
+    }
+
     alternar(item.id)
   }
 
@@ -1166,7 +1206,13 @@ export default function GraficosModule() {
   const tabActual = TABS.find(t => t.id === activeTab) || TABS[0]
 
   // Qué elemento de una pestaña está al aire, para marcarlo aunque no esté abierto.
-  const alAireEn = (tab) => itemsDe(tab).find(estaAlAire) || null
+  /* Al líder y al intervalo abren una columna del tótem, así que sin el
+     tótem al aire no hay dónde abrirla. Se deshabilitan en vez de fallar
+     en silencio al pulsarlos. */
+  const sinTotem = (item) =>
+    (item.id === 'totem-lider' || item.id === 'totem-intervalo') && !alAire.totem
+
+  const alAireEn = (tab) = itemsDe(tab).find(estaAlAire) || null
 
   // Lo que hay al aire, de la capa de atrás a la de adelante.
   const capasAlAire = GRUPOS
@@ -1424,7 +1470,7 @@ export default function GraficosModule() {
                     isActive={estaAlAire(item)}
                     isEditing={formAbierto === item.id}
                     isPending={pendiente === item.id}
-                    bloqueado={ocupado}
+                    bloqueado={ocupado || sinTotem(item)}
                     onClick={() => alPulsarItem(item)}
                   />
                 ))}

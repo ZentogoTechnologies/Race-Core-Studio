@@ -368,13 +368,17 @@ function torrePintarFilas(standings){
             columnas += `<div class="tf-marca">${logo}</div>`;
         }
 
-        if (torreConfig.dorsalIzquierda) {
+        /* Con la columna de tiempos abierta el dorsal se adelanta: queda
+           posicion, logo, dorsal, nombre y tiempos. Asi el dato que se
+           busca —el tiempo— cae al final de la fila y no en medio, y el
+           dorsal sigue pegado al nombre al que pertenece. */
+        if (torreConfig.dorsalIzquierda || torreConfig.columna) {
             columnas += `<div class="tf-dorsal izquierda">${torreEscapar(piloto.number)}</div>`;
         }
 
         columnas += `<div class="tf-nombre">${torreNombre(piloto)}</div>`;
 
-        if (!torreConfig.dorsalIzquierda) {
+        if (!torreConfig.dorsalIzquierda && !torreConfig.columna) {
             columnas += `<div class="tf-dorsal">${torreEscapar(piloto.number)}</div>`;
         }
 
@@ -420,6 +424,7 @@ function torrePintarFilas(standings){
     /* La franja se acaba de recrear, así que se le repone el estado: si
        estaba abierta y entra un piloto nuevo, no debe cerrarse sola. */
     torreElemento.classList.toggle("mejor-vuelta", torreConfig.mejorVuelta);
+    torreElemento.classList.toggle("con-diferencia", Boolean(torreConfig.columna));
 
     const comparando = Boolean(torreConfig.comparar);
 
@@ -560,6 +565,30 @@ function actualizarTorre(data){
                Se avisa al repintado para que la abra un fotograma después,
                con la franja ya puesta y cerrada. */
             torreAnimarComparar = true;
+
+            torreFirma = null;
+            torrePintar(timingUltimo());
+        }
+
+        /* Al lider o al de adelante. Llega desde el panel con el totem ya
+           al aire: no carga otra plantilla, solo abre o cierra la columna
+           de la derecha. null la cierra.
+
+           No toca la cabecera ni reescribe los nombres: el reloj, el grupo
+           y la tanda siguen donde estaban, y los nombres con la letra que
+           tuvieran. Lo unico que cambia es que aparece una columna. */
+        if (d.columna !== undefined) {
+            const cual = d.columna || null;
+
+            torreConfig.columna = cual;
+            torreConfig.etiqueta = cual === "leader"    ? T("totem.lider", "LÍDER")
+                                 : cual === "interval"  ? T("totem.intervalo", "INTERVALO")
+                                 : "";
+
+            /* El totem se ensancha para hacerle sitio: metiendola dentro
+               del ancho de siempre, el nombre perdia la mitad de su hueco
+               y se cortaba justo cuando mas se mira. */
+            torreElemento.classList.toggle("con-diferencia", Boolean(cual));
 
             torreFirma = null;
             torrePintar(timingUltimo());

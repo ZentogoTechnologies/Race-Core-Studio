@@ -59,8 +59,13 @@ TEMPLATES: dict[str, Template] = {
 
         # ── Tótems (capa 20) ──────────────────────────────────
         Template("totem-completo",  "Tótem Nombre Completo", "totem", 20, "html/20_totem_fullname",  accepts_data=True),
-        Template("totem-lider",     "Tótem al Líder",        "totem", 20, "html/22_totem_leader",    accepts_data=True),
-        Template("totem-intervalo", "Tótem Intervalo",       "totem", 20, "html/23_totem_interval",  accepts_data=True),
+        # Al líder y al intervalo ya no cargan plantilla propia: son una
+        # columna que el panel abre sobre el tótem completo que ya está al
+        # aire, con un UPDATE. Se dejan declarados porque el panel los
+        # sigue listando como botones, pero apuntan al mismo arte: si
+        # alguien los saca por API, ve el tótem, no un gráfico roto.
+        Template("totem-lider",     "Tótem al Líder",        "totem", 20, "html/20_totem_fullname",  accepts_data=True),
+        Template("totem-intervalo", "Tótem Intervalo",       "totem", 20, "html/20_totem_fullname",  accepts_data=True),
 
         # ── Banderas (capa 30) ────────────────────────────────
         Template("bandera-verde",    "Bandera Verde",      "flag", 30, "html/30_green_flag"),

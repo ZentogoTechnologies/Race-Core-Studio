@@ -322,11 +322,8 @@ CARPETA_TEXTOS = RAIZ / "Casparcg" / "template" / "i18n"
 JS_IDIOMA = RAIZ / "Casparcg" / "template" / "js" / "idioma_activo.js"
 
 IDIOMAS = [
-    {"id": "es", "nombre": "Español",   "listo": True},
-    {"id": "en", "nombre": "English",   "listo": True},
-    {"id": "pt", "nombre": "Português", "listo": False},
-    {"id": "fr", "nombre": "Français",  "listo": False},
-    {"id": "it", "nombre": "Italiano",  "listo": False},
+    {"id": "es", "nombre": "Español", "listo": True},
+    {"id": "en", "nombre": "English", "listo": True},
 ]
 
 IDIOMAS_POR_ID = {i["id"]: i for i in IDIOMAS}

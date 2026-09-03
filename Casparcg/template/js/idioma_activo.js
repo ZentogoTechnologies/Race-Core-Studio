@@ -5,51 +5,51 @@
 window.TEXTOS = {
     "totem": {
         "tiempo": "TIME",
-        "vueltas": "LAPS",
-        "mejor": "Best",
-        "ultima": "Last",
+        "vueltas": "VUELTAS",
+        "mejor": "Mejor",
+        "ultima": "Última",
         "pos": "Pos",
-        "lider": "Leader",
-        "intervalo": "Interval",
-        "vts": "Lps"
+        "lider": "LÍDER",
+        "intervalo": "INTERVALO",
+        "vts": "Vts"
     },
     "carta": {
-        "categoria": "CATEGORY",
-        "subcategoria": "SUBCATEGORY",
-        "vehiculo": "CAR",
-        "equipo": "TEAM",
-        "pais": "COUNTRY",
-        "mejor": "Best",
-        "ultima": "Last"
+        "categoria": "CATEGORÍA",
+        "subcategoria": "SUBCATEGORÍA",
+        "vehiculo": "VEHÍCULO",
+        "equipo": "EQUIPO",
+        "pais": "PAÍS",
+        "mejor": "Mejor",
+        "ultima": "Última"
     },
     "grilla": {
-        "titulo": "Starting Grid",
-        "de": "of"
+        "titulo": "Grilla de Partida",
+        "de": "de"
     },
     "resultados": {
-        "titulo": "Results",
-        "mejor_vuelta": "Fastest lap",
+        "titulo": "Cuadro de Resultados",
+        "mejor_vuelta": "Mejor vuelta",
         "pos": "Pos",
-        "nro": "No",
-        "piloto": "Driver",
-        "vueltas": "Laps",
-        "mejor": "Best",
-        "ultima": "Last"
+        "nro": "Nro",
+        "piloto": "Piloto",
+        "vueltas": "Vueltas",
+        "mejor": "Mejor",
+        "ultima": "Última"
     },
     "banderas": {
         "safety_car": "Safety car"
     },
     "clima": {
-        "sensacion": "FEELS LIKE",
-        "humedad": "HUMIDITY",
-        "viento": "WIND",
-        "fecha": "DATE"
+        "sensacion": "SENSACIÓN",
+        "humedad": "HUMEDAD",
+        "viento": "VIENTO",
+        "fecha": "FECHA"
     },
     "misc": {
-        "evento": "EVENT",
-        "categoria": "CATEGORY",
-        "narrador": "COMMENTATOR",
-        "comentarista": "ANALYST",
-        "reportero": "REPORTER"
+        "evento": "EVENTO",
+        "categoria": "CATEGORÍA",
+        "narrador": "NARRADOR",
+        "comentarista": "COMENTARISTA",
+        "reportero": "REPORTERO"
     }
 };

@@ -935,3 +935,37 @@
     from{ opacity:0; transform:translateX(-14px); }
     to  { opacity:1; transform:translateX(0); }
 }
+
+
+/* ==========================================================================
+   COLUMNA DE TIEMPOS
+
+   La abre el panel sobre el totem que ya esta al aire, no una plantilla
+   aparte. Al lider o al de adelante, nunca las dos.
+
+   El totem se ensancha para hacerle sitio. Metiendola dentro del ancho de
+   siempre, el nombre perdia la mitad de su hueco y se cortaba justo
+   cuando mas se mira.
+========================================================================== */
+
+.tf-torre.con-diferencia{
+
+    --tf-ancho: 470px;
+}
+
+/* La columna se descubre en vez de aparecer de golpe, como la franja de
+   la vuelta rapida. */
+.tf-torre .tf-dif{
+
+    overflow:hidden;
+
+    transition:width .40s cubic-bezier(.22,.61,.36,1),
+               opacity .30s ease .10s;
+}
+
+.tf-torre:not(.con-diferencia) .tf-dif{
+
+    width:0;
+
+    opacity:0;
+}
