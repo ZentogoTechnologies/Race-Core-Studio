@@ -58,6 +58,11 @@ let torreFirma = null;
    de dejarla puesta ya abierta. */
 let torreAnimarComparar = false;
 
+/* La entrada por fases solo corre una vez, al sacar el totem al aire. Los
+   repintados posteriores —entra un piloto, cambia el orden— no vuelven a
+   armarlo: seria un parpadeo cada vez que se mueve la clasificacion. */
+let torreEntrada = { hecha: false, corriendo: false, relojes: [] };
+
 
 function torreEscapar(texto){
 
@@ -175,6 +180,94 @@ function torreFranja(piloto, verde){
     html += '</div></div>';
 
     return html;
+}
+
+
+/* ==========================================================================
+   ENTRADA POR FASES
+
+   El totem se arma delante del espectador y en el orden en que se lee:
+   de quien es, que se corre, donde van a caber los nombres, y los nombres.
+
+   Los tiempos van aqui y no en el CSS porque la ultima fase depende de
+   cuantas filas se hayan pintado, y eso solo se sabe al terminar.
+========================================================================== */
+
+const TF_FASES = {
+    logo:     120,   // deja respirar antes de empezar
+    cabecera: 560,   // cuando el logo ha terminado su barrido
+    cuerpo:   1020,  // con la cabecera ya entera
+    nombres:  1400,  // con el hueco abierto
+};
+
+/* Lo que tarda cada fila en seguir a la anterior. Corto a proposito: con
+   veinte filas, un paso largo convierte la entrada en una espera. */
+const TF_PASO_FILA = 45;
+
+
+function torreCancelarEntrada(){
+    torreEntrada.relojes.forEach(clearTimeout);
+    torreEntrada.relojes = [];
+}
+
+
+function torreEscalonarFilas(){
+
+    /* El retraso se pone aqui y no en el CSS porque depende de la posicion
+       de cada fila, y las filas las pinta el script. */
+    torreCuerpo.querySelectorAll(".tf-fila").forEach((fila, i) => {
+        Array.from(fila.children).forEach(hijo => {
+            hijo.style.animationDelay = (i * TF_PASO_FILA) + "ms";
+        });
+    });
+}
+
+
+function torreArrancarEntrada(){
+
+    if (torreEntrada.hecha || torreEntrada.corriendo) return;
+    if (!torreCuerpo.querySelector(".tf-fila")) return;   // aun sin datos
+
+    torreEntrada.corriendo = true;
+
+    torreElemento.classList.add("entrando");
+    torreEscalonarFilas();
+
+    const paso = (clase, ms) => {
+        torreEntrada.relojes.push(setTimeout(() => {
+            torreElemento.classList.add(clase);
+        }, ms));
+    };
+
+    paso("fase-logo",     TF_FASES.logo);
+    paso("fase-cabecera", TF_FASES.cabecera);
+    paso("fase-cuerpo",   TF_FASES.cuerpo);
+    paso("fase-nombres",  TF_FASES.nombres);
+
+    /* Al terminar se retiran todas las clases: la entrada deja de existir
+       y el totem queda como estaba, sin transiciones colgando que le
+       compliquen la vida a los repintados. */
+    const filas = torreCuerpo.querySelectorAll(".tf-fila").length;
+    const total = TF_FASES.nombres + filas * TF_PASO_FILA + 400;
+
+    torreEntrada.relojes.push(setTimeout(() => {
+        torreElemento.classList.remove(
+            "entrando", "fase-logo", "fase-cabecera", "fase-cuerpo", "fase-nombres");
+        torreEntrada.corriendo = false;
+        torreEntrada.hecha = true;
+
+        /* La cuenta para encoger los nombres empieza aqui y no al sacar el
+           grafico: los siete segundos son para leerlos, y hasta este
+           momento no habia nada que leer. */
+        /* La primera vez que hay filas se arma la entrada; la cuenta para
+       encoger los nombres la arranca ella al terminar. Despues, cada
+       repintado la reprograma como siempre. */
+    if (!torreEntrada.hecha) {
+        torreArrancarEntrada();
+    } else {
+        torreProgramarCorto();
+    }
+    }, total));
 }
 
 
@@ -379,6 +472,12 @@ function arrancarTorre(opciones){
 
 
 function detenerTorre(){
+    torreCancelarEntrada();
+    torreEntrada.hecha = false;
+    torreEntrada.corriendo = false;
+    torreElemento.classList.remove(
+        "entrando", "fase-logo", "fase-cabecera", "fase-cuerpo", "fase-nombres");
+
 
     clearTimeout(torreTemporizador);
     detenerTiming();

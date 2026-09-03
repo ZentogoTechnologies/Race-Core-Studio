@@ -713,3 +713,102 @@
 
     opacity:1;
 }
+
+
+/* ==========================================================================
+   ENTRADA POR FASES
+
+   El totem aparecia entero de golpe, que es justo lo que no hace ningun
+   grafico de la casa. Ahora se arma delante del espectador y en el mismo
+   orden en que se lee: primero de quien es —el logo—, luego que se esta
+   corriendo —el grupo y la tanda—, luego el sitio donde van a caber los
+   nombres, y por ultimo los nombres.
+
+   Cada fase se dispara desde el script, que es quien sabe cuando estan
+   pintadas las filas. Aqui solo se declaran los estados.
+========================================================================== */
+
+/* Mientras entra, la caja no puede tener fondo propio: se veria el panel
+   entero antes de que se despliegue nada. */
+.tf-torre.entrando{
+
+    background:transparent;
+}
+
+
+/* ── 1. El logo, de izquierda a derecha ── */
+
+.tf-torre.entrando .tf-cabecera{
+
+    width:0;
+
+    overflow:hidden;
+
+    transition:width .42s cubic-bezier(.22,.61,.36,1);
+}
+
+/* Ancho fijo por dentro: si la cabecera se encogiera con su caja, el
+   grupo y el reloj se deformarian durante el barrido en vez de
+   descubrirse. */
+.tf-torre.entrando .tf-cabecera > *{
+
+    flex:0 0 auto;
+}
+
+.tf-torre.fase-logo .tf-cabecera{
+
+    width:var(--tf-logo-ancho);
+}
+
+
+/* ── 2. El resto de la cabecera ── */
+
+.tf-torre.fase-cabecera .tf-cabecera{
+
+    width:var(--tf-ancho);
+}
+
+
+/* ── 3. El cuerpo, hacia abajo ── */
+
+.tf-torre.entrando .tf-cuerpo{
+
+    max-height:0;
+
+    overflow:hidden;
+
+    transition:max-height .45s cubic-bezier(.22,.61,.36,1);
+}
+
+/* Un tope generoso y no la altura exacta: las filas las pinta el script y
+   son entre cinco y veinte. Con max-height la transicion necesita un
+   numero, y pasarse solo hace que termine antes de tiempo, que no se
+   nota; quedarse corto recortaria la ultima fila. */
+.tf-torre.fase-cuerpo .tf-cuerpo{
+
+    max-height:900px;
+}
+
+
+/* ── 4. Los nombres, de arriba abajo ── */
+
+/* Las filas ya estan puestas y ocupan su sitio: lo que entra es su
+   contenido. Animar la fila entera las haria saltar y el cuerpo, que
+   acaba de abrirse a su medida, daria un tiron. */
+.tf-torre.entrando .tf-fila > *{
+
+    opacity:0;
+
+    transform:translateX(-14px);
+}
+
+.tf-torre.fase-nombres .tf-fila > *{
+
+    animation:tfFilaEntra .30s ease forwards;
+}
+
+@keyframes tfFilaEntra{
+
+    from{ opacity:0; transform:translateX(-14px); }
+    to  { opacity:1; transform:translateX(0); }
+}
