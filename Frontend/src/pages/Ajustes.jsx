@@ -4,8 +4,8 @@ import {
   Upload, X, ImageIcon, Plug, Radio, Sliders, Languages, Type,
 } from 'lucide-react'
 import {
-  guardarRutaXml, leerAjustes, probarRutaXml, quitarLogoCliente,
-  subirLogoCliente, urlLogoCliente,
+  elegirFuente, guardarRutaXml, leerAjustes, listarFuentes, probarRutaXml,
+  quitarLogoCliente, subirLogoCliente, urlFuente, urlLogoCliente,
 } from '../api/registro'
 import { reconectarCasparcg } from '../api/graphics'
 import Trazados from '../components/settings/Trazados'
@@ -33,7 +33,50 @@ const IDIOMAS = [
 // ─── Generales ────────────────────────────────────────────────
 function Generales() {
 
-  const [idioma, setIdioma] = useState('es')
+  const { toast } = useToast()
+
+  const [idioma,   setIdioma]   = useState('es')
+  const [fuentes,  setFuentes]  = useState([])
+  const [actual,   setActual]   = useState(null)
+  const [guardando, setGuardando] = useState(null)
+
+  useEffect(() => {
+    listarFuentes()
+      .then(r => { setFuentes(r.fuentes || []); setActual(r.actual) })
+      .catch(() => {})
+  }, [])
+
+  /* Cada tipografía se declara en el propio panel apuntando a los mismos
+     archivos que usan las plantillas. Sin esto los cinco botones saldrían
+     con la letra de la interfaz y elegir sería adivinar. */
+  useEffect(() => {
+    if (!fuentes.length) return
+
+    const estilo = document.createElement('style')
+    estilo.textContent = fuentes.map(f => `
+      @font-face{
+        font-family:"${f.nombre}";
+        src:url("${urlFuente(f.url)}") format("woff2");
+        font-weight:700;
+        font-display:swap;
+      }`).join('')
+
+    document.head.appendChild(estilo)
+    return () => { document.head.removeChild(estilo) }
+  }, [fuentes])
+
+  const cambiar = async (id) => {
+    setGuardando(id)
+    try {
+      await elegirFuente(id)
+      setActual(id)
+      toast('Tipografía cambiada. Los gráficos que ya estén al aire la toman al volver a sacarlos.')
+    } catch (e) {
+      toast(e.message || 'No se pudo cambiar la tipografía', 'error')
+    } finally {
+      setGuardando(null)
+    }
+  }
 
   return (
     <>
@@ -66,25 +109,57 @@ function Generales() {
           <h3 className="text-lg font-black italic text-white">TIPOGRAFÍA DE LOS GRÁFICOS</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
-          La letra con la que salen al aire los tótems, las banderas, las cartas
-          y la grilla.
+          La letra con la que salen al aire los tótems, las banderas, las cartas y
+          la grilla. Van empaquetadas con el software, así que el arte se ve igual
+          en cualquier máquina sin instalar nada.
         </p>
 
-        <div className="rounded-lg border border-neutral-800 bg-[#0a0a0a] p-4">
-          <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">
-            En uso ahora mismo
-          </p>
-          <p className="text-2xl font-black text-white" style={{ fontFamily: 'Arial, sans-serif' }}>
-            Arial
-          </p>
-          <p className="text-neutral-500 text-sm mt-3 leading-relaxed">
-            Las plantillas piden <span className="text-neutral-300">Rajdhani</span> y,
-            en algunas, <span className="text-neutral-300">Titillium Web</span> o{' '}
-            <span className="text-neutral-300">Impact</span>. Ninguna de las dos primeras
-            está instalada en esta máquina y no se cargan desde ningún sitio, así que
-            CasparCG las sustituye por Arial. Lo que ves al aire es Arial en todos los
-            gráficos.
-          </p>
+        <div className="space-y-2.5">
+          {fuentes.map(f => {
+            const activa = actual === f.id
+            const ocupado = guardando === f.id
+            return (
+              <button
+                key={f.id} type="button"
+                onClick={() => cambiar(f.id)}
+                disabled={guardando !== null}
+                className={`w-full text-left rounded-lg border p-4 transition-colors disabled:cursor-not-allowed ${
+                  activa
+                    ? 'border-red-600 bg-red-600/10'
+                    : 'border-neutral-800 bg-[#0a0a0a] hover:border-neutral-600'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    {/* La muestra va en la propia letra: es lo único que
+                        deja comparar cinco tipografías de un vistazo. */}
+                    <p
+                      className="text-white text-2xl leading-tight truncate"
+                      style={{ fontFamily: `"${f.nombre}", sans-serif`, fontWeight: 700 }}
+                    >
+                      {f.nombre}
+                    </p>
+                    <p
+                      className="text-neutral-400 text-lg leading-tight truncate"
+                      style={{ fontFamily: `"${f.nombre}", sans-serif`, fontWeight: 700 }}
+                    >
+                      DE GRACIA · #24 · 1:23.456
+                    </p>
+                  </div>
+
+                  <span className={`flex-shrink-0 text-xs font-bold uppercase tracking-wider ${
+                    activa ? 'text-red-400' : 'text-neutral-600'
+                  }`}>
+                    {ocupado ? 'Guardando…' : activa ? 'En uso' : 'Usar'}
+                  </span>
+                </div>
+
+                <p className="text-neutral-500 text-sm mt-2.5 leading-relaxed">
+                  {f.nota}
+                </p>
+              </button>
+            )
+          })}
         </div>
       </div>
     </>

@@ -202,3 +202,106 @@ def xml_detectados() -> list[dict]:
         })
 
     return vistos
+
+
+# ── Tipografía de los gráficos ────────────────────────────────────
+#
+# Las fuentes van empaquetadas en Casparcg/template/fonts y no instaladas
+# en Windows: el arte tiene que verse igual en cualquier máquina donde se
+# instale el software, sin que nadie tenga que instalar tipografías a mano
+# antes de una carrera.
+#
+# Elegir una reescribe tipografia_activa.css, que es lo único que leen las
+# plantillas. No se toca el CSS de las caras, que es el pesado.
+
+CSS_TIPOGRAFIA = RAIZ / "Casparcg" / "template" / "css" / "tipografia_activa.css"
+
+# Donde viven los .woff2. Los sirve el backend en /media/fonts para que el
+# panel pueda enseñar cada letra antes de elegirla.
+CARPETA_FUENTES = RAIZ / "Casparcg" / "template" / "fonts"
+
+# El respaldo no es decorativo: si la fuente no cargara, Segoe UI y Arial
+# son lo único seguro en cualquier Windows.
+RESPALDO = '"Segoe UI", Arial, sans-serif'
+
+TIPOGRAFIAS = [
+    {
+        "id": "titillium",
+        "nombre": "Titillium Web",
+        "nota": "La que usa la Fórmula 1. Redonda y neutra; no es condensada, "
+                "así que los apellidos largos encogen antes en el tótem.",
+    },
+    {
+        "id": "barlow",
+        "nombre": "Barlow Condensed",
+        "nota": "Condensada de verdad: los apellidos largos caben sin encoger "
+                "la letra. Cifras de ancho fijo para tiempos y posiciones.",
+    },
+    {
+        "id": "saira",
+        "nombre": "Saira Condensed",
+        "nota": "Tan estrecha como Barlow pero con más carácter, de aire "
+                "técnico y deportivo.",
+    },
+    {
+        "id": "chakra",
+        "nombre": "Chakra Petch",
+        "nota": "La más de automovilismo, con cortes angulados. Muy buena en "
+                "nombres y dorsales grandes; menos en textos largos.",
+    },
+    {
+        "id": "archivo",
+        "nombre": "Archivo",
+        "nota": "La más segura. Pensada para leerse en tamaños pequeños y "
+                "pantallas malas, que es el caso del tótem por televisión.",
+    },
+]
+
+POR_ID = {t["id"]: t for t in TIPOGRAFIAS}
+
+
+PLANTILLA_CSS = """@charset "UTF-8";
+
+/* ==========================================================================
+   LA TIPOGRAFIA ELEGIDA
+
+   Lo reescribe el backend cada vez que se elige una fuente en
+   Ajustes -> Generales. No se edita a mano: el cambio se perderia en
+   cuanto alguien tocara el boton.
+========================================================================== */
+
+:root{{
+    --fuente-graficos: "{familia}", {respaldo};
+}}
+"""
+
+
+def _escribir_css(nombre: str) -> None:
+    """Deja en el CSS la familia elegida, con su respaldo detrás."""
+    CSS_TIPOGRAFIA.write_text(
+        PLANTILLA_CSS.format(familia=nombre, respaldo=RESPALDO),
+        encoding="utf-8",
+    )
+
+
+async def fuente_actual() -> str:
+    """El id de la tipografía puesta; la primera de la lista si no hay."""
+    ajustes = await Ajustes.find_one()
+    elegida = ajustes.font_graficos if ajustes else None
+    return elegida if elegida in POR_ID else TIPOGRAFIAS[0]["id"]
+
+
+async def guardar_fuente(tipografia_id: str) -> str:
+    """Guarda la elección y reescribe el CSS que leen las plantillas."""
+    if tipografia_id not in POR_ID:
+        raise ValueError(f"Tipografía desconocida: {tipografia_id}")
+
+    _escribir_css(POR_ID[tipografia_id]["nombre"])
+
+    ajustes = await Ajustes.find_one()
+    if ajustes is None:
+        ajustes = Ajustes()
+    ajustes.font_graficos = tipografia_id
+    await ajustes.save()
+
+    return tipografia_id

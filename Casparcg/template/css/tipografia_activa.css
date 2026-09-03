@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   LA TIPOGRAFIA ELEGIDA
+
+   Lo reescribe el backend cada vez que se elige una fuente en
+   Ajustes -> Generales. No se edita a mano: el cambio se perderia en
+   cuanto alguien tocara el boton.
+========================================================================== */
+
+:root{
+    --fuente-graficos: "Titillium Web", "Segoe UI", Arial, sans-serif;
+}

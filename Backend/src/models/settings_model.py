@@ -21,5 +21,10 @@ class Ajustes(Document):
     # saber si hay uno puesto y poder mostrarlo en la interfaz.
     client_logo: Optional[str] = None
 
+    # Cuál de las tipografías empaquetadas usan los gráficos. El archivo
+    # que leen las plantillas se reescribe al elegirla; esto es para saber
+    # cuál está puesta sin tener que leer el CSS.
+    font_graficos: Optional[str] = None
+
     class Settings:
         name = "ajustes"

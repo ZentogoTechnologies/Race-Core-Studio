@@ -3,56 +3,209 @@
 /* ==========================================================================
    TIPOGRAFIA DE LOS GRAFICOS
 
-   Un solo sitio donde se decide con que letra sale todo al aire.
+   Las cinco familias van empaquetadas con el software, en fonts/, y no
+   instaladas en Windows. El arte tiene que verse igual en el autodromo de
+   al lado, y alli nadie va a instalar tipografias a mano antes de una
+   carrera.
 
-   Antes cada hoja declaraba la suya: unas pedian Rajdhani, otras Titillium
-   Web, la carta de piloto pedia Impact para el nombre y el dorsal. Nada de
-   eso se veia. global.css forzaba Rajdhani con !important sobre el
-   selector universal, que gana a todas las demas reglas, y Rajdhani no
-   esta instalada en la maquina ni se carga desde ningun sitio. Resultado:
-   todos los graficos salian en Arial sin que nadie lo hubiera decidido.
+   Cual de las cinco se usa lo dice tipografia_activa.css, que reescribe el
+   backend cuando se elige una en Ajustes. Se separa en otro archivo para
+   que este, que es el pesado y no cambia nunca, no haya que tocarlo.
 
-   Las fuentes van empaquetadas con el software y no instaladas en Windows.
-   El arte tiene que verse igual en el autodromo de al lado, y alli nadie
-   va a instalar tipografias a mano antes de una carrera.
+   Antes cada hoja pedia la suya y no se aplicaba ninguna: global.css
+   forzaba Rajdhani con !important sobre el selector universal, y Rajdhani
+   no estaba instalada. Todo salia en Arial sin que nadie lo decidiera.
 ========================================================================== */
 
-/* Cuando esten los archivos en fonts/ se descomenta este bloque y la letra
-   pasa a ser la de verdad en cualquier maquina, sin instalar nada.
+@import url("tipografia_activa.css");
+
 
 @font-face{
     font-family:"Titillium Web";
-    src:url("../fonts/TitilliumWeb-Regular.woff2") format("woff2");
+    src:url("../fonts/TitilliumWeb-400.woff2") format("woff2");
     font-weight:400;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
     font-display:block;
 }
+
 @font-face{
     font-family:"Titillium Web";
-    src:url("../fonts/TitilliumWeb-SemiBold.woff2") format("woff2");
+    src:url("../fonts/TitilliumWeb-600.woff2") format("woff2");
     font-weight:600;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
     font-display:block;
 }
+
 @font-face{
     font-family:"Titillium Web";
-    src:url("../fonts/TitilliumWeb-Bold.woff2") format("woff2");
+    src:url("../fonts/TitilliumWeb-700.woff2") format("woff2");
     font-weight:700;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
     font-display:block;
 }
+
 @font-face{
     font-family:"Titillium Web";
-    src:url("../fonts/TitilliumWeb-Black.woff2") format("woff2");
+    src:url("../fonts/TitilliumWeb-900.woff2") format("woff2");
     font-weight:900;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
     font-display:block;
 }
 
-*/
+@font-face{
+    font-family:"Barlow Condensed";
+    src:url("../fonts/BarlowCondensed-400.woff2") format("woff2");
+    font-weight:400;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
 
-:root{
+@font-face{
+    font-family:"Barlow Condensed";
+    src:url("../fonts/BarlowCondensed-600.woff2") format("woff2");
+    font-weight:600;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
 
-    /* La que se quiere. Cambiar esta linea cambia los veintidos graficos.
+@font-face{
+    font-family:"Barlow Condensed";
+    src:url("../fonts/BarlowCondensed-700.woff2") format("woff2");
+    font-weight:700;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
 
-       El respaldo no es decorativo: si la fuente no carga, Segoe UI y
-       Arial son lo unico seguro en cualquier Windows, y mas vale un
-       grafico en Arial que uno en la letra por defecto del sistema. */
-    --fuente-graficos: "Titillium Web", "Segoe UI", Arial, sans-serif;
+@font-face{
+    font-family:"Barlow Condensed";
+    src:url("../fonts/BarlowCondensed-800.woff2") format("woff2");
+    font-weight:800;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Saira Condensed";
+    src:url("../fonts/SairaCondensed-400.woff2") format("woff2");
+    font-weight:400;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Saira Condensed";
+    src:url("../fonts/SairaCondensed-600.woff2") format("woff2");
+    font-weight:600;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Saira Condensed";
+    src:url("../fonts/SairaCondensed-700.woff2") format("woff2");
+    font-weight:700;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Saira Condensed";
+    src:url("../fonts/SairaCondensed-900.woff2") format("woff2");
+    font-weight:900;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Chakra Petch";
+    src:url("../fonts/ChakraPetch-400.woff2") format("woff2");
+    font-weight:400;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Chakra Petch";
+    src:url("../fonts/ChakraPetch-600.woff2") format("woff2");
+    font-weight:600;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Chakra Petch";
+    src:url("../fonts/ChakraPetch-700.woff2") format("woff2");
+    font-weight:700;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Archivo";
+    src:url("../fonts/Archivo-400.woff2") format("woff2");
+    font-weight:400;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Archivo";
+    src:url("../fonts/Archivo-600.woff2") format("woff2");
+    font-weight:600;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Archivo";
+    src:url("../fonts/Archivo-700.woff2") format("woff2");
+    font-weight:700;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
+}
+
+@font-face{
+    font-family:"Archivo";
+    src:url("../fonts/Archivo-900.woff2") format("woff2");
+    font-weight:900;
+    font-style:normal;
+    /* block y no swap: en un grafico de television no puede verse un
+       fotograma con la letra de respaldo y el siguiente con la buena. */
+    font-display:block;
 }

@@ -110,6 +110,17 @@ app.mount(
     name="logo",
 )
 
+# Las tipografías viven junto a las plantillas, que son quienes las pintan
+# al aire. La interfaz las sirve desde aquí para poder enseñar en Ajustes
+# cómo es cada letra antes de elegirla, sin duplicar los archivos.
+from src.services.settings_services import CARPETA_FUENTES
+
+app.mount(
+    "/media/fonts",
+    StaticFiles(directory=CARPETA_FUENTES),
+    name="fonts",
+)
+
 # Todo lo que toca la base o manda al aire exige un JWT válido. La
 # dependencia se declara aquí y no dentro de cada router para que la
 # política de acceso se lea de un vistazo en un solo lugar.

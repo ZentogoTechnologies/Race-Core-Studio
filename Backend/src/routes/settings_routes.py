@@ -1,10 +1,11 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
 from src.services.auth_services import puede_escribir
 from src.services.settings_services import (
+    TIPOGRAFIAS, fuente_actual, guardar_fuente,
     guardar_logo_cliente, guardar_ruta_timing, logo_cliente_actual,
     marcar_logo_cliente, restaurar_logo_fabrica, revisar_ruta, ruta_timing,
     url_logo_cliente, xml_detectados,
@@ -195,3 +196,32 @@ async def quitar_logo_cliente():
     await marcar_logo_cliente(None)
 
     return {"ok": True, "client_logo_url": url_logo_cliente()}
+
+
+# ── Tipografía de los gráficos ────────────────────────────────────
+
+@ajustes.get("/fuentes", tags=["Settings"])
+async def listar_fuentes():
+    """Las tipografías empaquetadas y cuál está puesta.
+
+    Se manda el archivo de cada una para que el panel pueda enseñar cómo
+    es la letra antes de elegirla: un nombre suelto no dice nada.
+    """
+    return {
+        "actual": await fuente_actual(),
+        "fuentes": [
+            {**t, "url": f"/media/fonts/{t['nombre'].replace(' ', '')}-700.woff2"}
+            for t in TIPOGRAFIAS
+        ],
+    }
+
+
+@ajustes.put("/fuentes/{tipografia_id}", dependencies=[Depends(puede_escribir)], tags=["Settings"])
+async def elegir_fuente(tipografia_id: str):
+    """Cambia la letra de los veintidós gráficos de una vez."""
+    try:
+        elegida = await guardar_fuente(tipografia_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    return {"ok": True, "actual": elegida}

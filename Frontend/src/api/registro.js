@@ -195,6 +195,16 @@ const ORIGEN = BASE.replace(/\/api\/v1\/?$/, '')
 export const urlImagenTrazado = (imagen) =>
   imagen ? `${ORIGEN}/media/circuits/${imagen}` : null
 
+// Las tipografías empaquetadas con el software. La URL que devuelve cada
+// una apunta a /media/fonts, que sirve los mismos archivos que usan las
+// plantillas: así el panel enseña exactamente la letra que va a salir.
+export const listarFuentes = () => pedir('/settings/fuentes')
+
+export const elegirFuente = (id) =>
+  pedir(`/settings/fuentes/${id}`, { method: 'PUT' })
+
+export const urlFuente = (ruta) => `${ORIGEN}${ruta}`
+
 export const listarTrazados = () => pedir('/settings/trazados')
 
 export const crearTrazado = (datos) =>
