@@ -848,7 +848,22 @@ const TABS = [
   },
   { id: 'pilotos', titulo: 'Pilotos', secciones: [SECCIONES.fichas] },
   { id: 'grilla',  titulo: 'Grilla',  secciones: [SECCIONES.grilla] },
+  {
+    /* El drag no se grafica como el circuito: no hay vueltas ni tótem de
+       clasificación, sino tiempos de reacción, velocidad final y llaves de
+       eliminación. Sus gráficos están por hacer; la pestaña existe ya para
+       que el sitio esté decidido y no aparezca luego colgando al final. */
+    id: 'drag',
+    titulo: 'Drag',
+    secciones: [],
+    disciplina: 'drag',
+  },
 ]
+
+/* Una pestaña con disciplina solo se usa en la suya. Las de circuito no
+   tienen sentido en una jornada de drag y al revés: mostrarlas activas
+   invita a sacar al aire un gráfico que no cuadra con lo que se corre. */
+const DISCIPLINA_DE_TAB = { carrera: 'circuito', drag: 'drag' }
 
 // Todos los botones de una pestaña, sin importar en qué sección estén.
 const itemsDe = (tab) => tab.secciones.flatMap(s => s.items)
@@ -1327,13 +1342,23 @@ export default function GraficosModule() {
           {TABS.map(tab => {
             const enAire     = alAireEn(tab)
             const esteActivo = activeTab === tab.id
-            const bloqueada  = !hayCarrera && TABS_QUE_NECESITAN_CARRERA.includes(tab.id)
+            const sinCarrera = !hayCarrera && TABS_QUE_NECESITAN_CARRERA.includes(tab.id)
+
+            const suya = DISCIPLINA_DE_TAB[tab.id]
+            const otraDisciplina = Boolean(suya && disciplina && suya !== disciplina)
+
+            const bloqueada = sinCarrera || otraDisciplina
+            const motivo = otraDisciplina
+              ? `Solo se usa en ${suya === 'drag' ? 'drag' : 'circuito'}`
+              : sinCarrera
+                ? 'Elige una carrera para usar esta pestaña'
+                : undefined
             return (
               <button
                 key={tab.id}
                 onClick={() => !bloqueada && setActiveTab(tab.id)}
                 disabled={bloqueada}
-                title={bloqueada ? 'Elige una carrera para usar esta pestaña' : undefined}
+                title={motivo}
                 className={`flex items-center gap-2 px-4 py-3 -mb-px border-b-2 font-bold text-xs uppercase tracking-wider whitespace-nowrap transition-colors ${
                   bloqueada
                     ? 'border-transparent text-neutral-700 cursor-not-allowed'
@@ -1354,6 +1379,16 @@ export default function GraficosModule() {
         </div>
 
         {/* Una sección por capa, cada una con su propio botón de limpiar */}
+        {tabActual.secciones.length === 0 && (
+          <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
+            <p className="text-neutral-500 text-sm">
+              Los gráficos de drag están por hacer: tiempos de reacción,
+              velocidad final y llaves de eliminación. La pestaña ya está aquí
+              para que el sitio quede decidido.
+            </p>
+          </div>
+        )}
+
         {tabActual.secciones.map((seccion, i) => {
           const ocupadaPor = alAire[seccion.grupo] || null
           return (

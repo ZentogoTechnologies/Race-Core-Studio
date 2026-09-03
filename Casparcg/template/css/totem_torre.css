@@ -355,7 +355,7 @@
 
 .tf-pos{
 
-    width:37px;
+    width:30px;
 
     flex:0 0 auto;
 
@@ -402,7 +402,7 @@
 
     flex:0 0 auto;
 
-    margin:0 10px 0 8px;
+    margin:0 7px 0 5px;
 
     display:flex;
     align-items:center;
@@ -457,9 +457,9 @@
 
     flex:0 0 auto;
 
-    min-width:34px;
+    min-width:30px;
 
-    margin-right:6px;
+    margin-right:5px;
 
     text-align:center;
 
@@ -506,7 +506,7 @@
    entre sí y la marca caiga siempre en la misma vertical. */
 .tf-crono-col{
 
-    width:20px;
+    width:18px;
 
     flex:0 0 auto;
 
@@ -560,7 +560,7 @@
 
 .tf-dif{
 
-    width:78px;
+    width:66px;
 
     /* flex:0 0 auto o el nombre se la come: con flex-shrink por defecto
        la columna cedía sitio y el tiempo quedaba partido. */
@@ -594,7 +594,13 @@
 
     font-size:10px;
 
-    letter-spacing:1.4px;
+    /* Menos separacion y menos relleno que en las cifras: INTERVALO es la
+       palabra mas larga que entra aqui y con el espaciado de antes se
+       salia de la columna al estrechar el totem. Medido: 55px de texto
+       sobre 66 de columna, con 10 de relleno. */
+    letter-spacing:.5px;
+
+    padding:0 6px 0 4px;
 
     color:var(--tf-oro);
 }
@@ -948,10 +954,10 @@
    cuando mas se mira.
 ========================================================================== */
 
-.tf-torre.con-diferencia{
-
-    --tf-ancho: 470px;
-}
+/* El ancho no cambia al abrir la columna. Antes el totem se ensanchaba y
+   el salto se veia al pasar del completo al lider: ahora los tres miden
+   lo mismo y lo unico que se mueve es el reparto de dentro, que el nombre
+   cede sitio a la columna. */
 
 /* La columna se descubre en vez de aparecer de golpe, como la franja de
    la vuelta rapida. */
