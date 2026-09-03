@@ -197,7 +197,10 @@
 
 .tf-reloj-banda{
 
-    --tf-reloj-alto: calc(var(--tf-alto-fila) * 1.5);
+    /* El mismo alto que una fila de la clasificacion. La cifra ya tiene el
+       cuerpo de los nombres, y con fila y media quedaba un cinturon de
+       aire vacio alrededor. */
+    --tf-reloj-alto: var(--tf-alto-fila);
 
     height:var(--tf-reloj-alto);
 
@@ -259,8 +262,10 @@
 
 .tf-reloj-valor{
 
-    /* El numero se lleva la franja: es a lo que se mira. */
-    font-size:calc(var(--tf-reloj-alto) * 0.50);
+    /* El mismo cuerpo que los nombres de la clasificacion: el reloj y los
+       pilotos son datos del mismo rango y leerlos con la misma letra hace
+       que el totem se lea como una pieza y no como dos. */
+    font-size:15px;
 
     font-weight:900;
 

@@ -92,15 +92,85 @@ function update(data){
     }catch(e){}
 }
 
-/* La carta entra entera: aqui no hay un panel que se despliegue desde un
-   logo, los dos lados pesan lo mismo. */
+/* ==========================================================================
+   ENTRADA
+
+   Las dos caras entran juntas en el centro y desde ahi se abren hacia sus
+   lados, descubriendo la informacion que va en medio.
+
+   Lo que se mueve no son las fotos: es lo que hay entre ellas, que empieza
+   sin ancho y lo recupera. Como la carta esta centrada en pantalla, las
+   caras se juntan y se separan solas. Asi no hay nada que medir, que es
+   donde fallaba antes: CasparCG llama a play() cuando el navegador aun no
+   ha hecho el diseño y las medidas salian mal.
+========================================================================== */
+
 function play(){
-    const c=document.getElementById("vsCard");
-    c.style.transform="translateX(-50%)";
-    c.style.animation="slideUp .5s ease forwards";
+
+    const carta = document.getElementById("vsCard");
+
+    carta.style.transform = "translateX(-50%)";
+    carta.style.animation = "slideUp .5s ease forwards";
+
+    /* Sin ancho en el centro desde el primer fotograma: es el punto de
+       partida, no un movimiento. */
+    carta.classList.remove("abriendo");
+    carta.classList.add("juntas");
+
+    /* Se abre cuando la carta ha terminado de subir y las dos caras estan
+       cargadas. Sin esperar a las fotos, el momento en que deberian verse
+       juntas se lo pasan como dos cajas negras sobre un panel negro: se
+       separan antes de que haya nada que mirar. */
+    cuandoEsten(carta.querySelectorAll(".vs-foto img"), () => {
+        setTimeout(() => {
+            /* Dos fotogramas para que el navegador registre el estado
+               cerrado antes de soltarlo, o se salta la transicion. */
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                carta.classList.add("abriendo");
+            }));
+        }, 620);
+    });
 }
+
 function stop(){
-    document.getElementById("vsCard").style.animation="slideDown .5s ease forwards";
+
+    const carta = document.getElementById("vsCard");
+    carta.style.animation = "slideDown .5s ease forwards";
+
+    /* Se limpia para que la proxima vez vuelva a entrar juntandose y no
+       desde donde se quedo. */
+    setTimeout(() => {
+        carta.classList.remove("juntas", "abriendo");
+    }, 500);
+}
+
+
+/* Llama a `seguir` cuando todas las imagenes hayan cargado, y en todo caso
+   al cabo de un segundo y medio: una foto que no llegue no puede dejar la
+   carta congelada a medio entrar. */
+function cuandoEsten(imagenes, seguir){
+
+    const lista = Array.from(imagenes).filter(im => im.getAttribute("src"));
+
+    let pendientes = lista.filter(im => !im.complete).length;
+    let hecho = false;
+
+    const listo = () => {
+        if (hecho) return;
+        hecho = true;
+        seguir();
+    };
+
+    if (!pendientes) { listo(); return; }
+
+    lista.forEach(im => {
+        if (im.complete) return;
+        const marcar = () => { if (--pendientes <= 0) listo(); };
+        im.addEventListener("load", marcar, { once: true });
+        im.addEventListener("error", marcar, { once: true });
+    });
+
+    setTimeout(listo, 1500);
 }
 
 if(!window.__casparcg){ play(); }

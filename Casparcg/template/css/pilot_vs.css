@@ -264,3 +264,64 @@
 
     font-weight:800;
 }
+
+
+/* ==========================================================================
+   ENTRADA: LOS DOS SE SEPARAN
+
+   Las dos caras entran juntas en el centro, enfrentadas, y desde ahi se
+   abren hacia sus lados descubriendo lo que va en medio. Primero se ve a
+   quien se compara y despues con que.
+
+   No se mueven las fotos: se encoge lo que va entre ellas. La carta esta
+   centrada en pantalla, asi que al quedarse sin contenido intermedio las
+   dos caras se juntan solas en el medio, y al recuperarlo se separan hacia
+   sus lados por simetria.
+
+   Se hizo antes moviendo cada foto con un transform calculado a medida, y
+   dependia de medir la carta en el momento justo. CasparCG llama a play()
+   cuando el navegador todavia no ha hecho el diseño, la medida salia mal y
+   las caras nunca llegaban a juntarse. Encogiendo el centro no hay nada
+   que medir.
+========================================================================== */
+
+.vs-card.juntas .vs-datos,
+.vs-card.juntas .vs-centro{
+
+    max-width:0;
+    min-width:0;
+
+    padding-left:0;
+    padding-right:0;
+
+    opacity:0;
+
+    overflow:hidden;
+}
+
+.vs-card.abriendo .vs-datos,
+.vs-card.abriendo .vs-centro{
+
+    /* Un tope holgado y no el ancho exacto: max-width necesita un numero
+       para poder animarse, y pasarse solo hace que la transicion termine
+       antes de tiempo, cosa que no se nota. Quedarse corto si cortaria un
+       nombre largo. */
+    max-width:700px;
+
+    opacity:1;
+
+    transition:max-width .75s cubic-bezier(.22,.61,.36,1),
+               padding   .75s cubic-bezier(.22,.61,.36,1),
+               /* El texto espera a que haya hueco donde caber. */
+               opacity   .40s ease .30s;
+}
+
+/* Las caras, por encima: si el texto quedara delante se veria asomar por
+   encima de ellas mientras se abre el hueco. */
+.vs-card.juntas .vs-foto,
+.vs-card.abriendo .vs-foto{
+
+    position:relative;
+
+    z-index:3;
+}
