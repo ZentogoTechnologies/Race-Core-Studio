@@ -187,8 +187,8 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
               }`}
             >
               {todosDeCategoria.completa
-                ? <><Square size={13}/> QUITAR TODOS</>
-                : <><CheckSquare size={13}/> MARCAR TODOS</>}
+                ? <><Square size={13}/> {t('QUITAR TODOS')}</>
+                : <><CheckSquare size={13}/> {t('MARCAR TODOS')}</>}
             </button>
           </div>
         )}
@@ -277,7 +277,7 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
                                   {v.brand || 'Sin marca'} {v.model || ''}
                                 </span>
                                 <span className="block text-xs text-yellow-600/80 truncate mt-0.5">
-                                  Sin piloto asignado
+                                  {t('Sin piloto asignado')}
                                 </span>
                               </>
                             )}

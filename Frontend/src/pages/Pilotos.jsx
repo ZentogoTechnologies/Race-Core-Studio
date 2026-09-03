@@ -315,7 +315,7 @@ export default function PilotosModule() {
                     type="button" onClick={quitarFoto}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 transition-colors font-bold text-xs"
                   >
-                    <X size={14}/> QUITAR
+                    <X size={14}/> {t('QUITAR')}
                   </button>
                 )}
               </div>

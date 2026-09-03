@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
@@ -85,7 +86,7 @@ export default function MainLayout() {
           {isSidebarOpen && (
             <>
               <span className="flex-1 text-left">
-                <span className="block text-[10px] uppercase tracking-wider text-neutral-500">Disciplina</span>
+                <span className="block text-[10px] uppercase tracking-wider text-neutral-500">{t('Disciplina')}</span>
                 <span className="block text-sm font-bold text-neutral-200">{etiquetaDisciplina}</span>
               </span>
               <Repeat size={14} className="text-neutral-600 group-hover:text-red-500 transition-colors" />
@@ -112,12 +113,12 @@ export default function MainLayout() {
           {isSidebarOpen && usuario && (
             <div className="mb-3 px-1">
               <p className="text-sm font-semibold text-neutral-200 truncate">{usuario.username}</p>
-              <p className="text-[11px] uppercase tracking-wider text-neutral-500">{ROTULO_ROL[usuario.role] || usuario.role}</p>
+              <p className="text-[11px] uppercase tracking-wider text-neutral-500">{t(ROTULO_ROL[usuario.role] || usuario.role)}</p>
             </div>
           )}
           <button onClick={salir} className={`w-full flex items-center ${isSidebarOpen ? 'justify-start px-4' : 'justify-center'} py-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors gap-3`}>
             <LogOut size={18} />
-            {isSidebarOpen && <span className="font-semibold text-sm">Cerrar Sesión</span>}
+            {isSidebarOpen && <span className="font-semibold text-sm">{t('Cerrar Sesión')}</span>}
           </button>
         </div>
       </aside>
@@ -125,7 +126,7 @@ export default function MainLayout() {
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-2 bg-red-600 rounded-bl-3xl opacity-80 z-0" />
         <header className="h-16 border-b border-neutral-800/50 flex items-center px-8 z-10 bg-[#0a0a0a]/80 backdrop-blur-sm">
-          <h2 className="text-xl font-bold uppercase tracking-wider text-neutral-200">{titulo}</h2>
+          <h2 className="text-xl font-bold uppercase tracking-wider text-neutral-200">{t(titulo)}</h2>
         </header>
         <div className="flex-1 overflow-auto p-8 z-10">
           <Outlet />

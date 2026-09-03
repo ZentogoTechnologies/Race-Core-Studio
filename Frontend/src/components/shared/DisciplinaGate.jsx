@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { Outlet } from 'react-router-dom'
 import { Flag, Zap } from 'lucide-react'
 import { useDisciplina } from '../../context/DisciplinaContext'
@@ -56,7 +57,7 @@ export default function DisciplinaGate() {
               <div className="bg-red-600/10 w-fit p-3 rounded-lg text-red-500 mb-5 group-hover:bg-red-600/20 transition-colors">
                 <Icon size={26} />
               </div>
-              <p className="text-xl font-black italic text-white mb-1">{etiqueta}</p>
+              <p className="text-xl font-black italic text-white mb-1">{t(etiqueta)}</p>
               <p className="text-neutral-500 text-sm leading-snug">{detalle}</p>
             </button>
           ))}

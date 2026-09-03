@@ -1,3 +1,4 @@
+import { t } from '../../i18n'
 import { Timer, Map } from 'lucide-react'
 
 // ==========================================
@@ -8,7 +9,7 @@ export default function EventSelectionScreen({ onSelectEvent }) {
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-4">
       <div className="text-center mb-12 animate-fade-in">
         <h2 className="text-4xl font-black text-white italic mb-4">
-          SELECCIONA LA MODALIDAD
+          {t('SELECCIONA LA MODALIDAD')}
         </h2>
         <p className="text-neutral-400">
           Elige el tipo de evento que deseas gestionar en esta sesión.
@@ -24,7 +25,7 @@ export default function EventSelectionScreen({ onSelectEvent }) {
           <div className="absolute -right-10 -top-10 w-40 h-40 bg-red-600/10 rounded-full group-hover:scale-150 transition-transform duration-500" />
           <Timer size={48} className="text-red-600 mb-6 relative z-10" />
           <h3 className="text-3xl font-black text-white italic mb-2 relative z-10">
-            DRAG RACING
+            {t('DRAG RACING')}
           </h3>
           <p className="text-neutral-400 relative z-10">
             Gestión de 1/4 de milla, tiempos de reacción y llaves de eliminación.
@@ -39,7 +40,7 @@ export default function EventSelectionScreen({ onSelectEvent }) {
           <div className="absolute -right-10 -top-10 w-40 h-40 bg-red-600/10 rounded-full group-hover:scale-150 transition-transform duration-500" />
           <Map size={48} className="text-red-600 mb-6 relative z-10" />
           <h3 className="text-3xl font-black text-white italic mb-2 relative z-10">
-            CIRCUITO
+            {t('CIRCUITO')}
           </h3>
           <p className="text-neutral-400 relative z-10">
             Gestión de carreras de pista, vueltas, clasificaciones y endurance.

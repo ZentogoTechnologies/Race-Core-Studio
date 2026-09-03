@@ -183,7 +183,7 @@ function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClic
       // Mientras un comando viaja al servidor no se aceptan más pulsaciones:
       // evita mandar dos ADD seguidos a la misma capa.
       disabled={bloqueado}
-      title={detalle}
+      title={t(detalle)}
       className={`relative w-full flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200 disabled:cursor-not-allowed ${
         isActive
           ? `${item.border} ${item.bgActive} text-white`
@@ -195,7 +195,7 @@ function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClic
       {isPending
         ? <Loader2 size={20} className={`flex-shrink-0 animate-spin ${item.icon}`} />
         : <Icon size={20} className={`flex-shrink-0 ${item.icon}`} />}
-      <span className="font-semibold text-sm truncate">{label}</span>
+      <span className="font-semibold text-sm truncate">{t(label)}</span>
       {/* Fuera del flujo: el ancho del botón no cambia al activarse */}
       {isActive && (
         <span className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ${item.dot} animate-pulse`} />
@@ -256,7 +256,7 @@ function SelectorPiloto({
   return (
     <div>
       <label className="block text-neutral-400 text-xs mb-1 uppercase">
-        {etiqueta}
+        {t(etiqueta)}
       </label>
 
       {elegido ? (
@@ -314,7 +314,7 @@ function SelectorPiloto({
           <div className="mt-2 max-h-44 overflow-y-auto rounded border border-neutral-800 divide-y divide-neutral-800/60">
             {disponibles.length === 0 ? (
               <p className="p-3 text-neutral-500 text-sm">
-                No hay pilotos registrados todavía.
+                {t('No hay pilotos registrados todavía.')}
               </p>
             ) : filtrados.length === 0 ? (
               <p className="p-3 text-neutral-500 text-sm">{t('Sin coincidencias.')}</p>
@@ -383,13 +383,13 @@ function FormularioPersonal({
   return (
     <div className="bg-[#141414] p-6 rounded-xl border border-red-600/30 mt-4">
       <p className="text-white font-bold text-sm uppercase tracking-wider mb-4">
-        {item.nombre}
+        {t(item.nombre)}
       </p>
 
       {tipo === 'categoria' ? (
         <div>
           <label className="block text-neutral-400 text-xs mb-2 uppercase">
-            Categoría que está corriendo
+            {t('Categoría que está corriendo')}
           </label>
 
           {categoriasDelEvento.length === 0 ? (
@@ -422,7 +422,7 @@ function FormularioPersonal({
               {categoriaCarta !== null && (
                 <div className="mt-4 border-t border-neutral-800 pt-3">
                   <p className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2">
-                    Subcategorías que salen en el arte
+                    {t('Subcategorías que salen en el arte')}
                   </p>
                   {subcategoriasDeLaCarta.length === 0 ? (
                     <p className="text-sm text-neutral-600">
@@ -597,7 +597,7 @@ function RelojTanda({ reloj, ocupado, pendiente, onConfig, onArrancar,
       <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h3 className="flex items-center gap-2 text-neutral-400 text-[11px] font-bold uppercase tracking-wider">
           <Timer size={13} />
-          Control de la tanda
+          {t('Control de la tanda')}
           <span className="text-neutral-600 normal-case">
             {corriendo ? 'en marcha'
               : reloj?.estado === 'pausado' ? 'en pausa'
@@ -651,7 +651,7 @@ function RelojTanda({ reloj, ocupado, pendiente, onConfig, onArrancar,
                 className={`${btnBase} border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400`}
               >
                 <Check size={15} />
-                FIJAR
+                {t('FIJAR')}
               </button>
             </div>
 
@@ -673,7 +673,7 @@ function RelojTanda({ reloj, ocupado, pendiente, onConfig, onArrancar,
                 className={`${btnBase} border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 hover:bg-red-600/10`}
               >
                 <RotateCcw size={15} />
-                REINICIAR
+                {t('REINICIAR')}
               </button>
             </div>
           </>
@@ -697,7 +697,7 @@ function RelojTanda({ reloj, ocupado, pendiente, onConfig, onArrancar,
                 className={`${btnBase} border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400`}
               >
                 <Check size={15} />
-                FIJAR
+                {t('FIJAR')}
               </button>
             </div>
 
@@ -714,7 +714,7 @@ function RelojTanda({ reloj, ocupado, pendiente, onConfig, onArrancar,
                 className={`${btnBase} border-green-500 text-green-400 hover:bg-green-500/10`}
               >
                 <Plus size={15} />
-                VUELTA
+                {t('VUELTA')}
               </button>
 
               <button
@@ -722,7 +722,7 @@ function RelojTanda({ reloj, ocupado, pendiente, onConfig, onArrancar,
                 className={`${btnBase} border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 hover:bg-red-600/10`}
               >
                 <RotateCcw size={15} />
-                REINICIAR
+                {t('REINICIAR')}
               </button>
             </div>
           </>
@@ -866,11 +866,11 @@ function Capa({ etiqueta, item }) {
   return (
     <div className="min-w-0">
       <p className="text-neutral-400 text-[11px] font-bold uppercase tracking-wider">
-        {etiqueta}
+        {t(etiqueta)}
       </p>
       {item ? (
         <p className="flex items-center gap-2 text-base font-black italic text-white min-w-0"
-           title={item.nombre}>
+           title={t(item.nombre)}>
           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${item.dot} animate-pulse`} />
           <span className="truncate">{item.nombre.toUpperCase()}</span>
         </p>
@@ -1207,7 +1207,7 @@ export default function GraficosModule() {
             <>
               <p className="text-[11px] uppercase tracking-wider text-amber-500">{t('Sin carrera seleccionada')}</p>
               <p className="text-sm text-amber-200/80">
-                Solo está disponible la pestaña General.
+                {t('Solo está disponible la pestaña General.')}
               </p>
             </>
           )}
@@ -1239,7 +1239,7 @@ export default function GraficosModule() {
               ) : (
                 capasAlAire.map(({ seccion, item }) => (
                   <Capa key={seccion.grupo}
-                        etiqueta={`${seccion.titulo} · 1-${seccion.capa}`}
+                        etiqueta={`${t(seccion.titulo)} · 1-${seccion.capa}`}
                         item={item} />
                 ))
               )}
@@ -1297,7 +1297,7 @@ export default function GraficosModule() {
                 }`}
               >
                 {bloqueada && <Lock size={11} />}
-                {tab.titulo}
+                {t(tab.titulo)}
                 {/* Marca la pestaña que tiene algo al aire aunque esté cerrada */}
                 {enAire && (
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${enAire.dot} animate-pulse`} />
@@ -1315,7 +1315,7 @@ export default function GraficosModule() {
 
               <div className="flex items-center justify-between gap-4 mb-2">
                 <h3 className="flex items-center gap-2 text-neutral-400 text-[11px] font-bold uppercase tracking-wider">
-                  {seccion.titulo}
+                  {t(seccion.titulo)}
                   <span className="text-neutral-600 font-mono normal-case">
                     1-{seccion.capa}
                   </span>

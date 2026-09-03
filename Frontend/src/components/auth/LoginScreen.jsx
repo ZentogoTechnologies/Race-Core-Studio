@@ -80,7 +80,7 @@ export default function LoginScreen() {
 
           <div>
             <label className="block text-neutral-400 text-xs font-bold mb-2 uppercase tracking-wider">
-              Contraseña
+              {t('Contraseña')}
             </label>
             <div className="relative">
               <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 w-5 h-5" />

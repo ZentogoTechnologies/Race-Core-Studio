@@ -136,7 +136,7 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
                           : 'border-neutral-800 text-neutral-500 hover:border-neutral-600'
                       }`}
                     >
-                      <Icon size={14} className={tipo === valor ? color : ''}/>{etiqueta}
+                      <Icon size={14} className={tipo === valor ? color : ''}/>{t(etiqueta)}
                     </button>
                   ))}
 
@@ -147,7 +147,7 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
                         onChange={e => cambiarLibre(e.target.checked)}
                         className="accent-red-600"
                       />
-                      PRÁCTICA LIBRE
+                      {t('PRÁCTICA LIBRE')}
                     </label>
                   )}
                 </div>

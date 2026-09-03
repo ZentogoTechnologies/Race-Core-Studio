@@ -245,7 +245,7 @@ export default function CategoriasModule() {
 
             <div className="min-w-0">
               <label className="block text-neutral-400 text-xs mb-2 uppercase">
-                Logo de la categoría
+                {t('Logo de la categoría')}
               </label>
 
               <input
@@ -267,7 +267,7 @@ export default function CategoriasModule() {
                     type="button" onClick={quitarLogo}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 transition-colors font-bold text-xs"
                   >
-                    <X size={14}/> QUITAR
+                    <X size={14}/> {t('QUITAR')}
                   </button>
                 )}
               </div>
@@ -287,7 +287,7 @@ export default function CategoriasModule() {
                 type="button" onClick={agregarSub}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 transition-colors text-xs font-bold"
               >
-                <Plus size={14}/> AGREGAR
+                <Plus size={14}/> {t('AGREGAR')}
               </button>
             </div>
 

@@ -70,7 +70,7 @@ export default function SelectorCarrera() {
       {!cargando && eventos.length === 0 && (
         <div className="bg-[#141414] border border-neutral-800 rounded-xl p-6 text-center mb-4">
           <p className="text-neutral-400 text-sm">
-            No hay eventos registrados en esta disciplina.
+            {t('No hay eventos registrados en esta disciplina.')}
           </p>
           <p className="text-neutral-600 text-xs mt-1">
             Créalos desde el módulo de Eventos, o continúa sin carrera.
@@ -122,12 +122,12 @@ export default function SelectorCarrera() {
                 <div className="border-t border-neutral-800 px-5 py-4">
                   {ev.sesiones.length === 0 ? (
                     <p className="text-sm text-neutral-600 mb-4">
-                      Este evento aún no tiene tandas programadas.
+                      {t('Este evento aún no tiene tandas programadas.')}
                     </p>
                   ) : (
                     <>
                       <p className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2">
-                        Tanda
+                        {t('Tanda')}
                       </p>
                       <div className="flex flex-col gap-2 mb-4 max-h-56 overflow-y-auto">
                         {ev.sesiones.map(s => {
@@ -179,10 +179,10 @@ export default function SelectorCarrera() {
           className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white transition-colors font-bold text-sm"
         >
           <SkipForward size={16}/>
-          AVANZAR SIN CARRERA SELECCIONADA
+          {t('AVANZAR SIN CARRERA SELECCIONADA')}
         </button>
         <p className="text-xs text-neutral-600 text-center mt-2">
-          Solo quedará disponible la pestaña <span className="text-neutral-400 font-bold">{t('General')}</span>:
+          {t('Solo quedará disponible la pestaña')} <span className="text-neutral-400 font-bold">{t('General')}</span>:
           fondos y misceláneos. Carrera, Pilotos y Grilla necesitan saber qué se está corriendo.
         </p>
       </div>

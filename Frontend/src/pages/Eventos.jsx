@@ -332,7 +332,7 @@ export default function EventosModule() {
 
               <div className="min-w-0">
                 <label className="block text-neutral-400 text-xs mb-2 uppercase">
-                  Imagen del evento
+                  {t('Imagen del evento')}
                 </label>
 
                 <input
@@ -354,7 +354,7 @@ export default function EventosModule() {
                       type="button" onClick={quitarImagen}
                       className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 transition-colors font-bold text-xs"
                     >
-                      <X size={14}/> QUITAR
+                      <X size={14}/> {t('QUITAR')}
                     </button>
                   )}
                 </div>
@@ -446,7 +446,7 @@ export default function EventosModule() {
               {paso === 2 && (
                 <button type="button" onClick={() => setPaso(1)}
                   className="flex items-center gap-2 px-5 py-2 rounded border border-neutral-700 text-neutral-400 hover:text-white hover:border-neutral-500 transition-colors font-bold text-sm">
-                  <ArrowLeft size={15}/> ATRÁS
+                  <ArrowLeft size={15}/> {t('ATRÁS')}
                 </button>
               )}
 
@@ -469,7 +469,7 @@ export default function EventosModule() {
                   disabled={faltantes.length > 0}
                   className="flex items-center gap-2 bg-white text-black font-bold py-2 px-6 rounded hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
-                  SIGUIENTE <ArrowRight size={15}/>
+                  {t('SIGUIENTE')} <ArrowRight size={15}/>
                 </button>
               ) : (
                 <button key="guardar" type="submit" disabled={guardando}
@@ -564,7 +564,7 @@ export default function EventosModule() {
                   <tr className="border-b border-neutral-800/50">
                     <td colSpan={columnas} className="p-4 bg-[#0f0f0f]">
                       <p className="text-xs uppercase tracking-wider text-neutral-500 mb-3">
-                        Programa por día
+                        {t('Programa por día')}
                       </p>
                       <SesionesEvento
                         evento={expandido}

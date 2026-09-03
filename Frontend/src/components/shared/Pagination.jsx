@@ -31,7 +31,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
         <span>
           {total === 0
             ? 'Sin resultados'
-            : <>{t('Mostrando')} <span className="text-neutral-300 font-bold">{desde}–{hasta}</span> de <span className="text-neutral-300 font-bold">{total}</span></>}
+            : <>{t('Mostrando')} <span className="text-neutral-300 font-bold">{desde}–{hasta}</span> {t('de')} <span className="text-neutral-300 font-bold">{total}</span></>}
         </span>
         <select
           value={limit}

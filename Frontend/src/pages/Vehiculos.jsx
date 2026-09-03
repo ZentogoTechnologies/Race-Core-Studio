@@ -402,7 +402,7 @@ export default function VehiculosModule() {
                 <div key={`nueva-${i}`} className="relative w-28 h-20 rounded-lg overflow-hidden border border-blue-600/50 bg-[#0a0a0a]">
                   <img src={URL.createObjectURL(archivo)} alt="" className="w-full h-full object-cover"/>
                   <span className="absolute bottom-0 inset-x-0 bg-blue-600/80 text-white text-[10px] font-bold text-center py-0.5">
-                    AL GUARDAR
+                    {t('AL GUARDAR')}
                   </span>
                   <button
                     type="button" onClick={() => setNuevas(n => n.filter((_, j) => j !== i))}

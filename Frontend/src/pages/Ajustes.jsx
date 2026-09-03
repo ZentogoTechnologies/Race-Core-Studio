@@ -92,7 +92,7 @@ function Generales() {
         >
           {idiomas.map(l => (
             <option key={l.id} value={l.id} disabled={!l.listo}>
-              {l.nombre}{l.listo ? '' : ' — próximamente'}
+              {t(l.nombre)}{l.listo ? '' : t(' — próximamente')}
             </option>
           ))}
         </select>
@@ -329,7 +329,7 @@ export default function AjustesModule() {
               }`}
             >
               <Icon size={16} />
-              {nombre}
+              {t(nombre)}
             </button>
           )
         })}
@@ -349,7 +349,7 @@ export default function AjustesModule() {
         </p>
 
         <label className="block text-neutral-400 text-xs mb-2 uppercase">
-          Ruta del current.xml
+          {t('Ruta del current.xml')}
         </label>
         <div className="flex flex-col sm:flex-row gap-2 mb-3">
           <input
@@ -410,17 +410,17 @@ export default function AjustesModule() {
               >
                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${d.existe ? 'bg-green-500' : 'bg-red-600'}`}/>
                 <span className="flex-1 min-w-0">
-                  <span className="block text-sm font-bold text-white">{d.nombre}</span>
+                  <span className="block text-sm font-bold text-white">{t(d.nombre)}</span>
                   <span className="block text-[11px] text-neutral-600 font-mono truncate">{d.ruta}</span>
                 </span>
                 {enUso && (
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-red-600/15 text-red-400 flex-shrink-0">
-                    EN USO
+                    {t('EN USO')}
                   </span>
                 )}
                 {!d.existe && (
                   <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-neutral-700/30 text-neutral-500 flex-shrink-0">
-                    NO ALCANZABLE
+                    {t('NO ALCANZABLE')}
                   </span>
                 )}
               </button>
@@ -531,7 +531,7 @@ export default function AjustesModule() {
                   type="button" onClick={restaurarLogo} disabled={subiendo}
                   className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 disabled:opacity-40 transition-colors font-bold text-sm"
                 >
-                  <X size={16}/> RESTAURAR
+                  <X size={16}/> {t('RESTAURAR')}
                 </button>
               )}
             </div>

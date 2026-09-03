@@ -176,7 +176,7 @@ export default function Trazados() {
           <div className="grid sm:grid-cols-2 gap-3 mb-3">
             <div>
               <label className="block text-neutral-400 text-xs mb-1.5 uppercase">
-                Nombre del circuito
+                {t('Nombre del circuito')}
               </label>
               <input
                 type="text" value={nuevo.name} autoFocus
@@ -187,7 +187,7 @@ export default function Trazados() {
             </div>
             <div>
               <label className="block text-neutral-400 text-xs mb-1.5 uppercase">
-                Variante
+                {t('Variante')}
               </label>
               <input
                 type="text" value={nuevo.variante}
@@ -198,7 +198,7 @@ export default function Trazados() {
             </div>
             <div>
               <label className="block text-neutral-400 text-xs mb-1.5 uppercase">
-                Disciplina
+                {t('Disciplina')}
               </label>
               <select
                 value={nuevo.discipline}
@@ -206,13 +206,13 @@ export default function Trazados() {
                 className="w-full bg-[#141414] border border-neutral-800 rounded p-2.5 text-sm focus:border-red-600 focus:outline-none text-white"
               >
                 {DISCIPLINAS.map(d => (
-                  <option key={d.valor} value={d.valor}>{d.etiqueta}</option>
+                  <option key={d.valor} value={d.valor}>{t(d.etiqueta)}</option>
                 ))}
               </select>
             </div>
             <div>
               <label className="block text-neutral-400 text-xs mb-1.5 uppercase">
-                Longitud en km
+                {t('Longitud en km')}
               </label>
               <input
                 type="number" step="0.001" min="0" value={nuevo.length_km}
@@ -277,7 +277,7 @@ export default function Trazados() {
                     </span>
                     {!t.image && (
                       <span className="inline-block mt-1 ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-600/15 text-yellow-500 uppercase tracking-wider">
-                        Sin imagen
+                        {t('Sin imagen')}
                       </span>
                     )}
                   </div>
@@ -285,14 +285,14 @@ export default function Trazados() {
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {t.activo ? (
                       <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded bg-red-600/15 text-red-400">
-                        <Check size={12}/> EN USO
+                        <Check size={12}/> {t('EN USO')}
                       </span>
                     ) : (
                       <button
                         type="button" onClick={() => activar(t)} disabled={trabajando}
                         className="text-[11px] font-bold px-2.5 py-1.5 rounded border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 disabled:opacity-40 transition-colors"
                       >
-                        USAR ESTE
+                        {t('USAR ESTE')}
                       </button>
                     )}
 
@@ -324,7 +324,7 @@ export default function Trazados() {
 
                     <div>
                       <p className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2">
-                        Desde este equipo
+                        {t('Desde este equipo')}
                       </p>
                       <input
                         type="file" accept="image/*"
@@ -344,7 +344,7 @@ export default function Trazados() {
 
                     <div>
                       <p className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2">
-                        O por ruta en el servidor
+                        {t('O por ruta en el servidor')}
                       </p>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <input
@@ -359,7 +359,7 @@ export default function Trazados() {
                           disabled={trabajando || !(rutas[t.trazado_id] || '').trim()}
                           className="flex items-center justify-center gap-2 bg-white text-black font-bold py-2.5 px-5 rounded-lg hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm whitespace-nowrap"
                         >
-                          TRAER
+                          {t('TRAER')}
                         </button>
                       </div>
                     </div>

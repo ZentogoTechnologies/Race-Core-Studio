@@ -204,7 +204,7 @@ export default function UsuariosModule() {
               </p>
             ) : currentEditId === usuario?.user_id ? (
               <p className="text-sm text-neutral-500 bg-[#0a0a0a] border border-neutral-800 rounded p-3">
-                No puedes cambiar tu propio rol.
+                {t('No puedes cambiar tu propio rol.')}
               </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -219,7 +219,7 @@ export default function UsuariosModule() {
                       }`}
                     >
                       <div className={`w-fit p-2 rounded mb-2 ${color}`}><Icon size={16}/></div>
-                      <p className={`font-bold text-sm ${activo ? 'text-white' : 'text-neutral-300'}`}>{etiqueta}</p>
+                      <p className={`font-bold text-sm ${activo ? 'text-white' : 'text-neutral-300'}`}>{t(etiqueta)}</p>
                       <p className="text-xs text-neutral-500 mt-1 leading-snug">{detalle}</p>
                     </button>
                   )

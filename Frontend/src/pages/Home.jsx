@@ -136,7 +136,7 @@ export default function HomeModule() {
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-white">{s.servicio}</p>
-                  <p className="text-xs text-neutral-500">{s.detalle}</p>
+                  <p className="text-xs text-neutral-500">{t(s.detalle)}</p>
                 </div>
               </div>
             ))}
@@ -260,7 +260,7 @@ export default function HomeModule() {
                 onClick={detenerTodo}
                 className="px-5 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition-colors"
               >
-                DETENER TODO
+                {t('DETENER TODO')}
               </button>
             </div>
           </div>
