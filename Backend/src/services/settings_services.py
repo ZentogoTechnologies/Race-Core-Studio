@@ -321,9 +321,13 @@ CARPETA_TEXTOS = RAIZ / "Casparcg" / "template" / "i18n"
 
 JS_IDIOMA = RAIZ / "Casparcg" / "template" / "js" / "idioma_activo.js"
 
+# El ingles queda apagado a peticion del cliente. La traduccion esta hecha
+# y se conserva entera —template/i18n/*.json y Frontend/src/i18n/en.json—:
+# volver a encenderlo es poner "listo" en True, nada mas. Se deja listado y
+# no se borra para que se vea que existe y no se rehaga desde cero.
 IDIOMAS = [
     {"id": "es", "nombre": "Español", "listo": True},
-    {"id": "en", "nombre": "English", "listo": True},
+    {"id": "en", "nombre": "English", "listo": False},
 ]
 
 IDIOMAS_POR_ID = {i["id"]: i for i in IDIOMAS}
@@ -366,7 +370,7 @@ async def guardar_idioma(idioma: str) -> str:
     if info is None:
         raise ValueError(f"Idioma desconocido: {idioma}")
     if not info["listo"]:
-        raise ValueError(f"El idioma {info['nombre']} todavía no está traducido")
+        raise ValueError(f"El idioma {info['nombre']} está desactivado")
 
     _escribir_js(idioma)
 

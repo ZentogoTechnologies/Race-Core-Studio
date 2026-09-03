@@ -80,6 +80,7 @@ function Generales() {
         <p className="text-neutral-500 text-sm mb-5">
           Cambia la interfaz y los rótulos de los gráficos a la vez. Los datos
           —nombres, equipos, marcas— no se traducen: son nombres propios.
+          El inglés está traducido pero apagado; se enciende cuando haga falta.
         </p>
 
         <select
@@ -92,7 +93,7 @@ function Generales() {
         >
           {idiomas.map(l => (
             <option key={l.id} value={l.id} disabled={!l.listo}>
-              {t(l.nombre)}{l.listo ? '' : t(' — próximamente')}
+              {t(l.nombre)}{l.listo ? '' : t(' — desactivado')}
             </option>
           ))}
         </select>
