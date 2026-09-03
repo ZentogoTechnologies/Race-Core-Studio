@@ -1203,7 +1203,7 @@ export default function GraficosModule() {
 
   const itemDelForm = formAbierto ? GRAFICOS.find(i => i.id === formAbierto) : null
 
-  const tabActual = TABS.find(t => t.id === activeTab) || TABS[0]
+  const tabActual = TABS.find(tab => tab.id === activeTab) || TABS[0]
 
   // Qué elemento de una pestaña está al aire, para marcarlo aunque no esté abierto.
   /* Al líder y al intervalo abren una columna del tótem, así que sin el

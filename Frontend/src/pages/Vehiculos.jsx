@@ -98,9 +98,9 @@ export default function VehiculosModule() {
   useEffect(() => { setSubFiltro('') }, [categoriaFiltro])
 
   const pilotosFiltrados = useMemo(() => {
-    const t = buscaPiloto.trim().toLowerCase()
-    if (!t) return pilotos
-    return pilotos.filter(p => `${p.name} ${p.last_name}`.toLowerCase().includes(t))
+    const busca = buscaPiloto.trim().toLowerCase()
+    if (!busca) return pilotos
+    return pilotos.filter(p => `${p.name} ${p.last_name}`.toLowerCase().includes(busca))
   }, [pilotos, buscaPiloto])
 
   // Las fotos no viajan en el JSON del vehículo sino como archivos, y en

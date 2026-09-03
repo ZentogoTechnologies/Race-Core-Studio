@@ -24,7 +24,7 @@ const PESTANAS = [
 // ─── Generales ────────────────────────────────────────────────
 function Generales() {
 
-  const { toast } = useToast()
+  const toast = useToast()
 
   const { idioma, idiomas, cambiar: cambiarIdioma } = useIdioma()
 

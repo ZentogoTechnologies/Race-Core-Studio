@@ -82,17 +82,17 @@ export default function Trazados() {
   }
 
   const reemplazar = (doc) =>
-    setItems(prev => prev.map(t => (t.trazado_id === doc.trazado_id ? doc : t)))
+    setItems(prev => prev.map(trazado => (trazado.trazado_id === doc.trazado_id ? doc : trazado)))
 
-  const activar = async (t) => {
-    setOcupado(t.trazado_id)
+  const activar = async (trazado) => {
+    setOcupado(trazado.trazado_id)
     try {
-      await activarTrazado(t.trazado_id)
+      await activarTrazado(trazado.trazado_id)
       // Se recarga entero: activar uno apaga al que estuviera, y esa
       // segunda tarjeta también tiene que reflejarlo.
       const r = await listarTrazados()
       setItems(r.items)
-      toast.exito('Trazado en uso', [t.name, t.variante].filter(Boolean).join(' · '))
+      toast.exito('Trazado en uso', [trazado.name, trazado.variante].filter(Boolean).join(' · '))
     } catch (err) {
       toast.error('No se pudo activar', err.message)
     } finally {
@@ -100,29 +100,29 @@ export default function Trazados() {
     }
   }
 
-  const subir = async (t, archivo) => {
+  const subir = async (trazado, archivo) => {
     if (!archivo) return
-    setOcupado(t.trazado_id)
+    setOcupado(trazado.trazado_id)
     try {
-      reemplazar(await subirImagenTrazado(t.trazado_id, archivo))
+      reemplazar(await subirImagenTrazado(trazado.trazado_id, archivo))
       toast.exito('Imagen cargada', archivo.name)
     } catch (err) {
       toast.error('No se pudo cargar la imagen', err.message)
     } finally {
       setOcupado(null)
       // Sin esto, volver a elegir el mismo archivo no dispara el onChange.
-      if (inputs.current[t.trazado_id]) inputs.current[t.trazado_id].value = ''
+      if (inputs.current[trazado.trazado_id]) inputs.current[trazado.trazado_id].value = ''
     }
   }
 
-  const traer = async (t) => {
-    const ruta = (rutas[t.trazado_id] || '').trim()
+  const traer = async (trazado) => {
+    const ruta = (rutas[trazado.trazado_id] || '').trim()
     if (!ruta) return
 
-    setOcupado(t.trazado_id)
+    setOcupado(trazado.trazado_id)
     try {
-      reemplazar(await imagenTrazadoPorRuta(t.trazado_id, ruta))
-      setRutas(prev => ({ ...prev, [t.trazado_id]: '' }))
+      reemplazar(await imagenTrazadoPorRuta(trazado.trazado_id, ruta))
+      setRutas(prev => ({ ...prev, [trazado.trazado_id]: '' }))
       toast.exito('Imagen cargada', 'Copiada dentro de la plantilla')
     } catch (err) {
       toast.error('No se pudo tomar esa imagen', err.message)
@@ -131,13 +131,13 @@ export default function Trazados() {
     }
   }
 
-  const borrar = async (t) => {
-    const nombre = [t.name, t.variante].filter(Boolean).join(' · ')
+  const borrar = async (trazado) => {
+    const nombre = [trazado.name, trazado.variante].filter(Boolean).join(' · ')
     if (!window.confirm(`¿Borrar el trazado "${nombre}"? También se borra su imagen.`)) return
 
-    setOcupado(t.trazado_id)
+    setOcupado(trazado.trazado_id)
     try {
-      await borrarTrazado(t.trazado_id)
+      await borrarTrazado(trazado.trazado_id)
       const r = await listarTrazados()   // el activo puede haber cambiado
       setItems(r.items)
       toast.exito('Trazado borrado', nombre)
@@ -244,16 +244,16 @@ export default function Trazados() {
         </p>
       ) : (
         <div className="flex flex-col gap-3">
-          {items.map(t => {
-            const trabajando = ocupado === t.trazado_id
-            const desplegado = abierto === t.trazado_id
-            const imagen = urlImagenTrazado(t.image)
+          {items.map(trazado => {
+            const trabajando = ocupado === trazado.trazado_id
+            const desplegado = abierto === trazado.trazado_id
+            const imagen = urlImagenTrazado(trazado.image)
 
             return (
               <div
-                key={t.trazado_id}
+                key={trazado.trazado_id}
                 className={`rounded-lg border transition-colors ${
-                  t.activo ? 'border-red-600/60 bg-red-600/5' : 'border-neutral-800'
+                  trazado.activo ? 'border-red-600/60 bg-red-600/5' : 'border-neutral-800'
                 }`}
               >
                 <div className="flex items-center gap-3 p-3">
@@ -267,15 +267,15 @@ export default function Trazados() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white truncate">{t.name}</p>
+                    <p className="text-sm font-bold text-white truncate">{trazado.name}</p>
                     <p className="text-xs text-neutral-500 truncate">
-                      {t.variante || 'Sin variante'}
-                      {t.length_km ? ` · ${t.length_km} km` : ''}
+                      {trazado.variante || 'Sin variante'}
+                      {trazado.length_km ? ` · ${trazado.length_km} km` : ''}
                     </p>
                     <span className="inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 uppercase tracking-wider">
-                      {t.discipline}
+                      {trazado.discipline}
                     </span>
-                    {!t.image && (
+                    {!trazado.image && (
                       <span className="inline-block mt-1 ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-600/15 text-yellow-500 uppercase tracking-wider">
                         {t('Sin imagen')}
                       </span>
@@ -283,13 +283,13 @@ export default function Trazados() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {t.activo ? (
+                    {trazado.activo ? (
                       <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded bg-red-600/15 text-red-400">
                         <Check size={12}/> {t('EN USO')}
                       </span>
                     ) : (
                       <button
-                        type="button" onClick={() => activar(t)} disabled={trabajando}
+                        type="button" onClick={() => activar(trazado)} disabled={trabajando}
                         className="text-[11px] font-bold px-2.5 py-1.5 rounded border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 disabled:opacity-40 transition-colors"
                       >
                         {t('USAR ESTE')}
@@ -298,7 +298,7 @@ export default function Trazados() {
 
                     <button
                       type="button"
-                      onClick={() => setAbierto(desplegado ? null : t.trazado_id)}
+                      onClick={() => setAbierto(desplegado ? null : trazado.trazado_id)}
                       className={`p-2 rounded border transition-colors ${
                         desplegado
                           ? 'border-blue-500 text-blue-400'
@@ -310,7 +310,7 @@ export default function Trazados() {
                     </button>
 
                     <button
-                      type="button" onClick={() => borrar(t)} disabled={trabajando}
+                      type="button" onClick={() => borrar(trazado)} disabled={trabajando}
                       className="p-2 rounded border border-neutral-800 text-neutral-500 hover:border-red-600 hover:text-red-500 disabled:opacity-40 transition-colors"
                       title={t('Borrar trazado')}
                     >
@@ -320,7 +320,7 @@ export default function Trazados() {
                 </div>
 
                 {desplegado && (
-                  <div className="border-t border-neutral-800 p-4 space-y-4">
+                  <div className="border-trazado border-neutral-800 p-4 space-y-4">
 
                     <div>
                       <p className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2">
@@ -328,13 +328,13 @@ export default function Trazados() {
                       </p>
                       <input
                         type="file" accept="image/*"
-                        ref={el => { inputs.current[t.trazado_id] = el }}
-                        onChange={e => subir(t, e.target.files?.[0])}
+                        ref={el => { inputs.current[trazado.trazado_id] = el }}
+                        onChange={e => subir(trazado, e.target.files?.[0])}
                         className="hidden"
                       />
                       <button
                         type="button" disabled={trabajando}
-                        onClick={() => inputs.current[t.trazado_id]?.click()}
+                        onClick={() => inputs.current[trazado.trazado_id]?.click()}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 disabled:opacity-40 transition-colors font-bold text-sm"
                       >
                         {trabajando ? <Loader2 size={16} className="animate-spin"/> : <Upload size={16}/>}
@@ -349,14 +349,14 @@ export default function Trazados() {
                       <div className="flex flex-col sm:flex-row gap-2">
                         <input
                           type="text" spellCheck={false}
-                          value={rutas[t.trazado_id] || ''}
-                          onChange={e => setRutas(p => ({ ...p, [t.trazado_id]: e.target.value }))}
+                          value={rutas[trazado.trazado_id] || ''}
+                          onChange={e => setRutas(p => ({ ...p, [trazado.trazado_id]: e.target.value }))}
                           placeholder="C:/imagenes/pista-corta.jpg"
                           className="flex-1 bg-[#0a0a0a] border border-neutral-800 rounded p-2.5 font-mono text-sm focus:border-red-600 focus:outline-none text-white"
                         />
                         <button
-                          type="button" onClick={() => traer(t)}
-                          disabled={trabajando || !(rutas[t.trazado_id] || '').trim()}
+                          type="button" onClick={() => traer(trazado)}
+                          disabled={trabajando || !(rutas[trazado.trazado_id] || '').trim()}
                           className="flex items-center justify-center gap-2 bg-white text-black font-bold py-2.5 px-5 rounded-lg hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm whitespace-nowrap"
                         >
                           {t('TRAER')}
