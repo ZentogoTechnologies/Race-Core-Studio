@@ -357,3 +357,68 @@
     from{ opacity:0; transform:translateX(-26px); }
     to  { opacity:1; transform:translateX(0); }
 }
+
+
+/* ===================================
+   EL PASO
+
+   La parrilla sale de diez en diez y se releva sola. Sin decir por donde
+   va, el publico ve cambiar los nombres y no sabe si ya salieron todos o
+   quedan tandas por delante.
+=================================== */
+
+.gr-paso{
+
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+
+    gap:18px;
+
+    margin-top:26px;
+
+    min-height:16px;
+}
+
+.gr-rango{
+
+    font-size:19px;
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    color:#FFFFFF;
+
+    font-variant-numeric:tabular-nums;
+}
+
+.gr-total{
+
+    font-weight:600;
+
+    color:#8E959E;
+}
+
+.gr-puntos{
+
+    display:flex;
+
+    gap:8px;
+}
+
+.gr-punto{
+
+    width:9px;
+    height:9px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.22);
+
+    transition:background .3s ease;
+}
+
+.gr-punto.activo{
+
+    background:var(--tf-acento, #D50000);
+}
