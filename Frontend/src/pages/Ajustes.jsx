@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Loader2, CheckCircle2, AlertCircle, FolderSearch, Save, FlaskConical,
-  Upload, X, ImageIcon, Plug, Radio,
+  Upload, X, ImageIcon, Plug, Radio, Sliders, Languages, Type,
 } from 'lucide-react'
 import {
   guardarRutaXml, leerAjustes, probarRutaXml, quitarLogoCliente,
@@ -11,9 +11,90 @@ import { reconectarCasparcg } from '../api/graphics'
 import Trazados from '../components/settings/Trazados'
 import { useToast } from '../context/ToastContext'
 
+
+// ─── Pestañas ─────────────────────────────────────────────────
+const PESTANAS = [
+  { id: 'generales',  nombre: 'Generales',  Icon: Sliders  },
+  { id: 'conexiones', nombre: 'Conexiones', Icon: Plug     },
+  { id: 'imagenes',   nombre: 'Imágenes',   Icon: ImageIcon },
+]
+
+// Los idiomas previstos. De momento solo se sirve español; los demás se
+// listan para que se vea hacia dónde va y no como un desplegable de uno
+// que parece roto.
+const IDIOMAS = [
+  { id: 'es', nombre: 'Español',   listo: true  },
+  { id: 'en', nombre: 'English',   listo: false },
+  { id: 'pt', nombre: 'Português', listo: false },
+  { id: 'fr', nombre: 'Français',  listo: false },
+  { id: 'it', nombre: 'Italiano',  listo: false },
+]
+
+// ─── Generales ────────────────────────────────────────────────
+function Generales() {
+
+  const [idioma, setIdioma] = useState('es')
+
+  return (
+    <>
+      <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Languages size={17} className="text-neutral-500"/>
+          <h3 className="text-lg font-black italic text-white">IDIOMA</h3>
+        </div>
+        <p className="text-neutral-500 text-sm mb-5">
+          El de la interfaz y el de los rótulos de los gráficos. Por ahora solo
+          está el español; los demás quedan listados para saber qué viene.
+        </p>
+
+        <select
+          value={idioma}
+          onChange={e => setIdioma(e.target.value)}
+          className="w-full sm:w-72 bg-[#0a0a0a] border border-neutral-800 rounded p-2.5 focus:border-red-600 focus:outline-none text-white"
+        >
+          {IDIOMAS.map(l => (
+            <option key={l.id} value={l.id} disabled={!l.listo}>
+              {l.nombre}{l.listo ? '' : ' — próximamente'}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Type size={17} className="text-neutral-500"/>
+          <h3 className="text-lg font-black italic text-white">TIPOGRAFÍA DE LOS GRÁFICOS</h3>
+        </div>
+        <p className="text-neutral-500 text-sm mb-5">
+          La letra con la que salen al aire los tótems, las banderas, las cartas
+          y la grilla.
+        </p>
+
+        <div className="rounded-lg border border-neutral-800 bg-[#0a0a0a] p-4">
+          <p className="text-xs uppercase tracking-wider text-neutral-500 mb-1">
+            En uso ahora mismo
+          </p>
+          <p className="text-2xl font-black text-white" style={{ fontFamily: 'Arial, sans-serif' }}>
+            Arial
+          </p>
+          <p className="text-neutral-500 text-sm mt-3 leading-relaxed">
+            Las plantillas piden <span className="text-neutral-300">Rajdhani</span> y,
+            en algunas, <span className="text-neutral-300">Titillium Web</span> o{' '}
+            <span className="text-neutral-300">Impact</span>. Ninguna de las dos primeras
+            está instalada en esta máquina y no se cargan desde ningún sitio, así que
+            CasparCG las sustituye por Arial. Lo que ves al aire es Arial en todos los
+            gráficos.
+          </p>
+        </div>
+      </div>
+    </>
+  )
+}
+
 export default function AjustesModule() {
   const toast = useToast()
 
+  const [pestana,   setPestana]   = useState('generales')
   const [cargando,  setCargando]  = useState(true)
   const [ruta,      setRuta]      = useState('')
   const [aplicada,  setAplicada]  = useState('')
@@ -158,8 +239,38 @@ export default function AjustesModule() {
   }
 
   return (
-    <div className="w-full max-w-3xl animate-fade-in space-y-6">
+    <div className="w-full max-w-3xl animate-fade-in">
 
+      {/* Ajustes eran una sola columna de tarjetas sueltas y ya no cabian
+          de un vistazo. Repartidas por pestañas, cada una agrupa cosas que
+          se tocan juntas: lo que conecta con el exterior, lo que se ve, y
+          lo que define el sistema. */}
+      <div className="flex gap-2 mb-6 border-b border-neutral-800">
+        {PESTANAS.map(({ id, nombre, Icon }) => {
+          const activa = pestana === id
+          return (
+            <button
+              key={id} type="button"
+              onClick={() => setPestana(id)}
+              className={`flex items-center gap-2 px-4 py-3 -mb-px border-b-2 font-bold text-sm uppercase tracking-wide transition-colors ${
+                activa
+                  ? 'border-red-600 text-white'
+                  : 'border-transparent text-neutral-500 hover:text-neutral-300'
+              }`}
+            >
+              <Icon size={16} />
+              {nombre}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="space-y-6">
+
+        {pestana === 'generales' && <Generales />}
+
+        {pestana === 'conexiones' && (
+          <>
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
         <h3 className="text-lg font-black italic text-white mb-1">CRONOMETRAJE</h3>
         <p className="text-neutral-500 text-sm mb-5">
@@ -251,6 +362,47 @@ export default function AjustesModule() {
         </div>
       </div>
 
+      {/* Reconexión con CasparCG. Hace falta porque el cliente solo se da
+          cuenta de que la conexión murió al mandar el siguiente comando:
+          si CasparCG se cerró y se abrió, parece viva y no lo está. */}
+      <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Plug size={17} className="text-neutral-500"/>
+          <h3 className="text-lg font-black italic text-white">CONEXIÓN CON CASPARCG</h3>
+        </div>
+        <p className="text-neutral-500 text-sm mb-5">
+          Si cerraste y volviste a abrir CasparCG, la conexión anterior se queda
+          colgada y el primer gráfico falla. Esto la fuerza sin reiniciar nada.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="button" onClick={reconectar} disabled={reconectando}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-40 transition-colors font-bold text-sm"
+          >
+            {reconectando ? <Loader2 size={16} className="animate-spin"/> : <Radio size={16}/>}
+            RECONECTAR
+          </button>
+
+          {conexion && (
+            <span className={`flex items-center gap-2 text-sm font-bold ${
+              conexion.ok ? 'text-green-400' : 'text-red-400'
+            }`}>
+              {conexion.ok
+                ? <CheckCircle2 size={16}/>
+                : <AlertCircle size={16}/>}
+              {conexion.ok
+                ? `Conectado a ${conexion.host}:${conexion.port}`
+                : conexion.detalle}
+            </span>
+          )}
+        </div>
+      </div>
+          </>
+        )}
+
+        {pestana === 'imagenes' && (
+          <>
       {/* Logo del cliente. Va aquí y no en cada plantilla porque las 22
           apuntan al mismo archivo: cambiarlo lo cambia en todos los
           gráficos de una vez. */}
@@ -323,44 +475,11 @@ export default function AjustesModule() {
         </div>
       </div>
 
-      {/* Reconexión con CasparCG. Hace falta porque el cliente solo se da
-          cuenta de que la conexión murió al mandar el siguiente comando:
-          si CasparCG se cerró y se abrió, parece viva y no lo está. */}
-      <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
-        <div className="flex items-center gap-2 mb-1">
-          <Plug size={17} className="text-neutral-500"/>
-          <h3 className="text-lg font-black italic text-white">CONEXIÓN CON CASPARCG</h3>
-        </div>
-        <p className="text-neutral-500 text-sm mb-5">
-          Si cerraste y volviste a abrir CasparCG, la conexión anterior se queda
-          colgada y el primer gráfico falla. Esto la fuerza sin reiniciar nada.
-        </p>
-
-        <div className="flex flex-wrap items-center gap-4">
-          <button
-            type="button" onClick={reconectar} disabled={reconectando}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-40 transition-colors font-bold text-sm"
-          >
-            {reconectando ? <Loader2 size={16} className="animate-spin"/> : <Radio size={16}/>}
-            RECONECTAR
-          </button>
-
-          {conexion && (
-            <span className={`flex items-center gap-2 text-sm font-bold ${
-              conexion.ok ? 'text-green-400' : 'text-red-400'
-            }`}>
-              {conexion.ok
-                ? <CheckCircle2 size={16}/>
-                : <AlertCircle size={16}/>}
-              {conexion.ok
-                ? `Conectado a ${conexion.host}:${conexion.port}`
-                : conexion.detalle}
-            </span>
-          )}
-        </div>
-      </div>
-
       <Trazados />
+          </>
+        )}
+
+      </div>
 
     </div>
   )
