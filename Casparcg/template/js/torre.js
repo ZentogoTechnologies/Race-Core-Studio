@@ -53,6 +53,11 @@ let torreElemento = null;
 let torreTemporizador = null;
 let torreFirma = null;
 
+/* Se levanta cuando la comparación la acaba de cambiar alguien desde el
+   panel, para que el repintado abra la franja verde con animación en vez
+   de dejarla puesta ya abierta. */
+let torreAnimarComparar = false;
+
 
 function torreEscapar(texto){
 
@@ -298,7 +303,24 @@ function torrePintarFilas(standings){
     /* La franja se acaba de recrear, así que se le repone el estado: si
        estaba abierta y entra un piloto nuevo, no debe cerrarse sola. */
     torreElemento.classList.toggle("mejor-vuelta", torreConfig.mejorVuelta);
-    torreElemento.classList.toggle("comparando", Boolean(torreConfig.comparar));
+
+    const comparando = Boolean(torreConfig.comparar);
+
+    if (torreAnimarComparar) {
+        /* Dos fotogramas y no uno: con uno solo el navegador puede juntar
+           el pintado y el cambio de clase en el mismo reflow, y la
+           transición vuelve a perderse. */
+        torreAnimarComparar = false;
+        torreElemento.classList.remove("comparando");
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            torreElemento.classList.toggle("comparando", comparando);
+        }));
+    } else {
+        /* Repintado de rutina —entró un piloto nuevo, cambió el orden—:
+           se repone tal cual estaba. Animarla aquí la cerraría y la
+           volvería a abrir sola cada vez que se mueve la clasificación. */
+        torreElemento.classList.toggle("comparando", comparando);
+    }
 }
 
 
@@ -391,7 +413,6 @@ function actualizarTorre(data){
         if (d.mejor_vuelta !== undefined) {
             torreConfig.mejorVuelta = Boolean(d.mejor_vuelta);
             torreElemento.classList.toggle("mejor-vuelta", torreConfig.mejorVuelta);
-    torreElemento.classList.toggle("comparando", Boolean(torreConfig.comparar));
         }
 
         /* El segundo piloto. Llega su dorsal para abrirla, o null para
@@ -399,7 +420,18 @@ function actualizarTorre(data){
            distinta según a quién se haya elegido. */
         if (d.comparar !== undefined) {
             torreConfig.comparar = d.comparar || null;
-            torreElemento.classList.toggle("comparando", Boolean(torreConfig.comparar));
+
+            /* La clase no se pone aquí. La franja verde no existe hasta el
+               repintado, y si al nacer ya está dentro de .comparando el
+               navegador la dibuja abierta en el primer fotograma: no hay
+               estado de partida desde el que animar y aparece de golpe. La
+               de la vuelta rápida no tenía el problema porque ya estaba en
+               el DOM, cerrada, y solo se le marcaba la clase.
+
+               Se avisa al repintado para que la abra un fotograma después,
+               con la franja ya puesta y cerrada. */
+            torreAnimarComparar = true;
+
             torreFirma = null;
             torrePintar(timingUltimo());
         }
