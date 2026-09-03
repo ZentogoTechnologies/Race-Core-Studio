@@ -398,6 +398,55 @@ class GraphicsService:
 service = GraphicsService()
 
 
+async def build_grid_payload(limite: int = 30) -> dict:
+    """
+    La parrilla de largada, sacada del cronometraje.
+
+    El orden de la grilla es el de la clasificación: en la práctica la
+    tanda de clasificación deja el XML ordenado por posición, que es lo
+    que se pinta. Cada fila lleva posición, dorsal, apellido y la marca
+    del carro.
+
+    El apellido y la marca vienen ya cruzados con la base por
+    obtener_clasificacion(): MyLaps manda los nombres sin acentos y a
+    veces abreviados, y la marca no la manda en absoluto.
+    """
+
+    # Igual que en la carta VS: el import va aquí dentro porque
+    # timing_services ya importa este módulo para el logo de la marca.
+    from src.services.timing_services import obtener_clasificacion
+
+    datos = await obtener_clasificacion(limite=limite)
+
+    pilotos = [
+        {
+            "position": fila.get("position"),
+            "number": fila.get("number", ""),
+            "name": fila.get("name", ""),
+            "last_name": fila.get("last_name", ""),
+            "full_name": fila.get("full_name", ""),
+            "brand": fila.get("brand") or "",
+            "brand_logo": fila.get("brand_logo") or "",
+        }
+        for fila in datos.get("standings", [])
+    ]
+
+    # El logo que se haya subido en Ajustes; si no hay ninguno, el de
+    # fábrica que ya trae la plantilla.
+    from src.services.settings_services import url_logo_cliente
+
+    return {
+        "title": "Grilla de Partida",
+        # El evento en curso según MyLaps, que es el que se está corriendo.
+        "subtitle": datos.get("event", ""),
+        # group_name y no group: MyLaps antepone el número de grupo
+        # ("5 - STREET LEGAL") y en el arte solo interesa el nombre.
+        "category": datos.get("group_name", ""),
+        "logo": url_logo_cliente(),
+        "drivers": pilotos,
+    }
+
+
 async def build_vs_payload(pilot_a: int, pilot_b: int) -> dict:
     """
     Los dos pilotos de la carta VS.

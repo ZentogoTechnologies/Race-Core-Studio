@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Grilla de Partida</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/grilla.css">
+</head>
+<body>
+
+    <div class="grilla" id="grilla">
+
+        <div class="gr-cabecera">
+            <div class="gr-logo"><img id="logo" src="../img/logoap.png" alt=""></div>
+            <div class="gr-titulos">
+                <div class="gr-rotulo" id="rotulo">Autódromo Panamá</div>
+                <div class="gr-titulo" id="titulo">Grilla de Partida</div>
+            </div>
+            <div class="gr-categoria" id="categoria"></div>
+        </div>
+
+        <div class="gr-columnas" id="columnas"></div>
+
+    </div>
+
+<script>
+
+/* ==========================================================================
+   GRILLA DE PARTIDA
+
+   Una fila por posicion: numero, logo de la marca y apellido. Los datos
+   llegan del backend ya cruzados con la base, porque el XML de MyLaps trae
+   los nombres sin acentos y a veces abreviados, y la marca no la trae en
+   absoluto: sale del vehiculo que lleva ese dorsal.
+========================================================================== */
+
+/* A partir de aqui la parrilla se parte en dos columnas. Con una sola, una
+   de veinticinco carros obliga a filas tan bajas que el apellido deja de
+   leerse desde el sofa. */
+const CORTE_DOS_COLUMNAS = 10;
+
+function escapar(t){
+    return String(t == null ? "" : t)
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
+}
+
+/* El apellido manda, como en cualquier parrilla: es lo que identifica al
+   piloto de un vistazo. Si no viene, se cae al nombre completo. */
+function nombreDeFila(p){
+    const apellido = (p.last_name || "").trim();
+    if (apellido) return apellido.toUpperCase();
+    return (p.full_name || p.name || "").trim().toUpperCase();
+}
+
+function marca(p){
+    if (p.brand_logo) return `<img src="${escapar(p.brand_logo)}" alt="">`;
+    if (p.brand)      return `<span>${escapar(p.brand)}</span>`;
+    return "";
+}
+
+function fila(p, orden){
+    const pole = String(p.position) === "1" ? " pole" : "";
+    const dorsal = p.number ? `<span class="gr-dorsal">#${escapar(p.number)}</span>` : "";
+
+    return `<div class="gr-fila${pole}" style="--orden:${orden}">`
+         +   `<div class="gr-pos">${escapar(p.position)}</div>`
+         +   `<div class="gr-marca">${marca(p)}</div>`
+         +   `<div class="gr-nombre">${escapar(nombreDeFila(p))}${dorsal}</div>`
+         + `</div>`;
+}
+
+/* Lo que queda para las filas despues de la cabecera y los margenes,
+   sobre los 1080 de la emision. */
+const ALTO_DISPONIBLE = 830;
+
+function medir(filas){
+
+    const caja = document.getElementById("grilla");
+    if (!caja || !filas) return;
+
+    const hueco = filas > 14 ? 6 : filas > 10 ? 8 : 10;
+
+    /* Ni tan bajas que el apellido no se lea desde el sofa, ni tan altas
+       que cuatro carros ocupen la pantalla entera. */
+    const alto = Math.max(40, Math.min(74,
+        Math.floor(ALTO_DISPONIBLE / filas) - hueco));
+
+    caja.style.setProperty("--gr-fila-alto", alto + "px");
+    caja.style.setProperty("--gr-hueco", hueco + "px");
+
+    /* El cuerpo sigue al alto de la fila, no al reves: si la letra no
+       encogiera con ella, el apellido se saldria de su caja. */
+    caja.style.setProperty("--gr-cuerpo",     Math.round(alto * 0.46) + "px");
+    caja.style.setProperty("--gr-cuerpo-pos", Math.round(alto * 0.46) + "px");
+}
+
+function pintar(pilotos){
+
+    const destino = document.getElementById("columnas");
+    if (!destino) return;
+
+    const lista = Array.isArray(pilotos) ? pilotos : [];
+
+    /* Se parte por la mitad y no de forma alterna: en una parrilla se
+       busca una posicion concreta, y leer 1..10 en una columna y 11..20 en
+       la otra es como esta escrito el orden de largada. */
+    const mitad = lista.length > CORTE_DOS_COLUMNAS
+        ? Math.ceil(lista.length / 2)
+        : lista.length;
+
+    const grupos = [lista.slice(0, mitad)];
+    if (lista.length > mitad) grupos.push(lista.slice(mitad));
+
+    /* Las filas se ajustan a cuantas hay. Con ocho carros pueden ser
+       generosas y con treinta tienen que apretarse; dejarlas fijas hacia
+       que una parrilla larga se saliera de pantalla y se comiera la
+       cabecera y las ultimas posiciones. */
+    medir(Math.max(...grupos.map(g => g.length)));
+
+    let orden = 0;
+    destino.innerHTML = grupos
+        .map(g => `<div class="gr-columna">`
+                + g.map(p => fila(p, orden++)).join("")
+                + `</div>`)
+        .join("");
+
+    /* La cascada se arranca aqui y no en el CSS: el retraso depende de
+       cuantas filas hay, y eso solo se sabe al pintar. */
+    destino.querySelectorAll(".gr-fila").forEach((el, i) => {
+        el.style.animation = `filaEntra .34s ease forwards`;
+        /* El retraso se reparte entre las filas que haya: con treinta,
+           un paso fijo hacia que la ultima entrara a los dos segundos. */
+        const paso = Math.min(0.045, 0.9 / Math.max(1, lista.length));
+        el.style.animationDelay = (0.30 + i * paso) + "s";
+    });
+}
+
+function update(data){
+    try{
+        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
+
+        if (d.logo      !== undefined) document.getElementById("logo").src = d.logo;
+        if (d.subtitle  !== undefined) document.getElementById("rotulo").textContent = d.subtitle;
+        if (d.title     !== undefined) document.getElementById("titulo").textContent = d.title;
+        if (d.category  !== undefined) document.getElementById("categoria").textContent =
+            (d.category || "").toUpperCase();
+
+        if (d.drivers !== undefined) pintar(d.drivers);
+
+    }catch(e){ /* un UPDATE con basura no puede tumbar el grafico */ }
+}
+
+function play(){
+    document.getElementById("grilla").style.animation =
+        "grillaEntra .5s ease forwards";
+}
+
+function stop(){
+    document.getElementById("grilla").style.animation =
+        "grillaSale .4s ease forwards";
+}
+
+if (!window.__casparcg) { play(); }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   GRILLA DE PARTIDA
+
+   Una fila por posicion: el numero, el logo de la marca y el apellido.
+   Es un grafico a pantalla completa, no una carta inferior, asi que ocupa
+   el centro y no comparte medidas con el totem.
+
+   Se reparte en dos columnas cuando hay mas de diez carros. Con una sola
+   columna, una parrilla de veinticinco obliga a filas tan bajas que el
+   apellido deja de leerse desde el sofa.
+========================================================================== */
+
+.grilla{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%, -50%);
+
+    width:1620px;
+
+    /* Tope duro: el grafico se emite en 1080 y sin esto una parrilla larga
+       se sale por arriba y por abajo, dejando fuera la cabecera y las
+       ultimas posiciones. */
+    max-height:1010px;
+
+    padding:30px 46px 34px;
+
+    box-sizing:border-box;
+
+    border-radius:14px;
+
+    background:#05070A url("../img/fondo.jpg") center/cover no-repeat;
+
+    box-shadow:0 22px 60px rgba(0,0,0,.6);
+
+    font-family:"Titillium Web","Segoe UI",Arial,sans-serif;
+
+    opacity:0;
+}
+
+
+/* ===================================
+   CABECERA
+=================================== */
+
+.gr-cabecera{
+
+    display:flex;
+    align-items:center;
+
+    gap:22px;
+
+    padding-bottom:20px;
+
+    margin-bottom:24px;
+
+    border-bottom:2px solid rgba(255,255,255,.14);
+}
+
+.gr-logo img{
+
+    height:62px;
+    width:auto;
+}
+
+.gr-titulos{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:3px;
+}
+
+.gr-rotulo{
+
+    font-size:15px;
+    font-weight:700;
+
+    letter-spacing:4px;
+
+    text-transform:uppercase;
+
+    color:#FF3B45;
+}
+
+.gr-titulo{
+
+    font-size:44px;
+    font-weight:900;
+
+    line-height:1;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+    color:#FFFFFF;
+
+    text-shadow:2px 2px 0 rgba(0,0,0,.55);
+}
+
+/* La categoria va al otro extremo: es el dato que cambia de tanda en
+   tanda y asi no empuja al titulo. */
+.gr-categoria{
+
+    margin-left:auto;
+
+    text-align:right;
+
+    font-size:26px;
+    font-weight:800;
+
+    text-transform:uppercase;
+
+    color:#FFFFFF;
+
+    text-shadow:2px 2px 0 rgba(0,0,0,.55);
+}
+
+
+/* ===================================
+   LAS COLUMNAS
+=================================== */
+
+.gr-columnas{
+
+    display:flex;
+
+    gap:34px;
+
+    align-items:flex-start;
+}
+
+.gr-columna{
+
+    flex:1 1 0;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:var(--gr-hueco, 10px);
+
+    min-width:0;
+}
+
+
+/* ===================================
+   UNA FILA
+=================================== */
+
+.gr-fila{
+
+    display:flex;
+    align-items:stretch;
+
+    height:var(--gr-fila-alto, 62px);
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    background:rgba(10,12,16,.82);
+
+    box-shadow:0 4px 14px rgba(0,0,0,.45);
+
+    /* Entran en cascada, de arriba abajo. */
+    opacity:0;
+
+    transform:translateX(-26px);
+}
+
+/* La primera posicion se distingue sin necesidad de rotularla. */
+.gr-fila.pole{
+
+    background:rgba(28,10,12,.9);
+
+    box-shadow:0 4px 18px rgba(213,0,0,.35);
+}
+
+
+/* ── Posicion ── */
+
+.gr-pos{
+
+    width:82px;
+
+    flex:0 0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#0A0C10;
+
+    position:relative;
+
+    font-size:var(--gr-cuerpo-pos, 30px);
+    font-weight:900;
+
+    color:#FFFFFF;
+
+    font-variant-numeric:tabular-nums;
+}
+
+/* Filo rojo a la izquierda, la firma que llevan el totem y las cartas. */
+.gr-pos::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0; top:0; bottom:0;
+
+    width:6px;
+
+    background:var(--tf-acento, #D50000);
+}
+
+.gr-fila.pole .gr-pos{
+
+    color:#FF3B45;
+}
+
+
+/* ── Marca ── */
+
+.gr-marca{
+
+    width:104px;
+
+    flex:0 0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:8px 10px;
+
+    background:rgba(255,255,255,.06);
+}
+
+.gr-marca img{
+
+    max-width:100%;
+    max-height:calc(var(--gr-fila-alto, 62px) - 20px);
+
+    object-fit:contain;
+}
+
+/* Sin logo se escribe la marca: mejor el nombre que un hueco. */
+.gr-marca span{
+
+    font-size:14px;
+    font-weight:800;
+
+    letter-spacing:.5px;
+
+    text-transform:uppercase;
+
+    color:#C6CBD2;
+
+    text-align:center;
+
+    line-height:1.1;
+
+    overflow:hidden;
+}
+
+
+/* ── Nombre ── */
+
+.gr-nombre{
+
+    flex:1 1 auto;
+
+    min-width:0;
+
+    display:flex;
+    align-items:center;
+
+    gap:14px;
+
+    padding:0 22px;
+
+    font-size:var(--gr-cuerpo, 30px);
+    font-weight:800;
+
+    letter-spacing:.5px;
+
+    text-transform:uppercase;
+
+    color:#FFFFFF;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    text-shadow:2px 2px 0 rgba(0,0,0,.5);
+}
+
+/* El dorsal acompaña al apellido, mas discreto: identifica el carro sin
+   competir con el nombre, que es lo que se busca de un vistazo. */
+.gr-dorsal{
+
+    flex:0 0 auto;
+
+    font-size:20px;
+    font-weight:700;
+
+    color:#8E959E;
+
+    font-variant-numeric:tabular-nums;
+}
+
+
+/* ===================================
+   ENTRADA Y SALIDA
+=================================== */
+
+@keyframes grillaEntra{
+    from{ opacity:0; transform:translate(-50%, -50%) scale(.96); }
+    to  { opacity:1; transform:translate(-50%, -50%) scale(1); }
+}
+
+@keyframes grillaSale{
+    from{ opacity:1; transform:translate(-50%, -50%) scale(1); }
+    to  { opacity:0; transform:translate(-50%, -50%) scale(.96); }
+}
+
+/* Cada fila entra un poco despues que la anterior: el retraso lo pone el
+   script en --orden, que es lo unico que no se puede escribir aqui. */
+@keyframes filaEntra{
+    from{ opacity:0; transform:translateX(-26px); }
+    to  { opacity:1; transform:translateX(0); }
+}

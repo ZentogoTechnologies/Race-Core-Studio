@@ -143,6 +143,14 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
         }
         return {**base, **(data or {})}
 
+    # La grilla se arma sola: no se elige nada en el panel, sale la
+    # parrilla de la tanda que esté cargada en el cronometraje.
+    if template.graphic_id == "grilla":
+        from src.services.graphics_services import build_grid_payload
+
+        base = await build_grid_payload()
+        return {**base, **(data or {})}
+
     # La carta VS necesita dos pilotos, así que tiene su propio armador.
     if template.graphic_id == "carta-vs":
         if pilot_id is None or pilot_id_2 is None:
