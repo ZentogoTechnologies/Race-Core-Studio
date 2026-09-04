@@ -74,10 +74,9 @@ function marca(p){
 }
 
 function fila(p){
-    const pole = String(p.position) === "1" ? " pole" : "";
     const dorsal = p.number ? `<span class="gr-dorsal">#${escapar(p.number)}</span>` : "";
 
-    return `<div class="gr-fila${pole}">`
+    return `<div class="gr-fila">`
          +   `<div class="gr-pos">${escapar(p.position)}</div>`
          +   `<div class="gr-marca">${marca(p)}</div>`
          +   `<div class="gr-nombre">${escapar(nombreDeFila(p))}${dorsal}</div>`

@@ -39,7 +39,7 @@
        obligaba a poner cada fila casi opaca para que se leyera. Con un
        negro limpio la pista se sigue viendo por detras, que es lo que hace
        util un grafico a pantalla completa durante la formacion. */
-    background:rgba(4,6,9,.88);
+    background:rgba(4,6,9,.95);
 
     /* Un desenfoque suave detras: lo que se ve de la pista queda como
        ambiente y no como una imagen que compite por atencion. */
@@ -189,11 +189,11 @@
 
     height:var(--gr-fila-alto, 62px);
 
-    border-radius:8px;
+    border-radius:14px;
 
     overflow:hidden;
 
-    background:rgba(255,255,255,.07);
+    background:rgba(255,255,255,.09);
 
     box-shadow:0 2px 8px rgba(0,0,0,.35);
 
@@ -203,13 +203,6 @@
     transform:translateX(-26px);
 }
 
-/* La primera posicion se distingue sin necesidad de rotularla. */
-.gr-fila.pole{
-
-    background:rgba(213,0,0,.20);
-
-    box-shadow:0 2px 14px rgba(213,0,0,.30);
-}
 
 
 /* ── Posicion ── */
@@ -250,10 +243,6 @@
     background:var(--tf-acento, #D50000);
 }
 
-.gr-fila.pole .gr-pos{
-
-    color:#FF3B45;
-}
 
 
 /* ── Marca ── */
