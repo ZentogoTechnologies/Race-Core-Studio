@@ -1203,6 +1203,15 @@ export default function GraficosModule() {
       return
     }
 
+    /* Las dos grillas también: el título lleva el nombre del evento, y ese
+       lo decide quien opera al elegir la carrera arriba, no el archivo que
+       MyLaps tenga cargado. Sin esto se graficaba Prospec Series y en
+       pantalla salía el nombre de la tanda anterior. */
+    if ((item.id === 'grilla' || item.id === 'grilla-fotos') && carrera) {
+      alternar(item.id, { eventId: carrera.event_id })
+      return
+    }
+
     /* Al líder y al intervalo no son gráficos: son una columna del tótem
        que ya está al aire. Mandan un UPDATE en vez de cargar otra
        plantilla, así la cabecera no parpadea, los nombres no se reescriben

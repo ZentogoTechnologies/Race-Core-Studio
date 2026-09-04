@@ -15,6 +15,7 @@ from fastapi import HTTPException
 
 from config import settings
 from src.models.categories_model import Category
+from src.models.events_model import Event
 from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
 from src.services.casparcg_client import casparcg
@@ -403,7 +404,7 @@ class GraphicsService:
 service = GraphicsService()
 
 
-async def build_grid_payload(limite: int = 30) -> dict:
+async def build_grid_payload(limite: int = 30, event_id: int | None = None) -> dict:
     """
     La parrilla de largada, sacada del cronometraje.
 
@@ -449,10 +450,20 @@ async def build_grid_payload(limite: int = 30) -> dict:
     # imagen no carga nunca. La plantilla apunta directamente a
     # img/logo-cliente.png, que es el archivo que Ajustes sobrescribe al
     # subir uno nuevo: es como lo resuelven el evento y el narrador.
+    # El nombre del evento sale del que se eligió en el panel, no del XML.
+    # MyLaps escribe ahí la tanda que tenga cargada, que puede ser la
+    # anterior: se graficaba Prospec Series y en pantalla salía Street
+    # Legal. Si no hay evento elegido se cae al del XML, que es mejor que
+    # dejar el título en blanco.
+    nombre_evento = datos.get("event", "")
+    if event_id is not None:
+        evento = await Event.find_one(Event.event_id == event_id)
+        if evento is not None and evento.name:
+            nombre_evento = evento.name
+
     return {
         "title": "Grilla de Partida",
-        # El evento en curso según MyLaps, que es el que se está corriendo.
-        "subtitle": datos.get("event", ""),
+        "subtitle": nombre_evento,
         # group_name y no group: MyLaps antepone el número de grupo
         # ("5 - STREET LEGAL") y en el arte solo interesa el nombre.
         "category": datos.get("group_name", ""),

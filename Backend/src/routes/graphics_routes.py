@@ -150,7 +150,8 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
     if template.graphic_id in ("grilla", "grilla-fotos"):
         from src.services.graphics_services import build_grid_payload
 
-        base = await build_grid_payload()
+        # El evento elegido en el panel manda sobre el que traiga el XML.
+        base = await build_grid_payload(event_id=event_id)
         return {**base, **(data or {})}
 
     # La carta VS necesita dos pilotos, así que tiene su propio armador.
