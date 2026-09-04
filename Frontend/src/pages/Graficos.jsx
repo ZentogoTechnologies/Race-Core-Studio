@@ -2,6 +2,7 @@ import { t } from '../i18n'
 import { useEffect, useMemo, useState } from 'react'
 import SelectorCarrera from '../components/graphics/SelectorCarrera'
 import { useCarrera } from '../context/CarreraContext'
+import { useDisciplina } from '../context/DisciplinaContext'
 import {
   Flag, Siren, CloudSun, Mic, Calendar, Share2, Map,
   SquareUser, Contact, ListOrdered, Crown, ArrowUpDown, LayoutGrid,
@@ -900,6 +901,8 @@ function Capa({ etiqueta, item }) {
 export default function GraficosModule() {
   // Una entrada por capa: { background, totem, flag, grid, pilot, misc }.
   // Las seis conviven al aire; tocar una no afecta a las demás.
+  const { disciplina } = useDisciplina()
+
   const [alAire,    setAlAire]    = useState({})
 
   // Vuelta rápida: si el desplegable está abierto y quién la tiene. El
@@ -1106,6 +1109,14 @@ export default function GraficosModule() {
   useEffect(() => {
     if (!alAire.totem && columnaTotem !== null) setColumnaTotem(null)
   }, [alAire.totem, columnaTotem])
+
+  /* Al cambiar de disciplina, la pestaña abierta puede dejar de valer. Se
+     vuelve a General en vez de quedarse en una bloqueada, que no responde
+     a los clics y parece que el panel se colgó. */
+  useEffect(() => {
+    const suya = DISCIPLINA_DE_TAB[activeTab]
+    if (suya && disciplina && suya !== disciplina) setActiveTab('general')
+  }, [disciplina, activeTab])
 
   const limpiarGrupo = (grupo) =>
     ejecutar(`limpiar-${grupo}`, () => clearGroup(grupo), () => marcar(grupo, null))
