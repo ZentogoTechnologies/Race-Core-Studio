@@ -143,9 +143,11 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
         }
         return {**base, **(data or {})}
 
-    # La grilla se arma sola: no se elige nada en el panel, sale la
-    # parrilla de la tanda que esté cargada en el cronometraje.
-    if template.graphic_id == "grilla":
+    # Las dos grillas se arman solas: no se elige nada en el panel, sale la
+    # parrilla de la tanda que esté cargada en el cronometraje. Comparten
+    # armador porque son los mismos datos contados de dos formas: una lista
+    # para buscarse, y las caras de los que salen juntos.
+    if template.graphic_id in ("grilla", "grilla-fotos"):
         from src.services.graphics_services import build_grid_payload
 
         base = await build_grid_payload()

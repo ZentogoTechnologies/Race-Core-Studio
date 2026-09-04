@@ -432,6 +432,13 @@ async def build_grid_payload(limite: int = 30) -> dict:
             "full_name": fila.get("full_name", ""),
             "brand": fila.get("brand") or "",
             "brand_logo": fila.get("brand_logo") or "",
+            # La de nombres no los usa, pero la de fotos sí: la cara y el
+            # tiempo de clasificación con el que se ganó el sitio. Se
+            # mandan en el mismo payload porque las dos salen de la misma
+            # tanda y no compensa un armador aparte para dos campos.
+            "photo": (pilot_photo_url(fila["pilot_id"])
+                      if fila.get("pilot_id") else ""),
+            "best_time": fila.get("best_time", ""),
         }
         for fila in datos.get("standings", [])
     ]

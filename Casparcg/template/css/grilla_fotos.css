@@ -1,0 +1,417 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   GRILLA DE PARTIDA CON FOTOS
+
+   Dos pilotos por pantalla, los de una misma fila de la parrilla, cara a
+   cara. Se van relevando de dos en dos hasta acabar la lista.
+
+   Es el grafico lento de la formacion: mientras la de nombres sirve para
+   buscar a alguien en una lista de treinta, esta sirve para mirar a la
+   cara a los que salen juntos.
+========================================================================== */
+
+.gf{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+    flex-direction:column;
+
+    background:rgba(4,6,9,.95);
+
+    font-family:var(--fuente-graficos);
+
+    opacity:0;
+
+    overflow:hidden;
+}
+
+
+/* ===================================
+   CABECERA
+=================================== */
+
+.gf-cabecera{
+
+    position:absolute;
+
+    left:0; right:0; top:0;
+
+    padding:34px 0 20px;
+
+    text-align:center;
+
+    position:relative;
+
+    z-index:3;
+}
+
+.gf-evento{
+
+    font-size:19px;
+    font-weight:700;
+
+    letter-spacing:5px;
+
+    text-transform:uppercase;
+
+    color:#FF3B45;
+
+    margin-bottom:6px;
+}
+
+.gf-titulo{
+
+    font-size:62px;
+    font-weight:900;
+
+    line-height:1;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    color:#FFFFFF;
+
+    text-shadow:0 3px 0 rgba(0,0,0,.5);
+}
+
+/* La categoria, discreta bajo el titulo: cambia de tanda en tanda y no
+   compite con el nombre del grafico. */
+.gf-categoria{
+
+    margin-top:8px;
+
+    font-size:20px;
+    font-weight:700;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    color:rgba(255,255,255,.55);
+}
+
+
+/* ===================================
+   LOS DOS PILOTOS
+=================================== */
+
+.gf-pareja{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    align-items:flex-end;
+
+    z-index:1;
+}
+
+.gf-lado{
+
+    /* Cada lado se pasa un poco del centro y la mascara los funde. Sin
+       solape quedaba una linea recta entre las dos caras. */
+    flex:1 1 0;
+
+    margin-right:-70px;
+
+    position:relative;
+
+    height:100%;
+
+    min-width:0;
+
+    display:flex;
+
+    /* Las dos caras miran al centro. */
+    justify-content:flex-end;
+}
+
+.gf-lado.der{
+
+    justify-content:flex-start;
+
+    margin-right:0;
+    margin-left:-70px;
+}
+
+/* Velo oscuro arriba y abajo. Va en un elemento propio y no en la mascara
+   de la foto: CEF no compone bien dos mascaras a la vez, y aqui ademas
+   hace falta que el oscurecido cubra tambien el hueco entre las dos. */
+.gf-pareja::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+        linear-gradient(180deg, rgba(4,6,9,.88) 0%, rgba(4,6,9,.30) 11%,
+                                transparent 20%),
+        linear-gradient(0deg,   rgba(4,6,9,.94) 0%, rgba(4,6,9,.72) 9%,
+                                transparent 22%);
+
+    z-index:2;
+}
+
+
+/* ── La foto ── */
+
+.gf-foto{
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    max-width:none;
+
+    /* Del pecho hacia arriba: los retratos vienen de medio cuerpo y
+       encuadrando arriba la cara queda donde tiene que quedar. */
+    object-fit:cover;
+    object-position:top center;
+
+    /* Se difumina hacia el centro para que las dos caras no choquen en una
+       linea recta. Una sola mascara y en un eje: CEF no compone bien dos
+       superpuestas, y el oscurecido de arriba y abajo lo pone el velo del
+       contenedor. */
+    -webkit-mask-image:linear-gradient(90deg, #000 46%, transparent 96%);
+    mask-image:linear-gradient(90deg, #000 46%, transparent 96%);
+}
+
+/* En el lado derecho la mascara va al reves: se difumina hacia la
+   izquierda, que es donde esta el centro. */
+.gf-lado.der .gf-foto{
+
+    -webkit-mask-image:linear-gradient(270deg, #000 46%, transparent 96%);
+    mask-image:linear-gradient(270deg, #000 46%, transparent 96%);
+}
+
+/* Sin foto no se deja el hueco vacio: se pone la silueta que ya usan las
+   cartas, para que la composicion no se desequilibre. */
+.gf-foto.sin{
+
+    opacity:.35;
+}
+
+
+/* ===================================
+   LA BANDA DE DATOS
+=================================== */
+
+.gf-datos{
+
+    position:absolute;
+
+    bottom:0;
+
+    width:50%;
+
+    display:flex;
+
+    align-items:flex-end;
+
+    gap:20px;
+
+    padding:0 46px 40px;
+
+    /* Por encima del velo. Y fuera del lado, que al animarse con un
+       transform crea contexto de apilado y encerraba el texto debajo. */
+    z-index:5;
+}
+
+.gf-datos.izq{ left:0; }
+.gf-datos.der{ right:0; }
+
+.gf-datos.der{
+
+    flex-direction:row-reverse;
+}
+
+
+/* ── Posicion ── */
+
+.gf-pos{
+
+    display:flex;
+
+    align-items:baseline;
+
+    flex:0 0 auto;
+
+    color:#FFFFFF;
+
+    text-shadow:0 3px 8px rgba(0,0,0,.9);
+}
+
+.gf-pos-num{
+
+    font-size:96px;
+    font-weight:900;
+
+    line-height:.85;
+
+    font-variant-numeric:tabular-nums;
+}
+
+/* El ordinal en pequeño y pegado al numero, como en la referencia: dice
+   que es una posicion y no un dorsal. */
+.gf-pos-suf{
+
+    font-size:30px;
+    font-weight:900;
+
+    margin-left:2px;
+}
+
+
+/* ── Nombre y tiempo ── */
+
+.gf-quien{
+
+    flex:1 1 auto;
+
+    min-width:0;
+
+    display:flex;
+    flex-direction:column;
+
+    padding-bottom:6px;
+}
+
+.gf-datos.der .gf-quien{
+
+    align-items:flex-end;
+
+    text-align:right;
+}
+
+.gf-nombre{
+
+    font-size:26px;
+    font-weight:600;
+
+    line-height:1;
+
+    color:#FFFFFF;
+
+    text-transform:capitalize;
+
+    text-shadow:0 2px 6px rgba(0,0,0,.9);
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.gf-apellido{
+
+    font-size:52px;
+    font-weight:900;
+
+    line-height:1;
+
+    letter-spacing:.5px;
+
+    text-transform:uppercase;
+
+    color:#FFFFFF;
+
+    text-shadow:0 3px 8px rgba(0,0,0,.9);
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.gf-tiempo{
+
+    margin-top:6px;
+
+    font-size:30px;
+    font-weight:700;
+
+    line-height:1;
+
+    color:rgba(255,255,255,.9);
+
+    font-variant-numeric:tabular-nums;
+
+    text-shadow:0 2px 6px rgba(0,0,0,.9);
+}
+
+
+/* ===================================
+   EL PASO
+=================================== */
+
+.gf-paso{
+
+    position:absolute;
+
+    right:46px;
+    bottom:14px;
+
+    display:flex;
+    align-items:center;
+
+    gap:14px;
+
+    z-index:4;
+}
+
+.gf-rango{
+
+    font-size:16px;
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    color:rgba(255,255,255,.75);
+
+    font-variant-numeric:tabular-nums;
+}
+
+.gf-puntos{ display:flex; gap:7px; }
+
+.gf-punto{
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.22);
+}
+
+.gf-punto.activo{ background:var(--tf-acento, #D50000); }
+
+
+/* ===================================
+   ENTRADA Y SALIDA
+=================================== */
+
+@keyframes gfEntra{ from{opacity:0} to{opacity:1} }
+@keyframes gfSale { from{opacity:1} to{opacity:0} }
+
+/* Cada pareja entra desde su lado, no aparece de golpe. */
+@keyframes gfLadoIzq{
+    from{ opacity:0; transform:translateX(-70px); }
+    to  { opacity:1; transform:translateX(0); }
+}
+
+@keyframes gfLadoDer{
+    from{ opacity:0; transform:translateX(70px); }
+    to  { opacity:1; transform:translateX(0); }
+}

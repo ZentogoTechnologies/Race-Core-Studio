@@ -1,526 +1,197 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-
-    <title>Starting Grid</title>
-
+    <title>Grilla con Fotos</title>
     <link rel="stylesheet" href="../css/global.css">
-    <link rel="stylesheet" href="../css/starting_grid.css">
+    <link rel="stylesheet" href="../css/grilla_fotos.css">
     <script src="../js/idioma_activo.js"></script>
     <script src="../js/i18n.js"></script>
 </head>
-
 <body>
 
-<div class="starting-grid" id="starting-grid">
+    <div class="gf" id="gf">
 
-
-    <!-- ==============================================================
-         HEADER
-    ============================================================== -->
-
-    <div class="grid-header">
-
-        <!-- LOGO -->
-        <div class="grid-logo">
-
-            <img
-                id="logo"
-                src="../img/logo-cliente.png"
-                alt="Logo">
-
+        <div class="gf-cabecera">
+            <div class="gf-evento" id="evento">Autódromo Panamá</div>
+            <div class="gf-titulo" id="titulo" data-t="grilla.titulo">Grilla de Partida</div>
+            <div class="gf-categoria" id="categoria"></div>
         </div>
 
+        <div class="gf-pareja" id="pareja"></div>
 
-        <!-- TITULOS -->
-        <div class="grid-header-info">
-
-            <div
-                class="grid-title"
-                id="title">
-                STARTING GRID
-            </div>
-
-            <div
-                class="grid-subtitle"
-                id="subtitle">
-                GRILLA DE PARTIDA
-            </div>
-
-        </div>
+        <div class="gf-paso" id="paso"></div>
 
     </div>
-
-
-    <!-- ==============================================================
-         GRID
-         
-         JavaScript genera aquí las posiciones.
-         Siempre se muestran 2 pilotos a la vez.
-    ============================================================== -->
-
-    <div
-        class="grid-list"
-        id="grid-list">
-    </div>
-
-
-</div>
-
 
 <script>
 
-
 /* ==========================================================================
-   VARIABLES
+   GRILLA DE PARTIDA CON FOTOS
+
+   Los mismos datos que la de nombres, pero de dos en dos y con la cara.
+   Mientras aquella sirve para buscarse en una lista de treinta, esta sirve
+   para mirar a los que salen juntos en una misma fila de la parrilla.
 ========================================================================== */
 
+/* Una fila de la parrilla: los dos que salen a la vez. */
+const POR_PAGINA = 2;
 
-/*
- * Todos los pilotos.
- */
-let drivers = [];
+/* Lo mismo que la de nombres. */
+const ESPERA = 5000;
 
+let parrilla = [];
+let pagina   = 0;
+let relevo   = null;
 
-/*
- * Pareja que se está mostrando actualmente.
- *
- * 0 = posiciones 1 y 2
- * 1 = posiciones 3 y 4
- * 2 = posiciones 5 y 6
- */
-let currentPage = 0;
-
-
-/*
- * Intervalo del carrusel.
- */
-let carouselInterval = null;
-
-
-
-/* ==========================================================================
-   UPDATE
-========================================================================== */
-
-function update(data) {
-    /* CasparCG 2.5 entrega el payload del CG ADD/UPDATE como texto JSON,
-       no como objeto. Sin este parseo data.<campo> siempre era undefined
-       y la plantilla se quedaba con sus valores por defecto. */
-
-    if (typeof data === "string") {
-        try { data = JSON.parse(data); }
-        catch (e) { return; }
-    }
-
-
-
-    /* ======================================================================
-       TITULO
-    ====================================================================== */
-
-    if(data.title !== undefined){
-
-        document.getElementById("title").textContent =
-            data.title.toUpperCase();
-
-    }
-
-
-    /* ======================================================================
-       SUBTITULO
-    ====================================================================== */
-
-    if(data.subtitle !== undefined){
-
-        document.getElementById("subtitle").textContent =
-            data.subtitle.toUpperCase();
-
-    }
-
-
-    /* ======================================================================
-       LOGO
-    ====================================================================== */
-
-    if(data.logo !== undefined){
-
-        document.getElementById("logo").src =
-            data.logo;
-
-    }
-
-
-    /* ======================================================================
-       PILOTOS
-    ====================================================================== */
-
-    if(data.drivers !== undefined){
-
-        /*
-         * Guardamos la data.
-         */
-        drivers = data.drivers;
-
-
-        /*
-         * Empezamos desde la primera pareja.
-         */
-        currentPage = 0;
-
-
-        /*
-         * Iniciamos el carrusel.
-         */
-        startCarousel();
-
-    }
-
+function escapar(t){
+    return String(t == null ? "" : t)
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;");
 }
 
-
-
-/* ==========================================================================
-   MOSTRAR PAREJA ACTUAL
-========================================================================== */
-
-function showPage() {
-
-
-    const grid =
-        document.getElementById("grid-list");
-
-
-    /*
-     * Limpiar la pareja anterior.
-     */
-    grid.innerHTML = "";
-
-
-    /*
-     * Cada página contiene 2 pilotos.
-     */
-    const start =
-        currentPage * 2;
-
-
-    /*
-     * Obtener máximo 2 pilotos.
-     */
-    const pageDrivers =
-        drivers.slice(start, start + 2);
-
-
-    /*
-     * Crear fila.
-     */
-    const row =
-        document.createElement("div");
-
-    row.className =
-        "grid-row";
-
-
-    /*
-     * Crear las tarjetas.
-     */
-    pageDrivers.forEach(driver => {
-
-
-        const card =
-            document.createElement("div");
-
-        card.className =
-            "driver-card";
-
-
-        card.innerHTML = `
-
-            <div class="position">
-                ${driver.position}
-            </div>
-
-
-            <div class="driver-photo">
-
-                <img
-                    src="${driver.photo}"
-                    alt="${driver.name}">
-
-            </div>
-
-
-            <div class="driver-info">
-
-                <div class="driver-name">
-                    ${driver.name}
-                </div>
-
-                <div class="driver-number">
-                    #${driver.number}
-                </div>
-
-            </div>
-
-        `;
-
-
-        row.appendChild(card);
-
-    });
-
-
-    /*
-     * Mostrar la fila.
-     */
-    grid.appendChild(row);
-
+/* 1º, 2º, 3º... El ordinal se arma aqui y no viene del backend: depende
+   del idioma y el backend manda solo el numero. */
+function ordinal(pos){
+    const n = parseInt(pos, 10);
+    if (!n) return "";
+    const es = (window.TEXTOS && window.TEXTOS.grilla && window.TEXTOS.grilla.titulo || "")
+                 .toLowerCase().includes("starting");
+    if (!es) return "º";
+    const resto100 = n % 100, resto10 = n % 10;
+    if (resto100 >= 11 && resto100 <= 13) return "TH";
+    return ["TH","ST","ND","RD"][resto10] || "TH";
 }
 
+function lado(p, clase){
 
+    if (!p) return `<div class="gf-lado ${clase}"></div>`;
 
-/* ==========================================================================
-   PLAY
-========================================================================== */
+    const foto = p.photo
+        ? `<img class="gf-foto" src="${escapar(p.photo)}" alt="">`
+        : `<img class="gf-foto sin" src="../img/pilot.png" alt="">`;
 
-function play() {
-
-    /*
-     * Inicia el carrusel.
-     */
-    startCarousel();
-
+    return `<div class="gf-lado ${clase}">${foto}</div>`;
 }
 
+/* Los datos van aparte de la foto y no dentro. El lado se anima con un
+   transform, que crea contexto de apilado, y ahi dentro el velo oscuro del
+   contenedor tapaba el nombre por mucho z-index que se le pusiera. */
+function datos(p, clase){
 
+    if (!p) return "";
 
-/* ==========================================================================
-   STOP
-========================================================================== */
+    /* El apellido manda y el nombre de pila lo acompaña arriba, como en
+       cualquier presentacion de parrilla. */
+    const apellido = (p.last_name || p.full_name || "").trim().toUpperCase();
+    const nombre   = (p.name || "").trim();
 
-function stop() {
+    const tiempo = p.best_time
+        ? `<div class="gf-tiempo">${escapar(p.best_time)}</div>` : "";
 
-    /*
-     * Detiene el carrusel.
-     */
-    clearInterval(carouselInterval);
-
+    return `<div class="gf-datos ${clase}">`
+         +   `<div class="gf-pos">`
+         +     `<span class="gf-pos-num">${escapar(p.position)}</span>`
+         +     `<span class="gf-pos-suf">${ordinal(p.position)}</span>`
+         +   `</div>`
+         +   `<div class="gf-quien">`
+         +     (nombre ? `<div class="gf-nombre">${escapar(nombre)}</div>` : "")
+         +     `<div class="gf-apellido">${escapar(apellido)}</div>`
+         +     tiempo
+         +   `</div>`
+         + `</div>`;
 }
 
+function cuantasPaginas(){
+    return Math.max(1, Math.ceil(parrilla.length / POR_PAGINA));
+}
 
+function pintarPaso(){
 
-/* ==========================================================================
-   CARRUSEL
-========================================================================== */
+    const paso = document.getElementById("paso");
+    if (!paso) return;
 
-function startCarousel() {
+    if (parrilla.length <= POR_PAGINA) { paso.innerHTML = ""; return; }
 
+    const desde = pagina * POR_PAGINA + 1;
+    const hasta = Math.min(parrilla.length, desde + POR_PAGINA - 1);
+    const de = T("grilla.de", "de");
 
-    /*
-     * Evitar que existan varios intervalos
-     * funcionando al mismo tiempo.
-     */
-    clearInterval(carouselInterval);
+    let puntos = "";
+    for (let i = 0; i < cuantasPaginas(); i++)
+        puntos += `<span class="gf-punto${i === pagina ? " activo" : ""}"></span>`;
 
+    paso.innerHTML = `<span class="gf-rango">${desde} – ${hasta} ${de} ${parrilla.length}</span>`
+                   + `<span class="gf-puntos">${puntos}</span>`;
+}
 
-    /*
-     * Si no hay pilotos, no hacer nada.
-     */
-    if(drivers.length === 0){
+function pintar(){
 
-        return;
+    const destino = document.getElementById("pareja");
+    if (!destino) return;
 
-    }
+    const par = parrilla.slice(pagina * POR_PAGINA, (pagina + 1) * POR_PAGINA);
 
+    destino.innerHTML = lado(par[0], "izq") + lado(par[1], "der")
+                      + datos(par[0], "izq") + datos(par[1], "der");
+    pintarPaso();
 
-    /*
-     * Mostrar inmediatamente
-     * la primera pareja.
-     */
-    showPage();
+    /* Cada uno entra desde su lado. Se arranca aqui porque los nodos
+       acaban de nacer: puesta en el CSS, la animacion no se veria al
+       relevar, solo la primera vez. */
+    const lados = destino.querySelectorAll(".gf-lado");
+    if (lados[0]) lados[0].style.animation = "gfLadoIzq .55s ease forwards";
+    if (lados[1]) lados[1].style.animation = "gfLadoDer .55s ease forwards";
+}
 
+function pararRelevo(){
+    if (relevo) { clearInterval(relevo); relevo = null; }
+}
 
-    /*
-     * Si hay solamente 1 o 2 pilotos,
-     * no necesitamos carrusel.
-     */
-    if(drivers.length <= 2){
+function arrancarRelevo(){
 
-        return;
+    pararRelevo();
 
-    }
+    /* Con dos o menos no hay nada que relevar. */
+    if (parrilla.length <= POR_PAGINA) return;
 
+    relevo = setInterval(() => {
+        pagina = (pagina + 1) % cuantasPaginas();
+        pintar();
+    }, ESPERA);
+}
 
-    /*
-     * Cambiar de pareja cada 3 segundos.
-     */
-    carouselInterval = setInterval(() => {
+function update(data){
+    try{
+        const d = typeof data === "string" ? JSON.parse(data) : (data || {});
 
+        if (d.subtitle !== undefined) document.getElementById("evento").textContent = d.subtitle;
+        if (d.title    !== undefined) document.getElementById("titulo").textContent = d.title;
+        if (d.category !== undefined) document.getElementById("categoria").textContent =
+            (d.category || "").toUpperCase();
 
-        /*
-         * Siguiente pareja.
-         */
-        currentPage++;
-
-
-        /*
-         * Número total de páginas.
-         */
-        const totalPages =
-            Math.ceil(drivers.length / 2);
-
-
-        /*
-         * Si llegamos al final,
-         * volver a la primera pareja.
-         */
-        if(currentPage >= totalPages){
-
-            currentPage = 0;
-
+        if (d.drivers !== undefined) {
+            parrilla = Array.isArray(d.drivers) ? d.drivers : [];
+            pagina = 0;
+            pintar();
+            arrancarRelevo();
         }
-
-
-        /*
-         * Mostrar nueva pareja.
-         */
-        showPage();
-
-
-    }, 3000);
-
+    }catch(e){ /* un UPDATE con basura no puede tumbar el grafico */ }
 }
 
+function play(){
+    document.getElementById("gf").style.animation = "gfEntra .5s ease forwards";
+}
 
+function stop(){
+    /* Sin esto el intervalo sigue latiendo con el grafico fuera de aire. */
+    pararRelevo();
+    document.getElementById("gf").style.animation = "gfSale .4s ease forwards";
+}
 
-/* ==========================================================================
-   DATOS DE PRUEBA
-========================================================================== */
-
-update({
-
-    title: "Starting Grid",
-
-    subtitle: "Grilla de Partida",
-
-    logo: "../img/logo-cliente.png",
-
-
-    drivers: [
-
-        {
-            position: 1,
-            name: "PILOTO 1",
-            number: 1,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 2,
-            name: "PILOTO 2",
-            number: 2,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 3,
-            name: "PILOTO 3",
-            number: 3,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 4,
-            name: "PILOTO 4",
-            number: 4,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 5,
-            name: "PILOTO 5",
-            number: 5,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 6,
-            name: "PILOTO 6",
-            number: 6,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 7,
-            name: "PILOTO 7",
-            number: 7,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 8,
-            name: "PILOTO 8",
-            number: 8,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 9,
-            name: "PILOTO 9",
-            number: 9,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 10,
-            name: "PILOTO 10",
-            number: 10,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 11,
-            name: "PILOTO 11",
-            number: 11,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 12,
-            name: "PILOTO 12",
-            number: 12,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 13,
-            name: "PILOTO 13",
-            number: 13,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 14,
-            name: "PILOTO 14",
-            number: 14,
-            photo: "../img/pilot.png"
-        },
-
-        {
-            position: 15,
-            name: "PILOTO 15",
-            number: 15,
-            photo: "../img/pilot.png"
-        }
-
-    ]
-
-});
+if (!window.__casparcg) { play(); }
 
 </script>
 
 </body>
-
 </html>
