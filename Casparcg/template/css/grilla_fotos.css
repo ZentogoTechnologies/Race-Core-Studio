@@ -15,17 +15,30 @@
 
     position:absolute;
 
-    inset:0;
+    left:50%;
+    top:50%;
 
-    display:flex;
-    flex-direction:column;
+    transform:translate(-50%, -50%);
+
+    /* Encajonada, no a sangre. Mismo ancho que la grilla de nombres para
+       que las dos se lean como el mismo grafico contado de dos formas, y
+       porque a pantalla completa las caras se comian el cuadro entero y no
+       parecia un grafico sino un cambio de plano. */
+    width:1620px;
+    height:830px;
+
+    border-radius:18px;
 
     background:rgba(4,6,9,.95);
+
+    box-shadow:0 22px 60px rgba(0,0,0,.6);
 
     font-family:var(--fuente-graficos);
 
     opacity:0;
 
+    /* Recorta las fotos contra la caja: sin esto se salen por las
+       esquinas redondeadas. */
     overflow:hidden;
 }
 
