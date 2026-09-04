@@ -34,7 +34,17 @@
 
     border-radius:14px;
 
-    background:#05070A url("../img/fondo.jpg") center/cover no-repeat;
+    /* Negro translucido y no el fondo de rayas que llevan las cartas. La
+       grilla es una lista larga: el dibujo del fondo competia con ella y
+       obligaba a poner cada fila casi opaca para que se leyera. Con un
+       negro limpio la pista se sigue viendo por detras, que es lo que hace
+       util un grafico a pantalla completa durante la formacion. */
+    background:rgba(4,6,9,.88);
+
+    /* Un desenfoque suave detras: lo que se ve de la pista queda como
+       ambiente y no como una imagen que compite por atencion. */
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
 
     box-shadow:0 22px 60px rgba(0,0,0,.6);
 
@@ -183,9 +193,9 @@
 
     overflow:hidden;
 
-    background:rgba(10,12,16,.82);
+    background:rgba(255,255,255,.07);
 
-    box-shadow:0 4px 14px rgba(0,0,0,.45);
+    box-shadow:0 2px 8px rgba(0,0,0,.35);
 
     /* Entran en cascada, de arriba abajo. */
     opacity:0;
@@ -196,9 +206,9 @@
 /* La primera posicion se distingue sin necesidad de rotularla. */
 .gr-fila.pole{
 
-    background:rgba(28,10,12,.9);
+    background:rgba(213,0,0,.20);
 
-    box-shadow:0 4px 18px rgba(213,0,0,.35);
+    box-shadow:0 2px 14px rgba(213,0,0,.30);
 }
 
 
@@ -214,7 +224,7 @@
     align-items:center;
     justify-content:center;
 
-    background:#0A0C10;
+    background:rgba(0,0,0,.45);
 
     position:relative;
 
@@ -260,7 +270,7 @@
 
     padding:8px 10px;
 
-    background:rgba(255,255,255,.06);
+    background:rgba(255,255,255,.05);
 }
 
 .gr-marca img{
