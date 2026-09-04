@@ -40,6 +40,11 @@
     /* Recorta las fotos contra la caja: sin esto se salen por las
        esquinas redondeadas. */
     overflow:hidden;
+
+    /* Lo que se reserva la cabecera. Va aqui y no repetido en cada regla
+       porque lo usan dos: la propia cabecera y el tope de las fotos. Si se
+       escribieran por separado, tocar una dejaria a la otra desfasada. */
+    --gf-cabecera:174px;
 }
 
 
@@ -52,6 +57,10 @@
     position:absolute;
 
     left:0; right:0; top:0;
+
+    height:var(--gf-cabecera);
+
+    box-sizing:border-box;
 
     padding:34px 0 20px;
 
@@ -117,7 +126,10 @@
 
     position:absolute;
 
-    inset:0;
+    left:0; right:0; bottom:0;
+
+    /* El tope es la cabecera: el titulo no se lee encima de una cara. */
+    top:var(--gf-cabecera);
 
     display:flex;
 
@@ -168,10 +180,9 @@
     pointer-events:none;
 
     background:
-        linear-gradient(180deg, rgba(4,6,9,.88) 0%, rgba(4,6,9,.30) 11%,
-                                transparent 20%),
-        linear-gradient(0deg,   rgba(4,6,9,.94) 0%, rgba(4,6,9,.72) 9%,
-                                transparent 22%);
+        linear-gradient(180deg, rgba(4,6,9,.55) 0%, transparent 9%),
+        linear-gradient(0deg,   rgba(4,6,9,.94) 0%, rgba(4,6,9,.72) 10%,
+                                transparent 26%);
 
     z-index:2;
 }
@@ -190,10 +201,11 @@
 
     max-width:none;
 
-    /* Del pecho hacia arriba: los retratos vienen de medio cuerpo y
-       encuadrando arriba la cara queda donde tiene que quedar. */
+    /* Las fotos son de pecho hacia arriba. Anclar al borde justo cortaba
+       la coronilla en cuanto la foto traia poco aire encima; un poco por
+       debajo deja respirar la cabeza y sigue dejando fuera las piernas. */
     object-fit:cover;
-    object-position:top center;
+    object-position:center 12%;
 
     /* Se difumina hacia el centro para que las dos caras no choquen en una
        linea recta. Una sola mascara y en un eje: CEF no compone bien dos
