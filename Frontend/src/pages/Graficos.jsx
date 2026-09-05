@@ -826,7 +826,7 @@ function PilotosEnPista({ carros, cargando, error, ocupado, onElegir, onRecargar
 // Sin carrera elegida estas pestañas quedan cerradas: las fichas salen de
 // los pilotos inscritos, la grilla de los vehículos del evento y el cuadro
 // de resultados lleva el nombre de la tanda. General no depende de nada.
-const TABS_QUE_NECESITAN_CARRERA = ['carrera', 'pilotos', 'grilla']
+const TABS_QUE_NECESITAN_CARRERA = ['circuito', 'pilotos', 'grilla']
 
 const TABS = [
   {
@@ -837,17 +837,17 @@ const TABS = [
       SECCIONES.miscelaneos,
     ],
   },
+  { id: 'pilotos', titulo: 'Pilotos', secciones: [SECCIONES.fichas] },
   {
     // Lo que se opera durante la tanda: primero la bandera, debajo el tótem.
-    id: 'carrera',
-    titulo: 'Carrera',
+    id: 'circuito',
+    titulo: 'Circuito',
     secciones: [
       SECCIONES.banderas,
       SECCIONES.totems,
       SECCIONES.resultados,
     ],
   },
-  { id: 'pilotos', titulo: 'Pilotos', secciones: [SECCIONES.fichas] },
   { id: 'grilla',  titulo: 'Grilla',  secciones: [SECCIONES.grilla] },
   {
     /* El drag no se grafica como el circuito: no hay vueltas ni tótem de
@@ -864,7 +864,13 @@ const TABS = [
 /* Una pestaña con disciplina solo se usa en la suya. Las de circuito no
    tienen sentido en una jornada de drag y al revés: mostrarlas activas
    invita a sacar al aire un gráfico que no cuadra con lo que se corre. */
-const DISCIPLINA_DE_TAB = { carrera: 'circuito', drag: 'drag' }
+const DISCIPLINA_DE_TAB = {
+  circuito: 'circuito',
+  // En drag no hay parrilla de partida: se corre por llaves de
+  // eliminacion, de dos en dos, y el orden lo decide cada ronda.
+  grilla:   'circuito',
+  drag:     'drag',
+}
 
 // Todos los botones de una pestaña, sin importar en qué sección estén.
 const itemsDe = (tab) => tab.secciones.flatMap(s => s.items)
@@ -1042,13 +1048,13 @@ export default function GraficosModule() {
   // Se recarga al entrar a la pestaña de Carrera: entre tanda y tanda
   // cambian los carros en pista.
   useEffect(() => {
-    if (activeTab === 'carrera') recargarPista()
+    if (activeTab === 'circuito') recargarPista()
   }, [activeTab])
 
   // El reloj lo lleva el backend; aquí solo se refresca para verlo bajar.
   // Solo mientras la pestaña está abierta: fuera de ella no hace falta.
   useEffect(() => {
-    if (activeTab !== 'carrera') return
+    if (activeTab !== 'circuito') return
 
     let vivo = true
     const tic = () => {
@@ -1535,7 +1541,7 @@ export default function GraficosModule() {
         })}
 
         {/* Control de la tanda: solo en Carrera */}
-        {tabActual.id === 'carrera' && (
+        {tabActual.id === 'circuito' && (
           <RelojTanda
             reloj={reloj}
             ocupado={ocupado}
@@ -1549,7 +1555,7 @@ export default function GraficosModule() {
         )}
 
         {/* Elegir piloto en los carros compartidos: solo en Carrera */}
-        {tabActual.id === 'carrera' && (
+        {tabActual.id === 'circuito' && (
           <PilotosEnPista
             carros={carros}
             cargando={cargandoPista}
