@@ -337,10 +337,10 @@ export default function PilotosModule() {
                   {previa || fotoActual ? 'CAMBIAR' : 'ELEGIR FOTO'}
                 </button>
 
-                {/* Solo con el piloto ya creado y su foto en el servidor: el
-                    recorte trabaja sobre el archivo guardado, y en un alta
-                    todavía no hay ninguno. */}
-                {fotoActual && currentEditId && !foto && (
+                {/* Con foto puesta se ofrecen los tres; sin ella, solo el de
+                    agregar. El recorte trabaja sobre el archivo guardado en
+                    el servidor, asi que necesita el piloto ya creado. */}
+                {fotoActual && currentEditId && (
                   <button
                     type="button" onClick={recortarFoto} disabled={recortando}
                     title="Recorta al piloto y deja el fondo transparente"

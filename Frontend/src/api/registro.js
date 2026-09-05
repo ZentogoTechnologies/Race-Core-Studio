@@ -119,6 +119,11 @@ export const vehiculosApi  = recurso('/vehicles')
 export const subirFotoVehiculo = (vehicleId, archivo) =>
   subirArchivo(`/vehicles/${vehicleId}/fotos`, archivo)
 
+// Recorta el carro de su fondo. Hay que decir cuál de las dos fotos.
+export const quitarFondoVehiculo = (vehicleId, archivo) =>
+  pedir(`/vehicles/${vehicleId}/fotos/${encodeURIComponent(archivo)}/sin-fondo`,
+        { method: 'POST' })
+
 export const borrarFotoVehiculo = (vehicleId, archivo) =>
   pedir(`/vehicles/${vehicleId}/fotos/${encodeURIComponent(archivo)}`, { method: 'DELETE' })
 

@@ -14,10 +14,18 @@ from typing import Optional
 
 from PIL import Image, ImageOps
 
-# u2net_human_seg y no el general: está entrenado solo con personas, que es
-# lo único que se recorta aquí, y acierta más en gorras y pelo, que es
-# justo donde se nota un recorte malo.
-MODELO = "u2net_human_seg"
+# Un modelo por tipo de sujeto. u2net_human_seg está entrenado solo con
+# personas y acierta mucho más en gorras y pelo, que es donde se nota un
+# recorte malo; pero delante de un carro no sabe qué mirar. El general sí,
+# y a cambio es peor con el pelo.
+#
+# Da igual que la foto de catálogo del BMW saliera bien con el de personas:
+# venía con el fondo ya blanco. La prueba de verdad es un carro en boxes,
+# con gente y carpas detrás.
+MODELOS = {
+    "persona": "u2net_human_seg",
+    "objeto":  "u2net",
+}
 
 # Las fotos llegan de un iPad a 4000px de ancho y el arte no las necesita:
 # el retrato más grande que se pinta es el de la grilla, que ocupa media
@@ -25,19 +33,20 @@ MODELO = "u2net_human_seg"
 # segundos a décimas y el PNG resultante de cinco megas a menos de uno.
 LADO_MAXIMO = 1400
 
-_sesion = None
+# Una sesión por modelo, cargada la primera vez que se pide. Son unos
+# segundos y 176 MB en memoria cada una, así que no se cargan las dos si
+# solo se usa una.
+_sesiones = {}
 
 
-def _obtener_sesion():
-    """La sesión del modelo, cargada una sola vez por proceso."""
-    global _sesion
-    if _sesion is None:
+def _obtener_sesion(sujeto: str):
+    if sujeto not in _sesiones:
         from rembg import new_session
-        _sesion = new_session(MODELO)
-    return _sesion
+        _sesiones[sujeto] = new_session(MODELOS.get(sujeto, MODELOS["persona"]))
+    return _sesiones[sujeto]
 
 
-def quitar_fondo(contenido: bytes) -> bytes:
+def quitar_fondo(contenido: bytes, sujeto: str = "persona") -> bytes:
     """Devuelve la foto en PNG con el fondo transparente.
 
     Se normaliza la orientación antes de recortar. Las fotos de móvil
@@ -53,7 +62,7 @@ def quitar_fondo(contenido: bytes) -> bytes:
     if max(imagen.size) > LADO_MAXIMO:
         imagen.thumbnail((LADO_MAXIMO, LADO_MAXIMO), Image.LANCZOS)
 
-    recortada = remove(imagen.convert("RGB"), session=_obtener_sesion())
+    recortada = remove(imagen.convert("RGB"), session=_obtener_sesion(sujeto))
 
     salida = io.BytesIO()
     recortada.save(salida, format="PNG", optimize=True)

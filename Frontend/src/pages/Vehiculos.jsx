@@ -1,11 +1,12 @@
 import { t } from '../i18n'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Flag, Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Users, Loader2, ImagePlus, X } from 'lucide-react'
+import { Flag, Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Users, Loader2, ImagePlus, Scissors, X } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import {
-  borrarFotoVehiculo, categoriasApi, pilotosApi, subirFotoVehiculo,
+  borrarFotoVehiculo, categoriasApi, pilotosApi, quitarFondoVehiculo,
+  subirFotoVehiculo,
   urlFotoVehiculo, vehiculosApi,
 } from '../api/registro'
 import { useListado } from '../hooks/useListado'
@@ -110,10 +111,33 @@ export default function VehiculosModule() {
   const [nuevas, setNuevas] = useState([])   // File elegidos, sin subir
   const inputFoto = useRef(null)
 
-  const TOPE_FOTOS = 4
+  // Dos: una de frente y una de perfil, que es lo que usan los gráficos.
+  // Tiene que coincidir con TOPE_FOTOS del backend, que es quien manda.
+  const TOPE_FOTOS = 2
 
   // Una foto ya guardada se borra en el acto, no al guardar: el vehículo
   // ya existe y el archivo está en el servidor.
+  // Cuál se está recortando, para poder marcarla mientras trabaja: son
+  // dos segundos y sin aviso parece que no pasó nada.
+  const [recortando, setRecortando] = useState(null)
+
+  const recortarFoto = async (archivo) => {
+    setRecortando(archivo)
+    try {
+      const v = await quitarFondoVehiculo(currentEditId, archivo)
+      setFotos((v.photos || []).map((a, i) => ({
+        archivo: a,
+        url: urlFotoVehiculo((v.photo_urls || [])[i]),
+      })))
+      lista.recargar()
+      toast.exito('Fondo quitado', 'La foto queda recortada sobre transparente')
+    } catch (err) {
+      toast.error('No se pudo quitar el fondo', err.message)
+    } finally {
+      setRecortando(null)
+    }
+  }
+
   const quitarFotoGuardada = async (archivo) => {
     try {
       const v = await borrarFotoVehiculo(currentEditId, archivo)
@@ -376,7 +400,8 @@ export default function VehiculosModule() {
             </div>
           </div>
 
-          {/* Fotos del carro. Hasta cuatro; cuál se saca al aire se decide
+          {/* Fotos del carro. Dos: una de frente y una de perfil. Cuál se
+              saca al aire se decide
               al graficar, así que aquí no hay principal ni secundaria: es
               una lista y el orden es el de subida. */}
           <div className="mt-5 border-t border-neutral-800 pt-4">
@@ -388,6 +413,16 @@ export default function VehiculosModule() {
               {fotos.map(f => (
                 <div key={f.archivo} className="relative w-28 h-20 rounded-lg overflow-hidden border border-neutral-800 bg-[#0a0a0a]">
                   <img src={f.url} alt="" className="w-full h-full object-cover"/>
+                  <button
+                    type="button" onClick={() => recortarFoto(f.archivo)}
+                    disabled={recortando !== null}
+                    className="absolute top-1 left-1 bg-black/70 rounded p-1 text-neutral-300 hover:text-green-400 disabled:opacity-40 transition-colors"
+                    title="Quitar el fondo de esta foto"
+                  >
+                    {recortando === f.archivo
+                      ? <Loader2 size={12} className="animate-spin"/>
+                      : <Scissors size={12}/>}
+                  </button>
                   <button
                     type="button" onClick={() => quitarFotoGuardada(f.archivo)}
                     className="absolute top-1 right-1 bg-black/70 rounded p-1 text-neutral-300 hover:text-red-500 transition-colors"

@@ -104,6 +104,18 @@ async def foto_vehiculo_por_ruta(vehicle_id: str, datos: RutaFotoVehiculo):
     return await service.foto_por_ruta(vehicle_id, datos.ruta)
 
 
+@vehicles.post("/{vehicle_id}/fotos/{archivo}/sin-fondo", tags=["Vehicles"],
+               response_model=VehicleResponse,
+               dependencies=[Depends(puede_escribir)])
+async def quitar_fondo_vehiculo(vehicle_id: str, archivo: str):
+    """
+    Recorta el carro de su fondo y reemplaza esa foto.
+
+    Hay que decir cuál de las dos: se pasa el nombre del archivo.
+    """
+    return await service.quitar_fondo(vehicle_id, archivo)
+
+
 @vehicles.delete("/{vehicle_id}/fotos/{archivo}", tags=["Vehicles"], response_model=VehicleResponse,
                  dependencies=[Depends(puede_escribir)])
 async def borrar_foto_vehiculo(vehicle_id: str, archivo: str):

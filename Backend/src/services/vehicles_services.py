@@ -21,9 +21,10 @@ CARPETA_FOTOS = Path(__file__).resolve().parents[1] / "public" / "vehiculos"
 
 RUTA_RELATIVA = "vehiculos"
 
-# Cuántas caben por carro. Se piden dos; se dejan cuatro para no tener que
-# tocar el modelo la primera vez que alguien quiera una más.
-TOPE_FOTOS = 4
+# Cuántas caben por carro. Dos: una de frente y una de perfil, que es lo
+# que usan los gráficos. Dejarlo abierto solo llenaba la carpeta de fotos
+# que nadie llega a sacar al aire.
+TOPE_FOTOS = 2
 
 
 def url_foto_vehiculo(archivo: str) -> str:
@@ -304,6 +305,48 @@ class VehicleService:
         destino = copiar_de_ruta(ruta, base)
 
         return await self._añadir(vehicle, destino)
+
+    async def quitar_fondo(self, vehicle_id: str, archivo: str) -> VehicleResponse:
+        """Recorta el carro de su fondo y reemplaza esa foto.
+
+        Se le pasa cuál de las dos, porque un carro tiene varias y hay que
+        decir a cuál. Por lo demás funciona igual que en pilotos: trabaja
+        sobre el archivo ya guardado y devuelve PNG, que es lo único que
+        admite transparencia.
+        """
+        vehicle = await self._obtener(vehicle_id)
+
+        if archivo not in (vehicle.photos or []):
+            raise HTTPException(404, "Esa foto no es de este vehículo")
+
+        actual = CARPETA_FOTOS / archivo
+        if not actual.is_file():
+            raise HTTPException(400, "El archivo de la foto no está en el disco")
+
+        from src.services.recorte_services import quitar_fondo as recortar
+
+        try:
+            # El modelo general y no el de personas: delante de un carro,
+            # el entrenado con gente no sabe qué mirar.
+            recortada = recortar(actual.read_bytes(), sujeto="objeto")
+        except Exception as e:
+            raise HTTPException(422, f"No se pudo quitar el fondo: {e}")
+
+        # Se conserva el hueco que ocupaba —el "-1" o el "-2"— para que la
+        # foto siga siendo la misma de la lista y no salte de sitio.
+        base = CARPETA_FOTOS / Path(archivo).stem
+        destino = guardar_bytes(recortada, "foto.png", base)
+
+        vehicle.photos = [destino.name if f == archivo else f
+                          for f in (vehicle.photos or [])]
+        await vehicle.save()
+
+        # El original solo se borra si el recorte quedó en otro archivo:
+        # con la misma extensión se acaba de sobrescribir.
+        if destino.name != archivo and actual.is_file():
+            actual.unlink()
+
+        return await self._build_response(vehicle)
 
     async def borrar_foto(self, vehicle_id: str, archivo: str) -> VehicleResponse:
         vehicle = await self._obtener(vehicle_id)
