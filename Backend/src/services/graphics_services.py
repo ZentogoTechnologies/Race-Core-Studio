@@ -40,6 +40,9 @@ LAYERS = {
     "totem": 20,
     "flag": 30,
     "grid": 40,
+    # El drag tiene capa propia y no comparte la de la grilla: no son lo
+    # mismo y en una jornada de drag no hay parrilla que quitar de en medio.
+    "drag": 45,
     "pilot": 50,
     "misc": 60,
     "results": 70,
@@ -88,6 +91,12 @@ TEMPLATES: dict[str, Template] = {
         Template("grilla-fotos", "Grilla con Fotos",    "grid", 40, "html/41_starting_grid_foto",  accepts_data=True),
 
         # ── Fichas de piloto (capa 50) ────────────────────────
+        # ── Drag ──
+        # Cada pasada se cuenta sola: no hay clasificación que actualizar
+        # ni vueltas que contar, así que estos gráficos no derivan de los
+        # del circuito.
+        Template("drag-resultado", "Resultado de la Pasada", "drag", 45, "html/80_drag_result", accepts_data=True),
+
         Template("ficha-corta",    "Carta",          "pilot", 50, "html/51_pilot_card_short",    accepts_data=True),
         # Dos pilotos frente a frente: nombre, dorsal y foto, nada más.
         Template("carta-vs",       "Carta VS",       "pilot", 50, "html/52_pilot_vs",            accepts_data=True),

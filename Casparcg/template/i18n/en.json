@@ -47,5 +47,14 @@
     "narrador": "COMMENTATOR",
     "comentarista": "ANALYST",
     "reportero": "REPORTER"
+  },
+  "drag": {
+    "resultado": "Run Result",
+    "reaccion": "Reaction",
+    "tiempo": "E.T.",
+    "velocidad": "Speed",
+    "carril": "Lane",
+    "gana": "Winner",
+    "ronda": "Round"
   }
 }

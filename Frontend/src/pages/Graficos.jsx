@@ -1,6 +1,7 @@
 import { t } from '../i18n'
 import { useEffect, useMemo, useState } from 'react'
 import SelectorCarrera from '../components/graphics/SelectorCarrera'
+import FormularioDrag from '../components/graphics/FormularioDrag'
 import { useCarrera } from '../context/CarreraContext'
 import { useDisciplina } from '../context/DisciplinaContext'
 import {
@@ -169,7 +170,7 @@ const GRILLAS = [
 ]
 
 // Catálogo plano, para resolver un botón por su id.
-const GRAFICOS = [...BACKGROUNDS, ...BANDERAS, ...MISCELANEOS, ...TOTEMS, ...FICHAS, ...GRILLAS]
+const GRAFICOS = [...BACKGROUNDS, ...BANDERAS, ...MISCELANEOS, ...TOTEMS, ...FICHAS, ...GRILLAS, ...DRAG]
 
 // Misma grilla en las tres secciones para que las columnas queden alineadas.
 const GRID = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3'
@@ -207,12 +208,22 @@ function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClic
 
 // ─── Gráficos que requieren datos antes de salir al aire ──────
 // El botón ya define el tipo, así que el formulario no lo vuelve a preguntar.
+// ─── Drag ─────────────────────────────────────────────────────
+// En drag cada pasada se cuenta sola: no hay clasificación que actualizar
+// ni vueltas que contar, así que estos gráficos no derivan de los del
+// circuito.
+const DRAG = [
+  { id: 'drag-resultado', label: 'Resultado', nombre: 'Resultado de la Pasada',
+    detalle: 'Reacción, tiempo y velocidad de los dos carriles', Icon: Timer, ...ROJO },
+]
+
 const REQUIERE_DATOS = {
   'narrador':       'narrador',  // se escribe al momento, no se guarda
   'comentarista':   'narrador',  // mismo formulario, misma plantilla base
   'reportero':      'narrador',  // idem; cambia el rótulo del arte
   'ficha-corta':    'piloto',    // sale del registro de pilotos
   'carta-vs':       'duelo',     // dos pilotos enfrentados
+  'drag-resultado': 'drag',      // se escribe a mano: tres cifras por carril
   'categoria':      'categoria',  // se elige cuál de las del evento
 }
 
@@ -567,6 +578,7 @@ const SECCIONES = {
   totems:      { titulo: 'Tótems',          grupo: 'totem',      capa: 20, items: TOTEMS },
   banderas:    { titulo: 'Banderas',        grupo: 'flag',       capa: 30, items: BANDERAS },
   grilla:      { titulo: 'Grilla',          grupo: 'grid',       capa: 40, items: GRILLAS },
+  drag:        { titulo: 'Drag',            grupo: 'drag',       capa: 45, items: DRAG },
   fichas:      { titulo: 'Fichas',          grupo: 'pilot',      capa: 50, items: FICHAS },
   miscelaneos: { titulo: 'Misceláneos',     grupo: 'misc',       capa: 60, items: MISCELANEOS },
   resultados:  { titulo: 'Resultados',      grupo: 'results',    capa: 70, items: RESULTADOS },
@@ -856,7 +868,7 @@ const TABS = [
        que el sitio esté decidido y no aparezca luego colgando al final. */
     id: 'drag',
     titulo: 'Drag',
-    secciones: [],
+    secciones: [SECCIONES.drag],
     disciplina: 'drag',
   },
 ]
@@ -1566,8 +1578,34 @@ export default function GraficosModule() {
           />
         )}
 
+        {/* El drag lleva formulario propio: son dos carriles con sus cifras
+            y no encaja con el de los demás, que giran alrededor de elegir un
+            piloto de la base. */}
+        {itemDelForm && itemsDe(tabActual).includes(itemDelForm)
+          && REQUIERE_DATOS[itemDelForm.id] === 'drag' && (
+          <FormularioDrag
+            item={itemDelForm}
+            pilotos={pilotosRegistrados}
+            alAire={estaAlAire(itemDelForm)}
+            ocupado={ocupado}
+            onMostrar={(datos) => {
+              // Si ya está al aire, refresca sin recargarlo: en drag las
+              // cifras llegan una detrás de otra y recargar la plantilla
+              // haría parpadear el gráfico en cada pasada.
+              if (estaAlAire(itemDelForm)) {
+                return ejecutar(itemDelForm.id,
+                  () => updateGraphic(itemDelForm.id, { data: datos }),
+                  () => {})
+              }
+              return alternar(itemDelForm.id, { data: datos })
+            }}
+            onOcultar={() => alternar(itemDelForm.id)}
+          />
+        )}
+
         {/* El formulario solo aparece si su botón vive en la pestaña abierta */}
-        {itemDelForm && itemsDe(tabActual).includes(itemDelForm) && (
+        {itemDelForm && itemsDe(tabActual).includes(itemDelForm)
+          && REQUIERE_DATOS[itemDelForm.id] !== 'drag' && (
           <FormularioPersonal
             item={itemDelForm}
             tipo={REQUIERE_DATOS[itemDelForm.id]}

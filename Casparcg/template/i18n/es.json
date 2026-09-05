@@ -47,5 +47,14 @@
     "narrador": "NARRADOR",
     "comentarista": "COMENTARISTA",
     "reportero": "REPORTERO"
+  },
+  "drag": {
+    "resultado": "Resultado de la pasada",
+    "reaccion": "Reacción",
+    "tiempo": "Tiempo",
+    "velocidad": "Velocidad",
+    "carril": "Carril",
+    "gana": "Gana",
+    "ronda": "Ronda"
   }
 }
