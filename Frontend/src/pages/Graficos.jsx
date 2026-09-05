@@ -169,6 +169,19 @@ const GRILLAS = [
     detalle: 'Posiciones de largada con la foto de cada piloto',      Icon: Contact,     ...ROJO },
 ]
 
+// ─── Drag ─────────────────────────────────────────────────────
+// En drag cada pasada se cuenta sola: no hay clasificación que actualizar
+// ni vueltas que contar, así que estos gráficos no derivan de los del
+// circuito.
+//
+// Va aquí y no más abajo: GRAFICOS lo usa justo debajo, y declararlo
+// después dejaba el módulo entero sin cargar. No es un error de sintaxis,
+// así que el build pasaba limpio y la aplicación no arrancaba.
+const DRAG = [
+  { id: 'drag-resultado', label: 'Resultado', nombre: 'Resultado de la Pasada',
+    detalle: 'Reacción, tiempo y velocidad de los dos carriles', Icon: Timer, ...ROJO },
+]
+
 // Catálogo plano, para resolver un botón por su id.
 const GRAFICOS = [...BACKGROUNDS, ...BANDERAS, ...MISCELANEOS, ...TOTEMS, ...FICHAS, ...GRILLAS, ...DRAG]
 
@@ -208,15 +221,6 @@ function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClic
 
 // ─── Gráficos que requieren datos antes de salir al aire ──────
 // El botón ya define el tipo, así que el formulario no lo vuelve a preguntar.
-// ─── Drag ─────────────────────────────────────────────────────
-// En drag cada pasada se cuenta sola: no hay clasificación que actualizar
-// ni vueltas que contar, así que estos gráficos no derivan de los del
-// circuito.
-const DRAG = [
-  { id: 'drag-resultado', label: 'Resultado', nombre: 'Resultado de la Pasada',
-    detalle: 'Reacción, tiempo y velocidad de los dos carriles', Icon: Timer, ...ROJO },
-]
-
 const REQUIERE_DATOS = {
   'narrador':       'narrador',  // se escribe al momento, no se guarda
   'comentarista':   'narrador',  // mismo formulario, misma plantilla base
