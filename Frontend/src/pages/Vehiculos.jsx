@@ -534,7 +534,12 @@ export default function VehiculosModule() {
       )}
 
       <div className="bg-[#141414] rounded-xl border border-neutral-800 overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        {/* Desplaza en horizontal en pantallas estrechas. Antes el
+            envoltorio recortaba y desde el móvil no se llegaba a las
+            acciones, que van al final de la fila: se veía la tabla pero
+            no se podía editar nada. */}
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[820px] text-left border-collapse">
           <thead>
             <tr className="bg-neutral-900 border-b border-neutral-800 text-neutral-400 text-xs uppercase tracking-wider">
               <th className="p-4 font-bold"><span className="flex items-center">{t('Dorsal')} <SortIcon columnKey="number" sortField={lista.sortBy} sortDirection={lista.sortDir} onSort={lista.ordenarPor}/></span></th>
@@ -599,6 +604,7 @@ export default function VehiculosModule() {
             ))}
           </tbody>
         </table>
+        </div>
 
         {!lista.cargando && !lista.error && (
           <Pagination
