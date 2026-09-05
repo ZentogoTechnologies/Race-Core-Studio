@@ -232,6 +232,47 @@ class PilotService:
         destino = copiar_de_ruta(ruta, self._destino_foto(pid))
         return await self._guardar_foto(pid, destino)
 
+    async def quitar_fondo(self, pilot_id: str) -> PilotResponse:
+        """Recorta al piloto de su fondo y reemplaza la foto.
+
+        Trabaja sobre la que ya está guardada en vez de pedir el archivo
+        otra vez: así vale igual para una foto recién tomada con el iPad y
+        para una que llevaba meses puesta, y no hay que volver a subir
+        nada por una red del autódromo.
+
+        El resultado siempre es PNG: el recorte necesita transparencia y
+        un JPG no la tiene.
+        """
+        pid = int(pilot_id)
+
+        pilot = await Pilot.find_one(Pilot.pilot_id == pid)
+        if not pilot:
+            raise HTTPException(status_code=404, detail="Piloto no encontrado")
+
+        actual = (CARPETA_FOTOS.parent / pilot.photo.lstrip("/")
+                  if pilot.photo else None)
+
+        if actual is None or not actual.is_file():
+            raise HTTPException(
+                status_code=400,
+                detail="El piloto no tiene foto: sube una antes de quitarle el fondo",
+            )
+
+        from src.services.recorte_services import quitar_fondo as recortar
+
+        try:
+            recortada = recortar(actual.read_bytes())
+        except Exception as e:
+            # El modelo puede fallar con un archivo que no sea una imagen
+            # de verdad. Se responde en claro en vez de dejar un 500 seco.
+            raise HTTPException(
+                status_code=422,
+                detail=f"No se pudo quitar el fondo: {e}",
+            )
+
+        destino = guardar_bytes(recortada, "foto.png", self._destino_foto(pid))
+        return await self._guardar_foto(pid, destino)
+
     async def borrar_foto(self, pilot_id: str) -> PilotResponse:
         pilot = await Pilot.find_one(Pilot.pilot_id == int(pilot_id))
         if not pilot:

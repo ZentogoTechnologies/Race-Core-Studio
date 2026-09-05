@@ -30,3 +30,8 @@ typing-inspection==0.4.4
 typing_extensions==4.16.0
 tzdata==2026.3
 uvicorn==0.52.1
+
+# Recorte del fondo de las fotos de pilotos. Corre en local: en el
+# autodromo la red se cae, y una foto que no se puede recortar por falta
+# de internet se queda con el fondo del taller.
+rembg[cpu]

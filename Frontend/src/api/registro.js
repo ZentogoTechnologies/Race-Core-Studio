@@ -103,6 +103,11 @@ export const urlFotoPiloto = (photo) =>
 export const subirFotoPiloto = (pilotId, archivo) =>
   subirArchivo(`/pilots/${pilotId}/foto`, archivo)
 
+// Recorta al piloto de su fondo. Trabaja sobre la foto que ya está
+// guardada, así que no hay que volver a subirla.
+export const quitarFondoPiloto = (pilotId) =>
+  pedir(`/pilots/${pilotId}/foto/sin-fondo`, { method: 'POST' })
+
 export const borrarFotoPiloto = (pilotId) =>
   pedir(`/pilots/${pilotId}/foto`, { method: 'DELETE' })
 export const vehiculosApi  = recurso('/vehicles')

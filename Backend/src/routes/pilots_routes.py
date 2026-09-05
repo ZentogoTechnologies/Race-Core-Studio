@@ -104,6 +104,19 @@ async def foto_por_ruta(pilot_id: str, datos: RutaFoto):
     return await service.foto_por_ruta(pilot_id, datos.ruta)
 
 
+@pilots.post("/{pilot_id}/foto/sin-fondo", tags=["Pilots"],
+             response_model=PilotResponse,
+             dependencies=[Depends(puede_escribir)])
+async def quitar_fondo(pilot_id: str):
+    """
+    Recorta al piloto de su fondo y reemplaza la foto que ya tiene.
+
+    Tarda unos segundos la primera vez del día, que es lo que cuesta
+    cargar el modelo; después es casi inmediato.
+    """
+    return await service.quitar_fondo(pilot_id)
+
+
 @pilots.delete("/{pilot_id}/foto", tags=["Pilots"], response_model=PilotResponse,
                dependencies=[Depends(puede_escribir)])
 async def borrar_foto(pilot_id: str):

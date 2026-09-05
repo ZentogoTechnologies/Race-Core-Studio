@@ -1,11 +1,12 @@
 import { t } from '../i18n'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2, Upload, User, X } from 'lucide-react'
+import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2, Scissors, Upload, User, X } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
 import {
-  borrarFotoPiloto, categoriasApi, pilotosApi, subirFotoPiloto, urlFotoPiloto,
+  borrarFotoPiloto, categoriasApi, pilotosApi, quitarFondoPiloto,
+  subirFotoPiloto, urlFotoPiloto,
 } from '../api/registro'
 import { useListado } from '../hooks/useListado'
 import { useToast } from '../context/ToastContext'
@@ -117,6 +118,32 @@ export default function PilotosModule() {
     setFotoActual(piloto.photo || null)
     if (inputFoto.current) inputFoto.current.value = ''
     setIsFormOpen(true)
+  }
+
+  const [recortando, setRecortando] = useState(false)
+
+  /* Recorta al piloto de su fondo. Trabaja sobre la foto ya guardada, así
+     que solo tiene sentido con el piloto creado: en un alta todavía no hay
+     nada en el servidor sobre lo que trabajar.
+
+     La primera del día tarda unos segundos —es cargar el modelo— y las
+     siguientes son casi inmediatas. Se avisa mientras tanto para que nadie
+     piense que se colgó. */
+  const recortarFoto = async () => {
+    if (!currentEditId) return
+    setRecortando(true)
+    try {
+      const actualizado = await quitarFondoPiloto(currentEditId)
+      // El recorte se guarda como PNG, así que la ruta cambia de extensión
+      // y el navegador no puede servir la anterior de su caché.
+      setFotoActual(actualizado.photo || null)
+      lista.recargar()
+      toast.exito('Fondo quitado', 'La foto queda recortada sobre transparente')
+    } catch (err) {
+      toast.error('No se pudo quitar el fondo', err.message)
+    } finally {
+      setRecortando(false)
+    }
   }
 
   const quitarFoto = async () => {
@@ -309,6 +336,22 @@ export default function PilotosModule() {
                   <Upload size={14}/>
                   {previa || fotoActual ? 'CAMBIAR' : 'ELEGIR FOTO'}
                 </button>
+
+                {/* Solo con el piloto ya creado y su foto en el servidor: el
+                    recorte trabaja sobre el archivo guardado, y en un alta
+                    todavía no hay ninguno. */}
+                {fotoActual && currentEditId && !foto && (
+                  <button
+                    type="button" onClick={recortarFoto} disabled={recortando}
+                    title="Recorta al piloto y deja el fondo transparente"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-bold text-xs"
+                  >
+                    {recortando
+                      ? <Loader2 size={14} className="animate-spin"/>
+                      : <Scissors size={14}/>}
+                    {recortando ? 'QUITANDO…' : 'QUITAR FONDO'}
+                  </button>
+                )}
 
                 {(previa || fotoActual) && (
                   <button
