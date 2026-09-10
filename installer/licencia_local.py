@@ -113,5 +113,5 @@ def validar(correo: str, clave: str) -> dict:
         "clave": clave,
         "dias": DIAS,
         "gracia_dias": GRACIA_DIAS,
-        "plan": "pro",
+        "plan": "estandar",
     }

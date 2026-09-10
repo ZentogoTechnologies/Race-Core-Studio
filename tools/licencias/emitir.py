@@ -31,11 +31,60 @@ ALGORITMO = "EdDSA"
 
 # Planes y qué habilita cada uno. Las features viajan dentro del token
 # firmado, así que el cliente no las puede ampliar editando un archivo.
+# ── Los planes ────────────────────────────────────────────────
+#
+# Los tres se llevan las actualizaciones de seguridad y de optimización,
+# porque todos corren la MISMA versión. No hay una rama por plan: eso
+# obligaría a portar cada arreglo de seguridad a todas las líneas vivas,
+# para siempre, y a un equipo pequeño eso se le come el año.
+#
+# Lo que separa a un plan de otro es qué módulos abre su licencia. Una
+# funcionalidad nueva viaja en el binario de todos, pero solo la ve quien
+# la tiene en «features». Así el estándar recibe los arreglos el mismo
+# día que el premium, sin recibir lo que no ha pagado, y de paso ve lo
+# que se está perdiendo, que es la mejor forma de que quiera subirse.
+#
+# «periodo» es lo que se factura, y de ahí sale cada cuánto hay que
+# revalidar: un plan mensual no se puede comprobar una vez al año.
+
+MODULOS_BASE = [
+    "graficos", "pilotos", "vehiculos", "categorias", "eventos",
+    "circuito", "drag", "clima",
+]
+
 PLANES = {
-    "basico": ["graficos", "pilotos", "vehiculos", "categorias"],
-    "pro": ["graficos", "pilotos", "vehiculos", "categorias", "eventos", "clima", "drag"],
-    "demo": ["graficos", "pilotos", "vehiculos", "categorias"],
+    # Solo licenciamiento. Se queda con lo que compró.
+    "estandar": {
+        "periodo": "mensual",
+        "revalidar_dias": 7,
+        "features": MODULOS_BASE,
+    },
+
+    # Licenciamiento y mantenimiento: le van llegando las novedades.
+    "premium": {
+        "periodo": "mensual",
+        "revalidar_dias": 7,
+        "features": MODULOS_BASE + ["novedades"],
+    },
+
+    # Todo lo anterior, facturado por año.
+    "platinum": {
+        "periodo": "anual",
+        "revalidar_dias": 30,
+        "features": MODULOS_BASE + ["novedades"],
+    },
 }
+
+# Lo que se le da a un token que no dice de qué plan es.
+PLAN_POR_DEFECTO = "estandar"
+
+
+def features_de(plan: str) -> list:
+    return list(PLANES.get(plan, PLANES[PLAN_POR_DEFECTO])["features"])
+
+
+def periodo_de(plan: str) -> str:
+    return PLANES.get(plan, PLANES[PLAN_POR_DEFECTO])["periodo"]
 
 
 def emitir(
@@ -67,7 +116,8 @@ def emitir(
         "correo": correo,
         "equipo": equipo,
         "plan": plan,
-        "features": PLANES.get(plan, PLANES["basico"]),
+        "features": features_de(plan),
+        "periodo": periodo_de(plan),
         "version_max": version_max,
 
         # Cuánto aguanta después de vencer antes de bloquear, y cada
