@@ -109,6 +109,48 @@ jobs:
           # CasparCG
           Copy-Item Casparcg payload/casparcg -Recurse
 
+          # Sus rutas, resueltas aqui y no en el equipo del cliente.
+          #
+          # El config del repositorio las declara relativas —media/, log/,
+          # data/, template/— porque alli CasparCG vive en la carpeta del
+          # proyecto, donde se puede escribir. Instalado en «Archivos de
+          # programa» no puede, y se niega a arrancar:
+          #
+          #     Failed to create directory media/ (Acceso denegado)
+          #
+          # Se dejan apuntando a ProgramData, que es fijo en Windows y no
+          # depende de donde el cliente decida instalar. Hacerlo aqui y no
+          # con codigo Pascal en el instalador quita una pieza que solo se
+          # podia probar instalando.
+          $datos = 'C:\ProgramData\Race Core Studio'
+          $cfg = 'payload/casparcg/casparcg.config'
+          $texto = Get-Content $cfg -Raw
+
+          $texto = $texto.Replace('<media-path>media/</media-path>',
+                                  "<media-path>$datos\casparcg\media\</media-path>")
+          $texto = $texto.Replace('<log-path disable="false">log/</log-path>',
+                                  "<log-path disable=""false"">$datos\casparcg\log\</log-path>")
+          $texto = $texto.Replace('<data-path>data/</data-path>',
+                                  "<data-path>$datos\casparcg\data\</data-path>")
+          $texto = $texto.Replace('<template-path>template/</template-path>',
+                                  "<template-path>$datos\plantillas\</template-path>")
+
+          # CEF —el navegador con el que CasparCG pinta los graficos—
+          # guarda su cache junto al ejecutable si no se le dice otra
+          # cosa. El config trae la opcion documentada pero fuera de la
+          # configuracion activa, o sea sin efecto.
+          $html = "    <html>`r`n        <cache-path>$datos\casparcg\cef-cache\</cache-path>`r`n    </html>`r`n</configuration>"
+          $texto = $texto.Replace('</configuration>', $html)
+
+          Set-Content $cfg -Value $texto -NoNewline
+
+          Write-Host "`n=== Rutas de CasparCG ==="
+          Select-String -Path $cfg -Pattern '-path' | ForEach-Object { $_.Line.Trim() }
+
+          # Que no quede ninguna relativa sin resolver.
+          $sueltas = Select-String -Path $cfg -Pattern '<(media|log|data|template)-path[^>]*>(media|log|data|template)/<'
+          if ($sueltas) { throw "Quedaron rutas relativas en casparcg.config" }
+
           # MongoDB: solo lo que hace falta para servir. Las herramientas
           # de línea de órdenes y Compass no pintan nada en un autódromo.
           New-Item -ItemType Directory -Force -Path payload/mongodb/bin | Out-Null
