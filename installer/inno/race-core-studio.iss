@@ -83,6 +83,13 @@ Filename: "{app}\mongodb\bin\mongod.exe"; \
 Filename: "{sys}\net.exe"; Parameters: "start ""{#Servicio}"""; \
     StatusMsg: "Arrancando la base de datos..."; Flags: runhidden waituntilterminated
 
+; Valida la licencia, la ata a este equipo, escribe la configuración y
+; genera el token del asistente. Antes de arrancar nada: si la clave no
+; vale, la instalación no debe darse por buena.
+Filename: "{app}\race-core-backend.exe"; \
+    Parameters: "--configurar --correo ""{code:CorreoLicencia}"" --clave ""{code:ClaveLicencia}"""; \
+    StatusMsg: "Comprobando la licencia..."; Flags: runhidden waituntilterminated
+
 Filename: "{app}\{#Ejecutable}"; Description: "Abrir el asistente de configuración"; \
     Flags: nowait postinstall skipifsilent
 
@@ -134,6 +141,21 @@ begin
   PaginaLicencia.Add('Nombre del autódromo o circuito:', False);
 end;
 
+function CorreoLicencia(Valor: String): String;
+begin
+  Result := Trim(PaginaLicencia.Values[0]);
+end;
+
+function ClaveLicencia(Valor: String): String;
+begin
+  Result := Trim(PaginaLicencia.Values[1]);
+end;
+
+function NombreCliente(Valor: String): String;
+begin
+  Result := Trim(PaginaLicencia.Values[2]);
+end;
+
 function NextButtonClick(PaginaActual: Integer): Boolean;
 begin
   Result := True;
@@ -144,9 +166,16 @@ begin
     begin
       MsgBox('Hacen falta el correo y la clave de la licencia.', mbError, MB_OK);
       Result := False;
+    end
+    else if Pos('RCS1-', UpperCase(Trim(PaginaLicencia.Values[1]))) <> 1 then
+    begin
+      // Solo la forma. Si la clave es válida de verdad lo dice el
+      // backend al configurar, que es quien lleva el validador; aquí
+      // solo se atajan las erratas evidentes antes de copiar 250 MB.
+      MsgBox('La clave empieza por RCS1- y lleva cinco bloques.' + #13#10 +
+             'Ejemplo:  RCS1-XXXX-XXXX-XXXX-XXXX', mbError, MB_OK);
+      Result := False;
     end;
-    // TODO: validar la clave aquí mismo, contra el validador que ya
-    // existe. Que el fallo salga ahora y no después de copiar 300 MB.
   end;
 end;
 

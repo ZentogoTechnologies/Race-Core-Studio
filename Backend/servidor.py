@@ -19,7 +19,34 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
+def configurar_desde_argumentos() -> int | None:
+    """--configurar deja el sistema listo en vez de arrancar el servidor.
+
+    Lo llama el instalador justo después de copiar los archivos, con el
+    correo y la clave que escribió el cliente en su página del asistente.
+    """
+    if "--configurar" not in sys.argv:
+        return None
+
+    import argparse
+
+    p = argparse.ArgumentParser(prog="race-core-backend", add_help=False)
+    p.add_argument("--configurar", action="store_true")
+    p.add_argument("--correo", required=True)
+    p.add_argument("--clave", required=True)
+    p.add_argument("--dias", type=int)
+    args, _ = p.parse_known_args()
+
+    from configurar import configurar
+
+    return configurar(args.correo, args.clave, args.dias)
+
+
 def main() -> int:
+    codigo = configurar_desde_argumentos()
+    if codigo is not None:
+        return codigo
+
     # Sin esto, cada proceso hijo que arranque el ejecutable congelado
     # vuelve a ejecutar el programa entero desde el principio, y en
     # Windows eso son instaladores abriéndose en bucle.

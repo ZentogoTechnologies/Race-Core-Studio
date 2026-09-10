@@ -10,6 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # sitios distintos según quién la leyera: el instalador dejaba el token
 # de instalación en la raíz y el backend lo buscaba en Backend/, no lo
 # encontraba, y daba el asistente por no disponible.
+import rutas
+
 BASE_DIR = Path(__file__).resolve().parent
 
 
@@ -41,7 +43,11 @@ def ruta_del_backend(valor: str) -> Path:
 class Settings(BaseSettings):
     # Sin esto el archivo .env no se lee: los valores salian siempre
     # de los defaults de abajo o de variables de entorno sueltas.
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # Ruta absoluta y no ".env" a secas: relativo se resolvería contra el
+    # directorio de trabajo, que instalado es desde donde se pulsó el
+    # acceso directo y no tiene por qué ser ninguno en concreto.
+    model_config = SettingsConfigDict(env_file=str(rutas.DATOS / ".env"),
+                                      extra="ignore")
 
     MONGO_URI: str = "mongodb://localhost:27017"
     DB_NAME: str = "race-core-studio"

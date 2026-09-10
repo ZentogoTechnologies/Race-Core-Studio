@@ -29,6 +29,10 @@ for paquete in ("beanie", "motor", "pymongo", "pydantic", "pydantic_settings",
 # igualmente, pero se declaran para que no dependa del orden de análisis.
 ocultos += collect_submodules("src")
 
+# Se importan solo al usarlos —configurar, o emitir la licencia— así que
+# el analizador no llega a verlos desde servidor.py.
+ocultos += ["configurar", "licencia_local", "emitir", "rutas", "config", "main"]
+
 datos = [
     # La versión, que config.py lee del disco al arrancar.
     (str(RAIZ / "VERSION"), "."),
@@ -44,7 +48,12 @@ datos = [
 
 a = Analysis(
     [str(RAIZ / "Backend" / "servidor.py")],
-    pathex=[str(RAIZ / "Backend")],
+    # El validador de licencias vive en installer/ y el emisor en
+    # tools/licencias/: los usa el modo --configurar y hay que decirle
+    # dónde están, porque no cuelgan de Backend/.
+    pathex=[str(RAIZ / "Backend"),
+            str(RAIZ / "installer"),
+            str(RAIZ / "tools" / "licencias")],
     binaries=[],
     datas=datos,
     hiddenimports=ocultos,

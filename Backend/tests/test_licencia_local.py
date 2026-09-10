@@ -25,7 +25,9 @@ CLAVE = "RCS1-XEA8-EXXK-EUNH-8M63"
 def test_la_clave_buena_valida():
     r = validar(CORREO_AUTORIZADO, CLAVE)
     assert r["ok"]
-    assert r["plan"] == "pro"
+    # Los planes de verdad son estandar, premium y platinum; «pro» era
+    # de relleno, de cuando no estaban decididos.
+    assert r["plan"] == "estandar"
     assert r["dias"] > 0
     assert r["gracia_dias"] > 0
 

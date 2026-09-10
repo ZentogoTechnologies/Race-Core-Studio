@@ -451,24 +451,30 @@ def paso_backend() -> bool:
 
     ok("panel compilado encontrado")
 
-    if not PYTHON_VENV.exists():
-        error("no encuentro el entorno virtual del backend")
-        detalle(f"esperaba: {PYTHON_VENV}")
-        detalle("créalo con:  python -m venv Backend\\venv")
-        return False
-
     # El host sale del .env y no va clavado aqui: con 0.0.0.0 el backend
     # atiende tambien a otras maquinas de la red, que es lo que hace falta
     # cuando alguien opera la interfaz desde su propio equipo.
     host = leer_env().get("API_HOST", "127.0.0.1")
 
+    # Hay dos formas de arrancarlo y solo una existe en cada equipo:
+    # instalado, el ejecutable congelado; en el árbol de desarrollo, el
+    # intérprete del entorno virtual. Se comprueba la que se vaya a usar,
+    # no una fija: exigir el entorno virtual en una instalación es pedir
+    # algo que ahí no existe ni tiene por qué.
     if BACKEND_EXE.is_file():
         orden, donde = [str(BACKEND_EXE)], RAIZ
-    else:
-        # Árbol de desarrollo: no hay ejecutable congelado todavía.
+    elif PYTHON_VENV.exists():
         orden = [str(PYTHON_VENV), "-m", "uvicorn", "main:app",
                  "--host", host, "--port", str(PUERTO_BACKEND)]
         donde = BACKEND
+    else:
+        error("no encuentro con qué arrancar el backend")
+        detalle(f"ni {BACKEND_EXE.name} junto al lanzador")
+        detalle(f"ni el entorno virtual en {PYTHON_VENV}")
+        detalle("")
+        detalle("si es una instalación, vuelve a ejecutar rcs-setup.exe")
+        detalle("si es el repositorio:  python -m venv Backend\\venv")
+        return False
 
     proceso = lanzar(orden, donde, "backend.log")
     print("      arrancando", end="", flush=True)
