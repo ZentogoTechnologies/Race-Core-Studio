@@ -44,7 +44,7 @@ FORMATO = re.compile(rf"^RCS1(-[{ALFABETO}]{{4}}){{4}}$")
 
 # Vigencia que se le da a la licencia emitida en local.
 DIAS = 365
-GRACIA_DIAS = 15
+GRACIA_DIAS = 7
 
 
 def normalizar(clave: str) -> str:
