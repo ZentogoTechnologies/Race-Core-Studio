@@ -5,9 +5,45 @@ from src.services.vehicles_services import VehicleService
 from src.schemas.vehicles_schemas import VehicleCreate, VehicleUpdate, VehicleResponse
 from src.schemas.common_schemas import Page
 from src.services.auth_services import puede_escribir
+from src.services.marcas_services import guardar_logo, listar as listar_marcas
 
 vehicles = APIRouter()
 service = VehicleService()
+
+# ══════════════════════════════════════════════════════════════
+#  CATÁLOGO DE MARCAS
+#
+#  Va antes del listado de vehículos a propósito: "/marcas" tiene que
+#  resolverse aquí y no caer en "/{vehicle_id}", que lo tomaría por el id
+#  de un vehículo llamado "marcas". FastAPI resuelve por orden.
+# ══════════════════════════════════════════════════════════════
+
+@vehicles.get("/marcas", tags=["Vehicles"])
+async def get_marcas(tipo: Optional[str] = Query(
+        None, description="auto, moto o kart. Sin esto vienen todas")):
+    """
+    Las marcas que se pueden elegir, con el logo de cada una
+
+    El logo va vacío en las que no tienen archivo todavía. Se sirve desde
+    aquí y no se copia al panel porque la lista que manda tiene que ser la
+    misma que valida al guardar.
+    """
+    return {"marcas": listar_marcas(tipo)}
+
+
+@vehicles.post("/marcas/{marca}/logo", tags=["Vehicles"],
+               dependencies=[Depends(puede_escribir)])
+async def subir_logo_marca(marca: str, archivo: UploadFile = File(...)):
+    """
+    Sube el logo de una marca del catálogo
+
+    Los logos son marcas registradas y no vienen empaquetados con el
+    sistema: se suben aquí conforme hagan falta. Se guarda como PNG con
+    transparencia, que es lo que necesitan los gráficos.
+    """
+    contenido = await archivo.read()
+    return {"logo_url": guardar_logo(marca, contenido, archivo.filename or "")}
+
 
 @vehicles.get("/", tags=["Vehicles"], response_model=Page[VehicleResponse])
 async def get_vehicles(
