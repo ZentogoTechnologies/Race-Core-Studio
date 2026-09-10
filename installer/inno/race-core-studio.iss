@@ -100,6 +100,19 @@ Filename: "{app}\mongodb\bin\mongod.exe"; Parameters: "--remove --serviceName ""
 Name: "{commonappdata}\{#Nombre}\db";   Permissions: users-modify
 Name: "{commonappdata}\{#Nombre}\logs"; Permissions: users-modify
 
+; CasparCG escribe en las suyas mientras emite: clips que se le manden,
+; registros y datos de sesión. En «Archivos de programa» no puede.
+Name: "{commonappdata}\{#Nombre}\casparcg\media"; Permissions: users-modify
+Name: "{commonappdata}\{#Nombre}\casparcg\log";   Permissions: users-modify
+Name: "{commonappdata}\{#Nombre}\casparcg\data";  Permissions: users-modify
+
+; Las plantillas las siembra el backend al arrancar, pero CasparCG
+; arranca antes que él y exige que la carpeta exista. Que esté vacía la
+; primera vez no importa: nadie saca un gráfico al aire en el segundo
+; que va de un arranque al otro.
+Name: "{commonappdata}\{#Nombre}\plantillas\img";     Permissions: users-modify
+Name: "{commonappdata}\{#Nombre}\casparcg\cef-cache"; Permissions: users-modify
+
 [UninstallDelete]
 ; Lo que el programa escribe dentro de su propia carpeta y que Inno no
 ; puso ahí, así que no sabe que existe.
@@ -173,10 +186,70 @@ begin
   end;
 end;
 
+// ── Las rutas de CasparCG ────────────────────────────────────
+//
+// El casparcg.config que viene del repositorio las declara relativas
+// —media/, log/, data/, template/— porque ahí el servidor vive en la
+// carpeta del proyecto, donde se puede escribir.
+//
+// Instalado no: «Archivos de programa» es de solo lectura para el
+// operador, y CasparCG se niega a arrancar en cuanto no puede crear
+// media/:
+//
+//     Failed to create directory media/ (Acceso denegado)
+//
+// Así que se reescriben apuntando a ProgramData, con el resto de lo que
+// se escribe. Las plantillas van a donde el backend las deja, que es de
+// donde salen los gráficos con el logo del cliente ya puesto.
+
+procedure ApuntarCasparCGaLosDatos;
+var
+  Archivo, Datos: String;
+  Lineas: TArrayOfString;
+  i: Integer;
+begin
+  Archivo := ExpandConstant('{app}\casparcg\casparcg.config');
+  Datos := ExpandConstant('{commonappdata}\{#Nombre}');
+
+  if not LoadStringsFromFile(Archivo, Lineas) then
+  begin
+    Log('No se pudo leer casparcg.config; se deja como estaba.');
+    Exit;
+  end;
+
+  for i := 0 to GetArrayLength(Lineas) - 1 do
+  begin
+    StringChangeEx(Lineas[i], '<media-path>media/</media-path>',
+      '<media-path>' + Datos + '\casparcg\media\</media-path>', True);
+    StringChangeEx(Lineas[i], '<log-path disable="false">log/</log-path>',
+      '<log-path disable="false">' + Datos + '\casparcg\log\</log-path>', True);
+    StringChangeEx(Lineas[i], '<data-path>data/</data-path>',
+      '<data-path>' + Datos + '\casparcg\data\</data-path>', True);
+    StringChangeEx(Lineas[i], '<template-path>template/</template-path>',
+      '<template-path>' + Datos + '\plantillas\</template-path>', True);
+
+    // CEF —el navegador con el que CasparCG pinta los gráficos— guarda
+    // su caché junto al ejecutable si no se le dice otra cosa, y ahí
+    // tampoco puede escribir. El config que viene no trae la sección
+    // activa, así que se añade antes de cerrar la configuración.
+    StringChangeEx(Lineas[i], '</configuration>',
+      '    <html>' + #13#10 +
+      '        <cache-path>' + Datos + '\casparcg\cef-cache\</cache-path>' + #13#10 +
+      '    </html>' + #13#10 +
+      '</configuration>', True);
+  end;
+
+  if not SaveStringsToFile(Archivo, Lineas, False) then
+    Log('No se pudo escribir casparcg.config.');
+end;
+
 procedure CurStepChanged(Paso: TSetupStep);
 begin
   if Paso = ssPostInstall then
+  begin
+    ApuntarCasparCGaLosDatos;
     RenombrarDesinstalador;
+  end;
 end;
 
 // ── Al desinstalar ───────────────────────────────────────────
