@@ -6,6 +6,7 @@ import {
   Shield, Flag, Zap, Repeat, SlidersHorizontal,
 } from 'lucide-react'
 import NavItem from '../components/layout/NavItem'
+import { VERSION } from '../version'
 import { useAuth } from '../context/AuthContext'
 import { useDisciplina } from '../context/DisciplinaContext'
 
@@ -120,6 +121,15 @@ export default function MainLayout() {
             <LogOut size={18} />
             {isSidebarOpen && <span className="font-semibold text-sm">{t('Cerrar Sesión')}</span>}
           </button>
+
+          {/* La versión, siempre a la vista: cuando un autódromo llama
+              para reportar algo, lo primero que hace falta saber es qué
+              está corriendo, y hasta ahora no había forma de mirarlo. */}
+          {isSidebarOpen && (
+            <p className="mt-3 px-1 text-[10px] tracking-wider text-neutral-600">
+              Race Core Studio v{VERSION}
+            </p>
+          )}
         </div>
       </aside>
 

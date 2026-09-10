@@ -1,5 +1,11 @@
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+
+// La versión sale del archivo VERSION de la raíz, que es de donde la leen
+// también el backend y los instaladores. Escribirla aquí a mano era una
+// cuarta copia que tarde o temprano deja de coincidir con las otras.
+const VERSION = readFileSync(new URL('../VERSION', import.meta.url), 'utf8').trim()
 
 // El backend, visto desde esta máquina. Solo lo usa el proxy de
 // desarrollo; en producción el propio backend sirve el frontend y no hay
@@ -7,6 +13,7 @@ import react from '@vitejs/plugin-react'
 const BACKEND = process.env.BACKEND_URL || 'http://127.0.0.1:8080'
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(VERSION) },
   plugins: [react()],
   server: {
     port: Number(process.env.PORT) || 5173,

@@ -123,6 +123,19 @@ def raiz_proyecto() -> Path:
 
 
 RAIZ = raiz_proyecto()
+
+
+def _version() -> str:
+    """La versión instalada, del archivo VERSION que va con el programa."""
+    for candidato in (RAIZ / "VERSION", Path(getattr(sys, "_MEIPASS", RAIZ)) / "VERSION"):
+        try:
+            return candidato.read_text(encoding="utf-8").strip()
+        except OSError:
+            continue
+    return "0.0.0-dev"
+
+
+VERSION = _version()
 CASPARCG = RAIZ / "Casparcg" / "casparcg.exe"
 BACKEND = RAIZ / "Backend"
 FRONTEND = RAIZ / "Frontend"
@@ -532,7 +545,7 @@ def main():
         esperar_enter()
         return 0
 
-    print(f"\n{NEGRITA}  RACE CORE STUDIO{FIN}")
+    print(f"\n{NEGRITA}  RACE CORE STUDIO{FIN}  {GRIS}v{VERSION}{FIN}")
     print(f"{GRIS}  {RAIZ}{FIN}")
 
     pasos = [

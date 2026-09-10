@@ -13,6 +13,22 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 BASE_DIR = Path(__file__).resolve().parent
 
 
+def _version() -> str:
+    """La versión, de un solo sitio: el archivo VERSION de la raíz.
+
+    Estaba escrita a mano en cuatro lugares —aquí, package.json y los dos
+    recursos de versión de los ejecutables—, que es la forma segura de que
+    acaben discrepando y de que un cliente informe de un fallo citando una
+    versión que no es la suya.
+    """
+    for candidato in (BASE_DIR / "VERSION", BASE_DIR.parent / "VERSION"):
+        try:
+            return candidato.read_text(encoding="utf-8").strip()
+        except OSError:
+            continue
+    return "0.0.0-dev"
+
+
 def ruta_del_backend(valor: str) -> Path:
     """Una ruta de los ajustes, anclada a la carpeta del backend.
 
@@ -144,7 +160,7 @@ class Settings(BaseSettings):
     # ── Instalación ──────────────────────────────────────────
     # Versión del producto. Fuente única: la reportan /setup/estado y el
     # actualizador, y con ella el manifiesto decide si hay algo nuevo.
-    APP_VERSION: str = "1.0.0"
+    APP_VERSION: str = _version()
 
     # Token de un solo uso que protege el asistente de instalación. Lo
     # escribe el instalador y se borra al terminar. Sin él, cualquiera en

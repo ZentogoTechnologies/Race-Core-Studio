@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { User, Shield, Loader2 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { VERSION } from '../../version'
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('')
@@ -111,6 +112,10 @@ export default function LoginScreen() {
             {enviando ? 'VERIFICANDO...' : 'INGRESAR AL SISTEMA'}
           </button>
         </form>
+
+        <p className="mt-6 text-center text-[11px] tracking-wider text-neutral-600">
+          Race Core Studio v{VERSION} · Zentogo Technologies
+        </p>
       </div>
     </div>
   )

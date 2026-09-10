@@ -42,6 +42,25 @@ DESTINO_POR_DEFECTO = Path("C:/Race-Core-Studio") if os.name == "nt" \
 
 TOTAL = 7
 
+
+def _version() -> str:
+    """La versión que se está instalando.
+
+    Congelado viaja dentro del .exe (--add-data VERSION); suelto se lee
+    del repositorio. Hace falta antes de descargar nada, así que no puede
+    salir de la copia que todavía no existe en el disco del cliente.
+    """
+    aqui = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+    for candidato in (aqui / "VERSION", aqui.parent / "VERSION"):
+        try:
+            return candidato.read_text(encoding="utf-8").strip()
+        except OSError:
+            continue
+    return "0.0.0-dev"
+
+
+VERSION = _version()
+
 ROJO, VERDE, AMARILLO, AZUL, GRIS, NEGRITA, FIN = (
     "\033[91m", "\033[92m", "\033[93m", "\033[94m", "\033[90m", "\033[1m", "\033[0m",
 )
@@ -851,7 +870,7 @@ def main() -> int:
     p.add_argument("--no-abrir", action="store_true")
     args = p.parse_args()
 
-    print(f"\n{NEGRITA}  RACE CORE STUDIO · INSTALADOR{FIN}")
+    print(f"\n{NEGRITA}  RACE CORE STUDIO · INSTALADOR{FIN}  {GRIS}v{VERSION}{FIN}")
     print(f"{GRIS}  Zentogo Technologies{FIN}")
     print(f"{AMARILLO}  Versión de pruebas: la licencia no se valida contra "
           f"el servidor todavía.{FIN}")
