@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown, ImagePlus, Loader2, Search, X } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ImagePlus, Loader2, Search, X } from 'lucide-react'
 import { t } from '../../i18n'
 import { listarMarcas, subirLogoMarca, urlLogoMarca } from '../../api/registro'
 import { urlBandera } from '../../data/paises'
@@ -160,9 +160,17 @@ export default function SelectorMarca({ valor, onChange, puedeSubirLogo = true }
           : elegida
             ? <><Marca m={elegida} />
                 <span className="text-white truncate">{elegida.nombre}</span></>
-            : <span className="text-neutral-600 truncate">
-                {valor ? valor : t('Sin marca')}
-              </span>}
+            : valor
+              /* Lo que ya estaba inscrito y no sale en la lista se enseña
+                 tal cual, en ámbar. Pintarlo como "Sin marca" haría creer
+                 que el dato se perdió, y no se perdió: sigue guardado y
+                 sigue saliendo al aire. Solo hay que sustituirlo por una
+                 marca de la lista, y en ámbar se ve cuál falta por tocar. */
+              ? <><AlertTriangle size={14} className="text-amber-500 flex-shrink-0" />
+                  <span className="text-amber-400 truncate" title={t('Fuera del catálogo')}>
+                    {valor}
+                  </span></>
+              : <span className="text-neutral-600 truncate">{t('Sin marca')}</span>}
 
         {elegida && (
           <span

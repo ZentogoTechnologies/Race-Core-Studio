@@ -13,10 +13,10 @@ queda como está.
     python migrar_marcas.py            # dice qué haría
     python migrar_marcas.py --aplicar  # lo hace
 
-Lo que no corresponde a ninguna marca —"00", "rush"— se vacía, porque un
-valor que el formulario ya no admite tampoco se puede corregir desde el
-panel sin borrarlo antes. Esos vehículos se listan al final para que
-alguien les ponga la marca buena.
+Este script no borra nada. Lo que no corresponde a ninguna marca —"00",
+"rush"— se deja intacto y se lista al final. Vaciarlo sería decidir por
+quien inscribió el carro: un dato raro se arregla mirándolo, pero borrado
+no se arregla, se pierde. Y lo que ya está inscrito se respeta.
 """
 
 import asyncio
@@ -35,7 +35,7 @@ async def main(aplicar: bool):
     cliente = AsyncIOMotorClient(settings.MONGO_URI)
     vehiculos = cliente[settings.DB_NAME]["vehicles"]
 
-    cambios, vaciar, iguales = [], [], 0
+    cambios, ajenas, iguales = [], [], 0
 
     campos = {"vehicle_id": 1, "number": 1, "brand": 1, "model": 1}
 
@@ -48,23 +48,23 @@ async def main(aplicar: bool):
         bueno = normalizar(valor)
 
         if bueno is None:
-            vaciar.append((v["_id"], v.get("vehicle_id"), etiqueta))
+            ajenas.append((v.get("vehicle_id"), etiqueta))
         elif bueno == valor:
             iguales += 1
         else:
             cambios.append((v["_id"], valor, bueno))
 
     print(f"{len(cambios)} por normalizar, {iguales} ya correctas, "
-          f"{len(vaciar)} sin marca en el catálogo")
+          f"{len(ajenas)} fuera del catálogo (se dejan como están)")
 
     if cambios:
         print("\nSe normalizan:")
         for _, viejo, nuevo in sorted(cambios, key=lambda c: c[1].lower()):
             print(f"  {viejo!r} -> {nuevo}")
 
-    if vaciar:
-        print("\nNo son marcas, se vacían. Corrígelos desde el panel:")
-        for _, vid, etiqueta in vaciar:
+    if ajenas:
+        print("\nFuera del catálogo. No se tocan; míralas en el panel:")
+        for vid, etiqueta in ajenas:
             print(f"  vehiculo {vid}: {etiqueta}")
 
     if not aplicar:
@@ -74,10 +74,7 @@ async def main(aplicar: bool):
     for _id, _, bueno in cambios:
         await vehiculos.update_one({"_id": _id}, {"$set": {"brand": bueno}})
 
-    for _id, _, _ in vaciar:
-        await vehiculos.update_one({"_id": _id}, {"$set": {"brand": None}})
-
-    print(f"\n{len(cambios)} normalizadas, {len(vaciar)} vaciadas.")
+    print(f"\n{len(cambios)} normalizadas. Ninguna borrada.")
 
 
 if __name__ == "__main__":
