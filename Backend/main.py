@@ -43,6 +43,15 @@ from src.services.license_services import licencia_vigente
 # CasparCG
 from src.services.casparcg_client import casparcg
 
+import rutas
+
+# Antes que nada: los montajes de StaticFiles de más abajo ocurren al
+# importar este módulo, y exigen que la carpeta exista. Congelado, la
+# primera vez no existe ninguna —los datos van a ProgramData, que está
+# vacío— así que se crean aquí, no en lifespan, que corre después.
+rutas.preparar()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     client = AsyncMongoClient(settings.MONGO_URI)
@@ -117,7 +126,7 @@ app.add_middleware(
 # aquí, así que el backend debe estar corriendo para que se vean al aire.
 app.mount(
     "/public",
-    StaticFiles(directory=Path(__file__).parent / "src" / "public"),
+    StaticFiles(directory=rutas.PUBLICO),
     name="public",
 )
 
@@ -232,7 +241,7 @@ app.include_router(timing, prefix="/api/v1/timing", tags=["Timing"])
 #  el navegador pide siempre a quien le dio la página.
 # ======================================================================
 
-FRONTEND_DIST = Path(__file__).resolve().parent.parent / "Frontend" / "dist"
+FRONTEND_DIST = rutas.PANEL
 
 
 class FrontendSPA(StaticFiles):

@@ -18,9 +18,11 @@ from src.schemas.events_schemas import (
 )
 from src.services.pagination import campo_orden, combinar, direccion, filtro_busqueda
 
+import rutas
+
 
 # Backend/src/public/eventos, mirando desde Backend/src/services.
-CARPETA_IMAGENES = Path(__file__).resolve().parents[1] / "public" / "eventos"
+CARPETA_IMAGENES = rutas.PUBLICO / "eventos"
 
 RUTA_RELATIVA = "eventos"
 

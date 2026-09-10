@@ -15,11 +15,13 @@ from src.services.pagination import (
 )
 from fastapi import HTTPException
 
+import rutas
+
 # Backend/src/public/pilotos, mirando desde Backend/src/services. Las
 # fotos subidas van a la raíz de pilotos/ y no a una subcarpeta de
 # categoría: un piloto puede correr en varias, y el campo `photo` guarda
 # la ruta exacta, así que no hace falta adivinarla después.
-CARPETA_FOTOS = Path(__file__).resolve().parents[1] / "public" / "pilotos"
+CARPETA_FOTOS = rutas.PUBLICO / "pilotos"
 
 RUTA_RELATIVA = "pilotos"
 

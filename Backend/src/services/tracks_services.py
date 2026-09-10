@@ -16,11 +16,12 @@ from fastapi import HTTPException
 
 from src.models.tracks_model import Trazado
 
+import rutas
+
 # Backend/src/public/circuit-image, mirando desde Backend/src/services.
 # Las imágenes viven con el resto del material del cliente —fotos de
 # pilotos, logos de marcas— y no dentro de la carpeta de CasparCG.
-RAIZ = Path(__file__).resolve().parents[3]
-CARPETA_IMAGENES = RAIZ / "Backend" / "src" / "public" / "circuit-image"
+CARPETA_IMAGENES = rutas.PUBLICO / "circuit-image"
 
 EXTENSIONES = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
 

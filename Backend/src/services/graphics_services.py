@@ -20,6 +20,8 @@ from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
 from src.services.casparcg_client import casparcg
 
+import rutas
+
 
 # ── Catálogo ──────────────────────────────────────────────────
 
@@ -153,7 +155,7 @@ def serialize_data(data: dict) -> str:
 
 # ── Fotos de pilotos y logos de marcas ────────────────────────
 
-PUBLIC_DIR = Path(__file__).resolve().parents[2] / "src" / "public"
+PUBLIC_DIR = rutas.PUBLICO
 
 # Formatos que CEF (el navegador de CasparCG) sabe pintar.
 EXTENSIONES = (".png", ".jpg", ".jpeg", ".webp", ".avif")

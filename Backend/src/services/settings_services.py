@@ -16,13 +16,15 @@ from typing import Optional
 from config import settings
 from src.models.settings_model import Ajustes
 
+import rutas
+
 # Valor vivo del proceso. None significa "usa el del .env".
 _ruta_timing: Optional[str] = None
 
 # Dónde se buscan XML para ofrecerlos en la lista. La carpeta public es la
 # que ya se usa para material del proyecto.
 CARPETAS_CANDIDATAS = [
-    Path(__file__).resolve().parents[1] / "public",
+    rutas.PUBLICO,
 ]
 
 # ── Logo del cliente ──────────────────────────────────────────────
@@ -32,12 +34,10 @@ CARPETAS_CANDIDATAS = [
 # sitio y en PNG, sea cual sea el formato que suban: así la ruta de las
 # plantillas es fija y no hay que tocarlas nunca más.
 
-RAIZ = Path(__file__).resolve().parents[3]
-
-LOGO_CLIENTE = RAIZ / "Casparcg" / "template" / "img" / "logo-cliente.png"
+LOGO_CLIENTE = rutas.PLANTILLAS / "img" / "logo-cliente.png"
 
 # El de fábrica, que no se toca: es a donde se vuelve al quitar el suyo.
-LOGO_FABRICA = RAIZ / "Casparcg" / "template" / "img" / "logoap.png"
+LOGO_FABRICA = rutas.PLANTILLAS / "img" / "logoap.png"
 
 
 def url_logo_cliente() -> str:
@@ -353,16 +353,16 @@ def xml_detectados() -> list[dict]:
 # Elegir una reescribe tipografia_activa.css, que es lo único que leen las
 # plantillas. No se toca el CSS de las caras, que es el pesado.
 
-CSS_TIPOGRAFIA = RAIZ / "Casparcg" / "template" / "css" / "tipografia_activa.css"
+CSS_TIPOGRAFIA = rutas.PLANTILLAS / "css" / "tipografia_activa.css"
 
 # Donde viven los .woff2. Los sirve el backend en /media/fonts para que el
 # panel pueda enseñar cada letra antes de elegirla.
-CARPETA_FUENTES = RAIZ / "Casparcg" / "template" / "fonts"
+CARPETA_FUENTES = rutas.PLANTILLAS / "fonts"
 
 # Las banderas de los paises. Viven junto a la plantilla porque es quien
 # las pinta al aire —las lee por file://, sin pasar por el backend— y el
 # panel las ve en /media/banderas. Un solo archivo por pais, no dos.
-CARPETA_BANDERAS = RAIZ / "Casparcg" / "template" / "img" / "banderas"
+CARPETA_BANDERAS = rutas.PLANTILLAS / "img" / "banderas"
 
 # Los codigos que de verdad tienen bandera en disco. Se leen una vez al
 # arrancar: son 255 archivos y preguntarselo al disco en cada alta de
@@ -467,9 +467,9 @@ async def guardar_fuente(tipografia_id: str) -> str:
 # sí se puede cargar con un <script src>. Mismo truco que con la
 # tipografía, y por la misma razón.
 
-CARPETA_TEXTOS = RAIZ / "Casparcg" / "template" / "i18n"
+CARPETA_TEXTOS = rutas.PLANTILLAS / "i18n"
 
-JS_IDIOMA = RAIZ / "Casparcg" / "template" / "js" / "idioma_activo.js"
+JS_IDIOMA = rutas.PLANTILLAS / "js" / "idioma_activo.js"
 
 # El ingles queda apagado a peticion del cliente. La traduccion esta hecha
 # y se conserva entera —template/i18n/*.json y Frontend/src/i18n/en.json—:

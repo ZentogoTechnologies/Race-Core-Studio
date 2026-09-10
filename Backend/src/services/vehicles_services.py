@@ -16,8 +16,10 @@ from src.services.pagination import (
 )
 from fastapi import HTTPException
 
+import rutas
+
 # Backend/src/public/vehiculos, mirando desde Backend/src/services.
-CARPETA_FOTOS = Path(__file__).resolve().parents[1] / "public" / "vehiculos"
+CARPETA_FOTOS = rutas.PUBLICO / "vehiculos"
 
 RUTA_RELATIVA = "vehiculos"
 

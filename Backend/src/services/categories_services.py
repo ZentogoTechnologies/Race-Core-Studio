@@ -14,8 +14,10 @@ from src.services.pagination import (
 )
 from fastapi import HTTPException
 
+import rutas
+
 # Backend/src/public/categorias, mirando desde Backend/src/services.
-CARPETA_LOGOS = Path(__file__).resolve().parents[1] / "public" / "categorias"
+CARPETA_LOGOS = rutas.PUBLICO / "categorias"
 
 RUTA_RELATIVA = "categorias"
 
