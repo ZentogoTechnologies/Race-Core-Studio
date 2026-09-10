@@ -18,6 +18,7 @@
 #define Version       "1.0.0"
 #define Ejecutable    "race-core-studio.exe"
 #define Desinstalador "uninstaller.exe"
+#define Servicio      "RaceCoreStudioDB"
 
 ; Fijo y para siempre: es lo que permite que la próxima versión se
 ; reconozca como actualización y no como un segundo programa.
@@ -72,8 +73,32 @@ Name: "{autodesktop}\{#Nombre}";     Filename: "{app}\{#Ejecutable}"; Tasks: esc
 Name: "escritorio"; Description: "Crear acceso directo en el escritorio"; GroupDescription: "Accesos:"
 
 [Run]
+; MongoDB, registrado como servicio para que arranque con Windows. El
+; lanzador solo comprueba que responde; quien lo levanta es Windows,
+; antes de que nadie toque nada.
+Filename: "{app}\mongodb\bin\mongod.exe"; \
+    Parameters: "--dbpath ""{commonappdata}\{#Nombre}\db"" --logpath ""{commonappdata}\{#Nombre}\logs\mongod.log"" --install --serviceName ""{#Servicio}"" --serviceDisplayName ""{#Nombre} — Base de datos"""; \
+    StatusMsg: "Registrando la base de datos..."; Flags: runhidden waituntilterminated
+
+Filename: "{sys}\net.exe"; Parameters: "start ""{#Servicio}"""; \
+    StatusMsg: "Arrancando la base de datos..."; Flags: runhidden waituntilterminated
+
 Filename: "{app}\{#Ejecutable}"; Description: "Abrir el asistente de configuración"; \
     Flags: nowait postinstall skipifsilent
+
+[UninstallRun]
+; Al desinstalar, en orden inverso: primero parar, después quitar el
+; servicio. Los datos no se tocan aquí; de eso se ocupa el código.
+Filename: "{sys}\net.exe"; Parameters: "stop ""{#Servicio}"""; \
+    Flags: runhidden; RunOnceId: "PararMongo"
+Filename: "{app}\mongodb\bin\mongod.exe"; Parameters: "--remove --serviceName ""{#Servicio}"""; \
+    Flags: runhidden; RunOnceId: "QuitarMongo"
+
+[Dirs]
+; La base de datos y los registros, donde se puede escribir. Nunca bajo
+; «Archivos de programa», que es de solo lectura para el operador.
+Name: "{commonappdata}\{#Nombre}\db";   Permissions: users-modify
+Name: "{commonappdata}\{#Nombre}\logs"; Permissions: users-modify
 
 [UninstallDelete]
 ; Lo que el programa escribe dentro de su propia carpeta y que Inno no

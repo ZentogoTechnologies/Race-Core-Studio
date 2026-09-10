@@ -1,0 +1,208 @@
+# Construye el instalador de verdad: rcs-setup.exe con interfaz de Inno
+# Setup y todo el producto ya compilado dentro.
+#
+# La diferencia con el flujo viejo es dónde se compila. Antes el .exe era
+# un guion que clonaba el repositorio en la máquina del cliente y
+# compilaba allí: veinte minutos, una terminal y una carpeta con el
+# proyecto entero. Aquí se compila en esta máquina, y el cliente recibe
+# el resultado.
+
+name: Instalador con interfaz
+
+on:
+  push:
+    branches: [test-production-1.0, main]
+    paths:
+      - 'installer/**'
+      - 'launcher/**'
+      - 'Backend/**'
+      - 'Frontend/**'
+      - 'Casparcg/template/**'
+      - 'VERSION'
+      - '.github/workflows/instalador-inno.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # La de MongoDB que se empaqueta. Fijada a propósito: que la versión de
+  # la base de datos cambie sola entre dos compilaciones es justo lo que
+  # no se quiere en un producto que se instala en sitios sin soporte.
+  MONGO_VERSION: 7.0.14
+
+jobs:
+  construir:
+    runs-on: windows-latest
+
+    steps:
+      - name: Traer el código
+        uses: actions/checkout@v4
+        with:
+          # Con LFS: aquí sí hacen falta los binarios de CasparCG, que
+          # viajan dentro del paquete.
+          lfs: true
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Comprobar que la versión cuadra en todas partes
+        run: python tools/version.py
+
+      - name: Dependencias del backend
+        run: |
+          python -m pip install --upgrade pip
+          # Sin rembg: son 200 MB de onnxruntime para recortar fondos de
+          # fotos, y se importa solo al usarlo.
+          Get-Content Backend/requirements.txt |
+            Where-Object { $_ -notmatch '^\s*(#|$)' -and $_ -notmatch 'rembg' } |
+            Set-Content requisitos-sin-rembg.txt
+          pip install -r requisitos-sin-rembg.txt
+          pip install pyinstaller
+
+      - name: Compilar el panel
+        working-directory: Frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Congelar el backend
+        run: pyinstaller Backend/backend.spec --noconfirm --clean --distpath dist-backend
+
+      - name: Congelar el lanzador
+        run: |
+          pyinstaller --onefile --console --clean --noconfirm --noupx `
+            --name race-core-studio `
+            --icon launcher/race-core-studio.ico `
+            --version-file launcher/version-info.txt `
+            --hidden-import pymongo `
+            --add-data "VERSION;." `
+            --distpath dist-launcher `
+            launcher/race_core_studio.py
+
+      - name: Bajar MongoDB
+        run: |
+          $url = "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-$env:MONGO_VERSION.zip"
+          Write-Host "Bajando $url"
+          Invoke-WebRequest -Uri $url -OutFile mongo.zip
+          Expand-Archive mongo.zip -DestinationPath mongo-tmp
+
+      - name: Armar el paquete
+        run: |
+          New-Item -ItemType Directory -Force -Path payload | Out-Null
+
+          # El programa
+          Copy-Item dist-backend/race-core-backend.exe payload/
+          Copy-Item dist-launcher/race-core-studio.exe  payload/
+          Copy-Item VERSION                             payload/
+
+          # El panel ya compilado
+          Copy-Item Frontend/dist payload/panel -Recurse
+
+          # CasparCG
+          Copy-Item Casparcg payload/casparcg -Recurse
+
+          # MongoDB: solo lo que hace falta para servir. Las herramientas
+          # de línea de órdenes y Compass no pintan nada en un autódromo.
+          New-Item -ItemType Directory -Force -Path payload/mongodb/bin | Out-Null
+          $origen = (Get-ChildItem mongo-tmp -Directory | Select-Object -First 1).FullName
+          Copy-Item "$origen/bin/mongod.exe" payload/mongodb/bin/
+          if (Test-Path "$origen/bin/mongod.cfg") {
+            Copy-Item "$origen/bin/mongod.cfg" payload/mongodb/bin/
+          }
+
+          Write-Host "`n=== El paquete ==="
+          Get-ChildItem payload | Format-Table Name, Length
+          "{0:N0} MB en total" -f ((Get-ChildItem payload -Recurse |
+            Measure-Object Length -Sum).Sum / 1MB)
+
+      - name: Comprobar que el backend congelado arranca
+        run: |
+          # No instala nada: solo obliga a cargar todos los módulos. Si a
+          # PyInstaller le faltó alguno, se ve aquí y no en un autódromo.
+          $p = Start-Process payload/race-core-backend.exe -PassThru `
+                 -RedirectStandardOutput arranque.log -RedirectStandardError arranque.err
+          Start-Sleep -Seconds 25
+          $vivo = -not $p.HasExited
+          if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force }
+          Write-Host "--- salida ---"; Get-Content arranque.log, arranque.err -EA SilentlyContinue
+          # Sin MongoDB detrás no llega a servir, pero sí tiene que pasar
+          # de las importaciones. Morir antes de eso es un módulo que falta.
+          if (-not $vivo) {
+            $texto = (Get-Content arranque.log, arranque.err -Raw -EA SilentlyContinue)
+            if ($texto -match "ModuleNotFoundError|ImportError") {
+              throw "Al backend congelado le falta un módulo. Ver arriba."
+            }
+          }
+
+      - name: Instalar Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Compilar el instalador
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\inno\race-core-studio.iss
+          Get-ChildItem dist
+
+      - name: Huella
+        id: huella
+        run: |
+          $h = (Get-FileHash dist/rcs-setup.exe -Algorithm SHA256).Hash.ToLower()
+          "sha256=$h" >> $env:GITHUB_OUTPUT
+          Write-Host "SHA-256: $h"
+
+      - name: Guardar el instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcs-setup
+          path: dist/rcs-setup.exe
+
+      - name: Publicar la descarga
+        if: github.ref == 'refs/heads/test-production-1.0'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: instalador
+          name: Race Core Studio — instalador
+          body: |
+            **rcs-setup.exe** — instalador de Race Core Studio.
+
+            Asistente con interfaz. Instala el programa ya compilado:
+            no descarga código ni compila nada en el equipo.
+
+            Incluye CasparCG y MongoDB. No hacen falta Python, Node ni
+            Git.
+
+            Los datos del autódromo se guardan en
+            `C:\ProgramData\Race Core Studio`, aparte del programa, para
+            que actualizar o reinstalar no los toque.
+
+            ### Antivirus
+
+            El ejecutable **no va firmado** todavía: Windows lo marcará
+            como «editor desconocido» y Defender puede llegar a borrarlo
+            con `Trojan:Win32/Wacatac.B!ml`. El sufijo `!ml` significa
+            que no coincide con ningún malware conocido — es el modelo
+            heurístico puntuando un binario sin firma. Se arregla de
+            verdad con un certificado Authenticode.
+
+            Se compila en un runner limpio de GitHub desde el código de
+            este repositorio, y su huella es comprobable:
+
+            ```
+            SHA-256  ${{ steps.huella.outputs.sha256 }}
+            ```
+
+            ```powershell
+            Get-FileHash rcs-setup.exe -Algorithm SHA256
+            ```
+
+            Compilado desde `${{ github.sha }}`.
+          files: dist/rcs-setup.exe
+          prerelease: true
+          make_latest: false

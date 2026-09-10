@@ -1,0 +1,76 @@
+CONTRATO DE LICENCIA DE USO — RACE CORE STUDIO
+
+ESTE ES UN TEXTO PROVISIONAL. Antes de vender, tiene que sustituirlo un
+contrato redactado por un abogado. Lo de abajo describe cómo funciona el
+software de verdad, para que sirva de guion a quien lo redacte, pero no
+es un documento con validez legal revisada.
+
+1. OBJETO
+
+Zentogo Technologies concede al Cliente una licencia de uso, no
+exclusiva e intransferible, del software Race Core Studio, en los
+términos que siguen.
+
+2. LICENCIA POR EQUIPO
+
+La licencia habilita el uso en UN (1) equipo. Al activarse queda
+asociada de forma permanente al identificador de ese equipo. Trasladarla
+a otro equipo requiere autorización expresa de Zentogo Technologies.
+
+3. PLANES Y VIGENCIA
+
+   Estándar   Mensual. Licenciamiento.
+   Premium    Mensual. Licenciamiento y mantenimiento; incluye las
+              funcionalidades que se publiquen durante su vigencia.
+   Platinum   Anual. Todo lo anterior.
+
+Los planes mensuales requieren comprobación periódica en línea. La
+ausencia prolongada de conexión no interrumpe el servicio de inmediato:
+para eso está el periodo de gracia.
+
+4. VENCIMIENTO
+
+Al vencer la licencia comienza un periodo de gracia de SIETE (7) días
+naturales, durante el cual el software sigue operando y avisa de su
+situación. Agotado ese periodo, el software se bloquea y deja de
+operar.
+
+El bloqueo NO borra dato alguno del Cliente. Los pilotos, vehículos,
+categorías, eventos, fotografías, logotipos, históricos de carreras y
+configuración permanecen íntegros en el equipo, y vuelven a estar
+disponibles al renovar.
+
+5. DATOS DEL CLIENTE
+
+Los datos introducidos o generados por el Cliente son de su propiedad.
+Se almacenan en su propio equipo. Zentogo Technologies no accede a ellos
+ni los transmite fuera del equipo del Cliente.
+
+6. ACTUALIZACIONES
+
+Las actualizaciones de seguridad y de corrección se publican para todos
+los planes. Las funcionalidades nuevas quedan habilitadas según el plan
+contratado. Ninguna actualización se aplica sin que el Cliente la
+acepte.
+
+7. PROPIEDAD INTELECTUAL
+
+El software es propiedad de Zentogo Technologies. Esta licencia no
+transfiere titularidad alguna. Queda prohibida su descompilación,
+ingeniería inversa, redistribución o cesión a terceros.
+
+8. COMPONENTES DE TERCEROS
+
+Race Core Studio incorpora CasparCG (servidor de gráficos) y MongoDB
+(base de datos), cada uno sujeto a su propia licencia, que se distribuye
+con ellos y prevalece sobre este contrato en lo que a ellos respecta.
+
+9. GARANTÍA Y RESPONSABILIDAD
+
+[A redactar por asesoría legal, atendiendo a la jurisdicción de venta.]
+
+10. LEY APLICABLE
+
+[A redactar por asesoría legal.]
+
+Zentogo Technologies

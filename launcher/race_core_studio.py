@@ -136,11 +136,45 @@ def _version() -> str:
 
 
 VERSION = _version()
-CASPARCG = RAIZ / "Casparcg" / "casparcg.exe"
+
+
+def rutas_de_datos() -> Path:
+    """Donde el backend guarda lo del cliente. Igual que Backend/rutas.py.
+
+    No se importa aquel módulo porque el lanzador se congela aparte y no
+    lleva el backend dentro; son ocho líneas y duplicarlas cuesta menos
+    que arrastrar todo el paquete.
+    """
+    forzada = os.environ.get("RCS_DATOS")
+    if forzada:
+        return Path(forzada).expanduser().resolve()
+    if os.name == "nt":
+        return Path(os.environ.get("ProgramData", r"C:\ProgramData")) / "Race Core Studio"
+    return Path.home() / ".local" / "share" / "Race Core Studio"
+# Instalado, cada cosa está junto al lanzador y en minúsculas; sin
+# congelar, donde la deja el repositorio. Se prueban los dos sitios y
+# manda el que exista, para que el mismo archivo sirva en las dos
+# situaciones sin una bandera que haya que acordarse de poner.
+
+def _elegir(*candidatas: Path) -> Path:
+    for c in candidatas:
+        if c.exists():
+            return c
+    return candidatas[0]
+
+
+CASPARCG = _elegir(RAIZ / "casparcg" / "casparcg.exe",
+                   RAIZ / "Casparcg" / "casparcg.exe")
+
+# El backend congelado. Cuando no está —árbol de desarrollo— se recurre
+# al intérprete del entorno virtual, que es como se arrancaba antes.
+BACKEND_EXE = RAIZ / "race-core-backend.exe"
 BACKEND = RAIZ / "Backend"
-FRONTEND = RAIZ / "Frontend"
 PYTHON_VENV = BACKEND / "venv" / "Scripts" / "python.exe"
-LOGS = RAIZ / "logs"
+
+# Instalado, el programa vive en «Archivos de programa», que es de solo
+# lectura: los registros van con el resto de datos del cliente.
+LOGS = _elegir(rutas_de_datos() / "logs", RAIZ / "logs")
 PIDS = LOGS / "procesos.json"
 
 PUERTO_CASPARCG = 5250
@@ -150,7 +184,9 @@ PUERTO_BACKEND = 8080
 URL_PANEL = f"http://127.0.0.1:{PUERTO_BACKEND}/"
 
 # Lo que el backend sirve como panel. Sin esto solo respondería el API.
-FRONTEND_DIST = FRONTEND / "dist"
+# Instalado se llama «panel» y está junto al lanzador; en desarrollo es
+# Frontend/dist, donde lo deja Vite.
+FRONTEND_DIST = _elegir(RAIZ / "panel", RAIZ / "Frontend" / "dist")
 
 
 # ─── Utilidades ──────────────────────────────────────────────
@@ -346,7 +382,10 @@ def paso_base_de_datos() -> bool:
     except Exception as e:
         error("no se pudo conectar")
         detalle(f"{type(e).__name__}: {str(e)[:120]}")
-        detalle("si MongoDB corre como servicio:  net start MongoDB")
+        # El instalador lo registra con este nombre; una instalación
+        # anterior, o un MongoDB que ya tuviera el cliente, usa el suyo.
+        detalle("arráncalo con:  net start RaceCoreStudioDB")
+        detalle("               (o net start MongoDB, si es uno anterior)")
         return False
 
     ok("conexión verificada")
@@ -369,7 +408,8 @@ def avisar_sin_usuarios() -> None:
     El enlace va con el token puesto. Es lo que el instalador enseñó una
     vez, y quien cierre esa pestaña no tiene de dónde sacarlo.
     """
-    token = RAIZ / "Backend" / "instalacion.token"
+    token = _elegir(rutas_de_datos() / "instalacion.token",
+                    RAIZ / "Backend" / "instalacion.token")
 
     if token.is_file():
         try:
@@ -422,11 +462,15 @@ def paso_backend() -> bool:
     # cuando alguien opera la interfaz desde su propio equipo.
     host = leer_env().get("API_HOST", "127.0.0.1")
 
-    proceso = lanzar(
-        [str(PYTHON_VENV), "-m", "uvicorn", "main:app",
-         "--host", host, "--port", str(PUERTO_BACKEND)],
-        BACKEND, "backend.log",
-    )
+    if BACKEND_EXE.is_file():
+        orden, donde = [str(BACKEND_EXE)], RAIZ
+    else:
+        # Árbol de desarrollo: no hay ejecutable congelado todavía.
+        orden = [str(PYTHON_VENV), "-m", "uvicorn", "main:app",
+                 "--host", host, "--port", str(PUERTO_BACKEND)]
+        donde = BACKEND
+
+    proceso = lanzar(orden, donde, "backend.log")
     print("      arrancando", end="", flush=True)
 
     # No basta con que el puerto abra: uvicorn escucha antes de terminar de
