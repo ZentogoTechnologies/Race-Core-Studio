@@ -72,6 +72,12 @@ Name: "{autodesktop}\{#Nombre}";     Filename: "{app}\{#Ejecutable}"; Tasks: esc
 [Tasks]
 Name: "escritorio"; Description: "Crear acceso directo en el escritorio"; GroupDescription: "Accesos:"
 
+[InstallDelete]
+; El backend pasa de ser un .exe suelto a una carpeta. Sin esto, el de
+; la version anterior se quedaria ahi, y el lanzador podria encontrarlo
+; antes que el nuevo.
+Type: files; Name: "{app}\race-core-backend.exe"
+
 [Run]
 ; MongoDB, registrado como servicio para que arranque con Windows. El
 ; lanzador solo comprueba que responde; quien lo levanta es Windows,
@@ -210,6 +216,38 @@ begin
     RegWriteStringValue(HKLM, Clave, 'UninstallString', '"' + Nuevo + '"');
     RegWriteStringValue(HKLM, Clave, 'QuietUninstallString', '"' + Nuevo + '" /SILENT');
   end;
+end;
+
+// ── Cerrar lo que este corriendo ─────────────────────────────
+//
+// Windows no deja sobrescribir un .exe en uso. Si Race Core Studio esta
+// abierto cuando se instala encima, los archivos bloqueados NO se
+// reemplazan y la instalacion termina diciendo que todo fue bien con la
+// version vieja todavia en el disco: el cliente actualiza, no ve ningun
+// cambio, y nada le dice por que.
+//
+// Asi que se cierran antes de copiar. Es lo que hace cualquier
+// instalador; lo raro era no hacerlo.
+
+procedure CerrarLoQueEsteAbierto;
+var
+  Codigo: Integer;
+  i: Integer;
+  Procesos: array[0..2] of String;
+begin
+  Procesos[0] := 'race-core-studio.exe';
+  Procesos[1] := 'race-core-backend.exe';
+  Procesos[2] := 'casparcg.exe';
+
+  for i := 0 to 2 do
+    Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM ' + Procesos[i],
+         '', SW_HIDE, ewWaitUntilTerminated, Codigo);
+end;
+
+function PrepareToInstall(var NecesitaReiniciar: Boolean): String;
+begin
+  CerrarLoQueEsteAbierto;
+  Result := '';
 end;
 
 procedure CurStepChanged(Paso: TSetupStep);

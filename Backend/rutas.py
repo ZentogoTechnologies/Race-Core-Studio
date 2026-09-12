@@ -34,10 +34,19 @@ _FUENTE = Path(__file__).resolve().parent
 
 
 def _app() -> Path:
-    """La carpeta del programa instalado."""
-    if CONGELADO:
-        return Path(sys.executable).resolve().parent
-    return _FUENTE
+    """La carpeta del programa instalado.
+
+    El backend congelado vive en su propia subcarpeta —{app}\\backend—
+    porque PyInstaller reparte ahí sus bibliotecas. Pero el panel y
+    CasparCG están un nivel más arriba, junto al lanzador, así que la
+    raíz del programa es la de encima. Sin esto, el backend busca el
+    panel dentro de su propia carpeta y arranca sirviendo solo el API.
+    """
+    if not CONGELADO:
+        return _FUENTE
+
+    aqui = Path(sys.executable).resolve().parent
+    return aqui.parent if aqui.name.lower() == "backend" else aqui
 
 
 def _recursos() -> Path:

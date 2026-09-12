@@ -67,8 +67,15 @@ a = Analysis(
 
 pyz = PYZ(a.pure)
 
+# Carpeta y no archivo único. Un .exe de un solo archivo se descomprime
+# ENTERO —50 MB— en una carpeta temporal cada vez que arranca, y eso en
+# un disco lento son decenas de segundos antes de ejecutar la primera
+# línea. Aquí no compensa: esto va dentro de un instalador, así que tener
+# una carpeta en vez de un archivo no le cuesta nada a nadie, y el
+# arranque pasa de decenas de segundos a un par.
 exe = EXE(
-    pyz, a.scripts, a.binaries, a.datas, [],
+    pyz, a.scripts, [],
+    exclude_binaries=True,
     name="race-core-backend",
     debug=False,
     bootloader_ignore_signals=False,
@@ -78,4 +85,11 @@ exe = EXE(
     disable_windowed_traceback=False,
     icon=str(RAIZ / "launcher" / "race-core-studio.ico"),
     version=str(RAIZ / "installer" / "version-info.txt"),
+)
+
+coll = COLLECT(
+    exe, a.binaries, a.datas,
+    strip=False,
+    upx=False,
+    name="race-core-backend",
 )

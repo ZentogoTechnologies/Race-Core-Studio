@@ -170,7 +170,8 @@ CASPARCG = _elegir(RAIZ / "casparcg" / "casparcg.exe",
 
 # El backend congelado. Cuando no está —árbol de desarrollo— se recurre
 # al intérprete del entorno virtual, que es como se arrancaba antes.
-BACKEND_EXE = RAIZ / "race-core-backend.exe"
+BACKEND_EXE = _elegir(RAIZ / "backend" / "race-core-backend.exe",
+                      RAIZ / "race-core-backend.exe")
 BACKEND = RAIZ / "Backend"
 PYTHON_VENV = BACKEND / "venv" / "Scripts" / "python.exe"
 

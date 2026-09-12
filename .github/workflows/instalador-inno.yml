@@ -111,7 +111,10 @@ jobs:
           New-Item -ItemType Directory -Force -Path payload | Out-Null
 
           # El programa
-          Copy-Item dist-backend/race-core-backend.exe payload/
+          # Carpeta y no archivo suelto: PyInstaller reparte ahi las
+          # bibliotecas, y asi el backend no tiene que descomprimirse
+          # entero en cada arranque.
+          Copy-Item dist-backend/race-core-backend payload/backend -Recurse
           Copy-Item dist-launcher/race-core-studio.exe  payload/
           Copy-Item VERSION                             payload/
 
@@ -173,6 +176,9 @@ jobs:
           }
 
           Write-Host "`n=== El paquete ==="
+          if (-not (Test-Path payload/backend/race-core-backend.exe)) {
+            throw "Falta el backend en el paquete"
+          }
           Get-ChildItem payload | Format-Table Name, Length
           "{0:N0} MB en total" -f ((Get-ChildItem payload -Recurse |
             Measure-Object Length -Sum).Sum / 1MB)
@@ -181,7 +187,7 @@ jobs:
         run: |
           # No instala nada: solo obliga a cargar todos los módulos. Si a
           # PyInstaller le faltó alguno, se ve aquí y no en un autódromo.
-          $p = Start-Process payload/race-core-backend.exe -PassThru `
+          $p = Start-Process payload/backend/race-core-backend.exe -PassThru `
                  -RedirectStandardOutput arranque.log -RedirectStandardError arranque.err
           Start-Sleep -Seconds 25
           $vivo = -not $p.HasExited
