@@ -23,7 +23,6 @@ from pathlib import Path
 from config import settings
 from src.services.graphics_services import brand_logo_url
 from src.models.categories_model import Category
-from src.models.pilots_model import Pilot
 from src.models.vehicles_model import Vehicle
 
 

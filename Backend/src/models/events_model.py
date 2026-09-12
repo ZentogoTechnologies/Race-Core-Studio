@@ -2,7 +2,7 @@ from datetime import date
 from typing import List, Optional
 
 from beanie import Document
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pymongo import ASCENDING, IndexModel
 
 # Tipos de sesión de una jornada. La práctica libre no es un tipo aparte:

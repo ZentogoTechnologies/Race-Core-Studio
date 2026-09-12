@@ -10,7 +10,7 @@ saber si tiene que enseñar el asistente o el login, y esa respuesta no
 revela nada que no se vea igual en la pantalla de entrada.
 """
 
-from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Header, HTTPException, UploadFile, status
 from typing import Optional
 
 from src.schemas.instalacion_schemas import (

@@ -1,7 +1,6 @@
 from beanie import Document
 from pydantic import Field
 from pymongo import IndexModel, ASCENDING
-from typing import Optional
 from datetime import datetime
 import uuid
 

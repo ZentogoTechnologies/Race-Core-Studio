@@ -22,4 +22,4 @@ async def init_db():
     print(f"✅ Conectado a MongoDB: {DB_NAME}")
 
 async def close_db():
-    print(f"❌ Desconectado de MongoDB")
+    print("❌ Desconectado de MongoDB")

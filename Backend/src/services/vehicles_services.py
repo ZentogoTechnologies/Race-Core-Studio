@@ -1,6 +1,5 @@
 from typing import Optional
 
-from beanie.operators import In
 from src.models.vehicles_model import Vehicle
 from src.models.pilots_model import Pilot
 from pathlib import Path

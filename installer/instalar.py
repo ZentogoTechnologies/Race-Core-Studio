@@ -38,7 +38,6 @@ import secrets
 import socket
 import subprocess
 import sys
-import time
 import webbrowser
 from pathlib import Path
 

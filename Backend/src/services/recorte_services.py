@@ -10,7 +10,6 @@ segundos y las siguientes son inmediatas.
 """
 
 import io
-from typing import Optional
 
 from PIL import Image, ImageOps
 

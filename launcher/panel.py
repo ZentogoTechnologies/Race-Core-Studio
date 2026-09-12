@@ -21,7 +21,6 @@ import queue
 import threading
 import tkinter as tk
 import webbrowser
-from tkinter import font as tkfont
 
 # ─── Colores, los de la marca ────────────────────────────────
 

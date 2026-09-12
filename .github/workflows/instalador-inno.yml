@@ -76,8 +76,16 @@ jobs:
           # su código de salida.
           $global:LASTEXITCODE = 0
 
+          # Se listan los que SI importan, no los que no. Al reves
+          # —ignorando una lista de avisos cosmeticos— cualquier aviso
+          # nuevo que pyflakes aprenda a dar tumba la compilacion, y la
+          # descarga se queda congelada en la version anterior sin que
+          # nadie lo note. Paso dos veces seguidas.
+          #
+          # Estos son los que revientan al ejecutar, que es lo unico que
+          # justifica no publicar:
           $graves = $salida | Where-Object {
-            $_ -notmatch 'imported but unused|unable to detect undefined|redefinition of unused'
+            $_ -match 'undefined name|referenced before assignment|invalid syntax|redefinition of unused .* from line'
           }
           if ($graves) {
             $graves | ForEach-Object { Write-Host $_ }
