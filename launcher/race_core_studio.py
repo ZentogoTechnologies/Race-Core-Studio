@@ -639,14 +639,6 @@ def main():
     return 0
 
 
-if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except KeyboardInterrupt:
-        print("\nInterrumpido.")
-        sys.exit(130)
-
-
 # ─── El mando del panel ──────────────────────────────────────
 #
 # Conecta los botones de la ventana con los servicios. Todo lo que tarda
@@ -884,3 +876,11 @@ def abrir_panel_grafico() -> int:
     mando.panel = ventana
     ventana.correr()
     return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("\nInterrumpido.")
+        sys.exit(130)

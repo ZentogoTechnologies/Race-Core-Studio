@@ -56,6 +56,18 @@ jobs:
       - name: Comprobar que la versión cuadra en todas partes
         run: python tools/version.py
 
+      - name: Revisar lo que no ve el compilador
+        run: |
+          python tools/revisar.py
+          pip install pyflakes
+          # Nombres indefinidos e imports rotos. Se limita a lo que viaja
+          # dentro del producto: las pruebas y los scripts sueltos no se
+          # instalan en casa de nadie.
+          python -m pyflakes launcher/*.py Backend/*.py Backend/src/services/*.py installer/*.py |
+            Select-String -NotMatch "imported but unused|unable to detect undefined" |
+            Tee-Object -Variable hallazgos
+          if ($hallazgos) { throw "Revisa lo de arriba antes de publicar" }
+
       - name: Dependencias del backend
         run: |
           python -m pip install --upgrade pip

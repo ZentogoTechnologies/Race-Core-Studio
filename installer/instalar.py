@@ -372,7 +372,7 @@ def paso_asistente(abrir: bool) -> None:
     print(f"  {NEGRITA}Abre el asistente en:{FIN}")
     print(f"    {AZUL}{url}{FIN}")
     if d["red"]:
-        print(f"\n  Desde otro equipo o un iPad de la misma red:")
+        print("\n  Desde otro equipo o un iPad de la misma red:")
         print(f"    {AZUL}{d['red']}/instalacion?token={token}{FIN}")
 
     if abrir:
