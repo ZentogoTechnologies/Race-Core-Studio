@@ -49,7 +49,7 @@ def arranque_al_final(archivo: Path) -> list:
 
 
 def rutas_del_instalador(iss: Path, payload: Path) -> list:
-    """Todo {app}\... que el instalador EJECUTA tiene que existir.
+    r"""Todo {app}\... que el instalador EJECUTA tiene que existir.
 
     El guion de Inno referencia archivos por su ruta, en texto. Nadie los
     comprueba: ni el compilador de Inno —que no sabe qué habrá en {app}

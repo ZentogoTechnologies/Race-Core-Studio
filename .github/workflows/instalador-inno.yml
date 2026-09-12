@@ -60,13 +60,30 @@ jobs:
         run: |
           python tools/revisar.py
           pip install pyflakes
-          # Nombres indefinidos e imports rotos. Se limita a lo que viaja
-          # dentro del producto: las pruebas y los scripts sueltos no se
-          # instalan en casa de nadie.
-          python -m pyflakes launcher/*.py Backend/*.py Backend/src/services/*.py installer/*.py |
-            Select-String -NotMatch "imported but unused|unable to detect undefined" |
-            Tee-Object -Variable hallazgos
-          if ($hallazgos) { throw "Revisa lo de arriba antes de publicar" }
+
+          # Los archivos se listan con Get-ChildItem y no con comodines:
+          # PowerShell no los expande para un programa externo, se los
+          # pasa tal cual, y pyflakes contesta «Invalid argument».
+          $archivos = Get-ChildItem -Recurse -Filter *.py -Path launcher,Backend,installer |
+            Where-Object { $_.FullName -notmatch '\\(venv|tests|__pycache__|build|dist)\\' } |
+            ForEach-Object { $_.FullName }
+
+          Write-Host "Revisando $($archivos.Count) archivos"
+          $salida = & python -m pyflakes $archivos 2>&1
+
+          # pyflakes sale con 1 en cuanto dice algo, incluidos los avisos
+          # que aquí no importan. Manda lo que queda tras filtrarlos, no
+          # su código de salida.
+          $global:LASTEXITCODE = 0
+
+          $graves = $salida | Where-Object {
+            $_ -notmatch 'imported but unused|unable to detect undefined|redefinition of unused'
+          }
+          if ($graves) {
+            $graves | ForEach-Object { Write-Host $_ }
+            throw "Revisa lo de arriba antes de publicar"
+          }
+          Write-Host "Sin nombres indefinidos."
 
       - name: Dependencias del backend
         run: |
