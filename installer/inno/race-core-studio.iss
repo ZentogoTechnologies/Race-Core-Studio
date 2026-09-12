@@ -136,9 +136,11 @@ begin
     'Introduzca los datos que recibió de {#Empresa}.',
     'La licencia se comprueba antes de copiar nada, y quedará asociada a este equipo.');
 
+  // Solo esto. El nombre del autodromo, el logo, las cuentas y el resto
+  // se preguntan en la configuracion, desde el navegador: repetirlos
+  // aqui seria pedir dos veces lo mismo.
   PaginaLicencia.Add('Correo de la licencia:', False);
   PaginaLicencia.Add('Clave del producto:', False);
-  PaginaLicencia.Add('Nombre del autódromo o circuito:', False);
 end;
 
 function CorreoLicencia(Valor: String): String;
@@ -149,11 +151,6 @@ end;
 function ClaveLicencia(Valor: String): String;
 begin
   Result := Trim(PaginaLicencia.Values[1]);
-end;
-
-function NombreCliente(Valor: String): String;
-begin
-  Result := Trim(PaginaLicencia.Values[2]);
 end;
 
 function NextButtonClick(PaginaActual: Integer): Boolean;

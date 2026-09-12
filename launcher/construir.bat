@@ -11,11 +11,13 @@ cd /d "%AQUI%.."
 
 echo Empaquetando el lanzador...
 Backend\venv\Scripts\python.exe -m PyInstaller ^
-  --onefile --console --clean --noconfirm --noupx ^
+  --onefile --windowed --clean --noconfirm --noupx ^
   --name race-core-studio ^
   --icon "%AQUI%race-core-studio.ico" ^
   --version-file "%AQUI%version-info.txt" ^
   --hidden-import pymongo ^
+  --hidden-import panel ^
+  --paths "%AQUI%." ^
   --distpath "%AQUI%dist" --workpath "%AQUI%build" --specpath "%AQUI%." ^
   "%AQUI%race_core_studio.py"
 

@@ -78,14 +78,26 @@ jobs:
 
       - name: Congelar el lanzador
         run: |
-          pyinstaller --onefile --console --clean --noconfirm --noupx `
+          # --windowed y no --console: es lo que hacia aparecer la
+          # ventana negra. Ahora abre su panel.
+          pyinstaller --onefile --windowed --clean --noconfirm --noupx `
             --name race-core-studio `
             --icon launcher/race-core-studio.ico `
             --version-file launcher/version-info.txt `
             --hidden-import pymongo `
+            --hidden-import panel `
+            --paths launcher `
             --add-data "VERSION;." `
             --distpath dist-launcher `
             launcher/race_core_studio.py
+
+      - name: Comprobar el panel del lanzador
+        run: |
+          # Se importa con el tkinter de verdad, sin abrir ventana. Es lo
+          # que atrapa un nombre mal escrito o un tkinter que no entro en
+          # el .exe: un panel roto solo se veria al ejecutarlo, y para
+          # entonces ya esta en el equipo del cliente.
+          python -c "import sys; sys.path.insert(0,'launcher'); import tkinter, panel; print('panel:', len(panel.ESTADOS), 'estados')"
 
       - name: Bajar MongoDB
         run: |

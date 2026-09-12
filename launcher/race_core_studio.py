@@ -27,9 +27,11 @@ tumbar los gráficos que están al aire.
 
 import json
 import os
+import signal
 import socket
 import subprocess
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -595,6 +597,13 @@ def main():
         esperar_enter()
         return 0
 
+    # Por defecto, la ventana. La consola solo con --consola, que queda
+    # para desarrollo y para cuando haya que ver el arranque entero: un
+    # cliente no tiene por qué leer una pantalla negra para abrir su
+    # programa, y si algo falla el panel lo dice con palabras.
+    if "--consola" not in sys.argv:
+        return abrir_panel_grafico()
+
     print(f"\n{NEGRITA}  RACE CORE STUDIO{FIN}  {GRIS}v{VERSION}{FIN}")
     print(f"{GRIS}  {RAIZ}{FIN}")
 
@@ -635,3 +644,242 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\nInterrumpido.")
         sys.exit(130)
+
+
+# ─── El mando del panel ──────────────────────────────────────
+#
+# Conecta los botones de la ventana con los servicios. Todo lo que tarda
+# corre en otro hilo y avisa por la cola del panel: si se hiciera en el
+# hilo de la ventana, arrancar CasparCG la dejaría congelada diez
+# segundos y parecería colgada.
+
+ERROR_LOG = LOGS / "error.log"
+
+
+def anotar(texto: str) -> None:
+    """Una línea en error.log. Es lo que abre el botón del panel."""
+    from datetime import datetime
+
+    try:
+        LOGS.mkdir(parents=True, exist_ok=True)
+        with open(ERROR_LOG, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S}  {texto}\n")
+    except OSError:
+        pass
+
+
+class Mando:
+    """Lo que el panel sabe pedir."""
+
+    def __init__(self):
+        self.panel = None
+        self.procesos = {}
+
+    # ── Consultas ──
+
+    def estado_mongo(self) -> str:
+        return "on" if puerto_abierto(27017) else "error"
+
+    def estado_caspar(self) -> str:
+        return "aire" if puerto_abierto(PUERTO_CASPARCG) else "off"
+
+    def estado_rcs(self) -> str:
+        return "on" if puerto_abierto(PUERTO_BACKEND) else "off"
+
+    def _refrescar(self) -> None:
+        self.panel.avisar("mongo", self.estado_mongo())
+        self.panel.avisar("caspar", self.estado_caspar())
+        self.panel.avisar("rcs", self.estado_rcs())
+
+    # ── Arrancar ──
+
+    def arrancar_mongo(self) -> None:
+        def trabajo():
+            self.panel.avisar("mongo", "wait")
+            if os.name == "nt":
+                for servicio in ("RaceCoreStudioDB", "MongoDB"):
+                    subprocess.run(["net", "start", servicio],
+                                   capture_output=True,
+                                   creationflags=subprocess.CREATE_NO_WINDOW)
+                    if puerto_abierto(27017):
+                        break
+            esperar(lambda: puerto_abierto(27017), 20)
+            estado = self.estado_mongo()
+            if estado == "error":
+                anotar("MongoDB no arrancó: el servicio no responde en el 27017")
+                self.panel.avisar("aviso",
+                    "La base de datos no arranca. Sin ella no se puede abrir el "
+                    "panel. Si el problema sigue, manda error.log a soporte.")
+            self.panel.avisar("mongo", estado)
+
+        threading.Thread(target=trabajo, daemon=True).start()
+
+    def arrancar_caspar(self) -> None:
+        def trabajo():
+            if puerto_abierto(PUERTO_CASPARCG):
+                self.panel.avisar("caspar", "aire")
+                return
+            self.panel.avisar("caspar", "wait")
+
+            if not CASPARCG.is_file():
+                anotar(f"No se encontró CasparCG en {CASPARCG}")
+                self.panel.avisar("caspar", "off")
+                self.panel.avisar("aviso",
+                    "No encuentro el servidor de gráficos. Vuelve a ejecutar "
+                    "rcs-setup.exe para reinstalarlo.")
+                return
+
+            try:
+                self.procesos["casparcg"] = lanzar(
+                    [str(CASPARCG)], CASPARCG.parent, "casparcg.log",
+                    nueva_consola=True)
+            except OSError as e:
+                anotar(f"CasparCG no se pudo lanzar: {type(e).__name__}: {e}")
+                self.panel.avisar("caspar", "off")
+                return
+
+            if not esperar(lambda: puerto_abierto(PUERTO_CASPARCG), 40):
+                anotar("CasparCG arrancó pero no abrió el puerto 5250")
+                self.panel.avisar("aviso",
+                    "El servidor de gráficos no responde. El panel funciona, "
+                    "pero no saldrá ningún gráfico al aire.")
+            self.panel.avisar("caspar", self.estado_caspar())
+
+        threading.Thread(target=trabajo, daemon=True).start()
+
+    def arrancar_rcs(self) -> None:
+        def trabajo():
+            if puerto_abierto(PUERTO_BACKEND):
+                self.panel.avisar("rcs", "on")
+                self.panel.avisar("listo", True)
+                return
+            self.panel.avisar("rcs", "wait")
+
+            host = leer_env().get("API_HOST", "0.0.0.0")
+
+            if BACKEND_EXE.is_file():
+                orden, donde = [str(BACKEND_EXE)], RAIZ
+            elif PYTHON_VENV.exists():
+                orden = [str(PYTHON_VENV), "-m", "uvicorn", "main:app",
+                         "--host", host, "--port", str(PUERTO_BACKEND)]
+                donde = BACKEND
+            else:
+                anotar("No hay con qué arrancar el backend: ni el ejecutable "
+                       "congelado ni el entorno virtual")
+                self.panel.avisar("rcs", "off")
+                self.panel.avisar("aviso",
+                    "Falta el programa principal. Vuelve a ejecutar rcs-setup.exe.")
+                return
+
+            try:
+                self.procesos["backend"] = lanzar(orden, donde, "backend.log")
+            except OSError as e:
+                anotar(f"El backend no se pudo lanzar: {type(e).__name__}: {e}")
+                self.panel.avisar("rcs", "off")
+                return
+
+            if esperar(lambda: puerto_abierto(PUERTO_BACKEND), 90):
+                self.panel.avisar("rcs", "on")
+                self.panel.avisar("listo", True)
+            else:
+                anotar("El backend no respondió en 90 segundos. "
+                       f"Ver {LOGS / 'backend.log'}")
+                self.panel.avisar("rcs", "error")
+                self.panel.avisar("aviso",
+                    "Race Core Studio no acabó de arrancar. Mira error.log, "
+                    "o mándalo a soporte.")
+
+        threading.Thread(target=trabajo, daemon=True).start()
+
+    # ── Detener ──
+
+    def _matar(self, nombre: str, puerto: int, clave: str) -> None:
+        def trabajo():
+            for pid in pids_en_puerto(puerto):
+                try:
+                    os.kill(pid, signal.SIGTERM)
+                except (OSError, ProcessLookupError):
+                    pass
+            if os.name == "nt":
+                subprocess.run(["taskkill", "/F", "/T", "/PID", str(
+                    self.procesos[nombre].pid)] if nombre in self.procesos else
+                    ["cmd", "/c", "exit"], capture_output=True,
+                    creationflags=subprocess.CREATE_NO_WINDOW)
+            esperar(lambda: not puerto_abierto(puerto), 15)
+            self.panel.avisar(clave, "off")
+            if clave == "rcs":
+                self.panel.avisar("listo", False)
+
+        threading.Thread(target=trabajo, daemon=True).start()
+
+    def detener_caspar(self) -> None:
+        self._matar("casparcg", PUERTO_CASPARCG, "caspar")
+
+    def detener_rcs(self) -> None:
+        self._matar("backend", PUERTO_BACKEND, "rcs")
+
+    # ── Lo que hace al abrirse ──
+
+    def arrancar_todo(self) -> None:
+        """Todo solo, sin que nadie pulse nada. Y al final se aparta."""
+        anotar(f"--- Arranque · Race Core Studio {VERSION} ---")
+        self._refrescar()
+
+        if not puerto_abierto(27017):
+            self.arrancar_mongo()
+            esperar(lambda: puerto_abierto(27017), 25)
+        self.panel.avisar("mongo", self.estado_mongo())
+
+        self.arrancar_caspar()
+        self.arrancar_rcs()
+
+        # A esperar a que el panel web conteste para abrirlo.
+        if esperar(lambda: puerto_abierto(PUERTO_BACKEND), 120):
+            self.panel.avisar("red", f"Desde otro equipo:  http://{ip_de_la_red()}:{PUERTO_BACKEND}")
+            self.abrir_panel()
+            # Se aparta: el operador trabaja en el navegador, no aquí.
+            # Sigue viva en la barra de tareas por si hay que volver.
+            self.panel.avisar("minimizar", True)
+        else:
+            anotar("No se llegó a abrir el panel: el backend no respondió")
+
+        guardar_pids({n: p.pid for n, p in self.procesos.items() if p})
+
+    # ── Botones sueltos ──
+
+    def abrir_panel(self) -> None:
+        from panel import abrir_en_navegador
+        abrir_en_navegador(URL_PANEL)
+
+    def abrir_registro(self) -> None:
+        """Abre error.log con lo que Windows use para los .log."""
+        anotar("(el operador abrió el registro)")
+        try:
+            if os.name == "nt":
+                os.startfile(str(ERROR_LOG))
+            else:
+                subprocess.run(["xdg-open", str(ERROR_LOG)], check=False)
+        except OSError as e:
+            anotar(f"No se pudo abrir el registro: {e}")
+
+
+def ip_de_la_red() -> str:
+    """La IP con la que se llega a este equipo desde la red local."""
+    import socket
+
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))          # no manda nada; solo elige ruta
+            return s.getsockname()[0]
+    except OSError:
+        return "127.0.0.1"
+
+
+def abrir_panel_grafico() -> int:
+    from panel import Panel
+
+    mando = Mando()
+    ventana = Panel(VERSION, mando)
+    mando.panel = ventana
+    ventana.correr()
+    return 0
