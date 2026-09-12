@@ -46,6 +46,55 @@ def arranque_al_final(archivo: Path) -> list:
     return []
 
 
+
+
+def rutas_del_instalador(iss: Path, payload: Path) -> list:
+    """Todo {app}\... que el instalador EJECUTA tiene que existir.
+
+    El guion de Inno referencia archivos por su ruta, en texto. Nadie los
+    comprueba: ni el compilador de Inno —que no sabe qué habrá en {app}
+    cuando alguien instale— ni Python, que ni se entera de que existe ese
+    archivo.
+
+    Pasó de verdad: el backend se movió a su propia carpeta, se actualizó
+    el flujo de compilación y el lanzador, y se olvidó el [Run] que lo
+    ejecuta. El instalador copió los 250 MB, fue a configurar y murió con
+    «CreateProcess falló; código 2».
+    """
+    import re
+
+    if not payload.is_dir():
+        return []
+
+    texto = iss.read_text(encoding="utf-8")
+    problemas = []
+
+    for linea in texto.splitlines():
+        limpia = linea.strip()
+        if not limpia.startswith("Filename:"):
+            continue
+        # Solo los que salen del paquete; {sys}\net.exe es de Windows.
+        m = re.search(r'Filename:\s*"\{app\}\\([^"]+)"', limpia)
+        if not m:
+            continue
+
+        relativa = m.group(1)
+        # Las constantes del guion (#Ejecutable y demás) se resuelven
+        # mirando su #define.
+        for nombre, valor in re.findall(r'#define\s+(\w+)\s+"([^"]+)"', texto):
+            relativa = relativa.replace("{#" + nombre + "}", valor)
+
+        if "{#" in relativa:
+            continue                      # constante que no se supo resolver
+
+        if not (payload / relativa.replace("\\", "/")).exists():
+            problemas.append(
+                f"{iss.name}: el instalador ejecuta «{relativa}», "
+                f"que no está en el paquete")
+
+    return problemas
+
+
 def main() -> int:
     problemas = []
 
@@ -55,6 +104,10 @@ def main() -> int:
                     RAIZ / "installer" / "instalar.py"):
         if archivo.is_file():
             problemas += arranque_al_final(archivo)
+
+    iss = RAIZ / "installer" / "inno" / "race-core-studio.iss"
+    if iss.is_file():
+        problemas += rutas_del_instalador(iss, RAIZ / "payload")
 
     if problemas:
         for p in problemas:

@@ -92,7 +92,7 @@ Filename: "{sys}\net.exe"; Parameters: "start ""{#Servicio}"""; \
 ; Valida la licencia, la ata a este equipo, escribe la configuración y
 ; genera el token del asistente. Antes de arrancar nada: si la clave no
 ; vale, la instalación no debe darse por buena.
-Filename: "{app}\race-core-backend.exe"; \
+Filename: "{app}\backend\race-core-backend.exe"; \
     Parameters: "--configurar --correo ""{code:CorreoLicencia}"" --clave ""{code:ClaveLicencia}"""; \
     StatusMsg: "Comprobando la licencia..."; Flags: runhidden waituntilterminated
 

@@ -214,6 +214,15 @@ jobs:
             }
           }
 
+      - name: Comprobar que el instalador no apunta al vacío
+        run: |
+          # Ahora que el paquete existe, se comprueba que cada archivo
+          # que el instalador ejecuta esté de verdad dentro. Inno no lo
+          # sabe —no puede saber qué habrá en {app} cuando alguien
+          # instale— y el fallo sale en el equipo del cliente, a mitad
+          # de la instalación y con 250 MB ya copiados.
+          python tools/revisar.py
+
       - name: Instalar Inno Setup
         run: choco install innosetup --no-progress -y
 
