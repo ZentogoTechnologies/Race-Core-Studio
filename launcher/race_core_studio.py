@@ -598,6 +598,9 @@ def main():
         esperar_enter()
         return 0
 
+    if "--comprobar-casparcg" in sys.argv:
+        return comprobar_casparcg()
+
     # Por defecto, la ventana. La consola solo con --consola, que queda
     # para desarrollo y para cuando haya que ver el arranque entero: un
     # cliente no tiene por qué leer una pantalla negra para abrir su
@@ -876,6 +879,74 @@ def abrir_panel_grafico() -> int:
     mando.panel = ventana
     ventana.correr()
     return 0
+
+
+def comprobar_casparcg() -> int:
+    """Arranca CasparCG, comprueba que responde y lo cierra.
+
+    Lo llama el instalador al terminar de copiar. La idea es no dejar que
+    el cliente descubra en su primera carrera que el servidor de gráficos
+    no levanta en ese equipo: si algo falla —permisos, la tarjeta de
+    vídeo, un códec— que se sepa ahora, con el instalador todavía
+    delante.
+
+    Se cierra al acabar porque esto es una comprobación, no el arranque
+    del sistema. Si no se deja cerrar, se dice en el código de salida y
+    el instalador avisa de que hay una ventana que cerrar a mano.
+
+        0  responde y se cerró
+        1  no llegó a responder
+        2  responde, pero quedó abierto
+    """
+    anotar("--- Comprobación de CasparCG (instalación) ---")
+
+    # El puerto primero: lo que importa es que haya un servidor de
+    # gráficos atendiendo, no dónde esté el ejecutable. Si ya hay uno
+    # —suyo, de otra instalación— no se toca ni se cierra: puede estar
+    # al aire.
+    if puerto_abierto(PUERTO_CASPARCG):
+        anotar("Ya había un CasparCG en marcha; no se toca")
+        return 0
+
+    if not CASPARCG.is_file():
+        anotar(f"No está casparcg.exe en {CASPARCG}")
+        return 1
+
+    try:
+        lanzar([str(CASPARCG)], CASPARCG.parent, "casparcg.log", nueva_consola=True)
+    except OSError as e:
+        anotar(f"No se pudo lanzar CasparCG: {type(e).__name__}: {e}")
+        return 1
+
+    if not esperar(lambda: puerto_abierto(PUERTO_CASPARCG), 60):
+        anotar("CasparCG arrancó pero no abrió el 5250 en 60 segundos")
+        cerrar_casparcg()
+        return 1
+
+    anotar("CasparCG responde en el 5250")
+
+    if cerrar_casparcg():
+        anotar("Comprobado y cerrado")
+        return 0
+
+    anotar("Comprobado, pero no se pudo cerrar")
+    return 2
+
+
+def cerrar_casparcg() -> bool:
+    """Lo cierra y espera a que suelte el puerto."""
+    for pid in pids_en_puerto(PUERTO_CASPARCG):
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except (OSError, ProcessLookupError):
+            pass
+
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/F", "/IM", "casparcg.exe"],
+                       capture_output=True,
+                       creationflags=subprocess.CREATE_NO_WINDOW)
+
+    return esperar(lambda: not puerto_abierto(PUERTO_CASPARCG), 20)
 
 
 if __name__ == "__main__":

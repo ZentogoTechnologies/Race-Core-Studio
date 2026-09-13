@@ -110,6 +110,10 @@ Filename: "{app}\mongodb\bin\mongod.exe"; Parameters: "--remove --serviceName ""
 [Dirs]
 ; La base de datos y los registros, donde se puede escribir. Nunca bajo
 ; «Archivos de programa», que es de solo lectura para el operador.
+; La raiz tambien: ahi van .env, la licencia y el token del asistente.
+; ProgramData deja crear archivos pero no modificar los que creo otro, y
+; eso sale como un permiso denegado al reconfigurar o renovar.
+Name: "{commonappdata}\{#Nombre}";      Permissions: users-modify
 Name: "{commonappdata}\{#Nombre}\db";   Permissions: users-modify
 Name: "{commonappdata}\{#Nombre}\logs"; Permissions: users-modify
 
@@ -250,10 +254,57 @@ begin
   Result := '';
 end;
 
+// ── Comprobar que CasparCG levanta en este equipo ────────────
+//
+// Se arranca una vez, se mira que conteste en el 5250 y se cierra. La
+// idea es no dejar que el cliente descubra en su primera carrera que el
+// servidor de graficos no funciona en su maquina: si falla —permisos,
+// tarjeta de video, un codec— que se sepa ahora, con el instalador
+// todavia delante y con alguien mirando.
+//
+// Nunca impide terminar la instalacion: el panel funciona sin CasparCG,
+// solo que no saldrian graficos al aire.
+
+procedure ComprobarCasparCG;
+var
+  Codigo: Integer;
+begin
+  WizardForm.StatusLabel.Caption := 'Comprobando el servidor de graficos...';
+
+  if not Exec(ExpandConstant('{app}\{#Ejecutable}'), '--comprobar-casparcg',
+              '', SW_HIDE, ewWaitUntilTerminated, Codigo) then
+  begin
+    MsgBox('No se pudo comprobar el servidor de graficos.' + #13#10#13#10 +
+           'La instalacion termina igual. Si al abrir Race Core Studio el ' +
+           'servidor de graficos no arranca, avise a soporte.',
+           mbInformation, MB_OK);
+    Exit;
+  end;
+
+  if Codigo = 1 then
+    MsgBox('El servidor de graficos (CasparCG) no arranco en este equipo.' +
+           #13#10#13#10 +
+           'La instalacion termina igual y el panel funcionara con ' +
+           'normalidad, pero no saldra ningun grafico al aire hasta ' +
+           'resolverlo.' + #13#10#13#10 +
+           'Suele ser la tarjeta de video o sus controladores. El detalle ' +
+           'esta en el registro, que se abre desde el propio programa.',
+           mbError, MB_OK)
+
+  else if Codigo = 2 then
+    MsgBox('El servidor de graficos funciona correctamente.' + #13#10#13#10 +
+           'No se pudo cerrar solo, asi que quedo una ventana abierta ' +
+           '(CasparCG). Cierrela a mano antes de continuar.',
+           mbInformation, MB_OK);
+end;
+
 procedure CurStepChanged(Paso: TSetupStep);
 begin
   if Paso = ssPostInstall then
+  begin
     RenombrarDesinstalador;
+    ComprobarCasparCG;
+  end;
 end;
 
 // ── Al desinstalar ───────────────────────────────────────────
