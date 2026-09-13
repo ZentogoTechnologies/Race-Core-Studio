@@ -95,6 +95,39 @@ def rutas_del_instalador(iss: Path, payload: Path) -> list:
     return problemas
 
 
+def almohadillas_sueltas(iss: Path) -> list:
+    """Ninguna linea del guion de Inno puede empezar por #, salvo #define.
+
+    El preprocesador de Inno toma cualquier linea que empiece por # como
+    una directiva suya. Un salto de linea de Pascal partido —#13#10 al
+    empezar la linea siguiente— le parece una directiva desconocida y
+    aborta la compilacion entera:
+
+        Error on line 286: Unknown preprocessor directive.
+        Compile aborted.
+
+    Solo se ve compilando en Windows, asi que sin esto la vuelta cuesta
+    una compilacion de siete minutos.
+    """
+    problemas = []
+    directivas = ("define", "include", "if", "ifdef", "ifndef", "else",
+                  "elif", "endif", "error", "pragma", "expr", "insert",
+                  "append", "emit", "file", "sub", "endsub", "for")
+
+    for n, linea in enumerate(iss.read_text(encoding="utf-8").splitlines(), 1):
+        limpia = linea.lstrip()
+        if not limpia.startswith("#"):
+            continue
+        palabra = limpia[1:].split()[0].lower() if limpia[1:].split() else ""
+        if not palabra.startswith(directivas):
+            problemas.append(
+                f"{iss.name}:{n}: la linea empieza por «{limpia[:14]}» y el "
+                f"preprocesador de Inno la tomara por una directiva. "
+                f"Pon el #13#10 al final de la linea anterior")
+
+    return problemas
+
+
 def main() -> int:
     problemas = []
 
@@ -108,6 +141,7 @@ def main() -> int:
     iss = RAIZ / "installer" / "inno" / "race-core-studio.iss"
     if iss.is_file():
         problemas += rutas_del_instalador(iss, RAIZ / "payload")
+        problemas += almohadillas_sueltas(iss)
 
     if problemas:
         for p in problemas:

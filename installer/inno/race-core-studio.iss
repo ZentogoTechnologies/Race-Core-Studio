@@ -282,8 +282,10 @@ begin
   end;
 
   if Codigo = 1 then
-    MsgBox('El servidor de graficos (CasparCG) no arranco en este equipo.' +
-           #13#10#13#10 +
+    // Ojo: #13#10 nunca al principio de linea. El preprocesador de Inno
+    // toma cualquier linea que empiece por # como directiva suya y aborta
+    // con «Unknown preprocessor directive».
+    MsgBox('El servidor de graficos (CasparCG) no arranco en este equipo.' + #13#10#13#10 +
            'La instalacion termina igual y el panel funcionara con ' +
            'normalidad, pero no saldra ningun grafico al aire hasta ' +
            'resolverlo.' + #13#10#13#10 +
