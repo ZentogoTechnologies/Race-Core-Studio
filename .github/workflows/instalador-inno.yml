@@ -220,24 +220,90 @@ jobs:
           "{0:N0} MB en total" -f ((Get-ChildItem payload -Recurse |
             Measure-Object Length -Sum).Sum / 1MB)
 
-      - name: Comprobar que el backend congelado arranca
+      - name: Arrancar el sistema entero y comprobar que sirve
         run: |
-          # No instala nada: solo obliga a cargar todos los módulos. Si a
-          # PyInstaller le faltó alguno, se ve aquí y no en un autódromo.
-          $p = Start-Process payload/backend/race-core-backend.exe -PassThru `
-                 -RedirectStandardOutput arranque.log -RedirectStandardError arranque.err
-          Start-Sleep -Seconds 25
-          $vivo = -not $p.HasExited
-          if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force }
-          Write-Host "--- salida ---"; Get-Content arranque.log, arranque.err -EA SilentlyContinue
-          # Sin MongoDB detrás no llega a servir, pero sí tiene que pasar
-          # de las importaciones. Morir antes de eso es un módulo que falta.
-          if (-not $vivo) {
-            $texto = (Get-Content arranque.log, arranque.err -Raw -EA SilentlyContinue)
-            if ($texto -match "ModuleNotFoundError|ImportError") {
-              throw "Al backend congelado le falta un módulo. Ver arriba."
+          # Esto es lo que faltaba. Antes solo se miraba que el ejecutable
+          # no muriera nada mas empezar, sin MongoDB detras, asi que nunca
+          # llegaba a servir y cualquier fallo posterior salia por primera
+          # vez en el equipo del cliente.
+          #
+          # Ahora se levanta el MongoDB que va en el paquete, se arranca
+          # el backend contra el, y se le piden paginas de verdad.
+
+          function Esperar-Puerto($puerto, $segundos) {
+            $fin = (Get-Date).AddSeconds($segundos)
+            while ((Get-Date) -lt $fin) {
+              try {
+                $c = New-Object System.Net.Sockets.TcpClient
+                $c.Connect('127.0.0.1', $puerto)
+                $c.Close()
+                return $true
+              } catch { Start-Sleep -Milliseconds 500 }
+            }
+            return $false
+          }
+
+          New-Item -ItemType Directory -Force -Path prueba\db, prueba\datos | Out-Null
+
+          Write-Host "Arrancando MongoDB..."
+          $mongo = Start-Process payload\mongodb\bin\mongod.exe -PassThru -WindowStyle Hidden `
+            -ArgumentList '--dbpath', "$PWD\prueba\db", '--port', '27017'
+          if (-not (Esperar-Puerto 27017 90)) { throw "MongoDB no llego a escuchar" }
+          Write-Host "  MongoDB en marcha"
+
+          # El backend imprime algun emoji al conectar. Con la salida
+          # redirigida, la pagina de codigos de Windows no sabe escribirlo
+          # y el arranque muere antes de servir nada.
+          $env:PYTHONIOENCODING = 'utf-8'
+          $env:RCS_DATOS = "$PWD\prueba\datos"
+
+          Write-Host "Arrancando el backend..."
+          $bk = Start-Process payload\backend\race-core-backend.exe -PassThru -WindowStyle Hidden `
+            -RedirectStandardOutput prueba\backend.log -RedirectStandardError prueba\backend.err
+
+          if (-not (Esperar-Puerto 8080 150)) {
+            Write-Host "--- backend.log ---"
+            Get-Content prueba\backend.log -EA SilentlyContinue
+            Write-Host "--- backend.err ---"
+            Get-Content prueba\backend.err -EA SilentlyContinue
+            throw "El backend no llego a servir en el 8080"
+          }
+          Write-Host "  Backend escuchando"
+
+          $fallos = @()
+          foreach ($ruta in '/', '/docs', '/api/v1/setup/estado') {
+            try {
+              $r = Invoke-WebRequest "http://127.0.0.1:8080$ruta" -UseBasicParsing -TimeoutSec 30
+              Write-Host "  $ruta -> $($r.StatusCode)"
+              if ($r.StatusCode -ne 200) { $fallos += "$ruta devolvio $($r.StatusCode)" }
+            } catch {
+              $fallos += "$ruta fallo: $_"
             }
           }
+
+          # Que sirva el PANEL y no solo el API. Cuando el backend no
+          # encuentra el panel arranca igual, sirviendo solo /docs, y
+          # desde fuera parece que todo va bien.
+          try {
+            $inicio = Invoke-WebRequest "http://127.0.0.1:8080/" -UseBasicParsing -TimeoutSec 30
+            if ($inicio.Content -notmatch 'Race Core Studio') {
+              $fallos += "La portada no es el panel; el backend no lo encontro"
+            } else {
+              Write-Host "  El panel se sirve"
+            }
+          } catch { $fallos += "No se pudo pedir la portada: $_" }
+
+          Write-Host "--- salida del backend ---"
+          Get-Content prueba\backend.log -EA SilentlyContinue | Select-Object -Last 20
+
+          Stop-Process -Id $bk.Id -Force -EA SilentlyContinue
+          Stop-Process -Id $mongo.Id -Force -EA SilentlyContinue
+
+          if ($fallos) {
+            $fallos | ForEach-Object { Write-Host "  FALLO: $_" }
+            throw "El sistema no sirve correctamente"
+          }
+          Write-Host "El sistema arranca y sirve."
 
       - name: Comprobar que el instalador no apunta al vacío
         run: |
