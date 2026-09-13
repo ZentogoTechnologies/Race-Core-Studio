@@ -19,6 +19,39 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
+def _salida_en_utf8() -> None:
+    """Que escribir un emoji no pueda tumbar el arranque.
+
+    Con la salida redirigida a un archivo —que es como lo arranca el
+    lanzador— Windows no usa UTF-8 sino la página de códigos del sistema,
+    cp1252 en español. El primer carácter que no quepa ahí lanza un
+    UnicodeEncodeError, y si sale durante el arranque de la aplicación se
+    lleva el proceso por delante:
+
+        File "main.py", line 62, in lifespan
+        UnicodeEncodeError: 'charmap' codec can't encode character '\u2705'
+        ERROR:    Application startup failed. Exiting.
+
+    Ese \u2705 era el «✅ Conectado a MongoDB». El backend conectaba bien
+    con la base de datos y moría al anunciarlo.
+
+    Se arregla aquí y no quitando los emojis de uno en uno: así tampoco
+    rompe el siguiente que alguien escriba. Y no se deja en manos de
+    PYTHONIOENCODING, porque eso depende de que quien nos lance se
+    acuerde de ponerlo.
+    """
+    for flujo in (sys.stdout, sys.stderr):
+        try:
+            flujo.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError):
+            # Sin consola —una aplicación de ventana— stdout puede ser
+            # None o no admitir reconfigure. No hay nada que arreglar.
+            pass
+
+
+_salida_en_utf8()
+
+
 def configurar_desde_argumentos() -> int | None:
     """--configurar deja el sistema listo en vez de arrancar el servidor.
 
