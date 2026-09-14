@@ -18,11 +18,22 @@
     left:50%;
     top:50%;
 
-    /* Un 30% mas pequeña. Se escala el cuadro entero en vez de tocar las
-       treinta medidas de dentro: asi las proporciones que ya estaban
-       ajustadas —el tope de las fotos, el aire de la cabecera, el cuerpo
-       de los nombres— siguen siendo las mismas, solo que mas chicas. */
-    transform:translate(-50%, -50%) scale(.7);
+    /* Se escala el cuadro entero en vez de tocar las treinta medidas de
+       dentro: asi las proporciones que ya estaban ajustadas —el tope de
+       las fotos, el aire de la cabecera, el cuerpo de los nombres— siguen
+       siendo las mismas, solo que a otro tamaño.
+
+       Estuvo en .7, luego en .84 y ahora en .95: seguia quedando chico
+       contra el fondo. A .95 el cuadro mide 1539x789 y deja 190px de
+       margen a cada lado y 145 arriba y abajo en una pantalla de
+       1920x1080, que es zona segura de sobra para television.
+
+       Escalar el cuadro entero es lo que agranda a la vez la letra, las
+       caras y el dibujo de la parrilla sin tener que retocar treinta
+       medidas una a una. Y es lo que mantiene el aire de la cabecera: el
+       hueco que se reserva arriba crece en la misma proporcion, asi que
+       las fotos no vuelven a subir hasta el titulo. */
+    transform:translate(-50%, -50%) scale(.95);
 
     /* Encajonada, no a sangre. Mismo ancho que la grilla de nombres para
        que las dos se lean como el mismo grafico contado de dos formas, y
@@ -33,7 +44,9 @@
 
     border-radius:18px;
 
-    background:rgba(4,6,9,.95);
+    /* Mas transparente: por debajo va la carrera y el cuadro tapa media
+       pantalla. A .95 era casi opaco y se comia el plano entero. */
+    background:rgba(4,6,9,.80);
 
     box-shadow:0 22px 60px rgba(0,0,0,.6);
 
@@ -48,7 +61,7 @@
     /* Lo que se reserva la cabecera. Va aqui y no repetido en cada regla
        porque lo usan dos: la propia cabecera y el tope de las fotos. Si se
        escribieran por separado, tocar una dejaria a la otra desfasada. */
-    --gf-cabecera:174px;
+    --gf-cabecera:212px;
 }
 
 
@@ -66,7 +79,9 @@
 
     box-sizing:border-box;
 
-    padding:34px 0 20px;
+    /* Mas aire arriba y abajo del titulo: pegado al borde y a las caras
+       se leia como una etiqueta y no como la cabecera del grafico. */
+    padding:44px 0 30px;
 
     text-align:center;
 
@@ -86,7 +101,7 @@
 
     color:#FF3B45;
 
-    margin-bottom:6px;
+    margin-bottom:12px;
 }
 
 .gf-titulo{
@@ -109,7 +124,7 @@
    compite con el nombre del grafico. */
 .gf-categoria{
 
-    margin-top:8px;
+    margin-top:14px;
 
     font-size:20px;
     font-weight:700;
@@ -144,30 +159,16 @@
 
 .gf-lado{
 
-    /* Cada lado se pasa un poco del centro y la mascara los funde. Sin
-       solape quedaba una linea recta entre las dos caras. */
+    /* Ya no se solapan en el centro. Cada cara se va a su esquina y en
+       medio queda el hueco, que es donde va a ir la pista con las
+       posiciones. */
     flex:1 1 0;
-
-    margin-right:-70px;
 
     position:relative;
 
     height:100%;
 
     min-width:0;
-
-    display:flex;
-
-    /* Las dos caras miran al centro. */
-    justify-content:flex-end;
-}
-
-.gf-lado.der{
-
-    justify-content:flex-start;
-
-    margin-right:0;
-    margin-left:-70px;
 }
 
 /* Velo oscuro arriba y abajo. Va en un elemento propio y no en la mascara
@@ -198,9 +199,22 @@
 
     position:absolute;
 
-    inset:0;
+    top:0; bottom:0;
 
-    width:100%;
+    /* Arrimada a su esquina y no a todo el lado. Lo que sobra por dentro
+       es el hueco del medio; cuanto mas estrecha la foto, mas hueco.
+
+       De paso el encuadre mejora: la caja se acerca a la proporcion de un
+       retrato, asi que `cover` recorta bastante menos que cuando ocupaba
+       media pantalla. */
+    left:0;
+    right:auto;
+
+    /* Algo mas de la mitad de su lado. Las caras se comen mas cuadro que
+       antes y aun asi queda libre el 44% del medio, que es de sobra para
+       la pista que va ahi. */
+    width:var(--gf-foto-ancho, 56%);
+
     height:100%;
 
     max-width:none;
@@ -215,16 +229,22 @@
        linea recta. Una sola mascara y en un eje: CEF no compone bien dos
        superpuestas, y el oscurecido de arriba y abajo lo pone el velo del
        contenedor. */
-    -webkit-mask-image:linear-gradient(90deg, #000 46%, transparent 96%);
-    mask-image:linear-gradient(90deg, #000 46%, transparent 96%);
+    /* Se difumina por el borde de dentro para que la foto no termine en
+       una linea recta contra el hueco. Empieza mas tarde que antes: la
+       caja es mas estrecha y con el corte al 46% se perdia media cara. */
+    -webkit-mask-image:linear-gradient(90deg, #000 62%, transparent 100%);
+    mask-image:linear-gradient(90deg, #000 62%, transparent 100%);
 }
 
-/* En el lado derecho la mascara va al reves: se difumina hacia la
-   izquierda, que es donde esta el centro. */
+/* En el lado derecho todo va al reves: la foto se arrima a la derecha y
+   la mascara se difumina hacia la izquierda, que es donde esta el hueco. */
 .gf-lado.der .gf-foto{
 
-    -webkit-mask-image:linear-gradient(270deg, #000 46%, transparent 96%);
-    mask-image:linear-gradient(270deg, #000 46%, transparent 96%);
+    left:auto;
+    right:0;
+
+    -webkit-mask-image:linear-gradient(270deg, #000 62%, transparent 100%);
+    mask-image:linear-gradient(270deg, #000 62%, transparent 100%);
 }
 
 /* Sin foto no se deja el hueco vacio: se pone la silueta que ya usan las
@@ -232,6 +252,192 @@
 .gf-foto.sin{
 
     opacity:.35;
+}
+
+
+/* ===================================
+   LA PARRILLA DIBUJADA
+
+   Ocupa el hueco que dejan las dos caras. Va por encima del velo oscuro
+   —que esta en la 2— y por debajo de los nombres y los tiempos, que van
+   en la 5: si un apellido de la pista se cruzara con el del piloto que se
+   presenta, manda el segundo.
+
+   Todo en linea fina y apagada. Es un plano, no un dato: tiene que
+   situar sin robarle la mirada a las caras.
+=================================== */
+
+.gf-pista{
+
+    position:absolute;
+
+    /* Debajo de la cabecera, igual que las caras. */
+    top:var(--gf-cabecera);
+    bottom:0;
+
+    left:50%;
+    transform:translateX(-50%);
+
+    /* Lo que queda libre entre las dos fotos. Se deriva del ancho de la
+       foto en vez de escribirse aparte: asi al mover --gf-foto-ancho el
+       dibujo se ajusta solo y no hay dos numeros que mantener a la par. */
+    width:calc(100% - var(--gf-foto-ancho, 56%));
+
+    z-index:3;
+
+    pointer-events:none;
+}
+
+.gf-pista svg{
+
+    width:100%;
+    height:100%;
+
+    display:block;
+
+    /* Un respiro por abajo: pegado al borde, la caja de delante se leia
+       como si se saliera del cuadro. */
+    padding-bottom:26px;
+
+    box-sizing:border-box;
+
+    overflow:visible;
+}
+
+
+/* ── El asfalto ── */
+
+/* El carril del medio en gris para que se entienda que es pista y no un
+   hueco entre las dos caras. El degradado va en la plantilla, que es
+   quien conoce la perspectiva. */
+.pi-asfalto{
+
+    fill:url(#piAsfalto);
+
+    stroke:none;
+}
+
+
+/* ── Los bordes del asfalto ── */
+
+.pi-borde{
+
+    stroke:rgba(255,255,255,.30);
+
+    stroke-width:2;
+
+    fill:none;
+}
+
+
+/* ── El logo del fondo ── */
+
+/* Donde muere la pista. Es un telon y no un dato: apagado para que no
+   compita con los apellidos ni con las dos caras. */
+.pi-logo{
+
+    opacity:.34;
+}
+
+
+/* ── Las franjas de los lados ── */
+
+/* Rectas paralelas al eje de la pista, alternando rojo y blanco. Adornan
+   el hueco que dejan las caras y encuadran el asfalto sin competir con
+   los apellidos, que ahora van por dentro. */
+.pi-franja{ stroke:none; }
+
+.pi-franja.roja  { fill:#FF1B2D; }
+.pi-franja.blanca{ fill:#FFFFFF; }
+
+
+/* ── La linea de meta ── */
+
+/* A cuadros y no una franja lisa: es la bandera de meta, y asi se
+   reconoce sin que nadie tenga que explicarla. El oscuro no es negro
+   puro: sobre el asfalto, que ya es oscuro, un negro pleno abre un hueco
+   en vez de leerse como un cuadro. */
+.pi-meta .claro { fill:#FFFFFF; stroke:none; }
+.pi-meta .oscuro{ fill:#12161C; stroke:none; }
+
+
+/* ── Los sitios de la parrilla ── */
+
+/* No es una caja cerrada sino la marca de verdad: la linea de delante y
+   los dos costados, abierta por detras. Cerrada pesaba de mas para lo que
+   tiene que decir. */
+.pi-sitio{
+
+    fill:none;
+
+    stroke:rgba(255,255,255,.45);
+
+    stroke-width:2;
+
+    stroke-linejoin:round;
+    stroke-linecap:round;
+}
+
+/* La fila de los dos que se estan presentando. */
+.pi-sitio.destacada{
+
+    stroke:#FFFFFF;
+
+    stroke-width:3;
+}
+
+/* El suelo de esa fila, sin filo: dice de quien se habla sin volver a
+   cerrar la caja. */
+.pi-suelo{
+
+    fill:rgba(255,255,255,.10);
+
+    stroke:none;
+}
+
+
+/* ── Los apellidos ── */
+
+/* Van dentro del sitio, centrados sobre su boca. Fuera se cruzaban con
+   las franjas de colores y el apellido se perdia contra ellas. La sombra
+   es lo que lo despega del asfalto cuando le cae encima. */
+.pi-nombre{
+
+    fill:rgba(255,255,255,.72);
+
+    paint-order:stroke;
+
+    stroke:rgba(0,0,0,.55);
+    stroke-width:3;
+    stroke-linejoin:round;
+
+    font-family:var(--fuente-graficos);
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    dominant-baseline:middle;
+}
+
+/* La posicion, delante del apellido. Mas apagada que el nombre: dice cual
+   es el sitio, pero de quien es se lee antes. */
+.pi-pos{
+
+    fill:rgba(255,255,255,.55);
+
+    font-weight:900;
+}
+
+.pi-nombre.destacada .pi-pos{
+
+    fill:rgba(255,255,255,.85);
+}
+
+.pi-nombre.destacada{
+
+    fill:#FFFFFF;
+
+    font-weight:900;
 }
 
 
@@ -364,21 +570,11 @@
     text-overflow:ellipsis;
 }
 
-.gf-tiempo{
+/* El tiempo de clasificacion se quito de la banda: la parrilla dice en
+   que orden se sale, y con que vuelta se gano el sitio es otra cosa. Lo
+   pedia el sitio, no el grafico.
 
-    margin-top:6px;
-
-    font-size:30px;
-    font-weight:700;
-
-    line-height:1;
-
-    color:rgba(255,255,255,.9);
-
-    font-variant-numeric:tabular-nums;
-
-    text-shadow:0 2px 6px rgba(0,0,0,.9);
-}
+   El campo sigue viajando en los datos por si vuelve. */
 
 
 /* ===================================
