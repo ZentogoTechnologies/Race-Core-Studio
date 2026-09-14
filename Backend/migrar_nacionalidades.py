@@ -37,6 +37,8 @@ ALIAS = {
     "estados unidos de america": "us",
     "inglaterra": "gb",
     "rusia": "ru",
+    # Gentilicio en vez de pais. Vino asi, en mayusculas, en el respaldo del 1-sep.
+    "colombiana": "co",
 }
 
 

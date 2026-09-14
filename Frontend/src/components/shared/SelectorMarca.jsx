@@ -53,14 +53,25 @@ export default function SelectorMarca({ valor, onChange, puedeSubirLogo = true }
   const campo  = useRef(null)
   const fichero = useRef(null)
 
+  // `intento` sube al pulsar "reintentar" y vuelve a disparar la carga.
+  const [intento, setIntento] = useState(0)
+
   useEffect(() => {
     let vigente = true
+    setCargando(true)
+    setError(null)
     pedirCatalogo()
       .then(lista => { if (vigente) setMarcas(lista) })
       .catch(e => { if (vigente) setError(e.message) })
       .finally(() => { if (vigente) setCargando(false) })
     return () => { vigente = false }
-  }, [])
+  }, [intento])
+
+  /* Si el catálogo no llegó no se sabe nada de ninguna marca, ni que esté
+     ni que falte. Distinguirlo importa: sin esto, un backend caído pintaba
+     de ámbar como "fuera del catálogo" a un Renault perfectamente válido y
+     parecía que el dato estaba mal cuando el roto era la conexión. */
+  const catalogoListo = !cargando && !error && marcas.length > 0
 
   // Cerrar al pulsar fuera. Sin esto la lista se queda abierta encima de
   // los campos de abajo y tapa el botón de guardar.
@@ -161,15 +172,21 @@ export default function SelectorMarca({ valor, onChange, puedeSubirLogo = true }
             ? <><Marca m={elegida} />
                 <span className="text-white truncate">{elegida.nombre}</span></>
             : valor
-              /* Lo que ya estaba inscrito y no sale en la lista se enseña
-                 tal cual, en ámbar. Pintarlo como "Sin marca" haría creer
-                 que el dato se perdió, y no se perdió: sigue guardado y
-                 sigue saliendo al aire. Solo hay que sustituirlo por una
-                 marca de la lista, y en ámbar se ve cuál falta por tocar. */
-              ? <><AlertTriangle size={14} className="text-amber-500 flex-shrink-0" />
-                  <span className="text-amber-400 truncate" title={t('Fuera del catálogo')}>
-                    {valor}
-                  </span></>
+              /* El ámbar es una acusación —"esta marca no está en la
+                 lista"— y solo se puede hacer con el catálogo delante. Si
+                 no llegó, la marca se enseña tal cual y en blanco: está
+                 guardada y sale al aire igual, lo que falta es el catálogo
+                 para contrastarla, y eso lo dice el aviso de abajo.
+
+                 Cuando sí llegó, el ámbar señala lo que hay que sustituir
+                 por una marca de la lista. Pintarlo como "Sin marca" haría
+                 creer que el dato se perdió, y no se perdió. */
+              ? catalogoListo
+                ? <><AlertTriangle size={14} className="text-amber-500 flex-shrink-0" />
+                    <span className="text-amber-400 truncate" title={t('Fuera del catálogo')}>
+                      {valor}
+                    </span></>
+                : <span className="text-white truncate">{valor}</span>
               : <span className="text-neutral-600 truncate">{t('Sin marca')}</span>}
 
         {elegida && (
@@ -205,7 +222,21 @@ export default function SelectorMarca({ valor, onChange, puedeSubirLogo = true }
         </>
       )}
 
-      {error && <p className="mt-1 text-[11px] text-red-400">{error}</p>}
+      {/* "Error 500" a secas no le dice nada a quien está inscribiendo un
+          carro. Se nombra lo que falló —el catálogo, no la marca— y se
+          ofrece reintentar, que es lo que arregla el caso normal: el
+          backend se reinició y el panel se quedó sin la lista. */}
+      {error && (
+        <p className="mt-1 text-[11px] text-red-400">
+          {t('No se pudo cargar el catálogo de marcas')} ({error}).{' '}
+          <button
+            type="button" onClick={() => setIntento(n => n + 1)}
+            className="underline hover:text-red-300"
+          >
+            {t('Reintentar')}
+          </button>
+        </p>
+      )}
 
       {abierto && (
         <div className="absolute z-30 mt-1 w-full bg-[#0f0f0f] border border-neutral-700 rounded-lg shadow-2xl overflow-hidden">
@@ -244,9 +275,14 @@ export default function SelectorMarca({ valor, onChange, puedeSubirLogo = true }
           </div>
 
           <div className="max-h-60 overflow-y-auto">
+            {/* Con el catálogo caído la lista también sale vacía, y decir
+                ahí "ninguna coincide" manda a buscar el fallo en lo que se
+                escribió cuando el fallo es que no hay lista. */}
             {resultados.length === 0 && (
               <p className="px-3 py-4 text-neutral-600 text-sm text-center">
-                {t('Ninguna marca coincide')}
+                {catalogoListo
+                  ? t('Ninguna marca coincide')
+                  : t('El catálogo de marcas no está disponible')}
               </p>
             )}
             {resultados.map(m => (
