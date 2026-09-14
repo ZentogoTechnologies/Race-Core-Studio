@@ -42,6 +42,12 @@ datos = [
     (str(RAIZ / "Backend" / "src" / "public" / "marcas"), "public/marcas"),
     (str(RAIZ / "Backend" / "src" / "public" / "demo"),   "public/demo"),
 
+    # El catálogo de marcas: la lista cerrada que valida al guardar un
+    # vehículo. Es producto, no del cliente, así que va dentro y no se
+    # siembra en ProgramData. Sin él el selector sale vacío y el backend
+    # rechaza cualquier marca: no se podría inscribir ni un carro.
+    (str(RAIZ / "Backend" / "src" / "data"), "data"),
+
     # Las plantillas de CasparCG, que se reponen en cada actualización.
     (str(RAIZ / "Casparcg" / "template"), "plantillas"),
 ]

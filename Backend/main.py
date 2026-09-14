@@ -54,12 +54,32 @@ rutas.preparar()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     client = AsyncMongoClient(settings.MONGO_URI)
+    modelos = [Category, Pilot, Vehicle, User, Event, Ajustes, Trazado,
+               Instalacion]
     await init_beanie(
         database=client[settings.DB_NAME],
-        document_models=[Category, Pilot, Vehicle, User, Event, Ajustes, Trazado,
-                         Instalacion]
+        document_models=modelos
     )
     print("✅ Conectado a MongoDB")
+
+    # Todas las colecciones, desde el primer arranque. Beanie solo crea la
+    # que tiene índices que crear, así que en una base recién instalada
+    # salían users, pilots, vehicles y events, y faltaban categories,
+    # ajustes y trazados hasta que alguien guardara el primero. Una base a
+    # medio crear parece una instalación rota a quien la abre en Compass.
+    from pymongo.errors import CollectionInvalid
+
+    base = client[settings.DB_NAME]
+    existentes = set(await base.list_collection_names())
+    for modelo in modelos:
+        nombre = modelo.get_collection_name()
+        if nombre in existentes:
+            continue
+        try:
+            await base.create_collection(nombre)
+            print(f"   colección creada: {nombre}")
+        except CollectionInvalid:
+            pass  # la creó otro proceso entre la consulta y aquí
 
     # Los ajustes que se cambian en caliente viven en la base; se traen a
     # memoria aquí para que leer_xml no consulte Mongo en cada lectura.

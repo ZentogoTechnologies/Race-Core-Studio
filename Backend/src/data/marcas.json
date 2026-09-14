@@ -1,0 +1,3215 @@
+[
+ {
+  "id": "abarth",
+  "nombre": "Abarth",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "ac",
+  "nombre": "AC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "acura",
+  "nombre": "Acura",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "aeon",
+  "nombre": "Aeon",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "tw"
+ },
+ {
+  "id": "aion",
+  "nombre": "Aion",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "aito",
+  "nombre": "AITO",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "ajs",
+  "nombre": "AJS",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "akt",
+  "nombre": "AKT",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "co"
+ },
+ {
+  "id": "alfa-romeo",
+  "nombre": "Alfa Romeo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "alpha-kart",
+  "nombre": "Alpha Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "alpina",
+  "nombre": "Alpina",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "alpine",
+  "nombre": "Alpine",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "alvis",
+  "nombre": "Alvis",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "amc",
+  "nombre": "AMC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "apollo",
+  "nombre": "Apollo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "aprilia",
+  "nombre": "Aprilia",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "arcfox",
+  "nombre": "Arcfox",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "ariel",
+  "nombre": "Ariel",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "arrow-karts",
+  "nombre": "Arrow Karts",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "artega",
+  "nombre": "Artega",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "aston-martin",
+  "nombre": "Aston Martin",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "audi",
+  "nombre": "Audi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "austin",
+  "nombre": "Austin",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "austin-healey",
+  "nombre": "Austin-Healey",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "auteco",
+  "nombre": "Auteco",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "co"
+ },
+ {
+  "id": "auto-union",
+  "nombre": "Auto Union",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "autobianchi",
+  "nombre": "Autobianchi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "avatr",
+  "nombre": "Avatr",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "bac",
+  "nombre": "BAC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "baic",
+  "nombre": "BAIC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "bajaj",
+  "nombre": "Bajaj",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "baojun",
+  "nombre": "Baojun",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "benda",
+  "nombre": "Benda",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "benelli",
+  "nombre": "Benelli",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "bentley",
+  "nombre": "Bentley",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "bera",
+  "nombre": "Bera",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "ve"
+ },
+ {
+  "id": "bestune",
+  "nombre": "Bestune",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "beta",
+  "nombre": "Beta",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "bimota",
+  "nombre": "Bimota",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "birel-art",
+  "nombre": "Birel ART",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "bitter",
+  "nombre": "Bitter",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "bizzarrini",
+  "nombre": "Bizzarrini",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "bmw",
+  "nombre": "BMW",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "bmw-motorrad",
+  "nombre": "BMW Motorrad",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "borgward",
+  "nombre": "Borgward",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "boss-hoss",
+  "nombre": "Boss Hoss",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "brabham",
+  "nombre": "Brabham",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "au"
+ },
+ {
+  "id": "brabus",
+  "nombre": "Brabus",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "brilliance",
+  "nombre": "Brilliance",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "bristol",
+  "nombre": "Bristol",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "bsa",
+  "nombre": "BSA",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "buell",
+  "nombre": "Buell",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "bugatti",
+  "nombre": "Bugatti",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "buick",
+  "nombre": "Buick",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "bultaco",
+  "nombre": "Bultaco",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "byd",
+  "nombre": "BYD",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "cadillac",
+  "nombre": "Cadillac",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "cagiva",
+  "nombre": "Cagiva",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "callaway",
+  "nombre": "Callaway",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "caterham",
+  "nombre": "Caterham",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "cfmoto",
+  "nombre": "CFMoto",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "changan",
+  "nombre": "Changan",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "changhe",
+  "nombre": "Changhe",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "chery",
+  "nombre": "Chery",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "chevrolet",
+  "nombre": "Chevrolet",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "chrysler",
+  "nombre": "Chrysler",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "cisitalia",
+  "nombre": "Cisitalia",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "citroen",
+  "nombre": "Citroën",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "compkart",
+  "nombre": "CompKart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "courage",
+  "nombre": "Courage",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "coyote",
+  "nombre": "Coyote",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "crawford",
+  "nombre": "Crawford",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "crg",
+  "nombre": "CRG",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "croc-promotion",
+  "nombre": "Croc Promotion",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "cupra",
+  "nombre": "Cupra",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "curtiss",
+  "nombre": "Curtiss",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "cz",
+  "nombre": "ČZ",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cz"
+ },
+ {
+  "id": "czinger",
+  "nombre": "Czinger",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "dacia",
+  "nombre": "Dacia",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ro"
+ },
+ {
+  "id": "daelim",
+  "nombre": "Daelim",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "daewoo",
+  "nombre": "Daewoo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "daf",
+  "nombre": "DAF",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "nl"
+ },
+ {
+  "id": "daihatsu",
+  "nombre": "Daihatsu",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "daimler",
+  "nombre": "Daimler",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "dallara",
+  "nombre": "Dallara",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "datsun",
+  "nombre": "Datsun",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "dayun",
+  "nombre": "Dayun",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "de-tomaso",
+  "nombre": "De Tomaso",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "deepal",
+  "nombre": "Deepal",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "delage",
+  "nombre": "Delage",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "delahaye",
+  "nombre": "Delahaye",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "delorean",
+  "nombre": "DeLorean",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "derbi",
+  "nombre": "Derbi",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "dkw",
+  "nombre": "DKW",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "dodge",
+  "nombre": "Dodge",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "dongfeng",
+  "nombre": "Dongfeng",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "donkervoort",
+  "nombre": "Donkervoort",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "nl"
+ },
+ {
+  "id": "dr-racing-kart",
+  "nombre": "DR Racing Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "ds",
+  "nombre": "DS",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "ducati",
+  "nombre": "Ducati",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "duqueine",
+  "nombre": "Duqueine",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "eagle",
+  "nombre": "Eagle",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "elfin",
+  "nombre": "Elfin",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "au"
+ },
+ {
+  "id": "emmick",
+  "nombre": "Emmick",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "energy-corse",
+  "nombre": "Energy Corse",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "eos",
+  "nombre": "EOS",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "exeed",
+  "nombre": "Exeed",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "exprit",
+  "nombre": "Exprit",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "fa-kart",
+  "nombre": "FA Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "facel-vega",
+  "nombre": "Facel Vega",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "fantic",
+  "nombre": "Fantic",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "faw",
+  "nombre": "FAW",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "ferrari",
+  "nombre": "Ferrari",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "fiat",
+  "nombre": "Fiat",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "force-motors",
+  "nombre": "Force Motors",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "ford",
+  "nombre": "Ford",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "formula-k",
+  "nombre": "Formula K",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "forthing",
+  "nombre": "Forthing",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "foton",
+  "nombre": "Foton",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "fso",
+  "nombre": "FSO",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "pl"
+ },
+ {
+  "id": "gac",
+  "nombre": "GAC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "gasgas",
+  "nombre": "GasGas",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "at"
+ },
+ {
+  "id": "gaz",
+  "nombre": "GAZ",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ru"
+ },
+ {
+  "id": "geely",
+  "nombre": "Geely",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "genesis",
+  "nombre": "Genesis",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "gilera",
+  "nombre": "Gilera",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "gillard",
+  "nombre": "Gillard",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "ginetta",
+  "nombre": "Ginetta",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "glickenhaus",
+  "nombre": "Glickenhaus",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "gmc",
+  "nombre": "GMC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "gold-kart",
+  "nombre": "Gold Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "golden-dragon",
+  "nombre": "Golden Dragon",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "great-wall",
+  "nombre": "Great Wall",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "gta-motor",
+  "nombre": "GTA Motor",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "gumpert",
+  "nombre": "Gumpert",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "gurgel",
+  "nombre": "Gurgel",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "br"
+ },
+ {
+  "id": "haase",
+  "nombre": "Haase",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "haima",
+  "nombre": "Haima",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "hanteng",
+  "nombre": "Hanteng",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "haojue",
+  "nombre": "Haojue",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "harley-davidson",
+  "nombre": "Harley-Davidson",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "haval",
+  "nombre": "Haval",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "hennessey",
+  "nombre": "Hennessey",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "hero",
+  "nombre": "Hero",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "hillman",
+  "nombre": "Hillman",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "hindustan",
+  "nombre": "Hindustan",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "hino",
+  "nombre": "Hino",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "hispano-suiza",
+  "nombre": "Hispano-Suiza",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "holden",
+  "nombre": "Holden",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "au"
+ },
+ {
+  "id": "honda",
+  "nombre": "Honda",
+  "tipos": [
+   "auto",
+   "moto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "hongqi",
+  "nombre": "Hongqi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "horch",
+  "nombre": "Horch",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "horex",
+  "nombre": "Horex",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "hsv",
+  "nombre": "HSV",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "au"
+ },
+ {
+  "id": "hummer",
+  "nombre": "Hummer",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "husqvarna",
+  "nombre": "Husqvarna",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "at"
+ },
+ {
+  "id": "hyosung",
+  "nombre": "Hyosung",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "hyundai",
+  "nombre": "Hyundai",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "im-motors",
+  "nombre": "IM Motors",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "indian",
+  "nombre": "Indian",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "infiniti",
+  "nombre": "Infiniti",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "innocenti",
+  "nombre": "Innocenti",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "intrepid",
+  "nombre": "Intrepid",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "ionic-edge",
+  "nombre": "Ionic Edge",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "ipk",
+  "nombre": "IPK",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "iran-khodro",
+  "nombre": "Iran Khodro",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ir"
+ },
+ {
+  "id": "isdera",
+  "nombre": "Isdera",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "iso-rivolta",
+  "nombre": "Iso Rivolta",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "isuzu",
+  "nombre": "Isuzu",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "italdesign",
+  "nombre": "Italdesign",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "italika",
+  "nombre": "Italika",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "mx"
+ },
+ {
+  "id": "jac",
+  "nombre": "JAC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "jaecoo",
+  "nombre": "Jaecoo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "jaguar",
+  "nombre": "Jaguar",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "jawa",
+  "nombre": "Jawa",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cz"
+ },
+ {
+  "id": "jeep",
+  "nombre": "Jeep",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "jensen",
+  "nombre": "Jensen",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "jetour",
+  "nombre": "Jetour",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "jetta",
+  "nombre": "Jetta",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "jialing",
+  "nombre": "Jialing",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "jinbei",
+  "nombre": "Jinbei",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "jmc",
+  "nombre": "JMC",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "kaiyi",
+  "nombre": "Kaiyi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "kali-kart",
+  "nombre": "Kalì-Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "karry",
+  "nombre": "Karry",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "kart-republic",
+  "nombre": "Kart Republic",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "kawasaki",
+  "nombre": "Kawasaki",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "keeway",
+  "nombre": "Keeway",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "kg-mobility",
+  "nombre": "KG Mobility",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "kia",
+  "nombre": "Kia",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "king-long",
+  "nombre": "King Long",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "koenigsegg",
+  "nombre": "Koenigsegg",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "se"
+ },
+ {
+  "id": "kosmic",
+  "nombre": "Kosmic",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "kove",
+  "nombre": "Kove",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "kreidler",
+  "nombre": "Kreidler",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "ktm",
+  "nombre": "KTM",
+  "tipos": [
+   "moto",
+   "auto"
+  ],
+  "pais": "at"
+ },
+ {
+  "id": "kymco",
+  "nombre": "KYMCO",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "tw"
+ },
+ {
+  "id": "lada",
+  "nombre": "Lada",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ru"
+ },
+ {
+  "id": "lamborghini",
+  "nombre": "Lamborghini",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "lancia",
+  "nombre": "Lancia",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "land-rover",
+  "nombre": "Land Rover",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "landwind",
+  "nombre": "Landwind",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "leapmotor",
+  "nombre": "Leapmotor",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "lenzokart",
+  "nombre": "Lenzokart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "lexus",
+  "nombre": "Lexus",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "li-auto",
+  "nombre": "Li Auto",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "lifan",
+  "nombre": "Lifan",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "ligier",
+  "nombre": "Ligier",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "lincoln",
+  "nombre": "Lincoln",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "lister",
+  "nombre": "Lister",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "livan",
+  "nombre": "Livan",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "ln-kart",
+  "nombre": "LN Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "lola",
+  "nombre": "Lola",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "loncin",
+  "nombre": "Loncin",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "lotus",
+  "nombre": "Lotus",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "lucid",
+  "nombre": "Lucid",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "lynk-co",
+  "nombre": "Lynk & Co",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "mach1-kart",
+  "nombre": "Mach1 Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "mahindra",
+  "nombre": "Mahindra",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "malaguti",
+  "nombre": "Malaguti",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "maranello-kart",
+  "nombre": "Maranello Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "march",
+  "nombre": "March",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "marcos",
+  "nombre": "Marcos",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "margay",
+  "nombre": "Margay",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "marussia",
+  "nombre": "Marussia",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ru"
+ },
+ {
+  "id": "maruti-suzuki",
+  "nombre": "Maruti Suzuki",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "maserati",
+  "nombre": "Maserati",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "mastretta",
+  "nombre": "Mastretta",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "mx"
+ },
+ {
+  "id": "matchless",
+  "nombre": "Matchless",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "matra",
+  "nombre": "Matra",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "maxus",
+  "nombre": "Maxus",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "maybach",
+  "nombre": "Maybach",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "mazda",
+  "nombre": "Mazda",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "mbk",
+  "nombre": "MBK",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "mclaren",
+  "nombre": "McLaren",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "melkus",
+  "nombre": "Melkus",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "mercedes-amg",
+  "nombre": "Mercedes-AMG",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "mercedes-benz",
+  "nombre": "Mercedes-Benz",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "mercury",
+  "nombre": "Mercury",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "merlin-kart",
+  "nombre": "Merlin Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "mg",
+  "nombre": "MG",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "mini",
+  "nombre": "Mini",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "mitsubishi",
+  "nombre": "Mitsubishi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "mitsuoka",
+  "nombre": "Mitsuoka",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "montesa",
+  "nombre": "Montesa",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "morgan",
+  "nombre": "Morgan",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "moskvitch",
+  "nombre": "Moskvitch",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ru"
+ },
+ {
+  "id": "mosler",
+  "nombre": "Mosler",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "moto-guzzi",
+  "nombre": "Moto Guzzi",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "moto-morini",
+  "nombre": "Moto Morini",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "munch",
+  "nombre": "Münch",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "mv-agusta",
+  "nombre": "MV Agusta",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "mygale",
+  "nombre": "Mygale",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "neta",
+  "nombre": "Neta",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "nio",
+  "nombre": "NIO",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "nismo",
+  "nombre": "Nismo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "nissan",
+  "nombre": "Nissan",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "noble",
+  "nombre": "Noble",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "norma",
+  "nombre": "Norma",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "norton",
+  "nombre": "Norton",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "nsu",
+  "nombre": "NSU",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "ok1",
+  "nombre": "OK1",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "oldsmobile",
+  "nombre": "Oldsmobile",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "omoda",
+  "nombre": "Omoda",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "opel",
+  "nombre": "Opel",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "ora",
+  "nombre": "Ora",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "oreca",
+  "nombre": "Oreca",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "osella",
+  "nombre": "Osella",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "ossa",
+  "nombre": "Ossa",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "otk",
+  "nombre": "OTK",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "otokar",
+  "nombre": "Otokar",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "tr"
+ },
+ {
+  "id": "pagani",
+  "nombre": "Pagani",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "panhard",
+  "nombre": "Panhard",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "panoz",
+  "nombre": "Panoz",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "parolin",
+  "nombre": "Parolin",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "pcr",
+  "nombre": "PCR",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "perodua",
+  "nombre": "Perodua",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "my"
+ },
+ {
+  "id": "pescarolo",
+  "nombre": "Pescarolo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "peugeot",
+  "nombre": "Peugeot",
+  "tipos": [
+   "auto",
+   "moto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "peugeot-motocycles",
+  "nombre": "Peugeot Motocycles",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "pgo",
+  "nombre": "PGO",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "tw"
+ },
+ {
+  "id": "piaggio",
+  "nombre": "Piaggio",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "piech",
+  "nombre": "Piëch",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ch"
+ },
+ {
+  "id": "plymouth",
+  "nombre": "Plymouth",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "polestar",
+  "nombre": "Polestar",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "se"
+ },
+ {
+  "id": "pontiac",
+  "nombre": "Pontiac",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "porsche",
+  "nombre": "Porsche",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "praga",
+  "nombre": "Praga",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cz"
+ },
+ {
+  "id": "praga-kart",
+  "nombre": "Praga Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "cz"
+ },
+ {
+  "id": "proton",
+  "nombre": "Proton",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "my"
+ },
+ {
+  "id": "puma",
+  "nombre": "Puma",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "br"
+ },
+ {
+  "id": "qj-motor",
+  "nombre": "QJ Motor",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "qoros",
+  "nombre": "Qoros",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "radical",
+  "nombre": "Radical",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "ram",
+  "nombre": "Ram",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "redspeed",
+  "nombre": "Redspeed",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "renault",
+  "nombre": "Renault",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "reynard",
+  "nombre": "Reynard",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "rezvani",
+  "nombre": "Rezvani",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "ricciardo-kart",
+  "nombre": "Ricciardo Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "rieju",
+  "nombre": "Rieju",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "righetti-ridolfi",
+  "nombre": "Righetti Ridolfi",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "riley",
+  "nombre": "Riley",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "riley-technologies",
+  "nombre": "Riley Technologies",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "rimac",
+  "nombre": "Rimac",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "hr"
+ },
+ {
+  "id": "rinspeed",
+  "nombre": "Rinspeed",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ch"
+ },
+ {
+  "id": "rivian",
+  "nombre": "Rivian",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "roewe",
+  "nombre": "Roewe",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "rolls-royce",
+  "nombre": "Rolls-Royce",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "rover",
+  "nombre": "Rover",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "royal-enfield",
+  "nombre": "Royal Enfield",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "ruf",
+  "nombre": "RUF",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "saab",
+  "nombre": "Saab",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "se"
+ },
+ {
+  "id": "sachs",
+  "nombre": "Sachs",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "saipa",
+  "nombre": "Saipa",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ir"
+ },
+ {
+  "id": "saleen",
+  "nombre": "Saleen",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "saturn",
+  "nombre": "Saturn",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "sbarro",
+  "nombre": "Sbarro",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ch"
+ },
+ {
+  "id": "scion",
+  "nombre": "Scion",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "seat",
+  "nombre": "SEAT",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "es"
+ },
+ {
+  "id": "seres",
+  "nombre": "Seres",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "serpento",
+  "nombre": "Serpento",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "shelby",
+  "nombre": "Shelby",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "sherco",
+  "nombre": "Sherco",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "shineray",
+  "nombre": "Shineray",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "simca",
+  "nombre": "Simca",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "skoda",
+  "nombre": "Škoda",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cz"
+ },
+ {
+  "id": "skywell",
+  "nombre": "Skywell",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "smart",
+  "nombre": "Smart",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "sodikart",
+  "nombre": "Sodikart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "soueast",
+  "nombre": "Soueast",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "spyker",
+  "nombre": "Spyker",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "nl"
+ },
+ {
+  "id": "ssangyong",
+  "nombre": "SsangYong",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "kr"
+ },
+ {
+  "id": "steyr",
+  "nombre": "Steyr",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "at"
+ },
+ {
+  "id": "studebaker",
+  "nombre": "Studebaker",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "subaru",
+  "nombre": "Subaru",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "sunbeam",
+  "nombre": "Sunbeam",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "suzuki",
+  "nombre": "Suzuki",
+  "tipos": [
+   "auto",
+   "moto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "swift-engineering",
+  "nombre": "Swift Engineering",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "swiss-hutless",
+  "nombre": "Swiss Hutless",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "ch"
+ },
+ {
+  "id": "swm",
+  "nombre": "SWM",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "sym",
+  "nombre": "SYM",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "tw"
+ },
+ {
+  "id": "talbot",
+  "nombre": "Talbot",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "tank",
+  "nombre": "Tank",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "tata",
+  "nombre": "Tata",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "tatra",
+  "nombre": "Tatra",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cz"
+ },
+ {
+  "id": "tatuus",
+  "nombre": "Tatuus",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "tecno",
+  "nombre": "Tecno",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "tesla",
+  "nombre": "Tesla",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "tm-racing",
+  "nombre": "TM Racing",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "tofas",
+  "nombre": "Tofaş",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "tr"
+ },
+ {
+  "id": "togg",
+  "nombre": "Togg",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "tr"
+ },
+ {
+  "id": "tony-kart",
+  "nombre": "Tony Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "topkart",
+  "nombre": "Topkart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "toyota",
+  "nombre": "Toyota",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "trabant",
+  "nombre": "Trabant",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "triumph",
+  "nombre": "Triumph",
+  "tipos": [
+   "auto",
+   "moto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "troller",
+  "nombre": "Troller",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "br"
+ },
+ {
+  "id": "trumpchi",
+  "nombre": "Trumpchi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "tvr",
+  "nombre": "TVR",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "tvs",
+  "nombre": "TVS",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "in"
+ },
+ {
+  "id": "uaz",
+  "nombre": "UAZ",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "ru"
+ },
+ {
+  "id": "ultima",
+  "nombre": "Ultima",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "um",
+  "nombre": "UM",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "co"
+ },
+ {
+  "id": "van-diemen",
+  "nombre": "Van Diemen",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "vauxhall",
+  "nombre": "Vauxhall",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "vector",
+  "nombre": "Vector",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "velocette",
+  "nombre": "Velocette",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "venturi",
+  "nombre": "Venturi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "fr"
+ },
+ {
+  "id": "venucia",
+  "nombre": "Venucia",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "vespa",
+  "nombre": "Vespa",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "victory",
+  "nombre": "Victory",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "vinfast",
+  "nombre": "VinFast",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "vn"
+ },
+ {
+  "id": "voge",
+  "nombre": "Voge",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "volkswagen",
+  "nombre": "Volkswagen",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "volvo",
+  "nombre": "Volvo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "se"
+ },
+ {
+  "id": "voyah",
+  "nombre": "Voyah",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "vuhl",
+  "nombre": "VUHL",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "mx"
+ },
+ {
+  "id": "wartburg",
+  "nombre": "Wartburg",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "westfield",
+  "nombre": "Westfield",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "wey",
+  "nombre": "Wey",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "wiesmann",
+  "nombre": "Wiesmann",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "de"
+ },
+ {
+  "id": "wildkart",
+  "nombre": "Wildkart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "wolf-racing-cars",
+  "nombre": "Wolf Racing Cars",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "wuling",
+  "nombre": "Wuling",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "xiaomi",
+  "nombre": "Xiaomi",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "xpeng",
+  "nombre": "XPeng",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "yamaha",
+  "nombre": "Yamaha",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "jp"
+ },
+ {
+  "id": "yugo",
+  "nombre": "Yugo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "rs"
+ },
+ {
+  "id": "zagato",
+  "nombre": "Zagato",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "zanardi",
+  "nombre": "Zanardi",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "it"
+ },
+ {
+  "id": "zastava",
+  "nombre": "Zastava",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "rs"
+ },
+ {
+  "id": "zeekr",
+  "nombre": "Zeekr",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "zenvo",
+  "nombre": "Zenvo",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "dk"
+ },
+ {
+  "id": "zero",
+  "nombre": "Zero",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "us"
+ },
+ {
+  "id": "zip-kart",
+  "nombre": "Zip Kart",
+  "tipos": [
+   "kart"
+  ],
+  "pais": "gb"
+ },
+ {
+  "id": "znen",
+  "nombre": "Znen",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "zongshen",
+  "nombre": "Zongshen",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "zontes",
+  "nombre": "Zontes",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "zotye",
+  "nombre": "Zotye",
+  "tipos": [
+   "auto"
+  ],
+  "pais": "cn"
+ },
+ {
+  "id": "zundapp",
+  "nombre": "Zündapp",
+  "tipos": [
+   "moto"
+  ],
+  "pais": "de"
+ }
+]

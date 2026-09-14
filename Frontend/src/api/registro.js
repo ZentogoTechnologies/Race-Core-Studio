@@ -130,6 +130,24 @@ export const borrarFotoVehiculo = (vehicleId, archivo) =>
 // El backend ya devuelve photo_urls relativas al origen; esto las
 // completa para usarlas en un <img>.
 export const urlFotoVehiculo = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
+
+// ─── Catálogo de marcas ───────────────────────────────────────
+// La marca ya no se escribe: se elige de una lista cerrada que sirve el
+// backend. No se copia aquí a propósito —dos listas se separan en cuanto
+// se toca una— y la que manda tiene que ser la que valida al guardar.
+//
+// `tipo` acota a 'auto', 'moto' o 'kart'; sin él vienen las cuatrocientas.
+
+export const listarMarcas = (tipo) => pedir(`/vehicles/marcas${query({ tipo })}`)
+
+// Los logos son marcas registradas y no vienen con el sistema, así que se
+// suben cuando hace falta. El nombre del archivo lo pone el backend: es el
+// identificador de la marca, que es lo que hace que lo encuentren tanto el
+// panel como los gráficos.
+export const subirLogoMarca = (marca, archivo) =>
+  subirArchivo(`/vehicles/marcas/${encodeURIComponent(marca)}/logo`, archivo)
+
+export const urlLogoMarca = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
 export const categoriasApi = recurso('/categories')
 
 // ─── Logo de la categoría ─────────────────────────────────────────

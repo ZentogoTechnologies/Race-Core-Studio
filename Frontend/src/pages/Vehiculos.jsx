@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
+import SelectorMarca from '../components/shared/SelectorMarca'
 import {
   borrarFotoVehiculo, categoriasApi, pilotosApi, quitarFondoVehiculo,
   subirFotoVehiculo,
@@ -233,6 +234,14 @@ export default function VehiculosModule() {
 
   const handleSave = async (e) => {
     e.preventDefault()
+
+    // El campo era un <input required> y el navegador lo frenaba solo. Un
+    // selector propio no lo vigila nadie, asi que se comprueba aqui.
+    if (!vehicleForm.brand) {
+      toast.error('Falta la marca', 'Elige una marca de la lista')
+      return
+    }
+
     setGuardando(true)
 
     const cuerpo = {
@@ -454,9 +463,13 @@ export default function VehiculosModule() {
             </div>
             <div>
               <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Marca')}</label>
-              <input required type="text" value={vehicleForm.brand}
-                onChange={e => setVehicleForm({ ...vehicleForm, brand: e.target.value })}
-                className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
+              {/* Se elige, no se escribe. El logo de la marca se busca por
+                  su nombre, asi que un 'Mc Laren' tecleado salia al aire
+                  sin logo y nadie se enteraba hasta verlo en pantalla. */}
+              <SelectorMarca
+                valor={vehicleForm.brand}
+                onChange={brand => setVehicleForm({ ...vehicleForm, brand })}
+              />
             </div>
             <div>
               <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Modelo')}</label>
