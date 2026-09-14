@@ -400,6 +400,35 @@ def paso_base_de_datos() -> bool:
     return True
 
 
+def token_de_instalacion() -> str:
+    """El token del asistente web, o cadena vacía si ya no hace falta.
+
+    El backend borra el archivo al terminar el asistente, así que su
+    presencia es la señal —la única— de que la instalación sigue a medias.
+    """
+    archivo = _elegir(rutas_de_datos() / "instalacion.token",
+                      RAIZ / "Backend" / "instalacion.token")
+    if not archivo.is_file():
+        return ""
+    try:
+        return archivo.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
+
+
+def url_del_panel() -> str:
+    """A dónde mandar el navegador al arrancar.
+
+    Si el asistente sigue pendiente hay que entrar con su token puesto:
+    sin él la primera pantalla contesta «Falta el token de instalación»
+    y el cliente se queda ahí, sin nada que pueda hacer.
+    """
+    clave = token_de_instalacion()
+    if clave:
+        return f"{URL_PANEL}instalacion?token={clave}"
+    return URL_PANEL
+
+
 def avisar_sin_usuarios() -> None:
     """Sin cuentas nadie entra, pero el remedio depende de dónde se quedó.
 
@@ -411,23 +440,14 @@ def avisar_sin_usuarios() -> None:
     El enlace va con el token puesto. Es lo que el instalador enseñó una
     vez, y quien cierre esa pestaña no tiene de dónde sacarlo.
     """
-    token = _elegir(rutas_de_datos() / "instalacion.token",
-                    RAIZ / "Backend" / "instalacion.token")
+    clave = token_de_instalacion()
 
-    if token.is_file():
-        try:
-            clave = token.read_text(encoding="utf-8").strip()
-        except OSError:
-            clave = ""
-
+    if clave:
         aviso("la instalación no se ha terminado todavía")
         detalle("las tres cuentas —dueño, administrador y estándar— se crean")
         detalle("en el asistente web, no a mano. Termínalo aquí:")
         detalle("")
-        if clave:
-            detalle(f"   http://127.0.0.1:{PUERTO_BACKEND}/instalacion?token={clave}")
-        else:
-            detalle(f"   no pude leer {token}")
+        detalle(f"   {url_del_panel()}")
         return
 
     aviso("no hay usuarios: nadie podrá entrar")
@@ -507,13 +527,14 @@ def paso_backend() -> bool:
 def paso_navegador() -> bool:
     paso(4, "Abriendo el panel")
 
+    destino = url_del_panel()
     try:
-        webbrowser.open(URL_PANEL)
-        ok(URL_PANEL)
+        webbrowser.open(destino)
+        ok(destino)
         return True
     except Exception as e:
         aviso("no pude abrir el navegador solo")
-        detalle(f"entra a mano: {URL_PANEL}  ({type(e).__name__})")
+        detalle(f"entra a mano: {destino}  ({type(e).__name__})")
         return True   # no es motivo para dar el arranque por fallido
 
 
@@ -845,7 +866,7 @@ class Mando:
 
     def abrir_panel(self) -> None:
         from panel import abrir_en_navegador
-        abrir_en_navegador(URL_PANEL)
+        abrir_en_navegador(url_del_panel())
 
     def abrir_registro(self) -> None:
         """Abre error.log con lo que Windows use para los .log."""

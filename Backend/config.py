@@ -2,16 +2,14 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# Carpeta del backend.
-#
-# Las rutas relativas de los ajustes se resuelven contra esto y NO contra
-# el directorio actual. El instalador corre desde la raíz del repositorio
-# y el backend desde Backend/, así que "licencia.lic" apuntaba a dos
-# sitios distintos según quién la leyera: el instalador dejaba el token
-# de instalación en la raíz y el backend lo buscaba en Backend/, no lo
-# encontraba, y daba el asistente por no disponible.
+# Las rutas relativas de los ajustes NO se resuelven contra el directorio
+# actual: el instalador corre desde la raíz del repositorio y el backend
+# desde Backend/, así que "licencia.lic" apuntaba a dos sitios distintos
+# según quién la leyera. Se anclan a rutas.DATOS (ver ruta_del_backend).
 import rutas
 
+# Carpeta del backend. Solo para leer cosas que viajan con el programa,
+# como el archivo VERSION. Lo que se escribe va a rutas.DATOS.
 BASE_DIR = Path(__file__).resolve().parent
 
 
@@ -32,13 +30,21 @@ def _version() -> str:
 
 
 def ruta_del_backend(valor: str) -> Path:
-    """Una ruta de los ajustes, anclada a la carpeta del backend.
+    """Una ruta de los ajustes, anclada a donde se puede escribir.
+
+    Las tres rutas que pasan por aquí —el token del asistente, la
+    licencia y su estado— se escriben, no solo se leen. Anclarlas a la
+    carpeta del programa funcionaba sin congelar (allí DATOS es esta
+    misma carpeta) pero instalado dejaba el token dentro de «Archivos de
+    programa», donde un usuario normal no puede escribir y donde el
+    lanzador no lo busca: el asistente se abría pidiendo un token que
+    nadie tenía de dónde sacar.
 
     Las absolutas se respetan tal cual: un cliente puede querer la
     licencia en otro disco.
     """
     ruta = Path(valor).expanduser()
-    return ruta if ruta.is_absolute() else BASE_DIR / ruta
+    return ruta if ruta.is_absolute() else rutas.DATOS / ruta
 
 class Settings(BaseSettings):
     # Sin esto el archivo .env no se lee: los valores salian siempre

@@ -48,11 +48,11 @@ export default function Instalacion() {
         if (!api.leerToken()) {
           // Se dice dónde está: quien llega aquí ya perdió el enlace, y
           // repetir «ábrelo desde el enlace» no le da forma de salir.
-          setBloqueo('Falta el token de instalación. Ábrelo desde el enlace que '
-                   + 'mostró el instalador. Si ya no lo tienes, el token está en '
-                   + 'Backend\\instalacion.token, dentro de la carpeta de '
-                   + 'instalación: añádelo a la dirección como '
-                   + '/instalacion?token=EL-TOKEN')
+          setBloqueo('Falta el token de instalación. La forma sencilla es volver '
+                   + 'a abrir Race Core Studio: el lanzador abre el navegador con '
+                   + 'el token ya puesto. Si prefieres hacerlo a mano, el token '
+                   + 'está en C:\\ProgramData\\Race Core Studio\\instalacion.token; '
+                   + 'añádelo a la dirección como /instalacion?token=EL-TOKEN')
           return
         }
         // Se retoma donde lo dejó, no desde el principio: cerrar el
