@@ -500,7 +500,7 @@ tr.vuelta-rapida .rs-best{
 
 /* El pie es solo la leyenda: qué significan el punto morado y la P. El
    nombre de la pista se quitó —lo dice la cabecera, y el XML lo manda
-   abreviado como "Autodromo AP"—, así que las dos entradas van juntas a
+   abreviado—, así que las dos entradas van juntas a
    la izquierda en vez de repartidas a los dos extremos. */
 .rs-pie{
 

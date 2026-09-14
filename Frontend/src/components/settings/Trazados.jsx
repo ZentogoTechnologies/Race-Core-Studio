@@ -181,7 +181,7 @@ export default function Trazados() {
               <input
                 type="text" value={nuevo.name} autoFocus
                 onChange={e => setNuevo(n => ({ ...n, name: e.target.value }))}
-                placeholder="Autódromo Panamá"
+                placeholder="Nombre del autódromo"
                 className="w-full bg-[#141414] border border-neutral-800 rounded p-2.5 text-sm focus:border-red-600 focus:outline-none text-white"
               />
             </div>

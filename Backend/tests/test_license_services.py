@@ -72,7 +72,7 @@ def token(
         "exp": int((ahora + timedelta(days=dias_para_vencer)).timestamp()),
         "producto": producto,
         "cliente": "Autódromo Panamá",
-        "correo": "pablo@autodromopanama.com",
+        "correo": "contacto@cliente.com",
         "equipo": equipo,
         "plan": plan,
         "features": ["graficos", "pilotos"],

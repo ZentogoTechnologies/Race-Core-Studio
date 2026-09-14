@@ -1,14 +1,16 @@
 """Trazados de pista: alta, imagen y cuál está activo.
 
-La imagen acaba siempre dentro de la plantilla de CasparCG, se haya subido
-desde el navegador o escrito su ruta en el servidor. Es a propósito: la
-plantilla se abre con file:// y una imagen suelta en otro disco puede no
-resolverse, además de perderse si alguien mueve la carpeta.
+La imagen vive en public/trazados, con el resto de lo que sube el cliente
+—fotos de pilotos, logos de categorías—, y se llama como el trazado: 3.png
+es la del trazado 3. Así se sabe qué es cada archivo sin abrirlo, y
+renombrar el circuito no deja la imagen con un nombre que ya no le toca.
+
+CasparCG la pide por HTTP al backend, igual que las fotos de los pilotos.
+La plantilla se abre con file:// y no tiene contra qué resolver una ruta
+relativa fuera de su carpeta, así que la dirección va completa.
 """
 
-import re
 import shutil
-import unicodedata
 from pathlib import Path
 from typing import Optional
 
@@ -18,10 +20,16 @@ from src.models.tracks_model import Trazado
 
 import rutas
 
-# Backend/src/public/circuit-image, mirando desde Backend/src/services.
-# Las imágenes viven con el resto del material del cliente —fotos de
-# pilotos, logos de marcas— y no dentro de la carpeta de CasparCG.
-CARPETA_IMAGENES = rutas.PUBLICO / "circuit-image"
+# public/trazados. Instalado es ProgramData; en desarrollo, Backend/src/public.
+CARPETA_IMAGENES = rutas.PUBLICO / "trazados"
+
+# Donde vivieron antes, y solo se miran al arrancar para traer lo que
+# quede: public/circuit-image en las primeras instalaciones, y dentro de
+# la plantilla de CasparCG en las versiones anteriores a esas.
+CARPETAS_ANTIGUAS = (
+    rutas.PUBLICO / "circuit-image",
+    rutas.PLANTILLAS / "img" / "circuits",
+)
 
 EXTENSIONES = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
 
@@ -30,35 +38,77 @@ EXTENSIONES = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
 TOPE_BYTES = 12 * 1024 * 1024
 
 
-def _sanear(texto: str) -> str:
-    """Un nombre de fichero seguro a partir del nombre del trazado."""
-    limpio = unicodedata.normalize("NFD", texto or "")
-    limpio = "".join(c for c in limpio if unicodedata.category(c) != "Mn")
-    limpio = re.sub(r"[^a-zA-Z0-9]+", "-", limpio).strip("-").lower()
-    return limpio or "trazado"
+def nombre_de(trazado_id: int, extension: str) -> str:
+    """El nombre del archivo de un trazado: su número y nada más."""
+    return f"{trazado_id}{extension.lower()}"
 
 
 def ruta_plantilla(imagen: Optional[str]) -> Optional[str]:
     """La URL con la que CasparCG carga la imagen del trazado.
 
-    Absoluta y por HTTP, no una ruta de disco. La plantilla se abre desde
-    file://, que no tiene contra qué resolver una ruta relativa, así que
-    tiene que apuntar al backend igual que ya hacen las fotos de pilotos
-    y los logos de marcas.
-
-    La consecuencia es que el backend debe estar corriendo para que el
-    trazado salga al aire. No añade una dependencia nueva: sin backend
-    tampoco saldrían las fotos ni los logos, ni habría de dónde sacar el
-    cronometraje.
+    Absoluta y por HTTP, no una ruta de disco: la plantilla se abre desde
+    file://. Significa que el backend tiene que estar corriendo para que el
+    trazado salga al aire, que no es nada nuevo: sin backend tampoco salen
+    las fotos, los logos ni el cronometraje.
     """
     from config import settings
 
     if not imagen:
         return None
 
-    return f"{settings.PUBLIC_BASE_URL.rstrip('/')}/public/circuit-image/{imagen}"
+    return f"{settings.PUBLIC_BASE_URL.rstrip('/')}/public/trazados/{imagen}"
 
 
+async def migrar_imagenes_antiguas() -> list[str]:
+    """Trae a public/trazados las imágenes guardadas con el esquema anterior.
+
+    Antes vivían dentro de la plantilla y se llamaban con el nombre del
+    circuito —3-autodromo-panama.png—. Se hace al arrancar y no con un
+    script aparte para que ninguna instalación se quede con trazados sin
+    imagen por no haberlo corrido.
+
+    Idempotente: lo ya migrado no se toca. Se copia primero y el original
+    solo se borra cuando la base ya apunta al nuevo, así que un corte a
+    mitad no deja a ningún trazado sin su imagen.
+    """
+    hechos = []
+    copiados = set()
+
+    for doc in await Trazado.find({"image": {"$nin": [None, ""]}}).to_list():
+        nuevo = nombre_de(doc.trazado_id, Path(doc.image).suffix)
+        destino = CARPETA_IMAGENES / nuevo
+
+        if doc.image == nuevo and destino.is_file():
+            continue
+
+        origen = next((carpeta / doc.image
+                       for carpeta in (CARPETA_IMAGENES, *CARPETAS_ANTIGUAS)
+                       if (carpeta / doc.image).is_file()), None)
+
+        # La base la nombra pero no está en ningún sitio. No hay nada que
+        # traer, y vaciar el campo borraría la pista de qué faltaba.
+        if origen is None:
+            continue
+
+        CARPETA_IMAGENES.mkdir(parents=True, exist_ok=True)
+
+        if origen.resolve() != destino.resolve():
+            shutil.copy2(origen, destino)
+            copiados.add(origen)
+
+        doc.image = nuevo
+        await doc.save()
+        hechos.append(f"{origen.name} -> trazados/{nuevo}")
+
+    # Los originales se van cuando ningún trazado los nombra ya.
+    for origen in copiados:
+        if await Trazado.find_one({"image": origen.name}) is None:
+            try:
+                origen.unlink()
+            except OSError:
+                pass
+
+    return hechos
 
 
 class TrazadosService:
@@ -152,7 +202,7 @@ class TrazadosService:
 
     def _destino(self, doc: Trazado, extension: str) -> Path:
         CARPETA_IMAGENES.mkdir(parents=True, exist_ok=True)
-        return CARPETA_IMAGENES / f"{doc.trazado_id}-{_sanear(doc.name)}{extension}"
+        return CARPETA_IMAGENES / nombre_de(doc.trazado_id, extension)
 
     async def _asignar(self, doc: Trazado, destino: Path) -> Trazado:
         anterior = doc.image
@@ -161,7 +211,8 @@ class TrazadosService:
         await doc.save()
 
         # La de antes se borra si nadie más la usa y no es la que se acaba
-        # de escribir (al repetir extensión, destino y anterior coinciden).
+        # de escribir. Con el nombre por número solo difieren cuando cambia
+        # la extensión: 3.jpg se va al subir 3.png.
         if anterior and anterior != destino.name:
             en_uso = await Trazado.find_one({"image": anterior})
             if en_uso is None:

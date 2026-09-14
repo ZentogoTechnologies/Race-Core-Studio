@@ -3,8 +3,8 @@
     python tools/licencias/emitir.py \
         --privada claves/licencias-privada.pem \
         --producto race-core-studio \
-        --cliente "Autódromo Panamá" \
-        --correo pablo@autodromopanama.com \
+        --cliente "Nombre del cliente" \
+        --correo contacto@cliente.com \
         --equipo e56a66e9...  \
         --meses 12
 

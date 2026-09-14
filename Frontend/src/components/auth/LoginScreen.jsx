@@ -74,7 +74,6 @@ export default function LoginScreen() {
                 disabled={enviando}
                 autoComplete="username"
                 className="w-full bg-[#0a0a0a] border border-neutral-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:border-red-600 transition-colors"
-                placeholder="admin"
               />
             </div>
           </div>
@@ -92,7 +91,6 @@ export default function LoginScreen() {
                 disabled={enviando}
                 autoComplete="current-password"
                 className="w-full bg-[#0a0a0a] border border-neutral-800 text-white pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:border-red-600 transition-colors"
-                placeholder="admin"
               />
             </div>
           </div>

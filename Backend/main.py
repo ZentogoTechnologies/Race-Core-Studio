@@ -81,6 +81,13 @@ async def lifespan(app: FastAPI):
         except CollectionInvalid:
             pass  # la creó otro proceso entre la consulta y aquí
 
+    # Las imágenes de trazados guardadas con el esquema anterior —dentro de
+    # la plantilla y con el nombre del circuito— pasan a public/trazados.
+    from src.services.tracks_services import migrar_imagenes_antiguas
+
+    for movida in await migrar_imagenes_antiguas():
+        print(f"   trazado migrado: {movida}")
+
     # Los ajustes que se cambian en caliente viven en la base; se traen a
     # memoria aquí para que leer_xml no consulte Mongo en cada lectura.
     from src.services.settings_services import cargar_ajustes
@@ -150,7 +157,7 @@ app.mount(
 )
 
 # Imágenes de los trazados. Viven dentro de src/public, así que el
-# montaje de arriba ya las sirve en /public/circuit-image/ y es de ahí de
+# montaje de arriba ya las sirve en /public/trazados/ y es de ahí de
 # donde las carga CasparCG.
 #
 # Se conserva además /media/circuits apuntando a la misma carpeta: es la

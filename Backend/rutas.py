@@ -111,7 +111,7 @@ PROPIAS_DEL_CLIENTE = ("img/logo-cliente.png",)
 SEMBRADAS = ("marcas", "demo")
 
 # Las que se llenan solo con lo que suba.
-SUBIDAS = ("pilotos", "vehiculos", "categorias", "eventos", "circuit-image")
+SUBIDAS = ("pilotos", "vehiculos", "categorias", "eventos", "trazados")
 
 
 def preparar() -> None:
