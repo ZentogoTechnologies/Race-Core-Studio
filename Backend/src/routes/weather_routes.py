@@ -10,7 +10,7 @@ async def clima(
     forzar: bool = Query(False, description="Ignora la caché y vuelve a consultar"),
 ):
     """
-    Clima actual en el autódromo (Sajalices, Capira).
+    Clima actual en el autódromo configurado (WEATHER_* en .env).
 
     Si el servicio no responde se devuelve el último dato conocido con
     `obsoleto: true`: al aire vale más un dato de hace un rato que un hueco

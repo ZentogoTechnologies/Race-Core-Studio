@@ -342,7 +342,7 @@ export default function EventosModule() {
             </div>
             <div className="md:col-span-2">
               <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Sede')}</label>
-              <input type="text" value={eventForm.location} placeholder="Autódromo Panamá"
+              <input type="text" value={eventForm.location} placeholder="Nombre del autódromo"
                 onChange={e => setEventForm({ ...eventForm, location: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>

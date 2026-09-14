@@ -77,7 +77,7 @@ def _consultar(lat: float, lon: float) -> dict:
             "temperature_2m", "relative_humidity_2m", "apparent_temperature",
             "precipitation", "weather_code", "wind_speed_10m", "is_day",
         ]),
-        "timezone": "America/Panama",
+        "timezone": "auto",
         "wind_speed_unit": "kmh",
     }
 

@@ -53,12 +53,13 @@ class Settings(BaseSettings):
     JWT_EXPIRE_HOURS: int = 12
 
     # ── Clima ────────────────────────────────────────────────
-    # Autódromo Panamá, Sajalices (Capira). Coordenadas tomadas del
-    # marcador del sitio en Google Maps.
-    WEATHER_LAT: float = 8.7016426
-    WEATHER_LON: float = -79.8702415
-    WEATHER_PLACE: str = "Sajalices, Capira"
-    WEATHER_COUNTRY: str = "PANAMÁ"
+    # Dónde está el circuito. Vacío a propósito: el software no es de un
+    # autódromo en concreto. Cada instalación pone lo suyo en .env
+    # (WEATHER_LAT, WEATHER_LON, WEATHER_PLACE, WEATHER_COUNTRY).
+    WEATHER_LAT: float = 0.0
+    WEATHER_LON: float = 0.0
+    WEATHER_PLACE: str = ""
+    WEATHER_COUNTRY: str = ""
 
     # Segundos que se reutiliza la última consulta. El clima no cambia de
     # un segundo a otro y la plantilla se puede sacar al aire muchas veces

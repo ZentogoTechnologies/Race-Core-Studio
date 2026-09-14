@@ -2,7 +2,7 @@
    BANDERAS - PLAY / STOP
 
    La bandera se despliega de izquierda a derecha desde el borde del logo.
-   El logo del Autodromo Panama queda siempre fijo en su posicion.
+   El logo del cliente queda siempre fijo en su posicion.
 
    La animacion de entrada arranca sola al cargar (via CSS), asi que el
    template funciona igual con CG ADD ... 1 (play-on-load) que sin el.
