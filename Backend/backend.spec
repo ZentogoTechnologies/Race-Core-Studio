@@ -25,6 +25,17 @@ for paquete in ("beanie", "motor", "pymongo", "pydantic", "pydantic_settings",
                 "uvicorn", "PIL"):
     ocultos += collect_submodules(paquete)
 
+# onnxruntime lo importa recorte_services DENTRO de una funcion, para no
+# cargar 45 MB en cada arranque cuando casi nadie recorta una foto. El
+# analizador sigue los imports de dentro de funciones, pero lo que no
+# arrastra solo es su parte nativa: los .dll del motor y sus proveedores
+# de ejecucion, que se cargan por nombre en tiempo de ejecucion.
+#
+# Sin esto el .exe compila, arranca y sirve; y revienta la primera vez
+# que alguien pulsa «quitar fondo», que es justo cuando el cliente esta
+# preparando las fotos de los pilotos para una carrera.
+ocultos += ["onnxruntime", "onnxruntime.capi", "onnxruntime.capi._pybind_state"]
+
 # Los routers y servicios se importan desde main por su nombre; van
 # igualmente, pero se declaran para que no dependa del orden de análisis.
 ocultos += collect_submodules("src")

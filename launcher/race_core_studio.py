@@ -852,7 +852,8 @@ class Mando:
 
         # A esperar a que el panel web conteste para abrirlo.
         if esperar(lambda: puerto_abierto(PUERTO_BACKEND), 120):
-            self.panel.avisar("red", f"Desde otro equipo:  http://{ip_de_la_red()}:{PUERTO_BACKEND}")
+            from textos import t as _t
+            self.panel.avisar("red", f'{_t("desde_otro")}  http://{ip_de_la_red()}:{PUERTO_BACKEND}')
             self.abrir_panel()
             # Se aparta: el operador trabaja en el navegador, no aquí.
             # Sigue viva en la barra de tareas por si hay que volver.

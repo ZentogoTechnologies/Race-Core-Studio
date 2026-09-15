@@ -22,6 +22,8 @@ import threading
 import tkinter as tk
 import webbrowser
 
+from textos import t
+
 # ─── Colores, los de la marca ────────────────────────────────
 
 FONDO      = "#0f0f10"
@@ -36,14 +38,15 @@ VERDE      = "#22c55e"
 AMBAR      = "#eab308"
 GRIS       = "#6b7280"
 
-# Estado → (color del punto, rótulo)
+# Estado → (color del punto, clave del rótulo). La clave y no el texto:
+# el idioma se resuelve al pintar cada fila, no al importar el módulo.
 ESTADOS = {
-    "on":    (VERDE, "EN MARCHA"),
-    "aire":  (VERDE, "AL AIRE"),
-    "wait":  (AMBAR, "ARRANCANDO"),
-    "off":   (GRIS,  "DETENIDO"),
-    "espera": (GRIS, "EN ESPERA"),
-    "error": (ROJO,  "NO RESPONDE"),
+    "on":     (VERDE, "est_on"),
+    "aire":   (VERDE, "est_aire"),
+    "wait":   (AMBAR, "est_wait"),
+    "off":    (GRIS,  "est_off"),
+    "espera": (GRIS,  "est_espera"),
+    "error":  (ROJO,  "est_error"),
 }
 
 
@@ -87,7 +90,8 @@ class Servicio:
         tk.Frame(self.marco, bg=LINEA, height=1).pack(fill="x")
 
     def poner(self, estado: str) -> None:
-        color, rotulo = ESTADOS.get(estado, ESTADOS["off"])
+        color, clave = ESTADOS.get(estado, ESTADOS["off"])
+        rotulo = t(clave)
         self.punto.itemconfig(self._circulo, fill=color)
         self.rotulo.config(text=rotulo, fg=color if estado != "off" else TENUE)
 
@@ -148,14 +152,14 @@ class Panel:
         # La base de datos no lleva «Detener» a propósito: es un servicio
         # de Windows, puede estar sirviendo a otra cosa, y pararla con el
         # sistema al aire es un error difícil de deshacer.
-        self.mongo = Servicio(caja, "Base de datos", "MongoDB · puerto 27017",
-                              [("Arrancar", self.mando.arrancar_mongo)])
-        self.caspar = Servicio(caja, "Servidor de gráficos", "CasparCG · puerto 5250",
-                               [("Arrancar", self.mando.arrancar_caspar),
-                                ("Detener", self.mando.detener_caspar)])
-        self.rcs = Servicio(caja, "Race Core Studio", "Panel y API · puerto 8080",
-                            [("Arrancar", self.mando.arrancar_rcs),
-                             ("Detener", self.mando.detener_rcs)])
+        self.mongo = Servicio(caja, t("base_datos"), t("base_detalle"),
+                              [(t("arrancar"), self.mando.arrancar_mongo)])
+        self.caspar = Servicio(caja, t("graficos"), t("graficos_det"),
+                               [(t("arrancar"), self.mando.arrancar_caspar),
+                                (t("detener"), self.mando.detener_caspar)])
+        self.rcs = Servicio(caja, t("programa"), t("programa_det"),
+                            [(t("arrancar"), self.mando.arrancar_rcs),
+                             (t("detener"), self.mando.detener_rcs)])
 
     def _pie(self) -> None:
         pie = tk.Frame(self.raiz, bg=FONDO_PIE)
@@ -164,7 +168,7 @@ class Panel:
         self.aviso = tk.Label(pie, text="", bg=FONDO_PIE, fg="#e8a8ac",
                               font=("Segoe UI", 8), wraplength=510, justify="left")
 
-        self.abrir = tk.Button(pie, text="ABRIENDO…", command=self.mando.abrir_panel,
+        self.abrir = tk.Button(pie, text=t("abriendo"), command=self.mando.abrir_panel,
                                bg=ROJO, fg="#ffffff", activebackground=ROJO_OSC,
                                activeforeground="#ffffff", relief="flat", bd=0,
                                font=("Segoe UI", 11, "bold"), pady=10, cursor="hand2",
@@ -178,7 +182,7 @@ class Panel:
                             font=("Consolas", 8))
         self.red.pack(side="left")
 
-        tk.Button(abajo, text="Ver error.log", command=self.mando.abrir_registro,
+        tk.Button(abajo, text=t("ver_registro"), command=self.mando.abrir_registro,
                   bg=FONDO_PIE, fg=TENUE, activebackground=FONDO_PIE,
                   activeforeground=TEXTO, relief="flat", bd=0,
                   font=("Segoe UI", 8, "underline"), cursor="hand2").pack(side="right")
@@ -205,11 +209,11 @@ class Panel:
             fila = filas[clave]
             fila.poner(valor)
             arrancado = valor in ("on", "aire", "wait")
-            fila.mostrar_boton("Arrancar", not arrancado)
-            fila.mostrar_boton("Detener", arrancado)
+            fila.mostrar_boton(t("arrancar"), not arrancado)
+            fila.mostrar_boton(t("detener"), arrancado)
 
         elif clave == "listo":
-            self.abrir.config(text="ABRIR EL PANEL", state="normal")
+            self.abrir.config(text=t("abrir_panel"), state="normal")
 
         elif clave == "red":
             self.red.config(text=valor)

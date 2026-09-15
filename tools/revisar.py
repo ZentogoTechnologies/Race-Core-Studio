@@ -8,6 +8,7 @@ porque no llegan a importar nada.
 """
 
 import ast
+import re
 import sys
 from pathlib import Path
 
@@ -66,7 +67,7 @@ def rutas_del_instalador(iss: Path, payload: Path) -> list:
     if not payload.is_dir():
         return []
 
-    texto = iss.read_text(encoding="utf-8")
+    texto = iss.read_text(encoding="utf-8-sig")
     problemas = []
 
     for linea in texto.splitlines():
@@ -114,7 +115,7 @@ def almohadillas_sueltas(iss: Path) -> list:
                   "elif", "endif", "error", "pragma", "expr", "insert",
                   "append", "emit", "file", "sub", "endsub", "for")
 
-    for n, linea in enumerate(iss.read_text(encoding="utf-8").splitlines(), 1):
+    for n, linea in enumerate(iss.read_text(encoding="utf-8-sig").splitlines(), 1):
         limpia = linea.lstrip()
         if not limpia.startswith("#"):
             continue
@@ -124,6 +125,63 @@ def almohadillas_sueltas(iss: Path) -> list:
                 f"{iss.name}:{n}: la linea empieza por «{limpia[:14]}» y el "
                 f"preprocesador de Inno la tomara por una directiva. "
                 f"Pon el #13#10 al final de la linea anterior")
+
+    return problemas
+
+
+def mensajes_en_los_dos_idiomas(iss: Path) -> list:
+    """Cada {cm:Clave} definida y traducida en TODOS los idiomas.
+
+    Inno no se queja de un mensaje que falta: lo sustituye por nada. Una
+    clave definida solo en «es.» deja al cliente inglés un botón sin
+    etiqueta, un aviso en blanco o una página de licencia sin título, y
+    eso no se ve compilando —se ve instalando, y en el otro idioma—.
+
+    Se comprueban las tres direcciones:
+
+        · toda clave usada con {cm:...} está definida
+        · toda clave definida lo está en todos los idiomas
+        · el archivo de licencia de cada idioma existe
+
+    Lo último por lo mismo: Inno aborta si falta, pero el error llega
+    siete minutos después, en Windows.
+    """
+    problemas = []
+    texto = iss.read_text(encoding="utf-8-sig")
+
+    idiomas = re.findall(r'^\s*Name:\s*"([^"]+)"\s*;\s*MessagesFile',
+                         texto, re.M)
+    if len(idiomas) < 2:
+        return []
+
+    # Definidas, por idioma: «es.Clave=...» dentro de [CustomMessages].
+    seccion = re.split(r"^\[", texto, flags=re.M)
+    cuerpo = next((s for s in seccion if s.startswith("CustomMessages]")), "")
+    definidas = {i: set() for i in idiomas}
+    for linea in cuerpo.splitlines():
+        m = re.match(r"\s*([A-Za-z]{2,5})\.([A-Za-z0-9_]+)\s*=", linea)
+        if m and m.group(1) in definidas:
+            definidas[m.group(1)].add(m.group(2))
+
+    usadas = set(re.findall(r"\{cm:([A-Za-z0-9_]+)", texto))
+    usadas |= set(re.findall(r"CustomMessage\(\s*'([A-Za-z0-9_]+)'", texto))
+
+    todas = set().union(*definidas.values()) if definidas else set()
+
+    for clave in sorted(usadas - todas):
+        problemas.append(f"{iss.name}: se usa {{cm:{clave}}} y no está "
+                         f"definida en [CustomMessages]")
+
+    for idioma in idiomas:
+        for clave in sorted(todas - definidas[idioma]):
+            problemas.append(f"{iss.name}: «{clave}» no está traducida al "
+                             f"idioma «{idioma}»; Inno la dejará vacía")
+
+    for idioma, archivo in re.findall(
+            r'^\s*Name:\s*"([^"]+)".*?LicenseFile:\s*"([^"]+)"', texto, re.M):
+        if not (iss.parent / archivo).is_file():
+            problemas.append(f"{iss.name}: el idioma «{idioma}» apunta a "
+                             f"{archivo}, que no existe")
 
     return problemas
 
@@ -142,6 +200,7 @@ def main() -> int:
     if iss.is_file():
         problemas += rutas_del_instalador(iss, RAIZ / "payload")
         problemas += almohadillas_sueltas(iss)
+        problemas += mensajes_en_los_dos_idiomas(iss)
 
     if problemas:
         for p in problemas:

@@ -1,4 +1,4 @@
-; ─────────────────────────────────────────────────────────────
+﻿; ─────────────────────────────────────────────────────────────
 ;  Race Core Studio — instalador de Windows
 ;
 ;  Se compila con Inno Setup 6:   ISCC.exe race-core-studio.iss
@@ -48,7 +48,9 @@ WizardSizePercent=120
 SetupIconFile=..\..\launcher\race-core-studio.ico
 WizardImageFile=marca-lateral.bmp
 WizardSmallImageFile=marca-cabecera.bmp
-LicenseFile=licencia-de-uso.txt
+
+; El idioma, lo primero de todo. Ver la nota de [Languages].
+ShowLanguageDialog=yes
 
 ; Lo que se ve en «Agregar o quitar programas».
 UninstallDisplayName={#Nombre} {#Version}
@@ -60,7 +62,90 @@ Compression=lzma2/max
 SolidCompression=yes
 
 [Languages]
-Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
+; Dos idiomas, asi que Inno enseña su dialogo de seleccion antes que
+; nada. ShowLanguageDialog=yes y no «auto»: auto lo salta cuando el
+; idioma de Windows coincide con uno de los de la lista, y entonces un
+; equipo en español nunca llegaria a ver la pregunta.
+;
+; Los nombres —es, en— son los mismos que usa el producto para su
+; idioma, asi que lo que se elige aqui se pasa tal cual al backend.
+;
+; Cada uno con su contrato: Inno no traduce el texto de la licencia, y
+; enseñarla en español a quien eligio ingles es enseñarle algo que no
+; puede leer antes de pedirle que lo acepte.
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"; LicenseFile: "licencia-de-uso.txt"
+Name: "en"; MessagesFile: "compiler:Default.isl";            LicenseFile: "licencia-de-uso-en.txt"
+
+[CustomMessages]
+; Todo el texto propio del instalador, en los dos idiomas. Lo que viene
+; de Inno —botones, «Siguiente», la pagina de la carpeta— lo traducen
+; sus .isl; esto es solo lo nuestro.
+;
+; Con acentos: este archivo lleva marca BOM al principio, asi que Inno 6
+; lo lee como UTF-8 y llegan bien a la pantalla. Sin la marca lo leeria
+; como ANSI y «configuración» saldria como «configuraciÃ³n».
+; %n es salto de linea; %1 lo rellena FmtMessage.
+
+es.TareaEscritorio=Crear acceso directo en el escritorio
+en.TareaEscritorio=Create a desktop shortcut
+
+es.GrupoAccesos=Accesos:
+en.GrupoAccesos=Shortcuts:
+
+es.PasoRegistrarDB=Registrando la base de datos...
+en.PasoRegistrarDB=Registering the database...
+
+es.PasoArrancarDB=Arrancando la base de datos...
+en.PasoArrancarDB=Starting the database...
+
+es.PasoLicencia=Comprobando la licencia...
+en.PasoLicencia=Checking the licence...
+
+es.AbrirAsistente=Abrir el asistente de configuración
+en.AbrirAsistente=Open the setup wizard
+
+; ── La pagina de la licencia ──
+es.LicenciaTitulo=Licencia del producto
+en.LicenciaTitulo=Product licence
+
+es.LicenciaCabecera=Introduzca los datos que recibió de Zentogo Technologies.
+en.LicenciaCabecera=Enter the details you received from Zentogo Technologies.
+
+es.LicenciaNota=La licencia se comprueba antes de copiar nada, y quedará asociada a este equipo.
+en.LicenciaNota=The licence is checked before anything is copied, and will be tied to this computer.
+
+es.LicenciaCorreo=Correo de la licencia:
+en.LicenciaCorreo=Licence e-mail:
+
+es.LicenciaClave=Clave del producto:
+en.LicenciaClave=Product key:
+
+es.LicenciaFaltan=Hacen falta el correo y la clave de la licencia.
+en.LicenciaFaltan=Both the licence e-mail and the product key are required.
+
+es.LicenciaForma=La clave empieza por RCS1- y lleva cinco bloques.%nEjemplo:  RCS1-XXXX-XXXX-XXXX-XXXX
+en.LicenciaForma=The key starts with RCS1- and has five blocks.%nExample:  RCS1-XXXX-XXXX-XXXX-XXXX
+
+; ── CasparCG ──
+es.CasparComprobando=Comprobando el servidor de gráficos...
+en.CasparComprobando=Checking the graphics server...
+
+es.CasparNoSePudo=No se pudo comprobar el servidor de gráficos.%n%nLa instalación termina igual. Si al abrir Race Core Studio el servidor de gráficos no arranca, avise a soporte.
+en.CasparNoSePudo=The graphics server could not be checked.%n%nSetup will finish anyway. If the graphics server does not start when you open Race Core Studio, please contact support.
+
+es.CasparNoArranco=El servidor de gráficos (CasparCG) no arrancó en este equipo.%n%nLa instalación termina igual y el panel funcionará con normalidad, pero no saldrá ningún gráfico al aire hasta resolverlo.%n%nSuele ser la tarjeta de vídeo o sus controladores. El detalle está en el registro, que se abre desde el propio programa.
+en.CasparNoArranco=The graphics server (CasparCG) did not start on this computer.%n%nSetup will finish anyway and the control panel will work normally, but no graphics will go on air until this is resolved.%n%nThis is usually the video card or its drivers. The details are in the log, which opens from within the program.
+
+es.CasparAbierto=El servidor de gráficos funciona correctamente.%n%nNo se pudo cerrar solo, así que quedó una ventana abierta (CasparCG). Ciérrela a mano antes de continuar.
+en.CasparAbierto=The graphics server works correctly.%n%nIt could not close itself, so a window was left open (CasparCG). Please close it by hand before continuing.
+
+; ── Al desinstalar ──
+es.DesinstalarDatos=Se va a quitar Race Core Studio de este equipo.%n%nLos datos del autódromo —pilotos, vehículos, categorías, históricos de carreras, logos y configuración— están en:%n%n%1%n%n¿Desea CONSERVARLOS?%n%nSí = se conservan (recomendado).%nNo = se borran. Se hará una copia en el Escritorio antes.
+en.DesinstalarDatos=Race Core Studio is about to be removed from this computer.%n%nThe circuit's data --drivers, vehicles, categories, race history, logos and settings-- is in:%n%n%1%n%nDo you want to KEEP it?%n%nYes = keep it (recommended).%nNo = delete it. A copy will be made on the Desktop first.
+
+; ── Nombre del servicio de MongoDB, que se ve en Servicios de Windows ──
+es.ServicioDB=Race Core Studio — Base de datos
+en.ServicioDB=Race Core Studio - Database
 
 [Files]
 Source: "..\..\payload\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -70,7 +155,7 @@ Name: "{group}\{#Nombre}";           Filename: "{app}\{#Ejecutable}"
 Name: "{autodesktop}\{#Nombre}";     Filename: "{app}\{#Ejecutable}"; Tasks: escritorio
 
 [Tasks]
-Name: "escritorio"; Description: "Crear acceso directo en el escritorio"; GroupDescription: "Accesos:"
+Name: "escritorio"; Description: "{cm:TareaEscritorio}"; GroupDescription: "{cm:GrupoAccesos}"
 
 [InstallDelete]
 ; El backend pasa de ser un .exe suelto a una carpeta. Sin esto, el de
@@ -83,20 +168,20 @@ Type: files; Name: "{app}\race-core-backend.exe"
 ; lanzador solo comprueba que responde; quien lo levanta es Windows,
 ; antes de que nadie toque nada.
 Filename: "{app}\mongodb\bin\mongod.exe"; \
-    Parameters: "--dbpath ""{commonappdata}\{#Nombre}\db"" --logpath ""{commonappdata}\{#Nombre}\logs\mongod.log"" --install --serviceName ""{#Servicio}"" --serviceDisplayName ""{#Nombre} — Base de datos"""; \
-    StatusMsg: "Registrando la base de datos..."; Flags: runhidden waituntilterminated
+    Parameters: "--dbpath ""{commonappdata}\{#Nombre}\db"" --logpath ""{commonappdata}\{#Nombre}\logs\mongod.log"" --install --serviceName ""{#Servicio}"" --serviceDisplayName ""{cm:ServicioDB}"""; \
+    StatusMsg: "{cm:PasoRegistrarDB}"; Flags: runhidden waituntilterminated
 
 Filename: "{sys}\net.exe"; Parameters: "start ""{#Servicio}"""; \
-    StatusMsg: "Arrancando la base de datos..."; Flags: runhidden waituntilterminated
+    StatusMsg: "{cm:PasoArrancarDB}"; Flags: runhidden waituntilterminated
 
 ; Valida la licencia, la ata a este equipo, escribe la configuración y
 ; genera el token del asistente. Antes de arrancar nada: si la clave no
 ; vale, la instalación no debe darse por buena.
 Filename: "{app}\backend\race-core-backend.exe"; \
-    Parameters: "--configurar --correo ""{code:CorreoLicencia}"" --clave ""{code:ClaveLicencia}"""; \
-    StatusMsg: "Comprobando la licencia..."; Flags: runhidden waituntilterminated
+    Parameters: "--configurar --correo ""{code:CorreoLicencia}"" --clave ""{code:ClaveLicencia}"" --idioma ""{code:IdiomaElegido}"""; \
+    StatusMsg: "{cm:PasoLicencia}"; Flags: runhidden waituntilterminated
 
-Filename: "{app}\{#Ejecutable}"; Description: "Abrir el asistente de configuración"; \
+Filename: "{app}\{#Ejecutable}"; Description: "{cm:AbrirAsistente}"; \
     Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
@@ -142,15 +227,15 @@ var
 procedure InitializeWizard;
 begin
   PaginaLicencia := CreateInputQueryPage(wpSelectDir,
-    'Licencia del producto',
-    'Introduzca los datos que recibió de {#Empresa}.',
-    'La licencia se comprueba antes de copiar nada, y quedará asociada a este equipo.');
+    ExpandConstant('{cm:LicenciaTitulo}'),
+    ExpandConstant('{cm:LicenciaCabecera}'),
+    ExpandConstant('{cm:LicenciaNota}'));
 
   // Solo esto. El nombre del autodromo, el logo, las cuentas y el resto
   // se preguntan en la configuracion, desde el navegador: repetirlos
   // aqui seria pedir dos veces lo mismo.
-  PaginaLicencia.Add('Correo de la licencia:', False);
-  PaginaLicencia.Add('Clave del producto:', False);
+  PaginaLicencia.Add(ExpandConstant('{cm:LicenciaCorreo}'), False);
+  PaginaLicencia.Add(ExpandConstant('{cm:LicenciaClave}'), False);
 end;
 
 function CorreoLicencia(Valor: String): String;
@@ -163,6 +248,22 @@ begin
   Result := Trim(PaginaLicencia.Values[1]);
 end;
 
+// ── El idioma elegido, para el producto ──────────────────────
+//
+// Lo que se eligio en la primera pantalla no se queda en el instalador:
+// se le pasa al backend, que lo deja en IDIOMA del .env, y de ahi lo
+// toma en el primer arranque para dejar el panel y los rotulos de los
+// graficos en ese idioma. Sin esto habria que elegirlo dos veces —una
+// para instalar y otra en Ajustes— y la segunda no es evidente.
+//
+// ActiveLanguage devuelve el Name de [Languages]: «es» o «en», que son
+// los mismos identificadores que usa el producto.
+
+function IdiomaElegido(Valor: String): String;
+begin
+  Result := ActiveLanguage;
+end;
+
 function NextButtonClick(PaginaActual: Integer): Boolean;
 begin
   Result := True;
@@ -171,7 +272,7 @@ begin
   begin
     if (Trim(PaginaLicencia.Values[0]) = '') or (Trim(PaginaLicencia.Values[1]) = '') then
     begin
-      MsgBox('Hacen falta el correo y la clave de la licencia.', mbError, MB_OK);
+      MsgBox(ExpandConstant('{cm:LicenciaFaltan}'), mbError, MB_OK);
       Result := False;
     end
     else if Pos('RCS1-', UpperCase(Trim(PaginaLicencia.Values[1]))) <> 1 then
@@ -179,8 +280,7 @@ begin
       // Solo la forma. Si la clave es válida de verdad lo dice el
       // backend al configurar, que es quien lleva el validador; aquí
       // solo se atajan las erratas evidentes antes de copiar 250 MB.
-      MsgBox('La clave empieza por RCS1- y lleva cinco bloques.' + #13#10 +
-             'Ejemplo:  RCS1-XXXX-XXXX-XXXX-XXXX', mbError, MB_OK);
+      MsgBox(ExpandConstant('{cm:LicenciaForma}'), mbError, MB_OK);
       Result := False;
     end;
   end;
@@ -269,15 +369,12 @@ procedure ComprobarCasparCG;
 var
   Codigo: Integer;
 begin
-  WizardForm.StatusLabel.Caption := 'Comprobando el servidor de graficos...';
+  WizardForm.StatusLabel.Caption := ExpandConstant('{cm:CasparComprobando}');
 
   if not Exec(ExpandConstant('{app}\{#Ejecutable}'), '--comprobar-casparcg',
               '', SW_HIDE, ewWaitUntilTerminated, Codigo) then
   begin
-    MsgBox('No se pudo comprobar el servidor de graficos.' + #13#10#13#10 +
-           'La instalacion termina igual. Si al abrir Race Core Studio el ' +
-           'servidor de graficos no arranca, avise a soporte.',
-           mbInformation, MB_OK);
+    MsgBox(ExpandConstant('{cm:CasparNoSePudo}'), mbInformation, MB_OK);
     Exit;
   end;
 
@@ -285,19 +382,10 @@ begin
     // Ojo: #13#10 nunca al principio de linea. El preprocesador de Inno
     // toma cualquier linea que empiece por # como directiva suya y aborta
     // con «Unknown preprocessor directive».
-    MsgBox('El servidor de graficos (CasparCG) no arranco en este equipo.' + #13#10#13#10 +
-           'La instalacion termina igual y el panel funcionara con ' +
-           'normalidad, pero no saldra ningun grafico al aire hasta ' +
-           'resolverlo.' + #13#10#13#10 +
-           'Suele ser la tarjeta de video o sus controladores. El detalle ' +
-           'esta en el registro, que se abre desde el propio programa.',
-           mbError, MB_OK)
+    MsgBox(ExpandConstant('{cm:CasparNoArranco}'), mbError, MB_OK)
 
   else if Codigo = 2 then
-    MsgBox('El servidor de graficos funciona correctamente.' + #13#10#13#10 +
-           'No se pudo cerrar solo, asi que quedo una ventana abierta ' +
-           '(CasparCG). Cierrela a mano antes de continuar.',
-           mbInformation, MB_OK);
+    MsgBox(ExpandConstant('{cm:CasparAbierto}'), mbInformation, MB_OK);
 end;
 
 procedure CurStepChanged(Paso: TSetupStep);
@@ -326,15 +414,8 @@ begin
   if not DirExists(Datos) then
     Exit;
 
-  Respuesta := MsgBox(
-    'Se va a quitar Race Core Studio de este equipo.' + #13#10#13#10 +
-    'Los datos del autódromo —pilotos, vehículos, categorías, históricos ' +
-    'de carreras, logos y configuración— están en:' + #13#10#13#10 +
-    Datos + #13#10#13#10 +
-    '¿Desea CONSERVARLOS?' + #13#10#13#10 +
-    'Sí = se conservan (recomendado).' + #13#10 +
-    'No = se borran. Se hará una copia en el Escritorio antes.',
-    mbConfirmation, MB_YESNOCANCEL);
+  Respuesta := MsgBox(FmtMessage(CustomMessage('DesinstalarDatos'), [Datos]),
+                      mbConfirmation, MB_YESNOCANCEL);
 
   if Respuesta = IDCANCEL then
     Result := False;

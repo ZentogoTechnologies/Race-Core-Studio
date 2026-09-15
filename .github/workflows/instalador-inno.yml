@@ -123,6 +123,7 @@ jobs:
             --version-file launcher/version-info.txt `
             --hidden-import pymongo `
             --hidden-import panel `
+            --hidden-import textos `
             --paths launcher `
             --add-data "VERSION;." `
             --distpath dist-launcher `
@@ -135,6 +136,13 @@ jobs:
           # el .exe: un panel roto solo se veria al ejecutarlo, y para
           # entonces ya esta en el equipo del cliente.
           python -c "import sys; sys.path.insert(0,'launcher'); import tkinter, panel; print('panel:', len(panel.ESTADOS), 'estados')"
+
+          # Y los dos idiomas enteros. Un texto que falta no revienta
+          # nada: el cliente ve «est_error» donde deberia poner NOT
+          # RESPONDING, o un boton sin etiqueta. Solo se ve abriendo el
+          # programa, y en el idioma que no es el nuestro.
+          python tools/revisar_idiomas.py
+          if ($LASTEXITCODE -ne 0) { throw "El panel no esta completo en los dos idiomas" }
 
       - name: Bajar MongoDB
         run: |

@@ -91,7 +91,7 @@ def emitir_para_este_equipo(lic: dict, dias: int | None) -> bool:
 
 # ─── 3 · La configuración ────────────────────────────────────
 
-def escribir_env(exigir_licencia: bool) -> None:
+def escribir_env(exigir_licencia: bool, idioma: str = "") -> None:
     """El .env, conservando lo que ya hubiera.
 
     La firma de sesiones se genera una vez y no se vuelve a tocar:
@@ -116,6 +116,16 @@ def escribir_env(exigir_licencia: bool) -> None:
         "LICENSE_REQUIRED": "true" if exigir_licencia else "false",
     }
 
+    # El idioma solo se pone si el instalador lo mandó y aún no había uno.
+    # Reinstalar no debe deshacer lo que alguien haya elegido después en
+    # Ajustes: a partir del primer arranque manda la base, y el backend
+    # reescribe esta línea con lo que allí esté guardado.
+    idioma = (idioma or "").strip().lower()
+    if idioma in ("es", "en"):
+        valores["IDIOMA"] = previos.get("IDIOMA") or idioma
+    elif previos.get("IDIOMA"):
+        valores["IDIOMA"] = previos["IDIOMA"]
+
     archivo.write_text(
         "# Race Core Studio — escrito por el instalador.\n"
         "# SECRET_KEY firma las sesiones: si cambia, todos vuelven a entrar.\n\n"
@@ -139,7 +149,8 @@ def token_del_asistente() -> str:
 
 # ─── Principal ───────────────────────────────────────────────
 
-def configurar(correo: str, clave: str, dias: int | None = None) -> int:
+def configurar(correo: str, clave: str, dias: int | None = None,
+               idioma: str = "") -> int:
     _decir(f"Race Core Studio · configurando en {rutas.DATOS}")
     rutas.preparar()
 
@@ -148,7 +159,7 @@ def configurar(correo: str, clave: str, dias: int | None = None) -> int:
         return 1
 
     emitida = emitir_para_este_equipo(lic, dias)
-    escribir_env(emitida)
+    escribir_env(emitida, idioma)
     token_del_asistente()
 
     _decir("Listo.")

@@ -68,11 +68,15 @@ def configurar_desde_argumentos() -> int | None:
     p.add_argument("--correo", required=True)
     p.add_argument("--clave", required=True)
     p.add_argument("--dias", type=int)
+    # El idioma que se eligió en la primera pantalla del instalador. Va
+    # al .env, y de ahí lo toma el backend en el primer arranque para
+    # dejar el panel y los gráficos en ese idioma sin preguntar otra vez.
+    p.add_argument("--idioma", default="")
     args, _ = p.parse_known_args()
 
     from configurar import configurar
 
-    return configurar(args.correo, args.clave, args.dias)
+    return configurar(args.correo, args.clave, args.dias, args.idioma)
 
 
 def main() -> int:
