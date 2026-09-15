@@ -93,7 +93,7 @@ export default function FormularioDuelo({
      que valgan, cualquiera corre contra cualquiera. */
   const cabecera = esDragWar
     ? 'DRAG WAR'
-    : [nombreCategoria, ronda].filter(Boolean).join(' · ')
+    : [nombreCategoria, t(ronda)].filter(Boolean).join(' · ')
 
   const datos = {
     header: cabecera,
@@ -211,7 +211,7 @@ export default function FormularioDuelo({
               </div>
 
               <SelectorPiloto
-                etiqueta={i === 0 ? 'Piloto del carril izquierdo' : 'Piloto del carril derecho'}
+                etiqueta={i === 0 ? t('Piloto del carril izquierdo') : t('Piloto del carril derecho')}
                 pilotos={pilotos} categorias={categorias}
                 valor={valor} excluir={otro}
                 onElegir={p => fijar(p.id)}
@@ -222,9 +222,9 @@ export default function FormularioDuelo({
                 {/* La reacción admite signo: negativa es salida quemada, y
                     el arte la pinta en rojo porque significa que pierde
                     aunque su tiempo sea el mejor. */}
-                {campoCifra(i, 'rt',    'Reacción',  '0.045')}
-                {campoCifra(i, 'et',    'Tiempo',    '12.348')}
-                {campoCifra(i, 'speed', 'Velocidad', '180.4')}
+                {campoCifra(i, 'rt',    t('Reacción'),  '0.045')}
+                {campoCifra(i, 'et',    t('Tiempo'),    '12.348')}
+                {campoCifra(i, 'speed', t('Velocidad'), '180.4')}
               </div>
             </div>
           )

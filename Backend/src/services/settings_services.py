@@ -110,6 +110,33 @@ async def logo_cliente_actual() -> Optional[str]:
     return doc.client_logo if doc else None
 
 
+# ── Redes sociales ───────────────────────────────────────────────
+
+REDES = ("instagram", "youtube", "website")
+
+
+async def redes_actuales() -> dict:
+    """Las cuentas guardadas para el gráfico de redes, las tres siempre."""
+    doc = await Ajustes.find_one({})
+    guardadas = (doc.redes if doc else None) or {}
+    return {red: (guardadas.get(red) or "") for red in REDES}
+
+
+async def guardar_redes(datos: dict) -> dict:
+    """Guarda las tres cuentas. Vacía quiere decir que esa red no sale."""
+    limpias = {red: str(datos.get(red) or "").strip()[:80] for red in REDES}
+
+    doc = await Ajustes.find_one({})
+    if doc is None:
+        doc = Ajustes(redes=limpias)
+        await doc.insert()
+    else:
+        doc.redes = limpias
+        await doc.save()
+
+    return limpias
+
+
 async def guardar_ruta_timing(ruta: Optional[str]) -> Optional[str]:
     """Cambia la ruta y la deja aplicada de inmediato."""
     global _ruta_timing
@@ -471,13 +498,12 @@ CARPETA_TEXTOS = RAIZ / "Casparcg" / "template" / "i18n"
 
 JS_IDIOMA = RAIZ / "Casparcg" / "template" / "js" / "idioma_activo.js"
 
-# El ingles queda apagado a peticion del cliente. La traduccion esta hecha
-# y se conserva entera —template/i18n/*.json y Frontend/src/i18n/en.json—:
-# volver a encenderlo es poner "listo" en True, nada mas. Se deja listado y
-# no se borra para que se vea que existe y no se rehaga desde cero.
+# Los idiomas disponibles. Las traducciones viven en template/i18n/*.json
+# y en Frontend/src/i18n/en.json; para apagar uno basta con poner "listo"
+# en False.
 IDIOMAS = [
     {"id": "es", "nombre": "Español", "listo": True},
-    {"id": "en", "nombre": "English", "listo": False},
+    {"id": "en", "nombre": "English", "listo": True},
 ]
 
 IDIOMAS_POR_ID = {i["id"]: i for i in IDIOMAS}
@@ -512,6 +538,32 @@ async def idioma_actual() -> str:
     elegido = ajustes.idioma if ajustes else None
     listos = {i["id"] for i in IDIOMAS if i["listo"]}
     return elegido if elegido in listos else "es"
+
+
+def anotar_idioma_en_env(idioma: str) -> None:
+    """Deja el idioma en el .env, para quien no puede leer la base.
+
+    El lanzador —la ventana de servicios— se congela aparte y no habla con
+    MongoDB: lee el .env de la carpeta de datos para saber en que idioma
+    pintarse.
+    """
+    try:
+        import rutas
+        archivo = rutas.DATOS / ".env"
+    except ImportError:
+        archivo = Path(__file__).resolve().parents[2] / ".env"
+
+    try:
+        lineas = archivo.read_text(encoding="utf-8").splitlines() if archivo.is_file() else []
+    except OSError:
+        return
+
+    nuevas = [linea for linea in lineas if not linea.strip().startswith("IDIOMA=")]
+    nuevas.append(f"IDIOMA={idioma}")
+    try:
+        archivo.write_text(chr(10).join(nuevas) + chr(10), encoding="utf-8")
+    except OSError:
+        pass
 
 
 async def guardar_idioma(idioma: str) -> str:

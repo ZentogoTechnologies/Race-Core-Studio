@@ -35,7 +35,7 @@ export default function LoginScreen() {
       // contactarlo (0), y son dos problemas muy distintos para el operador.
       setError(
         err.status === 0
-          ? 'No se pudo contactar al backend. ¿Está corriendo en el 8080?'
+          ? t('No se pudo contactar al backend. ¿Está corriendo en el 8080?')
           : err.message,
       )
     } finally {
@@ -106,7 +106,7 @@ export default function LoginScreen() {
             className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors flex justify-center items-center gap-2"
           >
             {enviando && <Loader2 size={18} className="animate-spin" />}
-            {enviando ? 'VERIFICANDO...' : 'INGRESAR AL SISTEMA'}
+            {enviando ? t('VERIFICANDO...') : t('INGRESAR AL SISTEMA')}
           </button>
         </form>
       </div>

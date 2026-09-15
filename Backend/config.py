@@ -70,4 +70,9 @@ class Settings(BaseSettings):
     # se prefiere el último dato conocido antes que retrasar un gráfico.
     WEATHER_TIMEOUT: float = 6.0
 
+    # El idioma con el que arranca una instalacion nueva: lo pone el
+    # instalador segun lo que se eligio al empezar. Despues manda lo que se
+    # elija en Ajustes, que queda guardado en la base.
+    IDIOMA: str = ""
+
 settings = Settings()

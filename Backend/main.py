@@ -81,6 +81,27 @@ async def lifespan(app: FastAPI):
     if ruta:
         print(f"   current.xml: {ruta} (ajuste guardado)")
 
+    # Idioma y tipografia de los graficos. En una instalacion nueva se toma
+    # el idioma que se eligio al instalar (IDIOMA en el .env). Y en cada
+    # arranque se vuelven a escribir los archivos que leen las plantillas:
+    # al actualizar el programa se reponen las de fabrica, y con ellas
+    # volverian el español y la letra por defecto aunque se hubieran cambiado.
+    from src.services.settings_services import (
+        IDIOMAS_POR_ID, POR_ID, _escribir_css, _escribir_js,
+        anotar_idioma_en_env, fuente_actual, guardar_idioma, idioma_actual,
+    )
+
+    doc_ajustes = await Ajustes.find_one({})
+    inicial = (settings.IDIOMA or "").strip().lower()
+    if (doc_ajustes is None or not doc_ajustes.idioma) and IDIOMAS_POR_ID.get(inicial, {}).get("listo"):
+        await guardar_idioma(inicial)
+        print(f"   idioma inicial: {inicial}")
+
+    idioma = await idioma_actual()
+    _escribir_js(idioma)
+    _escribir_css(POR_ID[await fuente_actual()]["nombre"])
+    anotar_idioma_en_env(idioma)
+
     yield
     await client.close()
     # La conexión con CasparCG se abre sola al primer comando; aquí solo
@@ -103,11 +124,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class EstaticosFrescos(StaticFiles):
+    """Archivos que el cliente reemplaza sin cambiarles el nombre.
+
+    La foto de un piloto es siempre pilotos/123.png. Sin Cache-Control el
+    navegador calcula por su cuenta cuánto guardarla —una fracción del
+    tiempo desde que se modificó— y una foto de hace dos semanas se daba
+    por buena durante horas sin volver a preguntar. Al subir la nueva
+    seguía saliendo la vieja hasta forzar la recarga.
+
+    no-cache no quiere decir «no guardar», sino «pregunta antes de usarla».
+    El navegador manda su ETag y, si no cambió, el servidor contesta 304
+    sin volver a mandar la imagen: una petición mínima, y la nueva aparece
+    al momento.
+    """
+
+    async def get_response(self, path: str, scope):
+        respuesta = await super().get_response(path, scope)
+        respuesta.headers["Cache-Control"] = "no-cache"
+        return respuesta
+
 # Fotos de pilotos y logos de marcas. CasparCG los carga por HTTP desde
 # aquí, así que el backend debe estar corriendo para que se vean al aire.
 app.mount(
     "/public",
-    StaticFiles(directory=Path(__file__).parent / "src" / "public"),
+    EstaticosFrescos(directory=Path(__file__).parent / "src" / "public"),
     name="public",
 )
 
@@ -122,7 +163,7 @@ CARPETA_IMAGENES.mkdir(parents=True, exist_ok=True)
 
 app.mount(
     "/media/circuits",
-    StaticFiles(directory=CARPETA_IMAGENES),
+    EstaticosFrescos(directory=CARPETA_IMAGENES),
     name="circuits",
 )
 
@@ -133,7 +174,7 @@ from src.services.settings_services import LOGO_CLIENTE
 
 app.mount(
     "/media/logo",
-    StaticFiles(directory=LOGO_CLIENTE.parent),
+    EstaticosFrescos(directory=LOGO_CLIENTE.parent),
     name="logo",
 )
 
@@ -144,7 +185,7 @@ from src.services.settings_services import CARPETA_FUENTES
 
 app.mount(
     "/media/fonts",
-    StaticFiles(directory=CARPETA_FUENTES),
+    EstaticosFrescos(directory=CARPETA_FUENTES),
     name="fonts",
 )
 
@@ -155,7 +196,7 @@ from src.services.settings_services import CARPETA_BANDERAS
 
 app.mount(
     "/media/banderas",
-    StaticFiles(directory=CARPETA_BANDERAS),
+    EstaticosFrescos(directory=CARPETA_BANDERAS),
     name="banderas",
 )
 

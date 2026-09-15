@@ -63,6 +63,8 @@ class PilotResponse(BaseModel):
     nationality: Optional[str] = None
     team_brand: Optional[str] = None
     photo: Optional[str] = None
+    # La dirección de la foto con su versión: cambia al subir otra.
+    photo_url: Optional[str] = None
     categories: List[int] = [] # Aquí devolvemos solo los category_id para no hacer fetch pesado
     discipline: List[str] = []
     is_active: bool

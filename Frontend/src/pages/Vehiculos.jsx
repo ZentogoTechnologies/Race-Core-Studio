@@ -86,7 +86,7 @@ export default function VehiculosModule() {
       pilotosApi.listar({ sort_by: 'last_name' }),
     ])
       .then(([cats, pils]) => { setCategorias(cats.items); setPilotos(pils.items) })
-      .catch(err => toast.error('No se pudieron cargar los catálogos', err.message))
+      .catch(err => toast.error(t('No se pudieron cargar los catálogos'), err.message))
   }, [disciplina])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Las subcategorías van embebidas en la categoría elegida.
@@ -138,9 +138,9 @@ export default function VehiculosModule() {
         url: urlFotoVehiculo((v.photo_urls || [])[i]),
       })))
       lista.recargar()
-      toast.exito('Fondo quitado', 'La foto queda recortada sobre transparente')
+      toast.exito(t('Fondo quitado'), t('La foto queda recortada sobre transparente'))
     } catch (err) {
-      toast.error('No se pudo quitar el fondo', err.message)
+      toast.error(t('No se pudo quitar el fondo'), err.message)
     } finally {
       setRecortando(null)
     }
@@ -155,7 +155,7 @@ export default function VehiculosModule() {
       })))
       lista.recargar()
     } catch (err) {
-      toast.error('No se pudo quitar la foto', err.message)
+      toast.error(t('No se pudo quitar la foto'), err.message)
     }
   }
 
@@ -214,7 +214,7 @@ export default function VehiculosModule() {
 
     vehiculosApi.obtener(id)
       .then(openEditForm)
-      .catch(err => toast.error('No se pudo abrir el vehículo', err.message))
+      .catch(err => toast.error(t('No se pudo abrir el vehículo'), err.message))
   }, [ubicacion.state])   // eslint-disable-line react-hooks/exhaustive-deps
 
   const alternarPiloto = (pilotId) => {
@@ -225,7 +225,7 @@ export default function VehiculosModule() {
       // El backend rechaza más de dos; se avisa aquí para no gastar un
       // viaje al servidor con un error que ya sabemos.
       if (f.pilot_ids.length >= 2) {
-        toast.info('Máximo dos pilotos', 'Quita uno antes de agregar otro.')
+        toast.info(t('Máximo dos pilotos'), t('Quita uno antes de agregar otro.'))
         return f
       }
       return { ...f, pilot_ids: [...f.pilot_ids, pilotId] }
@@ -238,7 +238,7 @@ export default function VehiculosModule() {
     // El campo era un <input required> y el navegador lo frenaba solo. Un
     // selector propio no lo vigila nadie, asi que se comprueba aqui.
     if (!vehicleForm.brand) {
-      toast.error('Falta la marca', 'Elige una marca de la lista')
+      toast.error(t('Falta la marca'), t('Elige una marca de la lista'))
       return
     }
 
@@ -271,13 +271,13 @@ export default function VehiculosModule() {
 
       if (currentEditId) {
         await vehiculosApi.actualizar(currentEditId, cuerpo)
-        toast.exito('Vehículo actualizado', etiqueta)
+        toast.exito(t('Vehículo actualizado'), etiqueta)
       } else {
         // Sin vehicle_id: lo asigna el backend. El dorsal (`number`) sí
         // lo escribe quien inscribe; esto era solo la clave interna.
         const creado = await vehiculosApi.crear(cuerpo)
         id = creado.vehicle_id
-        toast.exito('Vehículo creado', etiqueta)
+        toast.exito(t('Vehículo creado'), etiqueta)
       }
 
       // Después de guardar porque en un alta el id no existe hasta ahora.
@@ -303,7 +303,7 @@ export default function VehiculosModule() {
       setNuevas([])
       lista.recargar()
     } catch (err) {
-      toast.error(currentEditId ? 'No se pudo actualizar' : 'No se pudo crear', err.message)
+      toast.error(currentEditId ? t('No se pudo actualizar') : t('No se pudo crear'), err.message)
     } finally {
       setGuardando(false)
     }
@@ -315,13 +315,13 @@ export default function VehiculosModule() {
 
     try {
       await vehiculosApi.eliminar(vehiculo.vehicle_id)
-      toast.exito('Vehículo eliminado', [
+      toast.exito(t('Vehículo eliminado'), [
         vehiculo.number != null ? `#${vehiculo.number}` : '',
         vehiculo.brand || '',
       ].filter(Boolean).join(' ').trim())
       lista.recargar()
     } catch (err) {
-      toast.error('No se pudo eliminar', err.message)
+      toast.error(t('No se pudo eliminar'), err.message)
     }
   }
 
@@ -340,9 +340,9 @@ export default function VehiculosModule() {
         addButtonLabel="NUEVO VEHÍCULO"
         puedeCrear={puedeEscribir}
         exportData={() => vehiculosApi.listar({ ...filtros, search: lista.texto || undefined, sort_by: lista.sortBy, sort_dir: lista.sortDir }).then(p => p.items)}
-        onExportError={m => toast.error('No se pudo exportar', m)}
+        onExportError={m => toast.error(t('No se pudo exportar'), m)}
         exportFileName="vehiculos"
-        exportColumnMap={{ vehicle_id: 'ID', number: 'Dorsal', brand: 'Marca', model: 'Modelo', category_name: 'Categoría' }}
+        exportColumnMap={{ vehicle_id: 'ID', number: t('Dorsal'), brand: t('Marca'), model: t('Modelo'), category_name: t('Categoría') }}
       />
       )}
 
@@ -443,7 +443,7 @@ export default function VehiculosModule() {
             {!esDrag && (
               <div>
                 <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Dorsal en pantalla')}</label>
-                <input type="text" value={vehicleForm.display_number} placeholder={vehicleForm.number || 'igual al dorsal'}
+                <input type="text" value={vehicleForm.display_number} placeholder={vehicleForm.number || t('igual al dorsal')}
                   onChange={e => setVehicleForm({ ...vehicleForm, display_number: e.target.value })}
                   className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
                 <p className="text-[11px] text-neutral-600 mt-1">
@@ -492,7 +492,7 @@ export default function VehiculosModule() {
                 disabled={subcategorias.length === 0}
                 onChange={e => setVehicleForm({ ...vehicleForm, sub_category_id: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white disabled:opacity-40">
-                <option value="">{subcategorias.length ? 'Ninguna' : 'Sin subcategorías'}</option>
+                <option value="">{subcategorias.length ? t('Ninguna') : t('Sin subcategorías')}</option>
                 {subcategorias.map(s => (
                   <option key={s.sub_category_id} value={s.sub_category_id}>{s.sub_category_name}</option>
                 ))}
@@ -506,7 +506,7 @@ export default function VehiculosModule() {
               una lista y el orden es el de subida. */}
           <div className="mt-5 border-t border-neutral-800 pt-4">
             <label className="block text-neutral-400 text-xs mb-2 uppercase">
-              Fotos del vehículo ({fotos.length + nuevas.length}/{TOPE_FOTOS})
+              {t('Fotos del vehículo')} ({fotos.length + nuevas.length}/{TOPE_FOTOS})
             </label>
 
             <div className="flex flex-wrap gap-3 mb-3">
@@ -517,7 +517,7 @@ export default function VehiculosModule() {
                     type="button" onClick={() => recortarFoto(f.archivo)}
                     disabled={recortando !== null}
                     className="absolute top-1 left-1 bg-black/70 rounded p-1 text-neutral-300 hover:text-green-400 disabled:opacity-40 transition-colors"
-                    title="Quitar el fondo de esta foto"
+                    title={t('Quitar el fondo de esta foto')}
                   >
                     {recortando === f.archivo
                       ? <Loader2 size={12} className="animate-spin"/>
@@ -541,6 +541,7 @@ export default function VehiculosModule() {
                   </span>
                   <button
                     type="button" onClick={() => setNuevas(n => n.filter((_, j) => j !== i))}
+                    title={t('Quitar esta foto')} aria-label={t('Quitar esta foto')}
                     className="absolute top-1 right-1 bg-black/70 rounded p-1 text-neutral-300 hover:text-red-500 transition-colors"
                   >
                     <X size={12}/>
@@ -582,7 +583,7 @@ export default function VehiculosModule() {
 
           <div className="mt-5">
             <label className="block text-neutral-400 text-xs mb-2 uppercase">
-              Pilotos ({vehicleForm.pilot_ids.length}/2)
+              {t('Pilotos')} ({vehicleForm.pilot_ids.length}/2)
             </label>
             <input
               type="text" value={buscaPiloto} placeholder={t('Filtrar pilotos...')}
@@ -627,7 +628,7 @@ export default function VehiculosModule() {
             <button type="submit" disabled={guardando}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
-              {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+              {currentEditId ? t('ACTUALIZAR') : t('GUARDAR')}
             </button>
           </div>
         </form>
@@ -664,7 +665,7 @@ export default function VehiculosModule() {
 
             {!lista.cargando && !lista.error && lista.items.length === 0 && (
               <tr><td colSpan={puedeEscribir ? 5 : 4} className="p-10 text-center text-neutral-500">
-                {lista.texto ? `Sin resultados para "${lista.texto}".` : 'No hay vehículos registrados.'}
+                {lista.texto ? `${t('Sin resultados para')} "${lista.texto}".` : t('No hay vehículos registrados.')}
               </td></tr>
             )}
 
@@ -699,8 +700,8 @@ export default function VehiculosModule() {
                 </td>
                 {puedeEscribir && (
                   <td className="p-4 text-right whitespace-nowrap">
-                    <button onClick={() => openEditForm(vehiculo)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
-                    <button onClick={() => setPorBorrar(vehiculo)} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
+                    <button onClick={() => openEditForm(vehiculo)} title={t('Editar vehículo')} aria-label={t('Editar vehículo')} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
+                    <button onClick={() => setPorBorrar(vehiculo)} title={t('Eliminar vehículo')} aria-label={t('Eliminar vehículo')} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
                   </td>
                 )}
               </tr>

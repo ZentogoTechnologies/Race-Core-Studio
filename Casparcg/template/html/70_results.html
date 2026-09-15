@@ -30,7 +30,7 @@
 
         <div class="rs-meta">
             <div class="rs-dato">
-                <span class="rs-dato-etiqueta">Vueltas</span>
+                <span class="rs-dato-etiqueta" data-t="resultados.vueltas">Vueltas</span>
                 <span class="rs-dato-valor" id="vueltas">—</span>
             </div>
             <div class="rs-dato">
@@ -38,7 +38,7 @@
                 <span class="rs-dato-valor morado" id="mejorTiempo">—</span>
             </div>
             <div class="rs-dato">
-                <span class="rs-dato-etiqueta" id="mejorEtiqueta">Piloto</span>
+                <span class="rs-dato-etiqueta" id="mejorEtiqueta" data-t="resultados.piloto">Piloto</span>
                 <span class="rs-dato-valor" id="mejorPiloto">—</span>
             </div>
         </div>
@@ -48,12 +48,12 @@
     <table class="rs-tabla">
         <thead>
             <tr>
-                <th class="rs-pos">Pos</th>
+                <th class="rs-pos" data-t="resultados.pos">Pos</th>
                 <th class="rs-dorsal">Nro</th>
                 <th class="rs-marca"></th>
-                <th>Piloto</th>
+                <th data-t="resultados.piloto">Piloto</th>
                 <th>Equipo</th>
-                <th class="rs-num">Vts</th>
+                <th class="rs-num" data-t="resultados.vts">Vts</th>
                 <th class="rs-num">Líder</th>
                 <th class="rs-num">Intervalo</th>
                 <th class="rs-num" data-t="resultados.ultima">Última</th>
@@ -64,7 +64,7 @@
     </table>
 
     <div class="rs-pie">
-        <span class="rs-leyenda"><span class="rs-punto"></span> Vuelta rápida de la tanda</span>
+        <span class="rs-leyenda"><span class="rs-punto"></span> <span data-t="resultados.vuelta_rapida_tanda">Vuelta rápida de la tanda</span></span>
         <span class="rs-leyenda oculta" id="leyendaPena">
             <span class="rs-marca-pena">P</span>
             <span data-t="resultados.penalizado">Penalizado</span>

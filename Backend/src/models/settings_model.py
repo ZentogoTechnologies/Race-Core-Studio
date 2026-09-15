@@ -30,5 +30,10 @@ class Ajustes(Document):
     # datos —nombres, equipos, marcas— no se traducen: son nombres propios.
     idioma: Optional[str] = None
 
+    # Las cuentas que salen en el gráfico de redes sociales. Se guardan
+    # aquí para que el botón las saque solas, sin escribirlas en cada
+    # transmisión. Claves: instagram, youtube, website.
+    redes: Optional[dict] = None
+
     class Settings:
         name = "ajustes"

@@ -12,6 +12,7 @@ export default function ConfirmDialog({
   titulo,
   mensaje,
   etiquetaConfirmar = 'ELIMINAR',
+  aviso = 'Esta acción no se puede deshacer.',
   onCancelar,
   onConfirmar,
 }) {
@@ -35,7 +36,7 @@ export default function ConfirmDialog({
           <div>
             <h3 className="font-bold text-white">{titulo}</h3>
             <p className="text-sm text-neutral-400 mt-1">
-              {mensaje} Esta acción no se puede deshacer.
+              {mensaje}{aviso ? ` ${t(aviso)}` : ''}
             </p>
           </div>
         </div>
@@ -51,7 +52,7 @@ export default function ConfirmDialog({
             onClick={onConfirmar}
             className="px-5 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition-colors"
           >
-            {etiquetaConfirmar}
+            {t(etiquetaConfirmar)}
           </button>
         </div>
       </div>

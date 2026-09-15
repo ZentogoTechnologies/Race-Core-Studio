@@ -37,7 +37,7 @@
 
     font-family:var(--fuente-graficos);
 
-    background:url("../img/fondo.jpg") center/cover no-repeat;
+    background:var(--rcs-panel, rgba(6,8,11,.72));
 }
 
 /* Filo rojo en los dos extremos, la firma de la familia. En espejo para
@@ -142,7 +142,7 @@
 
     flex:0 0 auto;
 
-    background:#000;
+    background:var(--rcs-foto, rgba(0,0,0,.55));
 
     overflow:hidden;
 

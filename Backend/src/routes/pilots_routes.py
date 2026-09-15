@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 from pydantic import BaseModel
 from typing import Optional
 from src.services.pilots_services import PilotService
@@ -84,6 +84,20 @@ async def delete_pilot(pilot_id: str): # <- str no int
 class RutaFoto(BaseModel):
     ruta: str
 
+
+@pilots.post("/recortar", tags=["Pilots"],
+             response_class=Response,
+             responses={200: {"content": {"image/png": {}}}},
+             dependencies=[Depends(puede_escribir)])
+async def recortar_foto(archivo: UploadFile = File(...)):
+    """
+    Quita el fondo a una foto sin guardarla y devuelve el PNG recortado.
+
+    La usa el formulario para recortar antes de guardar, también al dar
+    de alta, cuando el piloto todavía no existe.
+    """
+    png = await service.recortar_subida(await archivo.read())
+    return Response(content=png, media_type="image/png")
 
 @pilots.post("/{pilot_id}/foto", tags=["Pilots"], response_model=PilotResponse,
              dependencies=[Depends(puede_escribir)])

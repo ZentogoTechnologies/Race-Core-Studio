@@ -31,7 +31,9 @@
     "vueltas": "Laps",
     "mejor": "Best",
     "ultima": "Last",
-    "penalizado": "Penalised"
+    "penalizado": "Penalised",
+    "vts": "Laps",
+    "vuelta_rapida_tanda": "Fastest lap of the session"
   },
   "banderas": {
     "safety_car": "Safety car",
@@ -48,7 +50,8 @@
     "categoria": "CATEGORY",
     "narrador": "COMMENTATOR",
     "comentarista": "ANALYST",
-    "reportero": "REPORTER"
+    "reportero": "REPORTER",
+    "circuito": "TRACK"
   },
   "drag": {
     "reaccion": "Reaction",

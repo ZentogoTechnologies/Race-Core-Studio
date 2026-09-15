@@ -144,7 +144,7 @@
     /* Fondo propio: al estar fuera del panel necesita el suyo para no
        quedar flotando sobre el video. Se remata la esquina derecha, que
        ahora es el final de la barra. */
-    background:#111111;
+    background:var(--rcs-logo, rgba(0,0,0,.80));
 
     border-radius:0 12px 12px 0;
 

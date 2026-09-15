@@ -29,7 +29,7 @@ export default function ModuleHeader({
       const filas = typeof exportData === 'function' ? await exportData() : exportData
 
       if (!filas || filas.length === 0) {
-        onExportError?.('No hay datos para exportar')
+        onExportError?.(t('No hay datos para exportar'))
         return
       }
 

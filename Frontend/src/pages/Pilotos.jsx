@@ -1,6 +1,6 @@
 import { idiomaDeAhora, t } from '../i18n'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2, Scissors, Upload, User, X } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2, ChevronUp, ChevronDown, ChevronsUpDown, Loader2, Scissors, Upload, User, X, RotateCcw } from 'lucide-react'
 import ModuleHeader from '../components/shared/ModuleHeader'
 import Pagination from '../components/shared/Pagination'
 import ConfirmDialog from '../components/shared/ConfirmDialog'
@@ -8,7 +8,7 @@ import CarrosDelPiloto from '../components/pilots/CarrosDelPiloto'
 import SelectorPais, { Bandera } from '../components/shared/SelectorPais'
 import { nombrePais } from '../data/paises'
 import {
-  borrarFotoPiloto, categoriasApi, pilotosApi, quitarFondoPiloto,
+  borrarFotoPiloto, categoriasApi, pilotosApi, quitarFondoPiloto, recortarFotoPiloto,
   subirFotoPiloto, urlFotoPiloto,
 } from '../api/registro'
 import { useListado } from '../hooks/useListado'
@@ -82,7 +82,7 @@ export default function PilotosModule() {
   useEffect(() => {
     categoriasApi.listar({ sort_by: 'category_name', discipline: disciplina })
       .then(p => setCategorias(p.items))
-      .catch(err => toast.error('No se pudieron cargar las categorías', err.message))
+      .catch(err => toast.error(t('No se pudieron cargar las categorías'), err.message))
   }, [disciplina])   // eslint-disable-line react-hooks/exhaustive-deps
 
   const nombreCategoria = (id) =>
@@ -94,6 +94,9 @@ export default function PilotosModule() {
   const [foto, setFoto] = useState(null)          // File elegido, sin subir
   const [fotoActual, setFotoActual] = useState(null)   // ruta ya guardada
   const inputFoto = useRef(null)
+  // La elegida tal como vino, mientras la de `foto` es su recorte. Es lo
+  // que permite deshacer y guardarla con fondo.
+  const [fotoOriginal, setFotoOriginal] = useState(null)
 
   // Vista previa de lo elegido antes de subirlo. Se revoca al cambiar para
   // no ir dejando URLs de objeto vivas en memoria.
@@ -107,6 +110,7 @@ export default function PilotosModule() {
 
   const limpiarFoto = () => {
     setFoto(null)
+    setFotoOriginal(null)
     setFotoActual(null)
     if (inputFoto.current) inputFoto.current.value = ''
   }
@@ -134,7 +138,8 @@ export default function PilotosModule() {
     })
     setCurrentEditId(piloto.pilot_id)
     setFoto(null)
-    setFotoActual(piloto.photo || null)
+    setFotoOriginal(null)
+    setFotoActual(piloto.photo_url || piloto.photo || null)
     if (inputFoto.current) inputFoto.current.value = ''
     setIsFormOpen(true)
   }
@@ -155,14 +160,44 @@ export default function PilotosModule() {
       const actualizado = await quitarFondoPiloto(currentEditId)
       // El recorte se guarda como PNG, así que la ruta cambia de extensión
       // y el navegador no puede servir la anterior de su caché.
-      setFotoActual(actualizado.photo || null)
+      setFotoActual(actualizado.photo_url || actualizado.photo || null)
       lista.recargar()
-      toast.exito('Fondo quitado', 'La foto queda recortada sobre transparente')
+      toast.exito(t('Fondo quitado'), t('La foto queda recortada sobre transparente'))
     } catch (err) {
-      toast.error('No se pudo quitar el fondo', err.message)
+      toast.error(t('No se pudo quitar el fondo'), err.message)
     } finally {
       setRecortando(false)
     }
+  }
+
+  /* Recorta la foto recién elegida, antes de guardar. Vale igual en un alta
+     que editando: el archivo viaja al servidor, vuelve sin fondo y ocupa el
+     lugar del elegido. Nada se guarda hasta pulsar GUARDAR, así que se puede
+     deshacer y quedarse con la original, con su fondo. */
+  const recortarElegida = async () => {
+    if (!foto) return
+    setRecortando(true)
+    try {
+      const png = await recortarFotoPiloto(foto)
+      const nombre = foto.name || 'foto'
+      const punto = nombre.lastIndexOf('.')
+      const base = punto > 0 ? nombre.slice(0, punto) : nombre
+      // Se guarda la original solo la primera vez: recortar dos veces no
+      // puede hacer que deshacer devuelva un recorte.
+      if (!fotoOriginal) setFotoOriginal(foto)
+      setFoto(new File([png], `${base}-sin-fondo.png`, { type: 'image/png' }))
+      toast.exito(t('Fondo quitado'), t('Guarda el piloto para quedarte con la foto recortada'))
+    } catch (err) {
+      toast.error(t('No se pudo quitar el fondo'), err.message)
+    } finally {
+      setRecortando(false)
+    }
+  }
+
+  const deshacerRecorte = () => {
+    if (!fotoOriginal) return
+    setFoto(fotoOriginal)
+    setFotoOriginal(null)
   }
 
   const quitarFoto = async () => {
@@ -171,9 +206,9 @@ export default function PilotosModule() {
       await borrarFotoPiloto(currentEditId)
       limpiarFoto()
       lista.recargar()
-      toast.exito('Foto quitada', 'El gráfico usará la silueta de reserva')
+      toast.exito(t('Foto quitada'), t('El gráfico usará la silueta de reserva'))
     } catch (err) {
-      toast.error('No se pudo quitar la foto', err.message)
+      toast.error(t('No se pudo quitar la foto'), err.message)
     }
   }
 
@@ -210,13 +245,13 @@ export default function PilotosModule() {
 
       if (currentEditId) {
         await pilotosApi.actualizar(currentEditId, cuerpo)
-        toast.exito('Piloto actualizado', `${pilotForm.name} ${pilotForm.last_name}`)
+        toast.exito(t('Piloto actualizado'), `${pilotForm.name} ${pilotForm.last_name}`)
       } else {
         // Sin pilot_id: lo asigna el backend, que es el único que sabe
         // cuál está libre aunque haya dos altas a la vez.
         const creado = await pilotosApi.crear(cuerpo)
         id = creado.pilot_id
-        toast.exito('Piloto creado', `${pilotForm.name} ${pilotForm.last_name}`)
+        toast.exito(t('Piloto creado'), `${pilotForm.name} ${pilotForm.last_name}`)
       }
 
       // Va después de guardar porque en un alta el id no existe hasta
@@ -224,9 +259,13 @@ export default function PilotosModule() {
       // que volver a intentarlo es abrir y elegir el archivo otra vez.
       if (foto && id) {
         try {
-          await subirFotoPiloto(id, foto)
+          const conFoto = await subirFotoPiloto(id, foto)
+          // La recién subida pasa a ser la actual. Sin esto, al soltar la
+          // elegida la ficha volvía a enseñar la foto anterior —o ninguna
+          // en un alta— hasta cerrar y volver a abrir el piloto.
+          setFotoActual(conFoto.photo_url || conFoto.photo || null)
         } catch (err) {
-          toast.error('El piloto se guardó, pero la foto no', err.message)
+          toast.error(t('El piloto se guardó, pero la foto no'), err.message)
         }
       }
       /* Se sigue en la ficha después de guardar, no se vuelve al listado.
@@ -240,11 +279,12 @@ export default function PilotosModule() {
 
       // La foto ya subió; se suelta para que no vuelva a mandarse.
       setFoto(null)
+      setFotoOriginal(null)
       if (inputFoto.current) inputFoto.current.value = ''
 
       lista.recargar()
     } catch (err) {
-      toast.error(currentEditId ? 'No se pudo actualizar' : 'No se pudo crear', err.message)
+      toast.error(currentEditId ? t('No se pudo actualizar') : t('No se pudo crear'), err.message)
     } finally {
       setGuardando(false)
     }
@@ -258,9 +298,9 @@ export default function PilotosModule() {
     try {
       await pilotosApi.actualizar(piloto.pilot_id, { is_active: !piloto.is_active })
       lista.recargar()
-      toast.exito(piloto.is_active ? 'Piloto inactivo' : 'Piloto activo', nombre)
+      toast.exito(piloto.is_active ? t('Piloto inactivo') : t('Piloto activo'), nombre)
     } catch (err) {
-      toast.error('No se pudo cambiar el estado', err.message)
+      toast.error(t('No se pudo cambiar el estado'), err.message)
     }
   }
 
@@ -270,10 +310,10 @@ export default function PilotosModule() {
 
     try {
       await pilotosApi.eliminar(piloto.pilot_id)
-      toast.exito('Piloto eliminado', `${piloto.name} ${piloto.last_name}`)
+      toast.exito(t('Piloto eliminado'), `${piloto.name} ${piloto.last_name}`)
       lista.recargar()
     } catch (err) {
-      toast.error('No se pudo eliminar', err.message)
+      toast.error(t('No se pudo eliminar'), err.message)
     }
   }
 
@@ -296,9 +336,9 @@ export default function PilotosModule() {
         // enseña.
         exportData={() => pilotosApi.listar({ ...filtros, search: lista.texto || undefined, sort_by: lista.sortBy, sort_dir: lista.sortDir })
           .then(p => p.items.map(x => ({ ...x, nationality: nombrePais(x.nationality, idiomaDeAhora()) })))}
-        onExportError={m => toast.error('No se pudo exportar', m)}
+        onExportError={m => toast.error(t('No se pudo exportar'), m)}
         exportFileName="pilotos"
-        exportColumnMap={{ pilot_id: 'ID', name: 'Nombre', last_name: 'Apellido', nationality: 'Nacionalidad', team_brand: 'Equipo' }}
+        exportColumnMap={{ pilot_id: 'ID', name: t('Nombre'), last_name: t('Apellido'), nationality: t('Nacionalidad'), team_brand: t('Equipo') }}
       />
       )}
 
@@ -389,7 +429,7 @@ export default function PilotosModule() {
 
               <input
                 type="file" accept="image/*" ref={inputFoto} className="hidden"
-                onChange={e => setFoto(e.target.files?.[0] || null)}
+                onChange={e => { setFoto(e.target.files?.[0] || null); setFotoOriginal(null) }}
               />
 
               <div className="flex flex-wrap gap-2">
@@ -398,22 +438,32 @@ export default function PilotosModule() {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 transition-colors font-bold text-xs"
                 >
                   <Upload size={14}/>
-                  {previa || fotoActual ? 'CAMBIAR' : 'ELEGIR FOTO'}
+                  {previa || fotoActual ? t('CAMBIAR') : t('ELEGIR FOTO')}
                 </button>
 
-                {/* Con foto puesta se ofrecen los tres; sin ella, solo el de
-                    agregar. El recorte trabaja sobre el archivo guardado en
-                    el servidor, asi que necesita el piloto ya creado. */}
-                {fotoActual && currentEditId && (
+                {/* Quitar fondo en cuanto hay foto, guardada o no. La recién
+                    elegida se recorta antes de guardar —también en un alta—;
+                    la ya guardada, en el servidor. */}
+                {(foto || (fotoActual && currentEditId)) && (
                   <button
-                    type="button" onClick={recortarFoto} disabled={recortando}
-                    title="Recorta al piloto y deja el fondo transparente"
+                    type="button" onClick={foto ? recortarElegida : recortarFoto} disabled={recortando}
+                    title={t('Recorta al piloto y deja el fondo transparente')}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-bold text-xs"
                   >
                     {recortando
                       ? <Loader2 size={14} className="animate-spin"/>
                       : <Scissors size={14}/>}
-                    {recortando ? 'QUITANDO…' : 'QUITAR FONDO'}
+                    {recortando ? t('QUITANDO…') : t('QUITAR FONDO')}
+                  </button>
+                )}
+
+                {fotoOriginal && (
+                  <button
+                    type="button" onClick={deshacerRecorte} disabled={recortando}
+                    title={t('Vuelve a la foto original, con su fondo')}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-amber-500 hover:text-amber-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-bold text-xs"
+                  >
+                    <RotateCcw size={14}/> {t('DESHACER')}
                   </button>
                 )}
 
@@ -431,8 +481,8 @@ export default function PilotosModule() {
                   todavía no hay piloto al que asociarla. */}
               <p className="text-[11px] text-neutral-600 mt-2">
                 {foto
-                  ? 'Se sube al guardar el piloto.'
-                  : 'La usan la ficha del piloto y la grilla con fotos.'}
+                  ? (fotoOriginal ? t('Sin fondo · se sube al guardar el piloto.') : t('Se sube al guardar el piloto.'))
+                  : t('La usan la ficha del piloto y la grilla con fotos.')}
               </p>
             </div>
           </div>
@@ -471,7 +521,7 @@ export default function PilotosModule() {
               // Sin ninguna marcada no saldría en ninguna lista, y quien lo
               // dio de alta no entendería por qué desapareció.
               <p className="text-[11px] text-red-400 mt-2">
-                Marca al menos una: sin disciplina el piloto no aparece en ningún listado.
+                {t('Marca al menos una: sin disciplina el piloto no aparece en ningún listado.')}
               </p>
             )}
           </div>
@@ -503,7 +553,7 @@ export default function PilotosModule() {
             <button type="submit" disabled={guardando || pilotForm.discipline.length === 0}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
-              {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+              {currentEditId ? t('ACTUALIZAR') : t('GUARDAR')}
             </button>
           </div>
         </form>
@@ -548,7 +598,7 @@ export default function PilotosModule() {
 
             {!lista.cargando && !lista.error && lista.items.length === 0 && (
               <tr><td colSpan={puedeEscribir ? 6 : 5} className="p-10 text-center text-neutral-500">
-                {lista.texto ? `Sin resultados para "${lista.texto}".` : 'No hay pilotos registrados.'}
+                {lista.texto ? `${t('Sin resultados para')} "${lista.texto}".` : t('No hay pilotos registrados.')}
               </td></tr>
             )}
 
@@ -590,27 +640,27 @@ export default function PilotosModule() {
                     <button
                       type="button"
                       onClick={() => alternarActivo(piloto)}
-                      title={piloto.is_active ? 'Dar de baja' : 'Reactivar'}
+                      title={piloto.is_active ? t('Dar de baja') : t('Reactivar')}
                       className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors ${
                         piloto.is_active
                           ? 'bg-green-500/10 text-green-500 border-green-600/40 hover:bg-green-500/20'
                           : 'bg-neutral-700/30 text-neutral-500 border-neutral-700 hover:text-neutral-300 hover:border-neutral-500'
                       }`}
                     >
-                      {piloto.is_active ? 'ACTIVO' : 'INACTIVO'}
+                      {piloto.is_active ? t('ACTIVO') : t('INACTIVO')}
                     </button>
                   ) : (
                     <span className={`px-3 py-1 text-xs font-bold rounded-full ${
                       piloto.is_active ? 'bg-green-500/10 text-green-500' : 'bg-neutral-700/30 text-neutral-500'
                     }`}>
-                      {piloto.is_active ? 'ACTIVO' : 'INACTIVO'}
+                      {piloto.is_active ? t('ACTIVO') : t('INACTIVO')}
                     </span>
                   )}
                 </td>
                 {puedeEscribir && (
                   <td className="p-4 text-right whitespace-nowrap">
-                    <button onClick={() => openEditForm(piloto)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
-                    <button onClick={() => setPorBorrar(piloto)} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
+                    <button onClick={() => openEditForm(piloto)} title={t('Editar piloto')} aria-label={t('Editar piloto')} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
+                    <button onClick={() => setPorBorrar(piloto)} title={t('Eliminar piloto')} aria-label={t('Eliminar piloto')} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
                   </td>
                 )}
               </tr>

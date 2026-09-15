@@ -6,7 +6,7 @@ from pathlib import Path
 
 from src.models.categories_model import Category
 from src.services.imagenes_services import (
-    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+    con_version,    borrar_si_sobra, copiar_de_ruta, guardar_bytes, revisar_tamano,
 )
 from src.schemas.pilots_schemas import PilotCreate, PilotUpdate, PilotResponse
 from src.schemas.common_schemas import Page
@@ -14,6 +14,7 @@ from src.services.pagination import (
     campo_orden, combinar, direccion, filtro_busqueda,
 )
 from fastapi import HTTPException
+from fastapi.concurrency import run_in_threadpool
 
 # Backend/src/public/pilotos, mirando desde Backend/src/services. Las
 # fotos subidas van a la raíz de pilotos/ y no a una subcarpeta de
@@ -24,6 +25,14 @@ CARPETA_FOTOS = Path(__file__).resolve().parents[1] / "public" / "pilotos"
 RUTA_RELATIVA = "pilotos"
 
 
+def url_foto_piloto(photo):
+    """La dirección con la que el panel pide la foto, con su versión."""
+    if not photo:
+        return None
+    relativa = photo.lstrip("/")
+    return con_version(f"/public/{relativa}", CARPETA_FOTOS.parent / relativa)
+
+
 class PilotService:
     async def _build_response(self, pilot: Pilot) -> PilotResponse:
         await pilot.fetch_all_links() # resuelve categories
@@ -32,6 +41,7 @@ class PilotService:
 
         return PilotResponse(
             id=str(pilot.id),
+            photo_url=url_foto_piloto(pilot.photo),
             pilot_id=pilot.pilot_id,
             name=pilot.name,
             last_name=pilot.last_name,
@@ -258,10 +268,15 @@ class PilotService:
                 detail="El piloto no tiene foto: sube una antes de quitarle el fondo",
             )
 
-        from src.services.recorte_services import quitar_fondo as recortar
-
         try:
-            recortada = recortar(actual.read_bytes())
+            # El import va dentro: si faltara algo para recortar, que se
+            # diga en claro y no como un 500 sin explicación.
+            from src.services.recorte_services import quitar_fondo as recortar
+
+            # En un hilo aparte: el primer recorte carga el modelo y tarda
+            # unos segundos, y mientras tanto el resto del backend —el
+            # cronometraje que está al aire— tiene que seguir contestando.
+            recortada = await run_in_threadpool(recortar, actual.read_bytes())
         except Exception as e:
             # El modelo puede fallar con un archivo que no sea una imagen
             # de verdad. Se responde en claro en vez de dejar un 500 seco.
@@ -272,6 +287,32 @@ class PilotService:
 
         destino = guardar_bytes(recortada, "foto.png", self._destino_foto(pid))
         return await self._guardar_foto(pid, destino)
+
+    async def recortar_subida(self, contenido: bytes) -> bytes:
+        """Quita el fondo a una foto que todavía no está guardada.
+
+        No toca ningún piloto ni escribe nada en disco: devuelve el PNG
+        recortado y el panel decide si lo guarda. Es lo que permite
+        recortar al dar de alta, cuando el piloto todavía no existe.
+        """
+        if not contenido:
+            raise HTTPException(status_code=400, detail="El archivo llegó vacío")
+
+        revisar_tamano(len(contenido))
+
+        try:
+            from src.services.recorte_services import quitar_fondo as recortar
+
+            return await run_in_threadpool(recortar, contenido)
+        except Exception as e:
+            if type(e).__name__ == "UnidentifiedImageError":
+                motivo = "el archivo no es una imagen que se pueda leer"
+            else:
+                motivo = str(e)
+            raise HTTPException(
+                status_code=422,
+                detail=f"No se pudo quitar el fondo: {motivo}",
+            )
 
     async def borrar_foto(self, pilot_id: str) -> PilotResponse:
         pilot = await Pilot.find_one(Pilot.pilot_id == int(pilot_id))

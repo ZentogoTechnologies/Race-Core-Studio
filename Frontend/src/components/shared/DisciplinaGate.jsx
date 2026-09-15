@@ -39,10 +39,10 @@ export default function DisciplinaGate() {
         <div className="text-center mb-10">
           <img src="/Logo.png" alt="Race Core Studio" className="w-56 mx-auto object-contain mb-6" />
           <h1 className="text-2xl font-black italic tracking-wide text-white mb-2">
-            ¿QUÉ VAS A GRAFICAR HOY?
+            {t('¿QUÉ VAS A GRAFICAR HOY?')}
           </h1>
           <p className="text-neutral-500 text-sm">
-            {usuario ? `Hola, ${usuario.username}. ` : ''}
+            {usuario ? `${t('Hola,')} ${usuario.username}. ` : ''}
             {t('Elige la disciplina. Puedes cambiarla después desde el menú.')}
           </p>
         </div>
@@ -58,7 +58,7 @@ export default function DisciplinaGate() {
                 <Icon size={26} />
               </div>
               <p className="text-xl font-black italic text-white mb-1">{t(etiqueta)}</p>
-              <p className="text-neutral-500 text-sm leading-snug">{detalle}</p>
+              <p className="text-neutral-500 text-sm leading-snug">{t(detalle)}</p>
             </button>
           ))}
         </div>

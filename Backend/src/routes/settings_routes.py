@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel
 
-from src.services.auth_services import puede_escribir
+from src.services.auth_services import puede_escribir, usuario_actual
 from src.services.settings_services import (
     IDIOMAS, TIPOGRAFIAS, fuente_actual, guardar_fuente,
     guardar_idioma, idioma_actual, textos_de,
@@ -271,4 +271,114 @@ async def elegir_idioma(idioma: str):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    # El lanzador no lee la base: se entera del idioma por el .env.
+    from src.services.settings_services import anotar_idioma_en_env
+
+    anotar_idioma_en_env(elegido)
     return {"ok": True, "actual": elegido}
+
+
+# ======================================================================
+#  REDES SOCIALES
+#  Las cuentas del gráfico de redes. Guardadas aquí, el botón las saca
+#  solas en cada transmisión.
+# ======================================================================
+
+
+class Redes(BaseModel):
+    instagram: Optional[str] = ""
+    youtube: Optional[str] = ""
+    website: Optional[str] = ""
+
+
+@ajustes.get("/redes", tags=["Settings"])
+async def leer_redes():
+    """
+    Las cuentas que salen en el gráfico de redes sociales
+    """
+    from src.services.settings_services import redes_actuales
+
+    return await redes_actuales()
+
+
+@ajustes.put("/redes", tags=["Settings"], dependencies=[Depends(puede_escribir)])
+async def cambiar_redes(datos: Redes):
+    """
+    Guarda las cuentas. La que quede vacía no sale en el gráfico
+    """
+    from src.services.settings_services import guardar_redes
+
+    return await guardar_redes(datos.model_dump())
+
+
+# ======================================================================
+#  RESPALDO
+#  Todo el sistema en un archivo .rcs-backup, y su restauración. Solo el
+#  dueño: el respaldo lleva la base entera, cuentas incluidas.
+# ======================================================================
+
+
+async def solo_dueno_respaldo(user=Depends(usuario_actual)):
+    if user.role != "owner":
+        raise HTTPException(403, "Solo el usuario dueño puede crear o restaurar respaldos")
+    return user
+
+
+@ajustes.get("/respaldo", tags=["Settings"], dependencies=[Depends(solo_dueno_respaldo)])
+async def descargar_respaldo():
+    """
+    Genera y descarga el respaldo completo (.rcs-backup)
+    """
+    from fastapi.concurrency import run_in_threadpool
+    from fastapi.responses import Response
+    from src.services.respaldo_services import crear
+
+    contenido, nombre, _ = await run_in_threadpool(crear)
+    return Response(
+        content=contenido,
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f'attachment; filename="{nombre}"',
+            "Access-Control-Expose-Headers": "Content-Disposition",
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+@ajustes.post("/respaldo/revisar", tags=["Settings"], dependencies=[Depends(solo_dueno_respaldo)])
+async def revisar_respaldo(archivo: UploadFile = File(...)):
+    """
+    Dice qué trae un respaldo, sin cambiar nada
+    """
+    from fastapi.concurrency import run_in_threadpool
+    from src.services.respaldo_services import revisar
+
+    contenido = await archivo.read()
+    try:
+        return await run_in_threadpool(revisar, contenido)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@ajustes.post("/respaldo/restaurar", tags=["Settings"], dependencies=[Depends(solo_dueno_respaldo)])
+async def restaurar_respaldo(archivo: UploadFile = File(...)):
+    """
+    Reemplaza base e imágenes por las del respaldo. Antes guarda una copia
+    del estado actual
+    """
+    from fastapi.concurrency import run_in_threadpool
+    from src.services.respaldo_services import restaurar
+    from src.services.settings_services import cargar_ajustes
+
+    contenido = await archivo.read()
+    try:
+        resultado = await run_in_threadpool(restaurar, contenido)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except RuntimeError as e:
+        raise HTTPException(500, str(e))
+
+    # Lo que el backend tiene en memoria —la ruta del cronometraje— sale
+    # de la base que se acaba de reemplazar.
+    await cargar_ajustes()
+    return resultado

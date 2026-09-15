@@ -31,7 +31,9 @@
     "vueltas": "Vueltas",
     "mejor": "Mejor",
     "ultima": "Última",
-    "penalizado": "Penalizado"
+    "penalizado": "Penalizado",
+    "vts": "Vts",
+    "vuelta_rapida_tanda": "Vuelta rápida de la tanda"
   },
   "banderas": {
     "safety_car": "Safety car",
@@ -48,7 +50,8 @@
     "categoria": "CATEGORÍA",
     "narrador": "NARRADOR",
     "comentarista": "COMENTARISTA",
-    "reportero": "REPORTERO"
+    "reportero": "REPORTERO",
+    "circuito": "CIRCUITO"
   },
   "drag": {
     "reaccion": "Reacción",

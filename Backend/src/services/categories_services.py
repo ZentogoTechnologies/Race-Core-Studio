@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from src.services.imagenes_services import (
-    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+    con_version,    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
 )
 from src.models.categories_model import Category, SubCategoryEmbedded
 from src.models.vehicles_model import Vehicle
@@ -22,7 +22,7 @@ RUTA_RELATIVA = "categorias"
 
 def url_logo_categoria(archivo):
     """La ruta con la que el navegador y CasparCG piden el logo."""
-    return f"/public/{RUTA_RELATIVA}/{archivo}" if archivo else None
+    return con_version(f"/public/{RUTA_RELATIVA}/{archivo}", CARPETA_LOGOS / archivo) if archivo else None
 
 
 class CategoryService:

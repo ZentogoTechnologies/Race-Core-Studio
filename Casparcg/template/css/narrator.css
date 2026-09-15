@@ -32,7 +32,7 @@
     justify-content:center;
     align-items:center;
 
-    background:#1d1d1d;
+    background:var(--rcs-logo, rgba(0,0,0,.80));
 
     border-left:10px solid #e10600;
     border-radius:10px 0 0 10px;
@@ -66,9 +66,16 @@
     flex-direction:column;
     justify-content:center;
 
-    padding-left:25px;
+    /* Todo al centro: el medio arriba, el nombre en medio y el cargo
+       abajo. El orden lo pone cada bloque con `order`, así las tres
+       plantillas —narrador, comentarista, reportero— cambian igual sin
+       tocar su HTML. */
+    align-items:center;
+    text-align:center;
 
-    background:url("../img/fondo.jpg") center center / cover no-repeat;
+    padding:0 15px;
+
+    background:var(--rcs-panel, rgba(6,8,11,.72));
 
     border-radius:0 10px 10px 0;
 }
@@ -79,6 +86,8 @@
 ========================================================================== */
 
 .narrator-name{
+    order:2;
+
     font-size:34px;
     font-weight:900;
     line-height:1;
@@ -97,7 +106,9 @@
 ========================================================================== */
 
 .narrator-text{
-    margin-top:12px;
+    order:1;
+
+    margin-bottom:8px;
 
     font-size:18px;
     font-weight:500;
@@ -116,18 +127,25 @@
 /* ===================================
    ROL
    ===================================
-   Encima del nombre y en pequeno: dice que papel cumple quien habla
-   (NARRADOR, COMENTARISTA, REPORTERO) sin robarle protagonismo al
-   nombre, que es lo que la gente quiere leer.
+   Debajo del nombre y grande: dice que papel cumple quien habla
+   (NARRADOR, COMENTARISTA, REPORTERO) y tiene que leerse de lejos.
 =================================== */
 
 .narrator-role{
 
-    font-size:12px;
+    order:3;
+
+    font-size:36px;
 
     font-weight:900;
 
-    letter-spacing:3px;
+    /* Letras juntas: con más espaciado la palabra se leía por sílabas
+       (N A R R A D O R). El tamaño lo da la letra, no el hueco. */
+    letter-spacing:1px;
+
+    /* El espaciado se añade también detrás de la última letra y corre la
+       palabra a la izquierda; se compensa con lo mismo delante. */
+    padding-left:1px;
 
     text-transform:uppercase;
 
@@ -135,5 +153,5 @@
 
     line-height:1;
 
-    margin-bottom:5px;
+    margin-top:10px;
 }

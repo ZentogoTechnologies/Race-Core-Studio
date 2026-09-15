@@ -1,4 +1,4 @@
-import { t } from '../../i18n'
+import { idiomaDeAhora, t } from '../../i18n'
 import { useState } from 'react'
 import { Plus, X, Timer, Flag, Trophy, Loader2 } from 'lucide-react'
 import { agregarSesion, quitarSesion } from '../../api/registro'
@@ -22,7 +22,7 @@ const ESTILO_TIPO = {
 function rotularDia(iso) {
   const [a, m, d] = iso.split('-').map(Number)
   const fecha = new Date(a, m - 1, d)
-  const texto = fecha.toLocaleDateString('es', {
+  const texto = fecha.toLocaleDateString(idiomaDeAhora(), {
     weekday: 'long', day: 'numeric', month: 'long',
   })
   return texto.charAt(0).toUpperCase() + texto.slice(1)
@@ -78,11 +78,11 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
         dia: diaAbierto, tipo, category_ids: categorias, libre,
       })
       const nueva = actualizado.sesiones[actualizado.sesiones.length - 1]
-      toast.exito('Sesión agregada', nueva?.nombre)
+      toast.exito(t('Sesión agregada'), nueva?.nombre)
       setDiaAbierto(null)
       onCambio(actualizado)
     } catch (err) {
-      toast.error('No se pudo agregar la sesión', err.message)
+      toast.error(t('No se pudo agregar la sesión'), err.message)
     } finally {
       setGuardando(false)
     }
@@ -91,10 +91,10 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
   const borrar = async (sesion) => {
     try {
       const actualizado = await quitarSesion(evento.event_id, sesion.numero_orden)
-      toast.exito('Sesión eliminada', sesion.nombre)
+      toast.exito(t('Sesión eliminada'), sesion.nombre)
       onCambio(actualizado)
     } catch (err) {
-      toast.error('No se pudo eliminar', err.message)
+      toast.error(t('No se pudo eliminar'), err.message)
     }
   }
 
@@ -118,7 +118,7 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 transition-colors text-xs font-bold"
                 >
                   {diaAbierto === dia ? <X size={14}/> : <Plus size={14}/>}
-                  {diaAbierto === dia ? 'CANCELAR' : 'AGREGAR SESIÓN'}
+                  {diaAbierto === dia ? t('CANCELAR') : t('AGREGAR SESIÓN')}
                 </button>
               )}
             </div>
@@ -153,7 +153,7 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
                 </div>
 
                 <p className="text-[11px] uppercase tracking-wider text-neutral-500 mb-2">
-                  {libre ? 'Categorías que salen juntas (mínimo dos)' : 'Categoría'}
+                  {libre ? t('Categorías que salen juntas (mínimo dos)') : t('Categoría')}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {evento.category_ids.map(id => {
@@ -203,6 +203,7 @@ export default function SesionesEvento({ evento, onCambio, puedeEscribir }) {
                       <button
                         onClick={() => borrar(s)}
                         className="p-1.5 rounded text-neutral-600 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                        title={t('Quitar sesión')}
                         aria-label={t('Quitar sesión')}
                       >
                         <X size={14}/>
