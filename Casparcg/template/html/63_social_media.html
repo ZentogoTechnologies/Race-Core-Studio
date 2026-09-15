@@ -170,17 +170,18 @@ function update(data){
     }
 
 
-    if(data.instagram !== undefined)
-        document.getElementById("instagram").textContent =
-            data.instagram;
+    ["instagram", "youtube", "website"].forEach(function(red){
+        if (data[red] === undefined) return;
 
-    if(data.youtube !== undefined)
-        document.getElementById("youtube").textContent =
-            data.youtube;
+        var valor = String(data[red] || "").trim();
+        var campo = document.getElementById(red);
+        campo.textContent = valor;
 
-    if(data.website !== undefined)
-        document.getElementById("website").textContent =
-            data.website;
+        /* Una red sin cuenta no se ensena: una fila con el icono y nada
+           al lado parece un error al aire. */
+        var fila = campo.closest(".social-row");
+        if (fila) fila.style.display = valor ? "" : "none";
+    });
 
     if(data.logo !== undefined)
         document.getElementById("logo").src =

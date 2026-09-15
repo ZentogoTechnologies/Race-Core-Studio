@@ -39,7 +39,7 @@
        obligaba a poner cada fila casi opaca para que se leyera. Con un
        negro limpio la pista se sigue viendo por detras, que es lo que hace
        util un grafico a pantalla completa durante la formacion. */
-    background:rgba(4,6,9,.95);
+    background:rgba(4,6,9,.80);
 
     /* Un desenfoque suave detras: lo que se ve de la pista queda como
        ambiente y no como una imagen que compite por atencion. */

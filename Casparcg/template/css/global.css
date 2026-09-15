@@ -3,6 +3,24 @@
 @import url("tipografia.css");
 
 /* ==========================================================================
+   FONDO DE TODOS LOS GRAFICOS
+
+   Negro translucido, el mismo tono en todas las cartas, como el totem y el
+   cuadro de resultados. Sin el arte de rayas rojas: sobre el video un fondo
+   limpio deja ver la pista y el texto se lee igual. Se afina aqui y cambia
+   en todos; las hojas que no cargan global.css llevan el mismo valor de
+   respaldo dentro de var().
+   ========================================================================== */
+
+:root{
+    --rcs-panel: rgba(6, 8, 11, .72);   /* el panel de datos */
+    --rcs-logo:  rgba(0, 0, 0, .80);    /* el recuadro del logo */
+    --rcs-foto:  rgba(0, 0, 0, .55);    /* detras de fotos y dibujos */
+}
+
+
+
+/* ==========================================================================
    1. RESET GENERAL
    ========================================================================== */
 
@@ -61,7 +79,7 @@ body{
     width:170px;
     height:150px;
 
-    background:#1d1d1d;
+    background:var(--rcs-logo, rgba(0,0,0,.80));
     border-left:10px solid red;
     border-radius:10px 0 0 10px;
 }
@@ -94,6 +112,6 @@ body{
     flex-direction:column;
     justify-content:center;
 
-    background:url("../img/fondo.jpg") center center / cover no-repeat;
+    background:var(--rcs-panel, rgba(6,8,11,.72));
     border-radius:0 10px 10px 0;
 }

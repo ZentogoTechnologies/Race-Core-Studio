@@ -2,7 +2,7 @@ import { t } from '../i18n'
 import { useEffect, useRef, useState } from 'react'
 import {
   Loader2, CheckCircle2, AlertCircle, FolderSearch, Save, FlaskConical,
-  Upload, X, ImageIcon, Plug, Radio, Sliders, Languages, Type,
+  Upload, X, ImageIcon, Plug, Radio, Sliders, Languages, Type, Share2, DatabaseBackup,
 } from 'lucide-react'
 import {
   elegirFuente, guardarRutaXml, leerAjustes, listarFuentes, probarRutaXml,
@@ -13,6 +13,8 @@ import Trazados from '../components/settings/Trazados'
 import { useToast } from '../context/ToastContext'
 import { useIdioma } from '../context/IdiomaContext'
 import ExploradorXml from '../components/settings/ExploradorXml'
+import RedesSociales from '../components/settings/RedesSociales'
+import Respaldo from '../components/settings/Respaldo'
 
 
 // ─── Pestañas ─────────────────────────────────────────────────
@@ -20,6 +22,8 @@ const PESTANAS = [
   { id: 'generales',  nombre: 'Generales',  Icon: Sliders  },
   { id: 'conexiones', nombre: 'Conexiones', Icon: Plug     },
   { id: 'imagenes',   nombre: 'Imágenes',   Icon: ImageIcon },
+  { id: 'redes',      nombre: 'Redes sociales', Icon: Share2 },
+  { id: 'respaldo',   nombre: 'Respaldo',   Icon: DatabaseBackup },
 ]
 
 // ─── Generales ────────────────────────────────────────────────
@@ -65,7 +69,7 @@ function Generales() {
       setActual(id)
       toast('Tipografía cambiada. Los gráficos que ya estén al aire la toman al volver a sacarlos.')
     } catch (e) {
-      toast(e.message || 'No se pudo cambiar la tipografía', 'error')
+      toast(e.message || t('No se pudo cambiar la tipografía'), 'error')
     } finally {
       setGuardando(null)
     }
@@ -79,16 +83,14 @@ function Generales() {
           <h3 className="text-lg font-black italic text-white">{t('IDIOMA')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
-          Cambia la interfaz y los rótulos de los gráficos a la vez. Los datos
-          —nombres, equipos, marcas— no se traducen: son nombres propios.
-          El inglés está traducido pero apagado; se enciende cuando haga falta.
+          {t('Cambia la interfaz y los rótulos de los gráficos a la vez. Los datos —nombres, equipos, marcas— no se traducen: son nombres propios.')}
         </p>
 
         <select
           value={idioma}
           onChange={async e => {
             try { await cambiarIdioma(e.target.value) }
-            catch (err) { toast(err.message || 'No se pudo cambiar el idioma', 'error') }
+            catch (err) { toast(err.message || t('No se pudo cambiar el idioma'), 'error') }
           }}
           className="w-full sm:w-72 bg-[#0a0a0a] border border-neutral-800 rounded p-2.5 focus:border-red-600 focus:outline-none text-white"
         >
@@ -106,9 +108,7 @@ function Generales() {
           <h3 className="text-lg font-black italic text-white">{t('TIPOGRAFÍA DE LOS GRÁFICOS')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
-          La letra con la que salen al aire los tótems, las banderas, las cartas y
-          la grilla. Van empaquetadas con el software, así que el arte se ve igual
-          en cualquier máquina sin instalar nada.
+          {t('La letra con la que salen al aire los tótems, las banderas, las cartas y la grilla. Van empaquetadas con el software, así que el arte se ve igual en cualquier máquina sin instalar nada.')}
         </p>
 
         <div className="space-y-2.5">
@@ -147,12 +147,12 @@ function Generales() {
                   <span className={`flex-shrink-0 text-xs font-bold uppercase tracking-wider ${
                     activa ? 'text-red-400' : 'text-neutral-600'
                   }`}>
-                    {ocupado ? 'Guardando…' : activa ? 'En uso' : 'Usar'}
+                    {ocupado ? t('Guardando…') : activa ? t('En uso') : t('Usar')}
                   </span>
                 </div>
 
                 <p className="text-neutral-500 text-sm mt-2.5 leading-relaxed">
-                  {f.nota}
+                  {t(f.nota)}
                 </p>
               </button>
             )
@@ -199,7 +199,7 @@ export default function AjustesModule() {
         setLogoUrl(a.client_logo_url || null)
         setLogoPropio(a.client_logo || null)
       })
-      .catch(err => toast.error('No se pudieron cargar los ajustes', err.message))
+      .catch(err => toast.error(t('No se pudieron cargar los ajustes'), err.message))
       .finally(() => setCargando(false))
   }
 
@@ -225,12 +225,12 @@ export default function AjustesModule() {
       setEstado(r.estado)
       setPrueba(null)
       toast.exito(
-        'Ruta aplicada',
-        r.estado?.ok ? `${r.estado.evento || 'archivo leído'} · ${r.estado.tanda || ''}`.trim()
-                     : 'guardada, pero el archivo no se pudo leer',
+        t('Ruta aplicada'),
+        r.estado?.ok ? `${r.estado.evento || t('archivo leído')} · ${r.estado.tanda || ''}`.trim()
+                     : t('guardada, pero el archivo no se pudo leer'),
       )
     } catch (err) {
-      toast.error('No se pudo guardar', err.message)
+      toast.error(t('No se pudo guardar'), err.message)
     } finally {
       setGuardando(false)
     }
@@ -243,9 +243,9 @@ export default function AjustesModule() {
       const r = await subirLogoCliente(archivo)
       setLogoUrl(r.client_logo_url)
       setLogoPropio(archivo.name)
-      toast.exito('Logo actualizado', 'Sale en todos los gráficos')
+      toast.exito(t('Logo actualizado'), t('Sale en todos los gráficos'))
     } catch (err) {
-      toast.error('No se pudo subir el logo', err.message)
+      toast.error(t('No se pudo subir el logo'), err.message)
     } finally {
       setSubiendo(false)
       if (inputLogo.current) inputLogo.current.value = ''
@@ -258,9 +258,9 @@ export default function AjustesModule() {
       const r = await quitarLogoCliente()
       setLogoUrl(r.client_logo_url)
       setLogoPropio(null)
-      toast.exito('Logo restaurado', 'Vuelve el que trae el software')
+      toast.exito(t('Logo restaurado'), t('Vuelve el que trae el software'))
     } catch (err) {
-      toast.error('No se pudo restaurar', err.message)
+      toast.error(t('No se pudo restaurar'), err.message)
     } finally {
       setSubiendo(false)
     }
@@ -291,11 +291,11 @@ export default function AjustesModule() {
           : <AlertCircle size={18} className="text-red-500 flex-shrink-0 mt-0.5"/>}
         <div className="min-w-0">
           {titulo && <p className="text-xs uppercase tracking-wider text-neutral-500 mb-0.5">{titulo}</p>}
-          <p className={`text-sm font-bold ${r.ok ? 'text-green-400' : 'text-red-400'}`}>{r.detalle}</p>
+          <p className={`text-sm font-bold ${r.ok ? 'text-green-400' : 'text-red-400'}`}>{t(r.detalle)}</p>
           {r.ok && (
             <p className="text-xs text-neutral-500 mt-1">
               {[r.evento, r.tanda, r.grupo].filter(Boolean).join(' · ')}
-              {r.filas != null && ` · ${r.filas} líneas`}
+              {r.filas != null && ` · ${r.filas} ${t('líneas')}`}
             </p>
           )}
         </div>
@@ -318,14 +318,14 @@ export default function AjustesModule() {
           de un vistazo. Repartidas por pestañas, cada una agrupa cosas que
           se tocan juntas: lo que conecta con el exterior, lo que se ve, y
           lo que define el sistema. */}
-      <div className="flex gap-2 mb-6 border-b border-neutral-800">
+      <div className="flex gap-2 mb-6 border-b border-neutral-800 overflow-x-auto">
         {PESTANAS.map(({ id, nombre, Icon }) => {
           const activa = pestana === id
           return (
             <button
               key={id} type="button"
               onClick={() => setPestana(id)}
-              className={`flex items-center gap-2 px-4 py-3 -mb-px border-b-2 font-bold text-sm uppercase tracking-wide transition-colors ${
+              className={`flex items-center gap-2 px-4 py-3 -mb-px border-b-2 whitespace-nowrap font-bold text-sm uppercase tracking-wide transition-colors ${
                 activa
                   ? 'border-red-600 text-white'
                   : 'border-transparent text-neutral-500 hover:text-neutral-300'
@@ -347,8 +347,7 @@ export default function AjustesModule() {
       <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
         <h3 className="text-lg font-black italic text-white mb-1">{t('CRONOMETRAJE')}</h3>
         <p className="text-neutral-500 text-sm mb-5">
-          Archivo que MyLaps reescribe con la clasificación en vivo. El backend lo relee
-          varias veces por segundo mientras hay una tanda en pista.
+          {t('Archivo que MyLaps reescribe con la clasificación en vivo. El backend lo relee varias veces por segundo mientras hay una tanda en pista.')}
         </p>
 
         <label className="block text-neutral-400 text-xs mb-2 uppercase">
@@ -464,8 +463,7 @@ export default function AjustesModule() {
           <h3 className="text-lg font-black italic text-white">{t('CONEXIÓN CON CASPARCG')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
-          Si cerraste y volviste a abrir CasparCG, la conexión anterior se queda
-          colgada y el primer gráfico falla. Esto la fuerza sin reiniciar nada.
+          {t('Si cerraste y volviste a abrir CasparCG, la conexión anterior se queda colgada y el primer gráfico falla. Esto la fuerza sin reiniciar nada.')}
         </p>
 
         <div className="flex flex-wrap items-center gap-4">
@@ -505,9 +503,7 @@ export default function AjustesModule() {
           <h3 className="text-lg font-black italic text-white">{t('LOGO DEL AUTÓDROMO')}</h3>
         </div>
         <p className="text-neutral-500 text-sm mb-5">
-          Sale en todos los gráficos: tótems, banderas, fichas y cartas. Se guarda
-          en PNG con transparencia, para que no salga con un recuadro blanco sobre
-          los paneles oscuros.
+          {t('Sale en todos los gráficos: tótems, banderas, fichas y cartas. Se guarda en PNG con transparencia, para que no salga con un recuadro blanco sobre los paneles oscuros.')}
         </p>
 
         <div className="flex items-center gap-5">
@@ -561,8 +557,8 @@ export default function AjustesModule() {
 
             <p className="text-xs text-neutral-600 mt-2">
               {logoPropio
-                ? `En uso: ${logoPropio}`
-                : 'Ahora mismo está el que trae el software.'}
+                ? `${t('En uso:')} ${logoPropio}`
+                : t('Ahora mismo está el que trae el software.')}
             </p>
           </div>
         </div>
@@ -571,6 +567,10 @@ export default function AjustesModule() {
       <Trazados />
           </>
         )}
+
+        {pestana === 'redes' && <RedesSociales />}
+
+        {pestana === 'respaldo' && <Respaldo />}
 
       </div>
 

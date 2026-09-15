@@ -35,4 +35,5 @@ uvicorn==0.52.1
 # Recorte del fondo de las fotos de pilotos. Corre en local: en el
 # autodromo la red se cae, y una foto que no se puede recortar por falta
 # de internet se queda con el fondo del taller.
-rembg[cpu]
+onnxruntime==1.29.0
+pillow==12.3.0

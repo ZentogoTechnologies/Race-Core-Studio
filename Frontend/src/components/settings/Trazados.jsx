@@ -48,7 +48,7 @@ export default function Trazados() {
     setCargando(true)
     listarTrazados()
       .then(r => setItems(r.items))
-      .catch(err => toast.error('No se pudieron cargar los trazados', err.message))
+      .catch(err => toast.error(t('No se pudieron cargar los trazados'), err.message))
       .finally(() => setCargando(false))
   }
 
@@ -73,9 +73,9 @@ export default function Trazados() {
       // Recién creado no tiene imagen, así que se abre directamente donde
       // toca ponerla en vez de dejar una tarjeta a medias.
       setAbierto(doc.trazado_id)
-      toast.exito('Trazado creado', 'Ahora ponle la imagen de la pista')
+      toast.exito(t('Trazado creado'), t('Ahora ponle la imagen de la pista'))
     } catch (err) {
-      toast.error('No se pudo crear', err.message)
+      toast.error(t('No se pudo crear'), err.message)
     } finally {
       setCreando(false)
     }
@@ -92,9 +92,9 @@ export default function Trazados() {
       // segunda tarjeta también tiene que reflejarlo.
       const r = await listarTrazados()
       setItems(r.items)
-      toast.exito('Trazado en uso', [trazado.name, trazado.variante].filter(Boolean).join(' · '))
+      toast.exito(t('Trazado en uso'), [trazado.name, trazado.variante].filter(Boolean).join(' · '))
     } catch (err) {
-      toast.error('No se pudo activar', err.message)
+      toast.error(t('No se pudo activar'), err.message)
     } finally {
       setOcupado(null)
     }
@@ -105,9 +105,9 @@ export default function Trazados() {
     setOcupado(trazado.trazado_id)
     try {
       reemplazar(await subirImagenTrazado(trazado.trazado_id, archivo))
-      toast.exito('Imagen cargada', archivo.name)
+      toast.exito(t('Imagen cargada'), archivo.name)
     } catch (err) {
-      toast.error('No se pudo cargar la imagen', err.message)
+      toast.error(t('No se pudo cargar la imagen'), err.message)
     } finally {
       setOcupado(null)
       // Sin esto, volver a elegir el mismo archivo no dispara el onChange.
@@ -123,9 +123,9 @@ export default function Trazados() {
     try {
       reemplazar(await imagenTrazadoPorRuta(trazado.trazado_id, ruta))
       setRutas(prev => ({ ...prev, [trazado.trazado_id]: '' }))
-      toast.exito('Imagen cargada', 'Copiada dentro de la plantilla')
+      toast.exito(t('Imagen cargada'), t('Copiada a los trazados del sistema'))
     } catch (err) {
-      toast.error('No se pudo tomar esa imagen', err.message)
+      toast.error(t('No se pudo tomar esa imagen'), err.message)
     } finally {
       setOcupado(null)
     }
@@ -133,16 +133,16 @@ export default function Trazados() {
 
   const borrar = async (trazado) => {
     const nombre = [trazado.name, trazado.variante].filter(Boolean).join(' · ')
-    if (!window.confirm(`¿Borrar el trazado "${nombre}"? También se borra su imagen.`)) return
+    if (!window.confirm(`${t('¿Borrar el trazado')} "${nombre}"? ${t('También se borra su imagen.')}`)) return
 
     setOcupado(trazado.trazado_id)
     try {
       await borrarTrazado(trazado.trazado_id)
       const r = await listarTrazados()   // el activo puede haber cambiado
       setItems(r.items)
-      toast.exito('Trazado borrado', nombre)
+      toast.exito(t('Trazado borrado'), nombre)
     } catch (err) {
-      toast.error('No se pudo borrar', err.message)
+      toast.error(t('No se pudo borrar'), err.message)
     } finally {
       setOcupado(null)
     }
@@ -162,13 +162,12 @@ export default function Trazados() {
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 transition-colors font-bold text-xs flex-shrink-0"
         >
           {alta ? <X size={14}/> : <Plus size={14}/>}
-          {alta ? 'CANCELAR' : 'NUEVO'}
+          {alta ? t('CANCELAR') : t('NUEVO')}
         </button>
       </div>
 
       <p className="text-neutral-500 text-sm mb-5">
-        El gráfico de Circuito muestra el trazado marcado en uso. Da de alta uno por
-        cada forma de correr el recinto: la pista corta, la larga, el cuarto de milla.
+        {t('El gráfico de Circuito muestra el trazado marcado en uso. Da de alta uno por cada forma de correr el recinto: la pista corta, la larga, el cuarto de milla.')}
       </p>
 
       {alta && (
@@ -181,7 +180,7 @@ export default function Trazados() {
               <input
                 type="text" value={nuevo.name} autoFocus
                 onChange={e => setNuevo(n => ({ ...n, name: e.target.value }))}
-                placeholder="Nombre del autódromo"
+                placeholder={t('Nombre del autódromo')}
                 className="w-full bg-[#141414] border border-neutral-800 rounded p-2.5 text-sm focus:border-red-600 focus:outline-none text-white"
               />
             </div>
@@ -192,7 +191,7 @@ export default function Trazados() {
               <input
                 type="text" value={nuevo.variante}
                 onChange={e => setNuevo(n => ({ ...n, variante: e.target.value }))}
-                placeholder="Pista corta · 2.5 km"
+                placeholder={t('Pista corta · 2.5 km')}
                 className="w-full bg-[#141414] border border-neutral-800 rounded p-2.5 text-sm focus:border-red-600 focus:outline-none text-white"
               />
             </div>
@@ -239,8 +238,7 @@ export default function Trazados() {
         </div>
       ) : items.length === 0 ? (
         <p className="text-sm text-neutral-600">
-          Todavía no hay ningún trazado. El gráfico de Circuito usará la imagen que
-          trae la plantilla de fábrica hasta que des uno de alta.
+          {t('Todavía no hay ningún trazado. El gráfico de Circuito usará la imagen que trae la plantilla de fábrica hasta que des uno de alta.')}
         </p>
       ) : (
         <div className="flex flex-col gap-3">
@@ -269,7 +267,7 @@ export default function Trazados() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-white truncate">{trazado.name}</p>
                     <p className="text-xs text-neutral-500 truncate">
-                      {trazado.variante || 'Sin variante'}
+                      {trazado.variante || t('Sin variante')}
                       {trazado.length_km ? ` · ${trazado.length_km} km` : ''}
                     </p>
                     <span className="inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400 uppercase tracking-wider">
@@ -368,13 +366,12 @@ export default function Trazados() {
                         distintos: el de arriba es tu equipo, el de abajo el
                         disco de la máquina donde corre el backend. */}
                     <p className="text-xs text-neutral-600">
-                      La imagen se copia dentro de la plantilla de CasparCG, así que
-                      luego puedes mover o borrar el original sin romper el gráfico.
+                      {t('La imagen se copia a la carpeta de trazados del sistema, así que luego puedes mover o borrar el original sin romper el gráfico.')}
                     </p>
 
                     {imagen && (
                       <div className="rounded-lg border border-neutral-800 bg-[#0a0a0a] p-3">
-                        <img src={imagen} alt="Trazado" className="max-h-52 mx-auto object-contain"/>
+                        <img src={imagen} alt={t('Trazado')} className="max-h-52 mx-auto object-contain"/>
                       </div>
                     )}
                   </div>

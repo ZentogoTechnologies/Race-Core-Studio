@@ -464,7 +464,7 @@ function FormularioPersonal({
           className="flex items-center gap-2 bg-white text-black font-bold py-2 px-6 rounded hover:bg-neutral-200 transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Eye size={16} />
-          {alAire ? 'ACTUALIZAR DATOS' : 'MOSTRAR GRÁFICO'}
+          {alAire ? t('ACTUALIZAR DATOS') : t('MOSTRAR GRÁFICO')}
         </button>
       </div>
     </div>
@@ -623,6 +623,7 @@ function RelojTanda({ reloj, ocupado, pendiente, onConfig, onArrancar,
             <div className="flex gap-2">
               <button
                 type="button" onClick={() => onVuelta(-1)} disabled={ocupado || !reloj?.vuelta}
+                title={t('Quitar vuelta')} aria-label={t('Quitar vuelta')}
                 className={`${btnBase} border-neutral-700 text-neutral-300 hover:border-neutral-500`}
               >
                 <Minus size={15} />
@@ -691,8 +692,8 @@ function PilotosEnPista({ carros, cargando, error, ocupado, onElegir, onRecargar
       ) : compartidos.length === 0 ? (
         <p className="text-neutral-500 text-sm">
           {carros.length === 0
-            ? 'Sin datos de cronometraje todavía.'
-            : 'Ningún carro de esta tanda lleva dos pilotos.'}
+            ? t('Sin datos de cronometraje todavía.')
+            : t('Ningún carro de esta tanda lleva dos pilotos.')}
         </p>
       ) : (
         <div className="space-y-2">
@@ -819,7 +820,7 @@ function Capa({ etiqueta, item }) {
         <p className="flex items-center gap-2 text-base font-black italic text-white min-w-0"
            title={t(item.nombre)}>
           <span className={`w-2 h-2 rounded-full flex-shrink-0 ${item.dot} animate-pulse`} />
-          <span className="truncate">{item.nombre.toUpperCase()}</span>
+          <span className="truncate">{t(item.nombre).toUpperCase()}</span>
         </p>
       ) : (
         <p className="text-base font-black italic text-neutral-600">—</p>
@@ -916,23 +917,43 @@ export default function GraficosModule() {
 
   // Los pilotos vienen del registro: el botón solo manda el pilot_id y el
   // backend arma los datos que recibirá la plantilla.
+  //
+  // Se vuelven a pedir al volver a esta pestaña y cada 30 segundos. En una
+  // transmisión esta pantalla se queda abierta mientras en otra se da de
+  // alta a un piloto, y cargarlos solo al abrirla obligaba a recargar el
+  // navegador para que apareciera.
   useEffect(() => {
-    getPilots()
-      .then(lista => setPilotos(lista.map(p => ({
-        id: p.pilot_id, nombre: p.name, apellido: p.last_name,
-        categorias: p.categories || [],
-      }))))
-      .catch(() => {})
+    const cargarRegistro = () => {
+      getPilots()
+        .then(lista => setPilotos(lista.map(p => ({
+          id: p.pilot_id, nombre: p.name, apellido: p.last_name,
+          categorias: p.categories || [],
+        }))))
+        .catch(() => {})
 
-    getCategories()
-      .then(lista => setCategorias(lista.map(c => ({
-        id: c.category_id,
-        nombre: c.category_name,
-        // Para enseñar en el formulario qué va a salir en el arte antes de
-        // sacarlo. El backend recorta a las que corren en el evento.
-        subcategorias: (c.sub_categories || []).map(s => s.sub_category_name),
-      }))))
-      .catch(() => {})
+      getCategories()
+        .then(lista => setCategorias(lista.map(c => ({
+          id: c.category_id,
+          nombre: c.category_name,
+          // Para enseñar en el formulario qué va a salir en el arte antes de
+          // sacarlo. El backend recorta a las que corren en el evento.
+          subcategorias: (c.sub_categories || []).map(s => s.sub_category_name),
+        }))))
+        .catch(() => {})
+    }
+
+    cargarRegistro()
+
+    const alVolver = () => { if (document.visibilityState === 'visible') cargarRegistro() }
+    document.addEventListener('visibilitychange', alVolver)
+    window.addEventListener('focus', cargarRegistro)
+    const intervalo = setInterval(cargarRegistro, 30000)
+
+    return () => {
+      document.removeEventListener('visibilitychange', alVolver)
+      window.removeEventListener('focus', cargarRegistro)
+      clearInterval(intervalo)
+    }
   }, [])
 
   // Se refresca sola: la vuelta rápida cambia durante la tanda y el botón
@@ -1255,7 +1276,7 @@ export default function GraficosModule() {
           onClick={() => { limpiar(); setActiveTab('general') }}
           className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-red-600 hover:text-red-400 transition-colors text-xs font-bold whitespace-nowrap flex-shrink-0"
         >
-          <Repeat size={14}/> {hayCarrera ? 'CAMBIAR CARRERA' : 'ELEGIR CARRERA'}
+          <Repeat size={14}/> {hayCarrera ? t('CAMBIAR CARRERA') : t('ELEGIR CARRERA')}
         </button>
       </div>
 
@@ -1306,6 +1327,7 @@ export default function GraficosModule() {
             type="button"
             onClick={() => setError(null)}
             className="text-red-400 hover:text-white flex-shrink-0"
+            title={t('Cerrar aviso')}
             aria-label={t('Cerrar aviso')}
           >
             <X size={16} />
@@ -1326,9 +1348,9 @@ export default function GraficosModule() {
 
             const bloqueada = sinCarrera || otraDisciplina
             const motivo = otraDisciplina
-              ? `Solo se usa en ${suya === 'drag' ? 'drag' : 'circuito'}`
+              ? `${t('Solo se usa en')} ${suya === 'drag' ? 'drag' : t('circuito')}`
               : sinCarrera
-                ? 'Elige una carrera para usar esta pestaña'
+                ? t('Elige una carrera para usar esta pestaña')
                 : undefined
             return (
               <button
@@ -1444,7 +1466,7 @@ export default function GraficosModule() {
                       {pendiente === 'comparar'
                         ? <Loader2 size={13} className="animate-spin" />
                         : <Timer size={13} />}
-                      {comparar ? `Ocultar #${comparar}` : 'Comparar piloto'}
+                      {comparar ? `${t('Ocultar')} #${comparar}` : t('Comparar piloto')}
                     </button>
 
                     {listaAbierta && !comparar && (
@@ -1472,9 +1494,9 @@ export default function GraficosModule() {
 
                   <span className="text-[11px] text-neutral-500">
                     {!alAire.totem
-                      ? 'Saca un tótem al aire para poder abrirlas.'
+                      ? t('Saca un tótem al aire para poder abrirlas.')
                       : !rapido
-                        ? 'Quien tiene la vuelta rápida no está entre los que se ven.'
+                        ? t('Quien tiene la vuelta rápida no está entre los que se ven.')
                         : <>
                             <span className="text-purple-400 font-bold">{rapido.tiempo}</span>
                             {' · '}

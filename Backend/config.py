@@ -179,4 +179,10 @@ class Settings(BaseSettings):
     # la red local podría llegar antes que el técnico y nombrarse dueño.
     SETUP_TOKEN_FILE: str = "instalacion.token"
 
+    # ── Idioma ───────────────────────────────────────────────
+    # El idioma con el que arranca una instalación nueva: lo pone el
+    # instalador según lo que se eligió al empezar. Después manda lo que
+    # se elija en Ajustes, que queda guardado en la base.
+    IDIOMA: str = ""
+
 settings = Settings()

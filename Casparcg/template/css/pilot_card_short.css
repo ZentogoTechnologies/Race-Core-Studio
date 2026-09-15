@@ -25,7 +25,7 @@
 
     flex-shrink:0;
 
-    background:#1d1d1d;
+    background:var(--rcs-logo, rgba(0,0,0,.80));
     border-left:10px solid #ff0000;
 
     display:flex;
@@ -82,7 +82,7 @@
     flex-direction:column;
     justify-content:center;
 
-    background:url("../img/fondo.jpg") center/cover no-repeat;
+    background:var(--rcs-panel, rgba(6,8,11,.72));
 }
 
 /* ==================================================
@@ -100,7 +100,7 @@
     position:relative;
     overflow:visible;
 
-    background:#000;
+    background:var(--rcs-foto, rgba(0,0,0,.55));
     z-index:2;
     border-radius:0 10px 10px 0;
 }

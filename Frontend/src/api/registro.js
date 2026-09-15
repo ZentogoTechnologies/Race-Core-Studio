@@ -97,8 +97,11 @@ export const pilotosApi    = recurso('/pilots')
 // Guardarlo dentro del documento obligaría a arrastrar la imagen en cada
 // listado, y las plantillas de CasparCG piden la foto por URL.
 
+// Acepta la ruta guardada ("pilotos/1.png") o la dirección con versión
+// que ya manda el backend ("/public/pilotos/1.png?v=…"). La segunda es la
+// buena: cambia al subir otra foto, y así el navegador no enseña la vieja.
 export const urlFotoPiloto = (photo) =>
-  photo ? `${ORIGEN}/public/${photo}` : null
+  !photo ? null : photo.startsWith('/') ? `${ORIGEN}${photo}` : `${ORIGEN}/public/${photo}`
 
 export const subirFotoPiloto = (pilotId, archivo) =>
   subirArchivo(`/pilots/${pilotId}/foto`, archivo)
@@ -110,6 +113,37 @@ export const quitarFondoPiloto = (pilotId) =>
 
 export const borrarFotoPiloto = (pilotId) =>
   pedir(`/pilots/${pilotId}/foto`, { method: 'DELETE' })
+
+// Recorta una foto que todavía no está guardada y la devuelve sin fondo,
+// en PNG. No toca el piloto ni el disco del servidor: sirve para recortar
+// en un alta, antes de que el piloto exista, y decidir luego si se guarda.
+export const recortarFotoPiloto = async (archivo) => {
+  const cuerpo = new FormData()
+  cuerpo.append('archivo', archivo)
+
+  let response
+  try {
+    response = await fetch(`${BASE}/pilots/recortar`, {
+      method: 'POST',
+      headers: { ...cabeceraAuth() },
+      body: cuerpo,
+    })
+  } catch {
+    throw new ApiError('No se pudo contactar al backend', 0)
+  }
+
+  if (response.status === 401) {
+    avisarSesionExpirada()
+    throw new ApiError('La sesión expiró, vuelve a iniciar sesión', 401)
+  }
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null)
+    throw new ApiError(leerDetalle(payload, response.status), response.status)
+  }
+
+  return response.blob()
+}
 export const vehiculosApi  = recurso('/vehicles')
 
 // ─── Fotos del vehículo ───────────────────────────────────────
@@ -223,6 +257,51 @@ export const quitarLogoCliente = () =>
   pedir('/settings/logo', { method: 'DELETE' })
 
 export const urlLogoCliente = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
+
+
+// ─── Redes sociales ───────────────────────────────────────────────
+// Las cuentas del gráfico de redes. Guardadas, el botón las saca solas.
+
+export const leerRedes = () => pedir('/settings/redes')
+
+export const guardarRedes = (redes) =>
+  pedir('/settings/redes', { method: 'PUT', body: redes })
+
+
+// ─── Respaldo ─────────────────────────────────────────────────────
+// Todo el sistema en un .rcs-backup. La descarga no pasa por `pedir`
+// porque lo que vuelve es un archivo, no JSON.
+
+export const descargarRespaldo = async () => {
+  let response
+  try {
+    response = await fetch(`${BASE}/settings/respaldo`, { headers: { ...cabeceraAuth() } })
+  } catch {
+    throw new ApiError('No se pudo contactar al backend', 0)
+  }
+
+  if (response.status === 401) {
+    avisarSesionExpirada()
+    throw new ApiError('La sesión expiró, vuelve a iniciar sesión', 401)
+  }
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null)
+    throw new ApiError(leerDetalle(payload, response.status), response.status)
+  }
+
+  const disposicion = response.headers.get('Content-Disposition') || ''
+  const hallado = disposicion.split('filename=')[1]
+  const nombre = hallado ? hallado.replaceAll('"', '').trim() : 'race-core-studio.rcs-backup'
+
+  return { blob: await response.blob(), nombre }
+}
+
+export const revisarRespaldo = (archivo) =>
+  subirArchivo('/settings/respaldo/revisar', archivo)
+
+export const restaurarRespaldo = (archivo) =>
+  subirArchivo('/settings/respaldo/restaurar', archivo)
 
 
 // ─── Trazados ─────────────────────────────────────────────────

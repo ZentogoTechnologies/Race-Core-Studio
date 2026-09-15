@@ -50,7 +50,7 @@ export default function HomeModule() {
         if (vigente) setTotales({ p: p.total, v: v.total, c: c.total, e: e.total })
       })
       .catch(err => {
-        if (vigente) toast.error('No se pudieron cargar los totales', err.message)
+        if (vigente) toast.error(t('No se pudieron cargar los totales'), err.message)
       })
       .finally(() => { if (vigente) setCargando(false) })
 
@@ -74,9 +74,9 @@ export default function HomeModule() {
         pilotos: pilotos.items,
         vehiculos: vehiculos.items,
       })
-      toast.exito('Exportación lista', 'Se descargó el archivo .json')
+      toast.exito(t('Exportación lista'), t('Se descargó el archivo .json'))
     } catch (err) {
-      toast.error('No se pudo exportar', err.message)
+      toast.error(t('No se pudo exportar'), err.message)
     } finally {
       setExportando(false)
     }
@@ -97,7 +97,7 @@ export default function HomeModule() {
       // respuesta no alcanzó a llegar; se dice tal cual en vez de dar un
       // error que haría pulsar el botón otra vez.
       setApagado([{
-        servicio: 'Sistema',
+        servicio: t('Sistema'),
         estado: err.status === 0 ? 'deteniendo' : 'fallo',
         detalle: err.status === 0
           ? 'se perdió la conexión con el backend, que es lo esperado al apagarlo'
@@ -130,9 +130,9 @@ export default function HomeModule() {
                     : s.estado === 'no_estaba' ? 'bg-neutral-700/30 text-neutral-500'
                     : 'bg-green-500/10 text-green-500'
                 }`}>
-                  {s.estado === 'fallo' ? 'FALLO'
-                    : s.estado === 'no_estaba' ? 'NO ESTABA'
-                    : s.estado === 'deteniendo' ? 'CERRANDO' : 'DETENIDO'}
+                  {s.estado === 'fallo' ? t('FALLO')
+                    : s.estado === 'no_estaba' ? t('NO ESTABA')
+                    : s.estado === 'deteniendo' ? t('CERRANDO') : t('DETENIDO')}
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-white">{s.servicio}</p>
@@ -160,8 +160,8 @@ export default function HomeModule() {
           <div>
             <h3 className="text-3xl font-black italic mb-2">{t('PANEL DE CONTROL')}</h3>
             <p className="text-neutral-400">
-              {t('Mostrando')} <span className="text-red-400 font-bold">{etiqueta}</span>.
-              Selecciona un módulo del menú para administrar los registros.
+              {t('Mostrando')} <span className="text-red-400 font-bold">{t(etiqueta)}</span>.
+              {t('Selecciona un módulo del menú para administrar los registros.')}
             </p>
           </div>
 
@@ -186,9 +186,8 @@ export default function HomeModule() {
       <div className="bg-[#141414] border border-neutral-800 rounded-xl px-6 py-4 flex items-center gap-3">
         <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
         <p className="text-neutral-400 text-sm">
-          <span className="text-white font-semibold">{t('EXPORTAR TODO')}</span> genera un único archivo{' '}
-          <span className="text-green-400 font-semibold">.json</span> con una sección por modulo:
-          Eventos, Categorías, Pilotos y Vehículos.
+          <span className="text-white font-semibold">{t('EXPORTAR TODO')}</span> {t('genera un único archivo')}{' '}
+          <span className="text-green-400 font-semibold">.json</span> {t('con una sección por modulo: Eventos, Categorías, Pilotos y Vehículos.')}
         </p>
       </div>
 
@@ -210,7 +209,7 @@ export default function HomeModule() {
             className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-red-600/50 bg-red-600/5 text-red-400 hover:bg-red-600/15 hover:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-sm whitespace-nowrap flex-shrink-0"
           >
             {apagando ? <Loader2 size={18} className="animate-spin"/> : <Power size={18} />}
-            {apagando ? 'DETENIENDO...' : 'DETENER RACE CORE STUDIO'}
+            {apagando ? t('DETENIENDO...') : t('DETENER RACE CORE STUDIO')}
           </button>
         </div>
       )}
@@ -241,12 +240,12 @@ export default function HomeModule() {
             <div className="bg-[#0a0a0a] border border-neutral-800 rounded-lg px-4 py-3 mb-5 text-sm">
               <p className="text-neutral-300 mb-2 font-semibold">{t('Se detienen:')}</p>
               <ul className="text-neutral-500 space-y-1 mb-3">
-                <li>· CasparCG — el servidor de gráficos</li>
-                <li>· Frontend — este panel</li>
-                <li>· Backend — el API</li>
+                <li>{t('· CasparCG — el servidor de gráficos')}</li>
+                <li>{t('· Frontend — este panel')}</li>
+                <li>{t('· Backend — el API')}</li>
               </ul>
               <p className="text-neutral-300 font-semibold">{t('Sigue corriendo:')}</p>
-              <p className="text-neutral-500">· MongoDB — no se pierde ningún dato</p>
+              <p className="text-neutral-500">{t('· MongoDB — no se pierde ningún dato')}</p>
             </div>
 
             <div className="flex justify-end gap-3">

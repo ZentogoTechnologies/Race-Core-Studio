@@ -131,3 +131,16 @@ def copiar_de_ruta(ruta: str, destino_sin_ext: Path) -> Path:
         raise HTTPException(400, f"No se pudo leer la imagen: {e}")
 
     return destino
+
+
+def con_version(url: str, archivo: Path) -> str:
+    """La URL con la fecha del archivo detrás, para que cambie al reemplazarlo.
+
+    El nombre de la foto no cambia al subir otra —sigue siendo 123.png— y un
+    <img> con la misma dirección no se vuelve a pedir aunque el archivo sea
+    otro. Con ?v=<fecha> la dirección cambia y el navegador la trae.
+    """
+    try:
+        return f"{url}?v={int(archivo.stat().st_mtime)}"
+    except OSError:
+        return url

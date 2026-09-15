@@ -30,7 +30,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
       <div className="flex items-center gap-3 text-xs text-neutral-500">
         <span>
           {total === 0
-            ? 'Sin resultados'
+            ? t('Sin resultados')
             : <>{t('Mostrando')} <span className="text-neutral-300 font-bold">{desde}–{hasta}</span> {t('de')} <span className="text-neutral-300 font-bold">{total}</span></>}
         </span>
         <select
@@ -39,7 +39,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
           className="bg-[#0a0a0a] border border-neutral-800 rounded px-2 py-1 text-neutral-300 focus:outline-none focus:border-red-600"
           aria-label={t('Registros por página')}
         >
-          {TAMANOS.map(n => <option key={n} value={n}>{n} por página</option>)}
+          {TAMANOS.map(n => <option key={n} value={n}>{n} {t('por página')}</option>)}
         </select>
       </div>
 
@@ -48,6 +48,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
           onClick={() => irA(paginaActual - 1)}
           disabled={paginaActual <= 1}
           className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
+          title={t('Página anterior')}
           aria-label={t('Página anterior')}
         >
           <ChevronLeft size={16} />
@@ -72,6 +73,7 @@ export default function Pagination({ total, skip, limit, onCambiarPagina, onCamb
           onClick={() => irA(paginaActual + 1)}
           disabled={paginaActual >= totalPaginas}
           className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors"
+          title={t('Página siguiente')}
           aria-label={t('Página siguiente')}
         >
           <ChevronRight size={16} />

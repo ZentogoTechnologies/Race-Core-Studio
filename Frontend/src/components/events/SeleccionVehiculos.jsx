@@ -60,7 +60,7 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
     if (huerfanos.length) {
       declaradas.push({
         id: SIN_SUB,
-        nombre: declaradas.length ? 'Sin subcategoría' : null,
+        nombre: declaradas.length ? t('Sin subcategoría') : null,
         carros: huerfanos,
       })
     }
@@ -153,7 +153,7 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
                   {c.category_name}
                 </span>
                 <span className={`block text-[11px] ${puestos ? 'text-green-500' : 'text-neutral-600'}`}>
-                  {puestos} de {total} carro{total === 1 ? '' : 's'}
+                  {puestos} {t('de')} {total} {total === 1 ? t('carro') : t('carros')}
                 </span>
               </span>
               {esActiva && <ChevronRight size={15} className="text-red-500 flex-shrink-0"/>}
@@ -174,7 +174,7 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
                 {categoria?.category_name}
               </p>
               <p className="text-[11px] text-neutral-600">
-                {todosDeCategoria.puestos} de {todosDeCategoria.total} carros marcados
+                {todosDeCategoria.puestos} {t('de')} {todosDeCategoria.total} {t('carros marcados')}
               </p>
             </div>
             <button
@@ -268,13 +268,13 @@ export default function SeleccionVehiculos({ categorias, vehiculos, inscritos, o
                                   </span>
                                 </span>
                                 <span className="block text-xs text-neutral-500 truncate mt-0.5 pl-[19px]">
-                                  {v.brand || 'Sin marca'} {v.model || ''}
+                                  {v.brand || t('Sin marca')} {v.model || ''}
                                 </span>
                               </>
                             ) : (
                               <>
                                 <span className="block text-sm font-bold text-white truncate">
-                                  {v.brand || 'Sin marca'} {v.model || ''}
+                                  {v.brand || t('Sin marca')} {v.model || ''}
                                 </span>
                                 <span className="block text-xs text-yellow-600/80 truncate mt-0.5">
                                   {t('Sin piloto asignado')}

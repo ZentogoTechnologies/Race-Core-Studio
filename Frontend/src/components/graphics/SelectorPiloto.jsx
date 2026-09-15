@@ -73,7 +73,7 @@ export default function SelectorPiloto({
           {/* Primero la categoría: acota la lista antes de buscar */}
           {conPilotos.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
-              {[{ id: null, nombre: 'Todas' }, ...conPilotos].map(c => {
+              {[{ id: null, nombre: t('Todas') }, ...conPilotos].map(c => {
                 const activa = categoria === c.id
                 const cuantos = c.id === null
                   ? disponibles.length

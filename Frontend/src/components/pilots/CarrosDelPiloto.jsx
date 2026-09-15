@@ -179,8 +179,7 @@ export default function CarrosDelPiloto({ pilotId, disciplinas }) {
       {!cargando && !error && total === 0 && (
         <div className="bg-[#141414] rounded-xl border border-neutral-800 p-6">
           <p className="text-neutral-500 text-sm mb-4">
-            Este piloto no tiene ningún vehículo asignado. Los carros se dan de
-            alta en Vehículos y ahí se les asigna quién los maneja.
+            {t('Este piloto no tiene ningún vehículo asignado. Los carros se dan de alta en Vehículos y ahí se les asigna quién los maneja.')}
           </p>
           <button
             type="button" onClick={() => navegar('/vehiculos')}

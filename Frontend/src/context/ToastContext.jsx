@@ -1,3 +1,4 @@
+import { t } from '../i18n'
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react'
 
@@ -38,7 +39,8 @@ function Toast({ toast, onCerrar }) {
         <button
           onClick={() => onCerrar(toast.id)}
           className="text-neutral-600 hover:text-white transition-colors flex-shrink-0"
-          aria-label="Cerrar aviso"
+          title={t('Cerrar aviso')}
+          aria-label={t('Cerrar aviso')}
         >
           <X size={15} />
         </button>

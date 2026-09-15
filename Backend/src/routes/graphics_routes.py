@@ -54,6 +54,18 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
         # la plantilla tiene sus propios valores por defecto.
         return data
 
+    # Las redes salen de Ajustes, igual que el clima o el circuito: el botón
+    # saca las cuentas guardadas y lo que venga en `data` manda encima. Van
+    # también las vacías, para que la plantilla oculte esa fila en vez de
+    # enseñar su texto de fábrica.
+    if template.graphic_id == "redes":
+        from src.services.settings_services import redes_actuales
+
+        redes = await redes_actuales()
+        if any(redes.values()):
+            return {**redes, **(data or {})}
+        return data
+
     # El circuito sale del trazado marcado como activo en Ajustes. Igual
     # que el clima: pulsar el botón tiene que sacar lo que corresponde sin
     # que nadie escriba nada, y lo que venga en `data` manda encima.

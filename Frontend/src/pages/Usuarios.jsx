@@ -82,9 +82,9 @@ export default function UsuariosModule() {
     try {
       await usuariosApi.actualizar(u.user_id, { active: !u.active })
       lista.recargar()
-      toast.exito(u.active ? 'Usuario inactivo' : 'Usuario activo', u.username)
+      toast.exito(u.active ? t('Usuario inactivo') : t('Usuario activo'), u.username)
     } catch (err) {
-      toast.error('No se pudo cambiar el estado', err.message)
+      toast.error(t('No se pudo cambiar el estado'), err.message)
     }
   }
 
@@ -115,15 +115,15 @@ export default function UsuariosModule() {
         }
 
         await usuariosApi.actualizar(currentEditId, cambios)
-        toast.exito('Usuario actualizado', userForm.username)
+        toast.exito(t('Usuario actualizado'), userForm.username)
       } else {
         await usuariosApi.crear(userForm)
-        toast.exito('Usuario creado', `${userForm.username} · ${userForm.role}`)
+        toast.exito(t('Usuario creado'), `${userForm.username} · ${userForm.role}`)
       }
       closeForm()
       lista.recargar()
     } catch (err) {
-      toast.error(currentEditId ? 'No se pudo actualizar' : 'No se pudo crear', err.message)
+      toast.error(currentEditId ? t('No se pudo actualizar') : t('No se pudo crear'), err.message)
     } finally {
       setGuardando(false)
     }
@@ -135,10 +135,10 @@ export default function UsuariosModule() {
 
     try {
       await usuariosApi.eliminar(u.user_id)
-      toast.exito('Usuario eliminado', u.username)
+      toast.exito(t('Usuario eliminado'), u.username)
       lista.recargar()
     } catch (err) {
-      toast.error('No se pudo eliminar', err.message)
+      toast.error(t('No se pudo eliminar'), err.message)
     }
   }
 
@@ -152,9 +152,9 @@ export default function UsuariosModule() {
         onFormToggle={handleFormToggle}
         addButtonLabel="NUEVO USUARIO"
         exportData={() => usuariosApi.listar({ search: lista.texto || undefined, sort_by: lista.sortBy, sort_dir: lista.sortDir }).then(p => p.items)}
-        onExportError={m => toast.error('No se pudo exportar', m)}
+        onExportError={m => toast.error(t('No se pudo exportar'), m)}
         exportFileName="usuarios"
-        exportColumnMap={{ username: 'Usuario', role: 'Rol', created_at: 'Creado', active: 'Activo' }}
+        exportColumnMap={{ username: t('Usuario'), role: t('Rol'), created_at: t('Creado'), active: t('Activo') }}
       />
 
       <div className="flex items-center gap-3 mb-4">
@@ -183,7 +183,7 @@ export default function UsuariosModule() {
             </div>
             <div>
               <label className="block text-neutral-400 text-xs mb-1 uppercase">
-                Contraseña {currentEditId && <span className="text-neutral-600 normal-case">— vacía la deja igual</span>}
+                Contraseña {currentEditId && <span className="text-neutral-600 normal-case">{t('— vacía la deja igual')}</span>}
               </label>
               <input
                 type="password" minLength={4} required={!currentEditId}
@@ -220,7 +220,7 @@ export default function UsuariosModule() {
                     >
                       <div className={`w-fit p-2 rounded mb-2 ${color}`}><Icon size={16}/></div>
                       <p className={`font-bold text-sm ${activo ? 'text-white' : 'text-neutral-300'}`}>{t(etiqueta)}</p>
-                      <p className="text-xs text-neutral-500 mt-1 leading-snug">{detalle}</p>
+                      <p className="text-xs text-neutral-500 mt-1 leading-snug">{t(detalle)}</p>
                     </button>
                   )
                 })}
@@ -233,7 +233,7 @@ export default function UsuariosModule() {
             <button type="submit" disabled={guardando}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
-              {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+              {currentEditId ? t('ACTUALIZAR') : t('GUARDAR')}
             </button>
           </div>
         </form>
@@ -263,7 +263,7 @@ export default function UsuariosModule() {
 
             {!lista.cargando && !lista.error && lista.items.length === 0 && (
               <tr><td colSpan={5} className="p-10 text-center text-neutral-500">
-                {lista.texto ? `Sin resultados para "${lista.texto}".` : 'No hay usuarios registrados.'}
+                {lista.texto ? `${t('Sin resultados para')} "${lista.texto}".` : t('No hay usuarios registrados.')}
               </td></tr>
             )}
 
@@ -280,14 +280,14 @@ export default function UsuariosModule() {
                       <div>
                         <p className="font-bold text-white">
                           {u.username}
-                          {soyYo(u) && <span className="ml-2 text-[11px] text-neutral-500 font-normal">(tú)</span>}
+                          {soyYo(u) && <span className="ml-2 text-[11px] text-neutral-500 font-normal">({t('tú')})</span>}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-bold ${insignia.clase}`}>
-                      <insignia.Icon size={12}/>{insignia.etiqueta}
+                      <insignia.Icon size={12}/>{t(insignia.etiqueta)}
                     </span>
                   </td>
                   <td className="p-4 text-neutral-400 text-sm font-mono">{u.created_at}</td>
@@ -299,29 +299,29 @@ export default function UsuariosModule() {
                       <button
                         type="button"
                         onClick={() => alternarActivo(u)}
-                        title={u.active ? 'Dar de baja' : 'Reactivar'}
+                        title={u.active ? t('Dar de baja') : t('Reactivar')}
                         className={`px-3 py-1 text-xs font-bold rounded-full border transition-colors ${
                           u.active
                             ? 'bg-green-500/10 text-green-500 border-green-600/40 hover:bg-green-500/20'
                             : 'bg-neutral-700/30 text-neutral-500 border-neutral-700 hover:text-neutral-300 hover:border-neutral-500'
                         }`}
                       >
-                        {u.active ? 'ACTIVO' : 'INACTIVO'}
+                        {u.active ? t('ACTIVO') : t('INACTIVO')}
                       </button>
                     ) : (
                       <span className={`px-3 py-1 text-xs font-bold rounded-full ${
                         u.active ? 'bg-green-500/10 text-green-500' : 'bg-neutral-700/30 text-neutral-500'
                       }`}>
-                        {u.active ? 'ACTIVO' : 'INACTIVO'}
+                        {u.active ? t('ACTIVO') : t('INACTIVO')}
                       </span>
                     )}
                   </td>
                   <td className="p-4 text-right whitespace-nowrap">
-                    <button onClick={() => openEditForm(u)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
+                    <button onClick={() => openEditForm(u)} title={t('Editar usuario')} aria-label={t('Editar usuario')} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
                     {/* Ni al dueño ni a uno mismo: el backend rechaza las dos
                         cosas, así que el botón solo prometería algo falso. */}
                     {!esOwner && !soyYo(u) && (
-                      <button onClick={() => setPorBorrar(u)} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
+                      <button onClick={() => setPorBorrar(u)} title={t('Eliminar usuario')} aria-label={t('Eliminar usuario')} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
                     )}
                   </td>
                 </tr>

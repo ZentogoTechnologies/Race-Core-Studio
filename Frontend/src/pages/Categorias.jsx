@@ -96,9 +96,9 @@ export default function CategoriasModule() {
       // navegador no puede servir la imagen anterior de su caché.
       setLogoActual(c.logo_url || null)
       lista.recargar()
-      toast.exito('Fondo quitado', 'El logo queda recortado sobre transparente')
+      toast.exito(t('Fondo quitado'), t('El logo queda recortado sobre transparente'))
     } catch (err) {
-      toast.error('No se pudo quitar el fondo', err.message)
+      toast.error(t('No se pudo quitar el fondo'), err.message)
     } finally {
       setRecortando(false)
     }
@@ -110,9 +110,9 @@ export default function CategoriasModule() {
       await borrarLogoCategoria(currentEditId)
       limpiarLogo()
       lista.recargar()
-      toast.exito('Logo quitado', '')
+      toast.exito(t('Logo quitado'), '')
     } catch (err) {
-      toast.error('No se pudo quitar el logo', err.message)
+      toast.error(t('No se pudo quitar el logo'), err.message)
     }
   }
 
@@ -126,7 +126,7 @@ export default function CategoriasModule() {
     try {
       await subirLogoCategoria(id, logo)
     } catch (err) {
-      toast.error('La categoría se guardó, pero el logo no', err.message)
+      toast.error(t('La categoría se guardó, pero el logo no'), err.message)
     }
   }
 
@@ -194,7 +194,7 @@ export default function CategoriasModule() {
           description: categoryForm.description || null,
           sub_categories: subs,
         })
-        toast.exito('Categoría actualizada', categoryForm.category_name)
+        toast.exito(t('Categoría actualizada'), categoryForm.category_name)
         if (logo) await subirLogo(currentEditId)
       } else {
         // Sin category_id: lo pone el servidor. Calcularlo en el navegador
@@ -206,7 +206,7 @@ export default function CategoriasModule() {
           sub_categories: subs,
         })
         id = creada.category_id
-        toast.exito('Categoría creada', `${creada.category_name} · ${etiquetaDisciplina}`)
+        toast.exito(t('Categoría creada'), `${creada.category_name} · ${etiquetaDisciplina}`)
         // Después de crear porque hasta ahora no había id al que asociarlo.
         if (logo) await subirLogo(creada.category_id)
       }
@@ -225,7 +225,7 @@ export default function CategoriasModule() {
     } catch (err) {
       // El formulario se queda abierto con lo escrito: si el guardado
       // falló, perder lo cargado sería el peor final posible.
-      toast.error(currentEditId ? 'No se pudo actualizar' : 'No se pudo crear', err.message)
+      toast.error(currentEditId ? t('No se pudo actualizar') : t('No se pudo crear'), err.message)
     } finally {
       setGuardando(false)
     }
@@ -237,10 +237,10 @@ export default function CategoriasModule() {
 
     try {
       await categoriasApi.eliminar(categoria.category_id)
-      toast.exito('Categoría eliminada', categoria.category_name)
+      toast.exito(t('Categoría eliminada'), categoria.category_name)
       lista.recargar()
     } catch (err) {
-      toast.error('No se pudo eliminar', err.message)
+      toast.error(t('No se pudo eliminar'), err.message)
     }
   }
 
@@ -259,9 +259,9 @@ export default function CategoriasModule() {
         addButtonLabel="NUEVA CATEGORÍA"
         puedeCrear={puedeEscribir}
         exportData={() => categoriasApi.listar({ ...filtros, search: lista.texto || undefined, sort_by: lista.sortBy, sort_dir: lista.sortDir }).then(p => p.items)}
-        onExportError={m => toast.error('No se pudo exportar', m)}
+        onExportError={m => toast.error(t('No se pudo exportar'), m)}
         exportFileName="categorias"
-        exportColumnMap={{ category_name: 'Categoría', discipline: 'Disciplina', description: 'Descripción' }}
+        exportColumnMap={{ category_name: t('Categoría'), discipline: t('Disciplina'), description: t('Descripción') }}
       />
       )}
 
@@ -319,7 +319,7 @@ export default function CategoriasModule() {
                   className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 transition-colors font-bold text-xs"
                 >
                   <Upload size={14}/>
-                  {vistaLogo ? 'CAMBIAR' : 'ELEGIR LOGO'}
+                  {vistaLogo ? t('CAMBIAR') : t('ELEGIR LOGO')}
                 </button>
 
                 {/* Con logo guardado se ofrecen los tres; sin él, solo el de
@@ -328,13 +328,13 @@ export default function CategoriasModule() {
                 {logoActual && currentEditId && (
                   <button
                     type="button" onClick={recortarLogo} disabled={recortando}
-                    title="Deja transparente el fondo, si es de un solo color"
+                    title={t('Deja transparente el fondo, si es de un solo color')}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-bold text-xs"
                   >
                     {recortando
                       ? <Loader2 size={14} className="animate-spin"/>
                       : <Scissors size={14}/>}
-                    {recortando ? 'QUITANDO…' : 'QUITAR FONDO'}
+                    {recortando ? t('QUITANDO…') : t('QUITAR FONDO')}
                   </button>
                 )}
 
@@ -349,7 +349,7 @@ export default function CategoriasModule() {
               </div>
 
               <p className="text-[11px] text-neutral-600 mt-2">
-                {logo ? 'Se sube al guardar la categoría.' : 'Sale junto al nombre en el listado.'}
+                {logo ? t('Se sube al guardar la categoría.') : t('Sale junto al nombre en el listado.')}
               </p>
             </div>
           </div>
@@ -357,7 +357,7 @@ export default function CategoriasModule() {
           <div className="col-span-full mt-2">
             <div className="flex items-center justify-between mb-2">
               <label className="text-neutral-400 text-xs uppercase">
-                Subcategorías ({categoryForm.sub_categories.length})
+                {t('Subcategorías')} ({categoryForm.sub_categories.length})
               </label>
               <button
                 type="button" onClick={agregarSub}
@@ -369,8 +369,7 @@ export default function CategoriasModule() {
 
             {categoryForm.sub_categories.length === 0 ? (
               <p className="text-sm text-neutral-600 py-2">
-                Sin subcategorías. Son las divisiones dentro de la categoría (GTS, GTS Jr, V8…) y
-                es lo que se elige después en cada vehículo.
+                {t('Sin subcategorías. Son las divisiones dentro de la categoría (GTS, GTS Jr, V8…) y es lo que se elige después en cada vehículo.')}
               </p>
             ) : (
               <div className="flex flex-col gap-2">
@@ -390,6 +389,7 @@ export default function CategoriasModule() {
                     <button
                       type="button" onClick={() => quitarSub(sub.sub_category_id)}
                       className="p-2 rounded-lg text-neutral-500 hover:text-red-500 hover:bg-red-500/10 transition-colors flex-shrink-0"
+                      title={t('Quitar subcategoría')}
                       aria-label={t('Quitar subcategoría')}
                     >
                       <X size={15}/>
@@ -405,7 +405,7 @@ export default function CategoriasModule() {
             <button type="submit" disabled={guardando}
               className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
               {guardando && <Loader2 size={16} className="animate-spin"/>}
-              {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+              {currentEditId ? t('ACTUALIZAR') : t('GUARDAR')}
             </button>
           </div>
         </form>
@@ -443,7 +443,7 @@ export default function CategoriasModule() {
 
             {!lista.cargando && !lista.error && lista.items.length === 0 && (
               <tr><td colSpan={puedeEscribir ? 3 : 2} className="p-10 text-center text-neutral-500">
-                {lista.texto ? `Sin resultados para "${lista.texto}".` : 'No hay categorías registradas.'}
+                {lista.texto ? `${t('Sin resultados para')} "${lista.texto}".` : t('No hay categorías registradas.')}
               </td></tr>
             )}
 
@@ -474,8 +474,8 @@ export default function CategoriasModule() {
                 </td>
                 {puedeEscribir && (
                   <td className="p-4 text-right whitespace-nowrap">
-                    <button onClick={() => openEditForm(categoria)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
-                    <button onClick={() => setPorBorrar(categoria)} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
+                    <button onClick={() => openEditForm(categoria)} title={t('Editar categoría')} aria-label={t('Editar categoría')} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
+                    <button onClick={() => setPorBorrar(categoria)} title={t('Eliminar categoría')} aria-label={t('Eliminar categoría')} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
                   </td>
                 )}
               </tr>

@@ -6,7 +6,7 @@ from src.models.categories_model import Category
 from pathlib import Path
 
 from src.services.imagenes_services import (
-    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+    con_version,    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
 )
 from src.models.events_model import Event, Inscrito, Sesion
 from src.models.pilots_model import Pilot
@@ -29,7 +29,7 @@ RUTA_RELATIVA = "eventos"
 
 def url_imagen_evento(archivo):
     """La ruta con la que el navegador y CasparCG piden la imagen."""
-    return f"/public/{RUTA_RELATIVA}/{archivo}" if archivo else None
+    return con_version(f"/public/{RUTA_RELATIVA}/{archivo}", CARPETA_IMAGENES / archivo) if archivo else None
 
 
 class EventService:

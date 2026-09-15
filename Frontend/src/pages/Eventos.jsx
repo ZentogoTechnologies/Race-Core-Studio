@@ -71,7 +71,7 @@ export default function EventosModule() {
       vehiculosApi.listar({ sort_by: 'number', discipline: disciplina }),
     ])
       .then(([c, v]) => { setCategorias(c.items); setVehiculos(v.items) })
-      .catch(err => toast.error('No se pudieron cargar los catálogos', err.message))
+      .catch(err => toast.error(t('No se pudieron cargar los catálogos'), err.message))
   }, [disciplina])   // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalDias = contarDias(eventForm.start_date, eventForm.end_date)
@@ -115,9 +115,9 @@ export default function EventosModule() {
       await borrarImagenEvento(currentEditId)
       limpiarImagen()
       lista.recargar()
-      toast.exito('Imagen quitada', 'El gráfico saldrá solo con el nombre')
+      toast.exito(t('Imagen quitada'), t('El gráfico saldrá solo con el nombre'))
     } catch (err) {
-      toast.error('No se pudo quitar la imagen', err.message)
+      toast.error(t('No se pudo quitar la imagen'), err.message)
     }
   }
 
@@ -189,12 +189,12 @@ export default function EventosModule() {
 
       if (currentEditId) {
         await eventosApi.actualizar(currentEditId, cuerpo)
-        toast.exito('Evento actualizado', eventForm.name)
+        toast.exito(t('Evento actualizado'), eventForm.name)
       } else {
         // Sin event_id: lo asigna el servidor, igual que en categorías.
         const creado = await eventosApi.crear({ ...cuerpo, discipline: disciplina })
         id = creado.event_id
-        toast.exito('Evento creado', `${eventForm.name} · ${totalDias} día(s)`)
+        toast.exito(t('Evento creado'), `${eventForm.name} · ${totalDias} día(s)`)
       }
 
       // Después de guardar porque en un alta el id no existe hasta ahora.
@@ -202,7 +202,7 @@ export default function EventosModule() {
         try {
           await subirImagenEvento(id, imagen)
         } catch (err) {
-          toast.error('El evento se guardó, pero la imagen no', err.message)
+          toast.error(t('El evento se guardó, pero la imagen no'), err.message)
         }
       }
 
@@ -216,7 +216,7 @@ export default function EventosModule() {
       setCurrentEditId(id)
       lista.recargar()
     } catch (err) {
-      toast.error(currentEditId ? 'No se pudo actualizar' : 'No se pudo crear', err.message)
+      toast.error(currentEditId ? t('No se pudo actualizar') : t('No se pudo crear'), err.message)
     } finally {
       setGuardando(false)
     }
@@ -227,11 +227,11 @@ export default function EventosModule() {
     setPorBorrar(null)
     try {
       await eventosApi.eliminar(ev.event_id)
-      toast.exito('Evento eliminado', ev.name)
+      toast.exito(t('Evento eliminado'), ev.name)
       if (expandido?.event_id === ev.event_id) setExpandido(null)
       lista.recargar()
     } catch (err) {
-      toast.error('No se pudo eliminar', err.message)
+      toast.error(t('No se pudo eliminar'), err.message)
     }
   }
 
@@ -246,10 +246,10 @@ export default function EventosModule() {
   // muestra al lado del botón: un botón apagado sin explicación deja al
   // operador pulsándolo sin entender por qué no pasa nada.
   const faltantes = []
-  if (!eventForm.name.trim())            faltantes.push('el nombre')
-  if (!eventForm.start_date)             faltantes.push('la fecha de inicio')
-  if (!eventForm.end_date)               faltantes.push('la fecha final')
-  if (eventForm.category_ids.length === 0) faltantes.push('al menos una categoría')
+  if (!eventForm.name.trim())            faltantes.push(t('el nombre'))
+  if (!eventForm.start_date)             faltantes.push(t('la fecha de inicio'))
+  if (!eventForm.end_date)               faltantes.push(t('la fecha final'))
+  if (eventForm.category_ids.length === 0) faltantes.push(t('al menos una categoría'))
 
   const columnas = puedeEscribir ? 6 : 5
 
@@ -268,9 +268,9 @@ export default function EventosModule() {
         addButtonLabel="NUEVO EVENTO"
         puedeCrear={puedeEscribir}
         exportData={() => eventosApi.listar({ ...filtros, search: lista.texto || undefined, sort_by: lista.sortBy, sort_dir: lista.sortDir }).then(p => p.items)}
-        onExportError={m => toast.error('No se pudo exportar', m)}
+        onExportError={m => toast.error(t('No se pudo exportar'), m)}
         exportFileName="eventos"
-        exportColumnMap={{ name: 'Evento', start_date: 'Inicio', end_date: 'Fin', location: 'Sede' }}
+        exportColumnMap={{ name: t('Evento'), start_date: t('Inicio'), end_date: t('Fin'), location: t('Sede') }}
       />
       )}
 
@@ -296,8 +296,8 @@ export default function EventosModule() {
               qué carros de cada una. */}
           <div className="flex items-center gap-3 mb-5 pb-4 border-b border-neutral-800">
             {[
-              { n: 1, titulo: 'Datos y categorías' },
-              { n: 2, titulo: 'Vehículos que corren' },
+              { n: 1, titulo: t('Datos y categorías') },
+              { n: 2, titulo: t('Vehículos que corren') },
             ].map(({ n, titulo }, i) => (
               <Fragment key={n}>
                 {i > 0 && <span className="flex-1 h-px bg-neutral-800" />}
@@ -342,7 +342,7 @@ export default function EventosModule() {
             </div>
             <div className="md:col-span-2">
               <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Sede')}</label>
-              <input type="text" value={eventForm.location} placeholder="Nombre del autódromo"
+              <input type="text" value={eventForm.location} placeholder={t('Nombre del autódromo')}
                 onChange={e => setEventForm({ ...eventForm, location: e.target.value })}
                 className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
             </div>
@@ -373,7 +373,7 @@ export default function EventosModule() {
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:border-blue-500 hover:text-blue-400 transition-colors font-bold text-xs"
                   >
                     <Upload size={14}/>
-                    {vistaImagen ? 'CAMBIAR' : 'ELEGIR IMAGEN'}
+                    {vistaImagen ? t('CAMBIAR') : t('ELEGIR IMAGEN')}
                   </button>
 
                   {vistaImagen && (
@@ -388,16 +388,16 @@ export default function EventosModule() {
 
                 <p className="text-[11px] text-neutral-600 mt-2">
                   {imagen
-                    ? 'Se sube al guardar el evento.'
-                    : 'Sale en el gráfico de Evento, junto al nombre.'}
+                    ? t('Se sube al guardar el evento.')
+                    : t('Sale en el gráfico de Evento, junto al nombre.')}
                 </p>
               </div>
             </div>
             <div className="md:col-span-2 flex items-end">
               <p className="text-sm text-neutral-500">
                 {totalDias > 0
-                  ? <>{t('Duración:')} <span className="text-white font-bold">{totalDias} día{totalDias > 1 ? 's' : ''}</span></>
-                  : 'Elige las dos fechas para ver la duración.'}
+                  ? <>{t('Duración:')} <span className="text-white font-bold">{totalDias} {totalDias > 1 ? t('días') : t('día')}</span></>
+                  : t('Elige las dos fechas para ver la duración.')}
               </p>
             </div>
           </div>
@@ -407,7 +407,7 @@ export default function EventosModule() {
               Categorías que corren ({eventForm.category_ids.length})
               {eventForm.category_ids.length === 0 && (
                 <span className="ml-2 normal-case tracking-normal text-amber-400 font-normal">
-                  · elige al menos una para continuar
+                  {t('· elige al menos una para continuar')}
                 </span>
               )}
             </label>
@@ -466,7 +466,7 @@ export default function EventosModule() {
             <div className="flex items-center gap-3">
               {paso === 1 && faltantes.length > 0 && (
                 <p className="text-xs text-amber-400 text-right max-w-xs">
-                  Falta {faltantes.join(', ').replace(/, ([^,]*)$/, ' y $1')}.
+                  {t('Falta')} {faltantes.join(', ').replace(/, ([^,]*)$/, ` ${t('y')} $1`)}.
                 </p>
               )}
 
@@ -502,7 +502,7 @@ export default function EventosModule() {
                 <button key="guardar" type="submit" disabled={guardando}
                   className="bg-white text-black font-bold py-2 px-8 rounded hover:bg-neutral-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2">
                   {guardando && <Loader2 size={16} className="animate-spin"/>}
-                  {currentEditId ? 'ACTUALIZAR' : 'GUARDAR'}
+                  {currentEditId ? t('ACTUALIZAR') : t('GUARDAR')}
                 </button>
               )}
             </div>
@@ -542,7 +542,7 @@ export default function EventosModule() {
 
             {!lista.cargando && !lista.error && lista.items.length === 0 && (
               <tr><td colSpan={columnas} className="p-10 text-center text-neutral-500">
-                {lista.texto ? `Sin resultados para "${lista.texto}".` : 'No hay eventos registrados.'}
+                {lista.texto ? `${t('Sin resultados para')} "${lista.texto}".` : t('No hay eventos registrados.')}
               </td></tr>
             )}
 
@@ -558,7 +558,7 @@ export default function EventosModule() {
                       <CalendarDays size={13} className="text-red-500"/>
                       {ev.start_date} → {ev.end_date}
                     </span>
-                    <p className="text-xs text-neutral-600 mt-0.5 pl-5">{ev.total_dias} día{ev.total_dias > 1 ? 's' : ''}</p>
+                    <p className="text-xs text-neutral-600 mt-0.5 pl-5">{ev.total_dias} {ev.total_dias > 1 ? t('días') : t('día')}</p>
                   </td>
                   <td className="p-4">
                     <div className="flex flex-wrap gap-1">
@@ -577,6 +577,7 @@ export default function EventosModule() {
                   <td className="p-4 text-right">
                     <button
                       onClick={() => setExpandido(expandido?.event_id === ev.event_id ? null : ev)}
+                      title={expandido?.event_id === ev.event_id ? t('Ocultar programa') : t('Ver programa')}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors ${
                         expandido?.event_id === ev.event_id
                           ? 'border-red-600 bg-red-600/10 text-red-400'
@@ -588,8 +589,8 @@ export default function EventosModule() {
                   </td>
                   {puedeEscribir && (
                     <td className="p-4 text-right whitespace-nowrap">
-                      <button onClick={() => openEditForm(ev)} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
-                      <button onClick={() => setPorBorrar(ev)} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
+                      <button onClick={() => openEditForm(ev)} title={t('Editar evento')} aria-label={t('Editar evento')} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
+                      <button onClick={() => setPorBorrar(ev)} title={t('Eliminar evento')} aria-label={t('Eliminar evento')} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
                     </td>
                   )}
                 </tr>
@@ -626,7 +627,7 @@ export default function EventosModule() {
       <ConfirmDialog
         abierto={Boolean(porBorrar)}
         titulo={t('Eliminar evento')}
-        mensaje={porBorrar ? `Se va a eliminar ${porBorrar.name} con sus ${porBorrar.total_sesiones} sesión(es).` : ''}
+        mensaje={porBorrar ? `${t('Se va a eliminar')} ${porBorrar.name} ${t('con sus')} ${porBorrar.total_sesiones} ${t('sesión(es).')}` : ''}
         onCancelar={() => setPorBorrar(null)}
         onConfirmar={confirmarBorrado}
       />

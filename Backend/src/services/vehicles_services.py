@@ -6,7 +6,7 @@ from pathlib import Path
 
 from src.models.categories_model import Category
 from src.services.imagenes_services import (
-    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
+    con_version,    borrar_si_sobra, copiar_de_ruta, guardar_bytes,
 )
 from src.schemas.vehicles_schemas import VehicleCreate, VehicleUpdate, VehicleResponse
 from src.schemas.common_schemas import Page
@@ -14,6 +14,7 @@ from src.services.pagination import (
     campo_orden, combinar, direccion, filtro_busqueda,
 )
 from fastapi import HTTPException
+from fastapi.concurrency import run_in_threadpool
 
 import rutas
 
@@ -30,7 +31,7 @@ TOPE_FOTOS = 2
 
 def url_foto_vehiculo(archivo: str) -> str:
     """La ruta con la que el navegador y CasparCG piden la imagen."""
-    return f"/public/{RUTA_RELATIVA}/{archivo}"
+    return con_version(f"/public/{RUTA_RELATIVA}/{archivo}", CARPETA_FOTOS / archivo)
 
 
 class VehicleService:
@@ -340,12 +341,14 @@ class VehicleService:
         if not actual.is_file():
             raise HTTPException(400, "El archivo de la foto no está en el disco")
 
-        from src.services.recorte_services import quitar_fondo as recortar
-
         try:
+            # Import dentro, y en un hilo aparte: igual que en pilotos.
+            from src.services.recorte_services import quitar_fondo as recortar
+
             # El modelo general y no el de personas: delante de un carro,
             # el entrenado con gente no sabe qué mirar.
-            recortada = recortar(actual.read_bytes(), sujeto="objeto")
+            recortada = await run_in_threadpool(
+                recortar, actual.read_bytes(), sujeto="objeto")
         except Exception as e:
             raise HTTPException(422, f"No se pudo quitar el fondo: {e}")
 

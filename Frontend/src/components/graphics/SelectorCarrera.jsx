@@ -42,7 +42,7 @@ export default function SelectorCarrera() {
         // más para llegar a lo único que hay es puro estorbo.
         if (p.items.length === 1) setAbierto(p.items[0].event_id)
       })
-      .catch(err => toast.error('No se pudieron cargar los eventos', err.message))
+      .catch(err => toast.error(t('No se pudieron cargar los eventos'), err.message))
       .finally(() => setCargando(false))
   }, [disciplina])   // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -54,7 +54,7 @@ export default function SelectorCarrera() {
           <Radio size={26} />
         </div>
         <h2 className="text-2xl font-black italic text-white mb-2">
-          ¿QUÉ VAS A GRAFICAR?
+          {t('¿QUÉ VAS A GRAFICAR?')}
         </h2>
         <p className="text-neutral-500 text-sm">
           {t('Elige el evento y, si quieres, la tanda concreta. Puedes cambiarlo después.')}
@@ -161,7 +161,7 @@ export default function SelectorCarrera() {
                     onClick={() => elegir(ev, null)}
                     className="w-full bg-white text-black font-bold py-2.5 rounded-lg hover:bg-neutral-200 transition-colors text-sm"
                   >
-                    GRAFICAR ESTE EVENTO {ev.sesiones.length > 0 && '(sin fijar tanda)'}
+                    {t('GRAFICAR ESTE EVENTO')} {ev.sesiones.length > 0 && t('(sin fijar tanda)')}
                   </button>
                 </div>
               )}
@@ -182,8 +182,7 @@ export default function SelectorCarrera() {
           {t('AVANZAR SIN CARRERA SELECCIONADA')}
         </button>
         <p className="text-xs text-neutral-600 text-center mt-2">
-          {t('Solo quedará disponible la pestaña')} <span className="text-neutral-400 font-bold">{t('General')}</span>:
-          fondos y misceláneos. Carrera, Pilotos y Grilla necesitan saber qué se está corriendo.
+          {t('Solo quedará disponible la pestaña')} <span className="text-neutral-400 font-bold">{t('General')}</span>{t(': fondos y misceláneos. Carrera, Pilotos y Grilla necesitan saber qué se está corriendo.')}
         </p>
       </div>
 
