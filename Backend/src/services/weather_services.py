@@ -60,6 +60,24 @@ CODIGOS = {
 MESES = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN",
          "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"]
 
+# Lo mismo en ingles. El grafico sigue el idioma elegido en Ajustes, y la
+# descripcion y el mes son los unicos textos del clima que no son cifras.
+DESCRIPCIONES_EN = {
+    0: "Clear", 1: "Mostly clear", 2: "Partly cloudy", 3: "Cloudy",
+    45: "Fog", 48: "Freezing fog",
+    51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+    56: "Freezing drizzle", 57: "Heavy freezing drizzle",
+    61: "Light rain", 63: "Rain", 65: "Heavy rain",
+    66: "Freezing rain", 67: "Heavy freezing rain",
+    71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains",
+    80: "Light showers", 81: "Showers", 82: "Heavy showers",
+    85: "Snow showers", 86: "Snow showers",
+    95: "Thunderstorm", 96: "Thunderstorm with hail", 99: "Thunderstorm with hail",
+}
+
+MESES_EN = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+            "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+
 # Último dato bueno y cuándo se obtuvo.
 _cache: Optional[dict] = None
 _cache_en: float = 0.0
@@ -67,6 +85,26 @@ _cache_en: float = 0.0
 
 def _fecha_es(momento: datetime) -> str:
     return f"{momento.day:02d} {MESES[momento.month - 1]} {momento.year}"
+
+
+def _en_idioma(datos: dict, idioma: str) -> dict:
+    """Descripcion y fecha en el idioma pedido; el resto son cifras.
+
+    La cache guarda la version en espanol y se traduce al entregar: asi
+    cambiar de idioma en Ajustes se ve al instante, sin esperar a que
+    caduque la cache ni volver a consultar Open-Meteo.
+    """
+    if idioma != "en" or not datos.get("ok"):
+        return datos
+
+    codigo = datos.get("weather_code")
+    traducido = dict(datos)
+    traducido["description"] = DESCRIPCIONES_EN.get(codigo, "No data")
+    fecha = datos.get("current_date") or ""
+    for es, en in zip(MESES, MESES_EN):
+        fecha = fecha.replace(f" {es} ", f" {en} ")
+    traducido["current_date"] = fecha
+    return traducido
 
 
 def _consultar(lat: float, lon: float) -> dict:
@@ -123,7 +161,7 @@ def ubicacion() -> tuple[float, float, str, str]:
             settings.WEATHER_PLACE, settings.WEATHER_COUNTRY)
 
 
-def obtener_clima(forzar: bool = False) -> dict:
+def obtener_clima(forzar: bool = False, idioma: str = "es") -> dict:
     """Clima actual del autódromo, listo para la plantilla.
 
     Devuelve siempre algo: si la consulta falla y hay un dato guardado, se
@@ -134,20 +172,20 @@ def obtener_clima(forzar: bool = False) -> dict:
 
     fresco = _cache and (time.time() - _cache_en) < settings.WEATHER_CACHE_SECONDS
     if fresco and not forzar:
-        return {**_cache, "desde_cache": True}
+        return _en_idioma({**_cache, "desde_cache": True}, idioma)
 
     try:
         lat, lon, _lugar, _pais = ubicacion()
         crudo = _consultar(lat, lon)
     except (urllib.error.URLError, OSError, ValueError, TimeoutError) as e:
         if _cache:
-            return {
+            return _en_idioma({
                 **_cache,
                 "desde_cache": True,
                 "obsoleto": True,
                 "edad_segundos": int(time.time() - _cache_en),
                 "error": f"{type(e).__name__}: {str(e)[:80]}",
-            }
+            }, idioma)
         return {
             "ok": False,
             "error": f"No se pudo consultar el clima: {type(e).__name__}",
@@ -186,4 +224,4 @@ def obtener_clima(forzar: bool = False) -> dict:
 
     _cache = datos
     _cache_en = time.time()
-    return datos
+    return _en_idioma(datos, idioma)

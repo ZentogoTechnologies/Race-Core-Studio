@@ -149,11 +149,18 @@ async function pedirRegistro(ruta) {
 // Los listados del backend vienen paginados en un sobre {items, total}.
 // Aquí se pide la lista completa (sin `limit`) y se devuelve solo `items`:
 // el selector de pilotos del panel los necesita todos de una.
-export const getPilots = () =>
-  pedirRegistro('/pilots/').then(p => p.items)
+//
+// Van filtrados por disciplina: en drag no tienen que aparecer los
+// pilotos ni las categorías de circuito, ni al revés. La base es la
+// misma; lo que cambia es lo que se ofrece al operador.
+const conDisciplina = (ruta, disciplina) =>
+  (disciplina ? `${ruta}?discipline=${encodeURIComponent(disciplina)}` : ruta)
 
-export const getCategories = () =>
-  pedirRegistro('/categories/').then(p => p.items)
+export const getPilots = (disciplina) =>
+  pedirRegistro(conDisciplina('/pilots/', disciplina)).then(p => p.items)
+
+export const getCategories = (disciplina) =>
+  pedirRegistro(conDisciplina('/categories/', disciplina)).then(p => p.items)
 
 
 // ─── Cronometraje ─────────────────────────────────────────────

@@ -841,9 +841,9 @@ export default function GraficosModule() {
   // piloto se consulta al cronometraje porque la franja solo puede
   // abrirse bajo su fila, y a veces no está entre los que se ven.
   const [mejorVuelta,   setMejorVuelta]   = useState(false)
-  // El recuadro morado del canto derecho. Sale encendido porque así lo
-  // pinta la plantilla: el panel refleja lo que hay, no lo impone.
-  const [cronoRapida,   setCronoRapida]   = useState(true)
+  // El recuadro morado del canto derecho. Sale apagado, igual que la
+  // plantilla: solo aparece cuando se pulsa Cronómetro.
+  const [cronoRapida,   setCronoRapida]   = useState(false)
   const [rapido,        setRapido]        = useState(null)
 
   // Segundo piloto, el de la franja verde. Se elige de los que están en
@@ -918,20 +918,24 @@ export default function GraficosModule() {
   // Los pilotos vienen del registro: el botón solo manda el pilot_id y el
   // backend arma los datos que recibirá la plantilla.
   //
+  // Solo los de la disciplina elegida. Con la lista entera, en drag salían
+  // los pilotos y las categorías de circuito —en la carta y en el duelo—,
+  // que no corren ahí.
+  //
   // Se vuelven a pedir al volver a esta pestaña y cada 30 segundos. En una
   // transmisión esta pantalla se queda abierta mientras en otra se da de
   // alta a un piloto, y cargarlos solo al abrirla obligaba a recargar el
   // navegador para que apareciera.
   useEffect(() => {
     const cargarRegistro = () => {
-      getPilots()
+      getPilots(disciplina)
         .then(lista => setPilotos(lista.map(p => ({
           id: p.pilot_id, nombre: p.name, apellido: p.last_name,
           categorias: p.categories || [],
         }))))
         .catch(() => {})
 
-      getCategories()
+      getCategories(disciplina)
         .then(lista => setCategorias(lista.map(c => ({
           id: c.category_id,
           nombre: c.category_name,
@@ -954,7 +958,7 @@ export default function GraficosModule() {
       window.removeEventListener('focus', cargarRegistro)
       clearInterval(intervalo)
     }
-  }, [])
+  }, [disciplina])
 
   // Se refresca sola: la vuelta rápida cambia durante la tanda y el botón
   // tiene que saber si el que la tiene sigue estando a la vista.
@@ -1073,6 +1077,14 @@ export default function GraficosModule() {
     if (suya && disciplina && suya !== disciplina) setActiveTab('general')
   }, [disciplina, activeTab])
 
+  /* Y la carrera elegida tampoco vale si era de la otra disciplina: se
+     suelta y se vuelve a preguntar. Si no, en circuito seguía arriba el
+     evento de drag, con sus tandas y sus categorías. */
+  useEffect(() => {
+    const suya = carrera?.disciplina
+    if (suya && disciplina && suya !== disciplina) limpiar()
+  }, [disciplina, carrera, limpiar])
+
   const limpiarGrupo = (grupo) =>
     ejecutar(`limpiar-${grupo}`, () => clearGroup(grupo), () => marcar(grupo, null))
 
@@ -1142,9 +1154,9 @@ export default function GraficosModule() {
   useEffect(() => {
     if (!alAire.totem) {
       setMejorVuelta(false); setComparar(null); setListaAbierta(false)
-      // La plantilla nace con el recuadro encendido: el panel vuelve ahí
-      // o al sacar el tótem otra vez diría que está apagado sin estarlo.
-      setCronoRapida(true)
+      // La plantilla nace con el recuadro apagado: el panel vuelve ahí
+      // o al sacar el tótem otra vez diría que está encendido sin estarlo.
+      setCronoRapida(false)
     }
   }, [alAire.totem])
 

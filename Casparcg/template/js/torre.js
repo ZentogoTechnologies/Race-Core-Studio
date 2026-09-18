@@ -44,9 +44,10 @@ let torreConfig = {
     mejorVuelta: false,
 
     /* El recuadro morado de la vuelta rápida, pegado al canto derecho.
-       Encendido de fábrica: es un dato de la tanda y estaba siempre. Se
-       apaga desde el panel cuando el arte de al lado estorba. */
-    crono: true,
+       Apagado de fábrica: sale solo cuando se pide desde el panel con el
+       botón Cronómetro. Encendido salía al desplegar el tótem sin que
+       nadie lo hubiera elegido. */
+    crono: false,
 
     // Dorsal de un segundo piloto del que también se abre su franja, en
     // verde. Sirve para comparar dos tiempos en pantalla a la vez.

@@ -242,6 +242,21 @@ def category_logo_url(archivo: str | None) -> str:
     return _url(ruta) if ruta.is_file() else ""
 
 
+def equipo_de(pilot, disciplina: str | None) -> str:
+    """El equipo del piloto en esa disciplina.
+
+    El mismo corredor puede llevar un equipo en circuito y otro en drag,
+    asi que el que sale al aire es el de la disciplina del carro. Si solo
+    corre en una, vale el suyo.
+    """
+    equipos = getattr(pilot, "equipos", None) or {}
+    if disciplina and equipos.get(disciplina):
+        return equipos[disciplina]
+    if len(equipos) == 1:
+        return next(iter(equipos.values()))
+    return ""
+
+
 def brand_logo_url(brand: str | None) -> str:
     """
     Logo de la marca, tolerante con el nombre del archivo.
@@ -258,7 +273,13 @@ def brand_logo_url(brand: str | None) -> str:
             if not archivo.is_file() or archivo.suffix.lower() not in EXTENSIONES:
                 continue
             if _slug(archivo.stem) == buscado:
-                return _url(archivo)
+                # Al aire va la version para fondo oscuro: el logo se pone
+                # directo sobre la caja negra, y los negros (Acura, Cupra)
+                # no se verian. Si no se pudo generar, el original.
+                from src.services.logos_oscuros import asegurar
+
+                oscuro = asegurar(archivo)
+                return _url(oscuro or archivo)
 
     reserva = _buscar(raiz, "_sin-logo")
     return _url(reserva) if reserva else ""
@@ -274,6 +295,7 @@ async def build_pilot_payload(
     graphic_id: str,
     pilot_id: int,
     category_id: int | None = None,
+    event_id: int | None = None,
 ) -> dict:
     pilot = await Pilot.find_one(Pilot.pilot_id == pilot_id)
     if pilot is None:
@@ -286,24 +308,47 @@ async def build_pilot_payload(
     # en GT Challenge con carros distintos, y sin acotar salia el primero
     # que devolviera Mongo, que no tiene por que ser el que se esta
     # graficando.
-    filtro: dict = {"pilots.$id": pilot.id}
-    if category_id is not None:
-        filtro["category_id"] = category_id
+    # Con evento y categoria manda lo que se inscribio. Importa cuando el
+    # piloto tiene mas de un carro y eligio con cual corre esa prueba:
+    # adivinarlo aqui sacaria al aire la maquina equivocada.
+    vehicle = None
+    if event_id is not None and category_id is not None:
+        evento = await Event.find_one(Event.event_id == event_id)
+        if evento is not None:
+            inscrito = next(
+                (i for i in evento.inscritos
+                 if i.category_id == category_id and pilot_id in (i.pilot_ids or [])),
+                None)
+            if inscrito is not None:
+                vehicle = await Vehicle.find_one(
+                    Vehicle.vehicle_id == inscrito.vehicle_id)
 
-    vehicle = await Vehicle.find_one(filtro)
+    if vehicle is None:
+        filtro: dict = {"pilots.$id": pilot.id}
 
-    # Pedida una categoria en la que no tiene carro, se dice: mostrar el de
-    # otra categoria seria peor que no mostrar ninguno.
-    if vehicle is None and category_id is not None:
-        vehicle = None
+        if category_id is not None:
+            abierta = await Category.find_one(
+                {"category_id": category_id, "base": True})
+            if abierta is None:
+                filtro["category_id"] = category_id
+            else:
+                # Una categoria abierta la corre toda la disciplina y
+                # ningun carro la lleva escrita: acotar por ella dejaba la
+                # carta sin maquina.
+                hermanas = await Category.find(
+                    Category.discipline == abierta.discipline).to_list()
+                filtro["category_id"] = {"$in": [c.category_id for c in hermanas]}
+
+        vehicle = await Vehicle.find_one(filtro)
 
     category = None
-    if vehicle is not None:
-        category = await Category.find_one(Category.category_id == vehicle.category_id)
-    elif category_id is not None:
-        # Sin carro, la categoria pedida se muestra igual: el piloto si
-        # pertenece a ella aunque no tenga maquina asignada.
+    if category_id is not None:
+        # La pedida manda sobre la principal del carro: es la que se esta
+        # graficando. Y si el piloto no tiene maquina se muestra igual,
+        # porque a la categoria si pertenece.
         category = await Category.find_one(Category.category_id == category_id)
+    elif vehicle is not None:
+        category = await Category.find_one(Category.category_id == vehicle.category_id)
 
     nombre = " ".join(x for x in (pilot.name, pilot.last_name) if x)
 
@@ -318,8 +363,11 @@ async def build_pilot_payload(
     # "Gran Turismo 2" sin decir nunca que eso es GT Challenge.
     categoria = category.category_name if category else ""
 
+    # La subcategoria solo vale dentro de la categoria del propio carro:
+    # en una abierta, el "Gran Turismo 2" del auto no dice nada.
     subcategoria = ""
-    if category and vehicle and vehicle.sub_category_id:
+    if (category and vehicle and vehicle.sub_category_id
+            and vehicle.category_id == category.category_id):
         sub = next((sc for sc in category.sub_categories
                     if sc.sub_category_id == vehicle.sub_category_id), None)
         if sub:
@@ -337,7 +385,7 @@ async def build_pilot_payload(
             "category": categoria,
             "sub_category": subcategoria,
             "vehicle": carro,
-            "team": pilot.team_brand or "",
+            "team": equipo_de(pilot, category.discipline if category else None),
             "country": pilot.nationality or "",
             "pilot_photo": foto,
             "brand_logo": logo,

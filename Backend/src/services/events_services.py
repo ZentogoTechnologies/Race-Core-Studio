@@ -140,10 +140,6 @@ class EventService:
             return []
 
         ids = [e.vehicle_id for e in entradas]
-        if len(ids) != len(set(ids)):
-            raise HTTPException(
-                status_code=400, detail="Hay vehículos repetidos en la lista de inscritos"
-            )
 
         # fetch_links resuelve los pilotos en la misma consulta. Sin esto
         # `v.pilots` son objetos Link sin abrir y no se les puede leer el
@@ -161,40 +157,93 @@ class EventService:
                 status_code=404, detail=f"Vehículos no encontrados: {sorted(faltan)}"
             )
 
+        # Las del evento y las de los carros, para saber de qué disciplina
+        # es cada una y cuáles son abiertas.
+        cats = await self._catalogo_categorias(list({
+            *category_ids, *(v.category_id for v in vehiculos.values())}))
+
         inscritos = []
         for e in entradas:
             v = vehiculos[e.vehicle_id]
+            nombre = v.display_number or v.number or v.vehicle_id
+            suya = cats.get(v.category_id)
 
-            if v.category_id not in category_ids:
-                raise HTTPException(
-                    status_code=400,
-                    detail=(
-                        f"El vehículo {v.display_number or v.number or v.vehicle_id} "
-                        "corre en una categoría que no está "
-                        "entre las del evento"
-                    ),
-                )
+            def admite(cid: int) -> bool:
+                """Si ese carro puede correr en esa categoría.
+
+                La suya siempre. Y además las abiertas de su disciplina:
+                a DragWar entra cualquier carro de drag, corra en 13 seg o
+                en 600 cc, sin que eso le cambie la clase.
+                """
+                if cid == v.category_id:
+                    return True
+                otra = cats.get(cid)
+                return bool(otra is not None and getattr(otra, "base", False)
+                            and suya is not None and otra.discipline == suya.discipline)
+
+            if e.category_id is not None:
+                if e.category_id not in category_ids:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=(f"La categoría {e.category_id} no está entre las "
+                                "del evento"),
+                    )
+                if not admite(e.category_id):
+                    raise HTTPException(
+                        status_code=400,
+                        detail=(f"El vehículo {nombre} no puede correr en la "
+                                f"categoría {e.category_id}"),
+                    )
+                categoria = e.category_id
+            else:
+                # Sin decir cuál, la suya si el evento la corre; si no, la
+                # abierta que le toque.
+                categoria = next(
+                    (c for c in [v.category_id, *category_ids]
+                     if c in category_ids and admite(c)), None)
+                if categoria is None:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=(
+                            f"El vehículo {nombre} corre en una categoría que no "
+                            "está entre las del evento"
+                        ),
+                    )
 
             # Los pilotos tienen que ser de ese carro. Sin esto se podría
             # inscribir a alguien en un vehículo que no conduce, y al aire
             # saldría un nombre que no corresponde al dorsal.
-            del_carro = {p.pilot_id for p in v.pilots} if v.pilots else set()
+            del_carro = {p.pilot_id for p in (v.pilots or [])
+                         if hasattr(p, "pilot_id")}
             ajenos = set(e.pilot_ids) - del_carro
             if ajenos:
                 raise HTTPException(
                     status_code=400,
                     detail=(
                         f"Los pilotos {sorted(ajenos)} no están asignados al "
-                        f"vehículo {v.display_number or v.number or v.vehicle_id}"
+                        f"vehículo {nombre}"
                     ),
                 )
 
             inscritos.append(Inscrito(
                 vehicle_id=v.vehicle_id,
                 pilot_ids=e.pilot_ids,
-                category_id=v.category_id,
-                sub_category_id=v.sub_category_id,
+                category_id=categoria,
+                # La subcategoría es la del carro, y solo vale dentro de
+                # su propia categoría: en una abierta no significa nada.
+                sub_category_id=(v.sub_category_id
+                                 if categoria == v.category_id else None),
             ))
+
+        # Repetido es el mismo carro dos veces en la misma categoría, no
+        # el mismo carro dos veces: un carro de drag corre su clase y el
+        # bracket general, y son dos inscripciones distintas.
+        parejas = [(i.vehicle_id, i.category_id) for i in inscritos]
+        if len(parejas) != len(set(parejas)):
+            raise HTTPException(
+                status_code=400,
+                detail="Hay vehículos repetidos en la misma categoría",
+            )
 
         return inscritos
 

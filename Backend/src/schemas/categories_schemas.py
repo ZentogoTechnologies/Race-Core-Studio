@@ -14,12 +14,14 @@ class CategoryCreate(BaseModel):
     discipline: str # "circuito" o "drag"
     sub_categories: List[SubCategoryEmbedded] = []
     description: Optional[str] = None
+    base: bool = False
 
 class CategoryUpdate(BaseModel): # para PUT/PATCH
     category_name: Optional[str] = None
     discipline: Optional[str] = None
     sub_categories: Optional[List[SubCategoryEmbedded]] = None
     description: Optional[str] = None
+    base: Optional[bool] = None
 
 class CategoryResponse(BaseModel):
     id: str = Field(alias="_id") # Beanie te devuelve _id como ObjectId
@@ -28,6 +30,7 @@ class CategoryResponse(BaseModel):
     discipline: str
     sub_categories: List[SubCategoryEmbedded]
     description: Optional[str] = None
+    base: bool = False
 
     logo: Optional[str] = None        # nombre del archivo
     logo_url: Optional[str] = None    # ya resuelta para <img>

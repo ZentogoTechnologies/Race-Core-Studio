@@ -28,7 +28,7 @@
 
     font-family:var(--fuente-graficos);
 
-    background:var(--rcs-panel, rgba(6,8,11,.72));
+    background:linear-gradient(90deg, #151515, #0b0b0b);
 }
 
 /* Filo rojo en los dos extremos: la firma de la familia, aqui tambien en
@@ -81,7 +81,7 @@
 
     flex:0 0 auto;
 
-    background:var(--rcs-foto, rgba(0,0,0,.55));
+    background:#000;
 
     overflow:hidden;
 
@@ -106,7 +106,7 @@
 
 .vs-datos{
 
-    padding:0 26px;
+    padding:0 34px;
 
     display:flex;
     flex-direction:column;
@@ -298,6 +298,12 @@
        antes de tiempo, cosa que no se nota. Quedarse corto si cortaria un
        nombre largo. */
     max-width:700px;
+
+    /* La carta sigue con .juntas mientras se abre, y .juntas deja el
+       padding a cero: sin reponerlo aqui el texto quedaba pegado a la
+       foto. */
+    padding-left:34px;
+    padding-right:34px;
 
     opacity:1;
 

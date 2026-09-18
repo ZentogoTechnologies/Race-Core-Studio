@@ -45,9 +45,12 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
     # real sin que nadie lo escriba a mano. Lo que venga en `data` manda
     # encima, por si hay que corregir algo puntual al aire.
     if template.graphic_id == "clima":
+        from src.services.settings_services import idioma_actual
         from src.services.weather_services import obtener_clima
 
-        clima = obtener_clima()
+        # La descripción («Nublado» / «Cloudy») y el mes siguen el idioma
+        # elegido en Ajustes, igual que los rótulos del gráfico.
+        clima = obtener_clima(idioma=await idioma_actual())
         if clima.get("ok"):
             return {**clima, **(data or {})}
         # Sin clima disponible se sigue adelante con lo que haya llegado:
@@ -193,7 +196,8 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
     if pilot_id is None:
         return data
 
-    payload = await build_pilot_payload(template.graphic_id, pilot_id, category_id)
+    payload = await build_pilot_payload(
+        template.graphic_id, pilot_id, category_id, event_id)
     if data:
         payload.update(data)
     return payload

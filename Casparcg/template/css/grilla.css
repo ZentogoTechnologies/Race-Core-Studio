@@ -270,6 +270,10 @@
     object-fit:contain;
 }
 
+.gr-marca img[src*="_sin-logo"]{
+    visibility:hidden;
+}
+
 /* Sin logo se escribe la marca: mejor el nombre que un hueco. */
 .gr-marca span{
 

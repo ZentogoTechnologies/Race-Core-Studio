@@ -136,6 +136,24 @@ async def lifespan(app: FastAPI):
     _escribir_css(POR_ID[await fuente_actual()]["nombre"])
     anotar_idioma_en_env(idioma)
 
+    # Versiones de los logos de marca para fondo oscuro. En segundo plano:
+    # son unos segundos la primera vez y no tienen por que retrasar el
+    # arranque; si un grafico las pide antes, se generan en ese momento.
+    import threading
+    from src.services.graphics_services import PUBLIC_DIR
+    from src.services.logos_oscuros import generar_todas
+
+    threading.Thread(target=generar_todas, args=(PUBLIC_DIR / "marcas",), daemon=True).start()
+
+    # El equipo de cada piloto pasa a guardarse por disciplina: el mismo
+    # corredor puede tener un equipo en circuito y otro en drag. Los que
+    # ya estaban conservan el suyo en la disciplina que tuvieran.
+    from src.services.pilots_services import migrar_equipos
+
+    movidos = await migrar_equipos()
+    if movidos:
+        print(f"   equipos por disciplina: {movidos} pilotos migrados")
+
     yield
     await client.close()
     # La conexión con CasparCG se abre sola al primer comando; aquí solo

@@ -110,9 +110,13 @@
     display:flex;
     align-items:center;
 
-    /* Mas bajo. La carta esta anclada por abajo —bottom:40px— asi que
-       encoger el cuerpo la acorta hacia arriba y no la mueve de sitio. */
-    height:156px;
+    /* La carta esta anclada por abajo —bottom:40px— asi que cambiar el
+       alto del cuerpo la crece o la acorta hacia arriba, sin moverla.
+
+       180 y no 156: con la etiqueta del ganador la columna de datos
+       mide 164, se salia por arriba y por abajo, y ahi es justo donde
+       van las dos lineas verdes; tapaban el carril y cortaban GANADOR. */
+    height:180px;
 }
 
 
@@ -403,7 +407,11 @@
 
 .duelo-etiqueta{
 
-    display:none;
+    /* Reserva su sitio desde el principio aunque todavia no haya ganador.
+       Con display:none aparecia de la nada al marcarlo y empujaba el
+       nombre y el tiempo hacia arriba, como si la carta se sacudiera.
+       visibility la enciende sin tocar el alto de la columna. */
+    visibility:hidden;
 
     align-self:flex-start;
 
@@ -426,7 +434,7 @@
 
 .duelo-lado.der .duelo-etiqueta{ align-self:flex-end; }
 
-.duelo-lado.gana .duelo-etiqueta{ display:block; }
+.duelo-lado.gana .duelo-etiqueta{ visibility:visible; }
 
 
 /* ===================================
@@ -501,6 +509,15 @@
                padding   .75s cubic-bezier(.22,.61,.36,1),
                /* El texto espera a que haya hueco donde caber. */
                opacity   .40s ease .30s;
+}
+
+/* La carta se queda con .juntas mientras se abre, y .juntas deja el relleno
+   a cero: sin reponerlo aqui el texto termina pegado a la foto. Va solo en
+   los datos, no en el centro, que ya tiene su propio ancho. */
+.duelo.abriendo .duelo-datos{
+
+    padding-left:30px;
+    padding-right:30px;
 }
 
 /* La cabecera solo se desvanece; no se le toca el ancho.

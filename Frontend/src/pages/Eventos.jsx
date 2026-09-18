@@ -10,7 +10,7 @@ import ConfirmDialog from '../components/shared/ConfirmDialog'
 import SesionesEvento from '../components/events/SesionesEvento'
 import SeleccionVehiculos from '../components/events/SeleccionVehiculos'
 import {
-  borrarImagenEvento, categoriasApi, eventosApi, subirImagenEvento,
+  borrarImagenEvento, categoriasApi, eventosApi, pilotosApi, subirImagenEvento,
   urlImagenEvento, vehiculosApi,
 } from '../api/registro'
 import { useListado } from '../hooks/useListado'
@@ -55,6 +55,8 @@ export default function EventosModule() {
 
   const [categorias,   setCategorias]   = useState([])
   const [vehiculos,    setVehiculos]    = useState([])
+  // Para las categorías abiertas, donde se eligen pilotos y no carros.
+  const [pilotos,      setPilotos]      = useState([])
   const [isFormOpen,   setIsFormOpen]   = useState(false)
   const [currentEditId, setCurrentEditId] = useState(null)
   const [eventForm,    setEventForm]    = useState(EMPTY_EVENT)
@@ -69,8 +71,11 @@ export default function EventosModule() {
     Promise.all([
       categoriasApi.listar({ sort_by: 'category_name', discipline: disciplina }),
       vehiculosApi.listar({ sort_by: 'number', discipline: disciplina }),
+      pilotosApi.listar({ sort_by: 'last_name', discipline: disciplina }),
     ])
-      .then(([c, v]) => { setCategorias(c.items); setVehiculos(v.items) })
+      .then(([c, v, p]) => {
+        setCategorias(c.items); setVehiculos(v.items); setPilotos(p.items)
+      })
       .catch(err => toast.error(t('No se pudieron cargar los catálogos'), err.message))
   }, [disciplina])   // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -132,7 +137,11 @@ export default function EventosModule() {
       start_date: ev.start_date,
       end_date: ev.end_date,
       category_ids: ev.category_ids,
-      inscritos: ev.inscritos.map(i => ({ vehicle_id: i.vehicle_id, pilot_ids: i.pilot_ids })),
+      // La categoría viaja con cada inscripción: un carro puede correr
+      // en dos del mismo evento y hay que saber cuál es cuál.
+      inscritos: ev.inscritos.map(i => ({
+        vehicle_id: i.vehicle_id, category_id: i.category_id, pilot_ids: i.pilot_ids,
+      })),
     })
     setCurrentEditId(ev.event_id)
     setPaso(1)
@@ -153,10 +162,7 @@ export default function EventosModule() {
         // Al quitar una categoría se sacan sus carros: el backend rechaza
         // guardar inscritos de categorías que ya no corren.
         inscritos: quitando
-          ? f.inscritos.filter(i => {
-              const v = vehiculos.find(x => x.vehicle_id === i.vehicle_id)
-              return v && v.category_id !== id
-            })
+          ? f.inscritos.filter(i => i.category_id !== id)
           : f.inscritos,
       }
     })
@@ -450,6 +456,7 @@ export default function EventosModule() {
               <SeleccionVehiculos
                 categorias={categoriasElegidas}
                 vehiculos={vehiculos}
+                pilotos={pilotos}
                 inscritos={eventForm.inscritos}
                 onCambiar={inscritos => setEventForm(f => ({ ...f, inscritos }))}
               />

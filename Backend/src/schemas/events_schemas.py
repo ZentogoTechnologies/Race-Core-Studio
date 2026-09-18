@@ -27,6 +27,14 @@ class InscritoIn(BaseModel):
     vehicle_id: int
     pilot_ids: List[int] = []
 
+    # En cuál de sus categorías corre. Un carro de drag entra en dos -su
+    # clase por tiempo y el bracket general- y puede correr las dos el
+    # mismo día, así que hay que decir cuál es esta inscripción.
+    #
+    # Sin decir nada se toma la primera suya que el evento corra, que es
+    # lo que hacía antes cuando un carro tenía una sola.
+    category_id: Optional[int] = None
+
 
 class InscritoOut(BaseModel):
     vehicle_id: int

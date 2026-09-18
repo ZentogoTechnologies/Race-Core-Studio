@@ -21,11 +21,11 @@
 
 .brand-panel{
     width:150px;
-    height:167px;
+    height:180px;
 
     flex-shrink:0;
 
-    background:var(--rcs-logo, rgba(0,0,0,.80));
+    background:#1d1d1d;
     border-left:10px solid #ff0000;
 
     display:flex;
@@ -37,15 +37,10 @@
 }
 
 .brand-logo{
-    max-width:130px;
-    max-height:86px;
     object-fit:contain;
 }
 
-.brand-panel img{
-    max-width:100px;
-    max-height:97px;
-}
+
 
 /* ==================================================
    PANEL PRINCIPAL
@@ -53,10 +48,13 @@
 
 .pilot-panel{
     /* Hasta aqui se abre el panel al entrar. */
-    --panel-w:910px;
+    /* Texto (520 + 30 de margen a cada lado, esta hoja no usa border-box)
+       mas la foto (150). Antes se abria a 910 con 690 de texto y quedaba
+       un hueco vacio al lado de la foto. */
+    --panel-w:730px;
 
     width:0;
-    height:167px;
+    height:180px;
 
     overflow:hidden;
     white-space:nowrap;
@@ -72,17 +70,17 @@
 
 .content-section{
     /* Se cambió a min-width y max-width para congelar el tamaño real */
-    width:690px;
-    min-width:690px;
-    max-width:690px;
+    width:520px;
+    min-width:520px;
+    max-width:520px;
 
-    padding:14px 32px;
+    padding:14px 30px;
 
     display:flex;
     flex-direction:column;
     justify-content:center;
 
-    background:var(--rcs-panel, rgba(6,8,11,.72));
+    background:linear-gradient(90deg, #151515, #0b0b0b);
 }
 
 /* ==================================================
@@ -100,7 +98,7 @@
     position:relative;
     overflow:visible;
 
-    background:var(--rcs-foto, rgba(0,0,0,.55));
+    background:#000;
     z-index:2;
     border-radius:0 10px 10px 0;
 }
@@ -132,13 +130,17 @@
     /* Menos hueco entre el nombre y los datos: la subcategoría añadió una
        línea y el bloque quedaba pegado al borde de abajo. */
     margin-bottom:8px;
+    line-height:1;
 }
 
 .pilot-name{
     font-family:var(--fuente-graficos);
-    font-size:33px;
-    font-weight:400;
-    letter-spacing: 1px;
+    /* Con 400 la letra elegida salia fina y no se parecia a la del resto
+       de graficos, que van en negrita. */
+    font-size:40px;
+    font-weight:900;
+    line-height:1;
+    letter-spacing: .5px;
     text-transform:uppercase;
 
     color:#fff;
@@ -146,8 +148,8 @@
 
 .car-number{
     font-family:var(--fuente-graficos);
-    font-size:41px;
-    font-weight:400;
+    font-size:44px;
+    font-weight:900;
     line-height:1;
 
     color:#ff0000;
@@ -177,8 +179,8 @@
     margin-bottom:2px;
 
     font-family:var(--fuente-graficos);
-    font-size:10px;
-    font-weight:600;
+    font-size:12px;
+    font-weight:700;
     text-transform:uppercase;
     letter-spacing: .8px;
     color:#bdbdbd;
@@ -186,7 +188,7 @@
 
 .value{
     font-family:var(--fuente-graficos);
-    font-size:17px;
+    font-size:22px;
     font-weight:700;
     line-height:1.1;
     letter-spacing: .5px;
@@ -216,7 +218,7 @@
    El borde no es adorno: hay banderas con el borde blanco —Japón, Corea,
    Suiza— que sin él se derraman sobre el fondo de la carta. */
 .bandera{
-    height:22px;
+    height:26px;
     width:auto;
 
     /* Alineada con la línea base del texto de al lado, que es lo que
@@ -227,4 +229,17 @@
     border-radius:2px;
 
     object-fit:cover;
+}
+
+/* El logo va directo sobre la caja oscura, sin placa. Los logos oscuros
+   llegan ya aclarados desde el backend (brand_logo_url sirve su version
+   para fondo oscuro), asi que no hace falta nada detras. */
+.brand-panel img{
+    max-width:118px;
+    max-height:84px;
+    object-fit:contain;
+}
+
+.brand-panel img[src*="_sin-logo"]{
+    visibility:hidden;
 }

@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from src.services.pilots_services import PilotService
-from src.schemas.pilots_schemas import PilotCreate, PilotUpdate, PilotResponse
+from src.schemas.pilots_schemas import (
+    AltaDisciplina, PilotCreate, PilotUpdate, PilotResponse,
+)
 from src.schemas.common_schemas import Page
 from src.services.auth_services import puede_escribir
 
@@ -38,6 +40,47 @@ async def create_pilot(data: PilotCreate):
     Valida que todas las category_ids existan
     """
     return await service.create_pilot(data)
+
+@pilots.get("/persona", tags=["Pilots"], response_model=List[PilotResponse])
+async def buscar_persona(
+    name: str = Query(..., description="Nombre, tal como se escribiría"),
+    last_name: str = Query(..., description="Apellido"),
+):
+    """
+    Si esa persona ya está registrada, en la disciplina que sea.
+
+    Sirve para no duplicar a alguien que ya corre en la otra: se avisa
+    antes de crear la ficha y se le suma la disciplina en vez de repetirla.
+
+    Va declarada antes que /{pilot_id} a propósito, o FastAPI leería
+    "persona" como un id.
+    """
+    return await service.buscar_persona(name, last_name)
+
+
+@pilots.post("/{pilot_id}/disciplinas", tags=["Pilots"], response_model=PilotResponse,
+             dependencies=[Depends(puede_escribir)])
+async def agregar_disciplina(pilot_id: str, datos: AltaDisciplina):
+    """
+    Suma a un piloto ya registrado a otra disciplina.
+
+    No copia nada de lo que tenga en la suya: el equipo y las categorías
+    llegan en blanco y se llenan con lo de la disciplina nueva.
+    """
+    return await service.agregar_disciplina(pilot_id, datos)
+
+
+@pilots.delete("/{pilot_id}/disciplinas/{disciplina}", tags=["Pilots"],
+               response_model=PilotResponse, dependencies=[Depends(puede_escribir)])
+async def quitar_disciplina(pilot_id: str, disciplina: str):
+    """
+    Deja de correr en esa disciplina, sin borrar a la persona.
+
+    Se lleva su equipo, sus categorías y sus carros de ahí. Lo de la otra
+    disciplina se queda como está.
+    """
+    return await service.quitar_disciplina(pilot_id, disciplina)
+
 
 @pilots.get("/{pilot_id}", tags=["Pilots"], response_model=PilotResponse)
 async def get_pilot_by_id(pilot_id: str): # <- str no int
