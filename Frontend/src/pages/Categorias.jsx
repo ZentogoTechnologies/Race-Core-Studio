@@ -21,7 +21,7 @@ import { useDisciplina } from '../context/DisciplinaContext'
 // se está viendo. Crear aquí una categoría de la otra disciplina solo
 // serviría para que desapareciera de la lista al guardarla.
 const EMPTY_CATEGORY = {
-  category_name: '', description: '', sub_categories: [],
+  category_name: '', description: '', sub_categories: [], base: false,
 }
 
 // El id de una subcategoría es a lo que apunta el `sub_category_id` de cada
@@ -135,6 +135,7 @@ export default function CategoriasModule() {
       category_name: categoria.category_name,
       description: categoria.description || '',
       sub_categories: categoria.sub_categories || [],
+      base: !!categoria.base,
     })
     setCurrentEditId(categoria.category_id)
 
@@ -193,6 +194,7 @@ export default function CategoriasModule() {
           category_name: categoryForm.category_name,
           description: categoryForm.description || null,
           sub_categories: subs,
+          base: categoryForm.base,
         })
         toast.exito(t('Categoría actualizada'), categoryForm.category_name)
         if (logo) await subirLogo(currentEditId)
@@ -204,6 +206,7 @@ export default function CategoriasModule() {
           discipline: disciplina,
           description: categoryForm.description || null,
           sub_categories: subs,
+          base: categoryForm.base,
         })
         id = creada.category_id
         toast.exito(t('Categoría creada'), `${creada.category_name} · ${etiquetaDisciplina}`)
@@ -294,6 +297,26 @@ export default function CategoriasModule() {
               onChange={e => setCategoryForm({ ...categoryForm, description: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
+          {/* La categoría que corren todos los de la disciplina, sea cual
+              sea la suya. En drag es DragWar: cada carro conserva su
+              clase —13 seg, 600 cc— y además puede correr aquí, sin que
+              haya que tocarle la ficha a ninguno. */}
+          <div className="col-span-full">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input type="checkbox" checked={!!categoryForm.base}
+                onChange={e => setCategoryForm({ ...categoryForm, base: e.target.checked })}
+                className="mt-0.5 w-4 h-4 accent-red-600 flex-shrink-0"/>
+              <span className="min-w-0">
+                <span className="block text-sm font-bold text-white">
+                  {t('Categoría abierta a toda la disciplina')}
+                </span>
+                <span className="block text-xs text-neutral-500 leading-snug">
+                  {t('La corren todos los vehículos de la disciplina, sin dejar la suya. Solo una por disciplina.')}
+                </span>
+              </span>
+            </label>
+          </div>
+
           {/* Logo del campeonato: TCR, GT Challenge, Fórmula 1. Sale junto
               al nombre en la tabla. */}
           <div className="col-span-full flex items-center gap-4 border-t border-neutral-800 pt-4 mt-2">

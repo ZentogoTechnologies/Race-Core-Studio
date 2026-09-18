@@ -38,12 +38,26 @@ class VehicleService:
         await vehicle.fetch_all_links() # resuelve pilots
         category = await Category.find_one(Category.category_id == vehicle.category_id)
 
+        # El equipo es de cada disciplina, y la del carro la dice su
+        # categoria.
+        from src.services.graphics_services import equipo_de
+
+        disciplina = category.discipline if category else None
+
         pilots_data = []
-        for p in vehicle.pilots:
+        for p in vehicle.pilots or []:
+            # Si el piloto ya no existe, el enlace se queda sin resolver y
+            # llega como Link. Se salta: un carro al que le falta un piloto
+            # se ve y se arregla, pero la pantalla entera en Error 500 no
+            # deja ni llegar a el. Pasaba con los carros de un piloto
+            # borrado, que tumbaban el listado de su disciplina.
+            if not hasattr(p, "pilot_id"):
+                continue
+
             pilots_data.append({
                 "pilot_id": p.pilot_id,
                 "name": f"{p.name} {p.last_name}",
-                "team_brand": p.team_brand
+                "team_brand": equipo_de(p, disciplina) or None
             })
 
         sub_name = None
@@ -117,8 +131,14 @@ class VehicleService:
         campos = data.model_dump(exclude={"pilot_ids"})
         # Sin dorsal escrito se asume que es el entero. Solo se separa
         # cuando el carro lleva ceros a la izquierda ('044' != '44').
+        #
+        # Y sin numero no se inventa ninguno: en drag los carros no lo
+        # llevan, y str(None) dejaba guardada la palabra "None", que
+        # salia escrita tal cual en el grafico.
         if not campos.get("display_number"):
-            campos["display_number"] = str(campos["number"])
+            campos["display_number"] = (
+                str(campos["number"]) if campos.get("number") is not None else None
+            )
 
         vehicle = Vehicle(**campos, pilots=pilots_links)
         await vehicle.insert()
@@ -160,7 +180,20 @@ class VehicleService:
             if ids_disciplina is not None and cid not in ids_disciplina:
                 return Page(items=[], total=0, skip=skip, limit=limit)
 
-            filtros.append({"category_id": cid})
+            # Una categoría abierta la corren todos los de su disciplina,
+            # y ninguno la lleva escrita en su ficha: filtrar por ella
+            # devolvía cero carros en vez de los de toda la disciplina.
+            abierta = await Category.find_one(
+                {"category_id": cid, "base": True})
+
+            if abierta is None:
+                filtros.append({"category_id": cid})
+            else:
+                if ids_disciplina is None:
+                    hermanas = await Category.find(
+                        Category.discipline == abierta.discipline).to_list()
+                    ids_disciplina = [c.category_id for c in hermanas]
+                filtros.append({"category_id": {"$in": ids_disciplina}})
 
         elif ids_disciplina is not None:
             filtros.append({"category_id": {"$in": ids_disciplina}})

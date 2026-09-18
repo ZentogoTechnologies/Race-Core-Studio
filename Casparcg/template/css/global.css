@@ -3,13 +3,11 @@
 @import url("tipografia.css");
 
 /* ==========================================================================
-   FONDO DE TODOS LOS GRAFICOS
+   FONDO TRANSLUCIDO
 
-   Negro translucido, el mismo tono en todas las cartas, como el totem y el
-   cuadro de resultados. Sin el arte de rayas rojas: sobre el video un fondo
-   limpio deja ver la pista y el texto se lee igual. Se afina aqui y cambia
-   en todos; las hojas que no cargan global.css llevan el mismo valor de
-   respaldo dentro de var().
+   Lo usan las plantillas de Grilla y Drag. Las de General y Pilotos
+   llevan fondo opaco (degradado oscuro, sin la imagen de rayas): con el
+   translucido se transparentaban demasiado sobre el video.
    ========================================================================== */
 
 :root{
@@ -79,7 +77,7 @@ body{
     width:170px;
     height:150px;
 
-    background:var(--rcs-logo, rgba(0,0,0,.80));
+    background:#1d1d1d;
     border-left:10px solid red;
     border-radius:10px 0 0 10px;
 }
@@ -112,6 +110,6 @@ body{
     flex-direction:column;
     justify-content:center;
 
-    background:var(--rcs-panel, rgba(6,8,11,.72));
+    background:linear-gradient(90deg, #151515, #0b0b0b);
     border-radius:0 10px 10px 0;
 }

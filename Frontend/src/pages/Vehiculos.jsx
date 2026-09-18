@@ -83,7 +83,10 @@ export default function VehiculosModule() {
   useEffect(() => {
     Promise.all([
       categoriasApi.listar({ sort_by: 'category_name', discipline: disciplina }),
-      pilotosApi.listar({ sort_by: 'last_name' }),
+      // Solo los de la disciplina abierta: un carro de drag no lo maneja
+      // un piloto que solo corre en circuito, y con la lista entera salian
+      // los ciento y pico de circuito al dar de alta un carro de drag.
+      pilotosApi.listar({ sort_by: 'last_name', discipline: disciplina }),
     ])
       .then(([cats, pils]) => { setCategorias(cats.items); setPilotos(pils.items) })
       .catch(err => toast.error(t('No se pudieron cargar los catálogos'), err.message))

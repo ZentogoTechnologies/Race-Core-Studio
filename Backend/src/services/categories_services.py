@@ -40,6 +40,7 @@ class CategoryService:
             discipline=category.discipline,
             sub_categories=sub_cats_data, # <- ya son dicts
             description=category.description,
+            base=bool(getattr(category, "base", False)),
             logo=category.logo,
             logo_url=url_logo_categoria(category.logo),
         )
@@ -77,10 +78,29 @@ class CategoryService:
             category_name=data.category_name,
             discipline=data.discipline,
             sub_categories=[SubCategoryEmbedded(**sc.model_dump()) for sc in data.sub_categories],
-            description=data.description
+            description=data.description,
+            base=data.base,
         )
         await category.insert()
+
+        if data.base:
+            await self._solo_una_base(category)
+
         return self._to_response(category)
+
+    async def _solo_una_base(self, categoria: Category) -> None:
+        """Deja a esta como la unica categoria abierta de su disciplina.
+
+        Con dos, un mismo carro entraria por la puerta grande en las dos y
+        no habria manera de decir en cual de ellas corre de verdad. Se
+        quita la marca a las demas en vez de rechazar el cambio: quien la
+        marca aqui esta diciendo cual quiere.
+        """
+        await Category.find({
+            "discipline": categoria.discipline,
+            "base": True,
+            "category_id": {"$ne": categoria.category_id},
+        }).update({"$set": {"base": False}})
 
     ORDENABLES = {"category_id", "category_name", "discipline"}
     BUSCABLES = ["category_name", "description"]
@@ -176,6 +196,9 @@ class CategoryService:
             update_data["sub_categories"] = subs
 
         await category.update({"$set": update_data})
+
+        if update_data.get("base"):
+            await self._solo_una_base(category)
 
         # Beanie viejo no tiene reload. Hacemos un find de nuevo
         updated_category = await Category.find_one(Category.category_id == int(category_id))

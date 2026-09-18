@@ -1,3 +1,4 @@
+import unicodedata
 from typing import Optional
 
 from beanie.operators import In
@@ -8,7 +9,9 @@ from src.models.categories_model import Category
 from src.services.imagenes_services import (
     con_version,    borrar_si_sobra, copiar_de_ruta, guardar_bytes, revisar_tamano,
 )
-from src.schemas.pilots_schemas import PilotCreate, PilotUpdate, PilotResponse
+from src.schemas.pilots_schemas import (
+    AltaDisciplina, PilotCreate, PilotUpdate, PilotResponse,
+)
 from src.schemas.common_schemas import Page
 from src.services.pagination import (
     campo_orden, combinar, direccion, filtro_busqueda,
@@ -25,6 +28,21 @@ CARPETA_FOTOS = Path(__file__).resolve().parents[1] / "public" / "pilotos"
 RUTA_RELATIVA = "pilotos"
 
 
+DISCIPLINAS = ("circuito", "drag")
+
+
+def _normalizar(texto: Optional[str]) -> str:
+    """Para comparar nombres: sin tildes, sin mayusculas y sin dobles espacios.
+
+    "José Pérez" y "jose perez" son la misma persona escrita por dos
+    personas distintas, y el aviso de duplicado solo sirve si las ve
+    iguales.
+    """
+    limpio = unicodedata.normalize("NFD", (texto or "").strip().lower())
+    limpio = "".join(c for c in limpio if unicodedata.category(c) != "Mn")
+    return " ".join(limpio.split())
+
+
 def url_foto_piloto(photo):
     """La dirección con la que el panel pide la foto, con su versión."""
     if not photo:
@@ -34,10 +52,32 @@ def url_foto_piloto(photo):
 
 
 class PilotService:
-    async def _build_response(self, pilot: Pilot) -> PilotResponse:
+    async def _build_response(self, pilot: Pilot,
+                              disciplina: Optional[str] = None) -> PilotResponse:
         await pilot.fetch_all_links() # resuelve categories
 
-        categories_data = [c.category_id for c in pilot.categories]
+        # Una categoria borrada deja el enlace sin resolver; se descarta en
+        # vez de tumbar el listado entero.
+        categorias = [c for c in (pilot.categories or [])
+                      if hasattr(c, "category_id")]
+
+        # Solo las de la disciplina por la que se pregunta: en drag no
+        # pintan nada las categorias de circuito.
+        if disciplina:
+            categorias = [c for c in categorias if c.discipline == disciplina]
+
+        categories_data = [c.category_id for c in categorias]
+
+        equipos = pilot.equipos or {}
+        # El equipo que se devuelve es el de la disciplina por la que se
+        # pregunta. Sin disciplina —una ficha suelta— vale el suyo cuando
+        # solo corre en una; si corre en las dos no hay uno solo que valga.
+        if disciplina:
+            equipo = equipos.get(disciplina)
+        elif len(equipos) == 1:
+            equipo = next(iter(equipos.values()))
+        else:
+            equipo = None
 
         return PilotResponse(
             id=str(pilot.id),
@@ -46,7 +86,8 @@ class PilotService:
             name=pilot.name,
             last_name=pilot.last_name,
             nationality=pilot.nationality,
-            team_brand=pilot.team_brand,
+            team_brand=equipo,
+            equipos=equipos,
             photo=pilot.photo,
             categories=categories_data,
             discipline=pilot.discipline,
@@ -83,8 +124,16 @@ class PilotService:
                 raise HTTPException(status_code=404, detail=f"Categorías no encontradas: {missing}")
             categories_links = list(categories)  # Beanie los convierte a Link al guardar
 
+        # El equipo se guarda por disciplina. Si el alta viene con el campo
+        # viejo —una importacion, o el panel antiguo— se reparte entre las
+        # disciplinas que traiga.
+        equipos = dict(data.equipos or {})
+        if data.team_brand and not equipos:
+            equipos = {d: data.team_brand for d in (data.discipline or [])}
+
         pilot = Pilot(
-            **data.model_dump(exclude={"category_ids"}),
+            **data.model_dump(exclude={"category_ids", "equipos", "team_brand"}),
+            equipos=equipos,
             categories=categories_links
         )
         await pilot.insert()
@@ -93,7 +142,7 @@ class PilotService:
     # Campos por los que se deja ordenar. La lista es blanca a propósito:
     # sort_by llega del cliente y termina en el sort de Mongo.
     ORDENABLES = {"pilot_id", "name", "last_name", "nationality", "team_brand"}
-    BUSCABLES = ["name", "last_name", "nationality", "team_brand"]
+    BUSCABLES = ["name", "last_name", "nationality"]
 
     async def get_all_pilots(
         self,
@@ -106,12 +155,18 @@ class PilotService:
         limit: Optional[int] = None,
         is_active: Optional[bool] = None,
     ) -> Page[PilotResponse]:
+        # El equipo es de cada disciplina, asi que buscar y ordenar por el
+        # solo tiene sentido dentro de una: `equipos.drag` es un campo mas
+        # para Mongo. Sin disciplina se busca solo por persona.
+        campo_equipo = f"equipos.{discipline}" if discipline else None
+        buscables = self.BUSCABLES + ([campo_equipo] if campo_equipo else [])
+
         filtros = [
             {"discipline": discipline} if discipline else None,
             # None es "todos"; True o False filtran. Se distingue de False
             # a propósito: `if is_active` dejaría fuera a los inactivos.
             {"is_active": is_active} if is_active is not None else None,
-            filtro_busqueda(search, self.BUSCABLES),
+            filtro_busqueda(search, buscables),
         ]
 
         # El filtro por categoría se resuelve contra el DBRef guardado, no
@@ -127,8 +182,12 @@ class PilotService:
 
         total = await Pilot.find(query).count()
 
+        orden = campo_orden(sort_by, self.ORDENABLES, "last_name")
+        if orden == "team_brand":
+            orden = campo_equipo or "last_name"
+
         consulta = Pilot.find(query).sort(
-            (campo_orden(sort_by, self.ORDENABLES, "last_name"), direccion(sort_dir))
+            (orden, direccion(sort_dir))
         ).skip(skip)
 
         # limit=None es "tráeme todo": lo usa el panel de gráficos, que
@@ -139,7 +198,7 @@ class PilotService:
         pilots = await consulta.to_list()
 
         return Page(
-            items=[await self._build_response(p) for p in pilots],
+            items=[await self._build_response(p, discipline) for p in pilots],
             total=total,
             skip=skip,
             limit=limit,
@@ -158,6 +217,10 @@ class PilotService:
 
         update_data = data.model_dump(exclude_unset=True) # <- model_dump
 
+        # La disciplina desde la que se edita. No se guarda: dice cual de
+        # las dos mitades de la ficha viene en esta peticion.
+        activa = update_data.pop("disciplina_activa", None)
+
         # Si vienen category_ids nuevos, los convertimos a Link
         if "category_ids" in update_data:
             categories = await Category.find(In(Category.category_id, update_data["category_ids"])).to_list()
@@ -165,8 +228,29 @@ class PilotService:
                 found_ids = [c.category_id for c in categories]
                 missing = set(update_data["category_ids"]) - set(found_ids)
                 raise HTTPException(status_code=404, detail=f"Categorías no encontradas: {missing}")
-            update_data["categories"] = list(categories)  # Beanie los convierte a Link
+
+            nuevas = list(categories)
+            if activa:
+                # El formulario solo ensena las de la disciplina abierta, asi
+                # que solo esas se reemplazan. Sin esto, guardar desde drag
+                # borraba las categorias de circuito del mismo piloto.
+                await pilot.fetch_all_links()
+                nuevas = [c for c in (pilot.categories or [])
+                          if hasattr(c, "category_id") and c.discipline != activa] + nuevas
+
+            update_data["categories"] = nuevas  # Beanie los convierte a Link
             del update_data["category_ids"]
+
+        # Los equipos se mezclan: el panel manda solo el de la disciplina
+        # abierta y el de la otra se queda como estaba.
+        if update_data.get("equipos") is not None:
+            mezcla = dict(pilot.equipos or {})
+            for disciplina, equipo in update_data.pop("equipos").items():
+                if equipo:
+                    mezcla[disciplina] = equipo
+                else:
+                    mezcla.pop(disciplina, None)
+            update_data["equipos"] = mezcla
 
         for campo, valor in update_data.items():
             setattr(pilot, campo, valor)
@@ -187,12 +271,156 @@ class PilotService:
         # siguiente piloto que reciba ese id heredaría la cara del anterior.
         foto = (CARPETA_FOTOS.parent / pilot.photo.lstrip("/")) if pilot.photo else None
 
-        # Opcional: validar que no esté asignado a un Vehicle
+        # El piloto sale antes de los carros que manejaba. Si no, el
+        # vehiculo se queda apuntando a algo que ya no existe y el
+        # listado de su disciplina se caia entero con Error 500.
+        from src.models.vehicles_model import Vehicle
+
+        await Vehicle.find({"pilots.$id": pilot.id}).update(
+            {"$pull": {"pilots": {"$id": pilot.id}}}
+        )
+        # Y deja de ser el que sale al aire en los carros compartidos.
+        await Vehicle.find({"active_pilot_id": pilot.pilot_id}).update(
+            {"$set": {"active_pilot_id": None}}
+        )
+
         await pilot.delete()
 
         borrar_si_sobra(foto, CARPETA_FOTOS / "__ninguno__")
 
         return {"detail": "Piloto eliminado"}
+
+    # ── La misma persona en varias disciplinas ────────────────────────
+
+    async def buscar_persona(self, name: str, last_name: str) -> list[PilotResponse]:
+        """Quien ya esta registrado con ese nombre, en la disciplina que sea.
+
+        Es la unica consulta que cruza disciplinas a proposito: sirve para
+        avisar de que esa persona ya existe antes de crear una ficha
+        repetida. Devuelve la persona, no su temporada: lo que se ensena
+        es el nombre, la foto y en que corre.
+        """
+        buscado = (_normalizar(name), _normalizar(last_name))
+        if not buscado[0] and not buscado[1]:
+            return []
+
+        # Son unos cientos y la comparacion va sin tildes, que Mongo no sabe
+        # hacer sin un indice de intercalacion: se filtra aqui.
+        todos = await Pilot.find_all().to_list()
+        iguales = [p for p in todos
+                   if (_normalizar(p.name), _normalizar(p.last_name)) == buscado]
+
+        return [await self._build_response(p) for p in iguales]
+
+    async def agregar_disciplina(self, pilot_id: str,
+                                 datos: AltaDisciplina) -> PilotResponse:
+        """Suma a una persona ya registrada a otra disciplina.
+
+        Se le anade la disciplina, su equipo y sus categorias de alli. No
+        se toca nada de lo que tenga en la otra: el equipo, las categorias
+        y los carros son de cada campeonato.
+        """
+        pilot = await Pilot.find_one(Pilot.pilot_id == int(pilot_id))
+        if not pilot:
+            raise HTTPException(status_code=404, detail="Piloto no encontrado")
+
+        disciplina = (datos.disciplina or "").strip().lower()
+        if disciplina not in DISCIPLINAS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"'{datos.disciplina}' no es una disciplina",
+            )
+
+        categorias = []
+        if datos.category_ids:
+            categorias = await Category.find(
+                In(Category.category_id, datos.category_ids)
+            ).to_list()
+            if len(categorias) != len(datos.category_ids):
+                faltan = set(datos.category_ids) - {c.category_id for c in categorias}
+                raise HTTPException(
+                    status_code=404, detail=f"Categorías no encontradas: {faltan}"
+                )
+            ajenas = [c.category_name for c in categorias if c.discipline != disciplina]
+            if ajenas:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"{ajenas} no son categorías de {disciplina}",
+                )
+
+        await pilot.fetch_all_links()
+        ya = {c.category_id for c in (pilot.categories or [])
+              if hasattr(c, "category_id")}
+
+        pilot.discipline = sorted(set(pilot.discipline or []) | {disciplina})
+        equipos = dict(pilot.equipos or {})
+        if datos.equipo:
+            equipos[disciplina] = datos.equipo
+        pilot.equipos = equipos
+        pilot.categories = [c for c in (pilot.categories or [])
+                            if hasattr(c, "category_id")] + \
+                           [c for c in categorias if c.category_id not in ya]
+
+        await pilot.save()
+        return await self._build_response(pilot, disciplina)
+
+    async def quitar_disciplina(self, pilot_id: str, disciplina: str) -> PilotResponse:
+        """Deja de correr en esa disciplina, sin borrar a la persona.
+
+        Borrar desde drag a alguien que tambien corre en circuito se
+        llevaria por delante su ficha y su historial de alli. Esto quita
+        solo lo de esta: la disciplina, su equipo, sus categorias y sus
+        carros.
+        """
+        from src.models.vehicles_model import Vehicle
+
+        pilot = await Pilot.find_one(Pilot.pilot_id == int(pilot_id))
+        if not pilot:
+            raise HTTPException(status_code=404, detail="Piloto no encontrado")
+
+        disciplina = (disciplina or "").strip().lower()
+        suyas = list(pilot.discipline or [])
+        if disciplina not in suyas:
+            raise HTTPException(
+                status_code=400,
+                detail=f"El piloto no corre en {disciplina}",
+            )
+        if len(suyas) == 1:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "Es la única disciplina del piloto: para darlo de baja hay "
+                    "que eliminarlo"
+                ),
+            )
+
+        await pilot.fetch_all_links()
+        quedan = []
+        salen = []
+        for c in (pilot.categories or []):
+            if not hasattr(c, "category_id"):
+                continue
+            (salen if c.discipline == disciplina else quedan).append(c)
+
+        # Sus carros de esa disciplina dejan de tenerlo. Un carro es de la
+        # disciplina de su categoria.
+        if salen:
+            ids = [c.category_id for c in salen]
+            await Vehicle.find(
+                {"pilots.$id": pilot.id, "category_id": {"$in": ids}}
+            ).update({"$pull": {"pilots": {"$id": pilot.id}}})
+            await Vehicle.find(
+                {"active_pilot_id": pilot.pilot_id, "category_id": {"$in": ids}}
+            ).update({"$set": {"active_pilot_id": None}})
+
+        pilot.discipline = [d for d in suyas if d != disciplina]
+        equipos = dict(pilot.equipos or {})
+        equipos.pop(disciplina, None)
+        pilot.equipos = equipos
+        pilot.categories = quedan
+
+        await pilot.save()
+        return await self._build_response(pilot)
 
     # ── Foto ──────────────────────────────────────────────────────────
 
@@ -328,3 +556,24 @@ class PilotService:
             borrar_si_sobra(fichero, CARPETA_FOTOS / "__ninguno__")
 
         return await self._build_response(pilot)
+
+
+async def migrar_equipos() -> int:
+    """El equipo suelto pasa a ser el equipo de su disciplina.
+
+    Antes el piloto tenia un solo equipo porque pertenecia a una sola
+    disciplina. Al poder correr en las dos, el equipo es de cada una: se
+    copia el que tenia a las disciplinas en las que ya estaba y se vacia
+    el campo viejo, para que no queden dos sitios diciendo lo mismo.
+    """
+    pendientes = await Pilot.find({"team_brand": {"$nin": [None, ""]}}).to_list()
+
+    hechos = 0
+    for piloto in pendientes:
+        if not piloto.equipos:
+            piloto.equipos = {d: piloto.team_brand for d in (piloto.discipline or [])}
+        piloto.team_brand = None
+        await piloto.save()
+        hechos += 1
+
+    return hechos

@@ -41,3 +41,6 @@ race-core-studio.exe
 
 # Copias automáticas previas a restaurar un respaldo: datos del cliente
 Backend/respaldos/
+
+# Versiones de los logos para fondo oscuro: las genera el backend.
+Backend/src/public/marcas/oscuro/

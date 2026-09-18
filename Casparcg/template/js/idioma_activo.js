@@ -34,10 +34,14 @@ window.TEXTOS = {
         "piloto": "Piloto",
         "vueltas": "Vueltas",
         "mejor": "Mejor",
-        "ultima": "Última"
+        "ultima": "Última",
+        "penalizado": "Penalizado",
+        "vts": "Vts",
+        "vuelta_rapida_tanda": "Vuelta rápida de la tanda"
     },
     "banderas": {
-        "safety_car": "Safety car"
+        "safety_car": "Safety car",
+        "una_vuelta": "1 LAP"
     },
     "clima": {
         "sensacion": "SENSACIÓN",
@@ -50,6 +54,17 @@ window.TEXTOS = {
         "categoria": "CATEGORÍA",
         "narrador": "NARRADOR",
         "comentarista": "COMENTARISTA",
-        "reportero": "REPORTERO"
+        "reportero": "REPORTERO",
+        "circuito": "CIRCUITO"
+    },
+    "drag": {
+        "reaccion": "Reacción",
+        "tiempo": "Tiempo",
+        "velocidad": "Velocidad",
+        "carril_izquierdo": "Carril izquierdo",
+        "carril_derecho": "Carril derecho",
+        "ganador": "Ganador",
+        "ronda": "Ronda",
+        "dragwar": "Drag War"
     }
 };

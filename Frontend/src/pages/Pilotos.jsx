@@ -8,8 +8,9 @@ import CarrosDelPiloto from '../components/pilots/CarrosDelPiloto'
 import SelectorPais, { Bandera } from '../components/shared/SelectorPais'
 import { nombrePais } from '../data/paises'
 import {
-  borrarFotoPiloto, categoriasApi, pilotosApi, quitarFondoPiloto, recortarFotoPiloto,
-  subirFotoPiloto, urlFotoPiloto,
+  agregarDisciplina, borrarFotoPiloto, buscarPersona, categoriasApi, pilotosApi,
+  quitarDisciplina, quitarFondoPiloto, recortarFotoPiloto, subirFotoPiloto,
+  urlFotoPiloto,
 } from '../api/registro'
 import { useListado } from '../hooks/useListado'
 import { useToast } from '../context/ToastContext'
@@ -76,6 +77,11 @@ export default function PilotosModule() {
   const [pilotForm,     setPilotForm]     = useState(EMPTY_PILOT)
   const [guardando,     setGuardando]     = useState(false)
   const [porBorrar,     setPorBorrar]     = useState(null)
+  /* Si la persona que se está dando de alta ya está registrada, en la
+     disciplina que sea. Una ficha es una persona: el mismo corredor no
+     puede tener dos por correr en circuito y en drag. */
+  const [yaExiste,      setYaExiste]      = useState(null)
+  const [sumando,       setSumando]       = useState(false)
 
   // Las categorías se traen enteras una sola vez: son seis y alimentan
   // tanto el filtro de arriba como el selector del formulario.
@@ -119,9 +125,12 @@ export default function PilotosModule() {
     // Marcada la disciplina abierta: es de la que se está dando de alta.
     // Se puede añadir la otra sin salir de aquí.
     setPilotForm({ ...EMPTY_PILOT, discipline: [disciplina] })
-    setCurrentEditId(null); limpiarFoto(); setIsFormOpen(true)
+    setCurrentEditId(null); limpiarFoto(); setYaExiste(null); setIsFormOpen(true)
   }
-  const closeForm    = () => { setIsFormOpen(false); setCurrentEditId(null); setPilotForm(EMPTY_PILOT); limpiarFoto() }
+  const closeForm    = () => {
+    setIsFormOpen(false); setCurrentEditId(null); setPilotForm(EMPTY_PILOT)
+    limpiarFoto(); setYaExiste(null)
+  }
   const handleFormToggle = () => isFormOpen ? closeForm() : openAddForm()
 
   const openEditForm = (piloto) => {
@@ -134,9 +143,12 @@ export default function PilotosModule() {
       category_ids: piloto.categories || [],
       // Las que ya tiene, no la que se está viendo: editar desde circuito
       // no puede borrarle drag.
-      discipline: piloto.discipline || [],
+      /* Sin ninguna marcada no sale en ningun listado. Se le pone la
+         disciplina abierta, que es desde donde se le encontro. */
+      discipline: piloto.discipline?.length ? piloto.discipline : [disciplina],
     })
     setCurrentEditId(piloto.pilot_id)
+    setYaExiste(null)
     setFoto(null)
     setFotoOriginal(null)
     setFotoActual(piloto.photo_url || piloto.photo || null)
@@ -221,8 +233,61 @@ export default function PilotosModule() {
     }))
   }
 
+  // Las disciplinas por su nombre: el aviso se lee mejor diciendo "Drag"
+  // y "Circuito" que "esta" y "la otra".
+  const nombreDisciplina = (d) => t(d === 'drag' ? 'Drag' : 'Circuito')
+  const suOtraDisciplina = (p) => (p?.discipline || [])
+    .filter(d => d !== disciplina)
+    .map(nombreDisciplina)
+    .join(', ')
+
+  /* Se pregunta al salir del apellido, que es cuando ya hay nombre
+     completo que buscar. Solo en un alta: editando ya se sabe quién es. */
+  const buscarSiYaExiste = async () => {
+    if (currentEditId) return
+
+    const name = pilotForm.name.trim()
+    const last_name = pilotForm.last_name.trim()
+    if (!name || !last_name) { setYaExiste(null); return }
+
+    try {
+      const iguales = await buscarPersona(name, last_name)
+      setYaExiste(iguales[0] || null)
+    } catch {
+      // Si la consulta falla se sigue con el alta normal: avisar es una
+      // ayuda, no un requisito para poder registrar a alguien.
+    }
+  }
+
+  /* Le suma esta disciplina a quien ya está registrado. El equipo y las
+     categorías son los que se acaban de escribir aquí; su foto, su
+     nacionalidad y lo que tenga en la otra disciplina se quedan igual. */
+  const sumarADisciplina = async () => {
+    setSumando(true)
+    try {
+      await agregarDisciplina(yaExiste.pilot_id, {
+        disciplina,
+        equipo: pilotForm.team_brand || null,
+        category_ids: pilotForm.category_ids,
+      })
+      toast.exito(t('Piloto agregado a esta disciplina'),
+                  `${yaExiste.name} ${yaExiste.last_name}`)
+      closeForm()
+      lista.recargar()
+    } catch (err) {
+      toast.error(t('No se pudo agregar a esta disciplina'), err.message)
+    } finally {
+      setSumando(false)
+    }
+  }
+
   const handleSave = async (e) => {
     e.preventDefault()
+
+    // Esa persona ya existe: se le suma la disciplina desde el aviso, no
+    // se crea otra ficha.
+    if (!currentEditId && yaExiste) return
+
     setGuardando(true)
 
     // El modelo la guarda como lista porque un piloto puede correr en las
@@ -232,8 +297,13 @@ export default function PilotosModule() {
       name: pilotForm.name,
       last_name: pilotForm.last_name,
       nationality: pilotForm.nationality || null,
-      team_brand: pilotForm.team_brand || null,
+      // El equipo es de cada disciplina: se manda solo el de la abierta y
+      // el de la otra se queda como estaba.
+      equipos: { [disciplina]: pilotForm.team_brand || '' },
       category_ids: pilotForm.category_ids,
+      // Desde dónde se está editando, para que el backend reemplace solo
+      // las categorías de esta disciplina.
+      disciplina_activa: disciplina,
       /* Lo marcado en la ficha. Antes iba [disciplina], la que estuviera
          abierta, y eso borraba la otra sin avisar: editar a alguien desde
          circuito para cambiarle el equipo lo sacaba de drag. */
@@ -304,16 +374,29 @@ export default function PilotosModule() {
     }
   }
 
+  /* Quien corre en las dos disciplinas no se borra desde una: se quita de
+     esta y sigue en la otra. Borrarlo se llevaría por delante su ficha, su
+     foto y su historial de allá, que no tiene nada que ver con esto. */
+  const enVariasDisciplinas = (p) => (p?.discipline?.length || 0) > 1
+
   const confirmarBorrado = async () => {
     const piloto = porBorrar
+    const quitar = enVariasDisciplinas(piloto)
     setPorBorrar(null)
 
     try {
-      await pilotosApi.eliminar(piloto.pilot_id)
-      toast.exito(t('Piloto eliminado'), `${piloto.name} ${piloto.last_name}`)
+      if (quitar) {
+        await quitarDisciplina(piloto.pilot_id, disciplina)
+        toast.exito(t('Piloto quitado de esta disciplina'),
+                    `${piloto.name} ${piloto.last_name}`)
+      } else {
+        await pilotosApi.eliminar(piloto.pilot_id)
+        toast.exito(t('Piloto eliminado'), `${piloto.name} ${piloto.last_name}`)
+      }
       lista.recargar()
     } catch (err) {
-      toast.error(t('No se pudo eliminar'), err.message)
+      toast.error(quitar ? t('No se pudo quitar de esta disciplina')
+                         : t('No se pudo eliminar'), err.message)
     }
   }
 
@@ -398,6 +481,7 @@ export default function PilotosModule() {
             <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Apellido')}</label>
             <input required type="text" value={pilotForm.last_name}
               onChange={e => setPilotForm({ ...pilotForm, last_name: e.target.value })}
+              onBlur={buscarSiYaExiste}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
           <div>
@@ -416,6 +500,49 @@ export default function PilotosModule() {
               onChange={e => setPilotForm({ ...pilotForm, team_brand: e.target.value })}
               className="w-full bg-[#0a0a0a] border border-neutral-800 rounded p-2 focus:border-red-600 focus:outline-none text-white"/>
           </div>
+          {/* La persona ya está registrada. No se duplica: se le suma esta
+              disciplina y se conserva quién es —foto, nacionalidad— y lo
+              que tenga en la otra. */}
+          {yaExiste && (
+            <div className="col-span-full rounded-lg border border-amber-500/40 bg-amber-500/5 p-4">
+              <p className="text-amber-300 text-sm font-bold">
+                {yaExiste.name} {yaExiste.last_name} {t('ya corre en')}{' '}
+                {suOtraDisciplina(yaExiste) || nombreDisciplina(disciplina)}
+              </p>
+
+              {yaExiste.discipline?.includes(disciplina) ? (
+                <p className="text-neutral-400 text-sm mt-1">
+                  {t('Búscalo en el listado en lugar de registrarlo de nuevo.')}
+                </p>
+              ) : (
+                <>
+                  <p className="text-neutral-400 text-sm mt-1">
+                    {t('Si es la misma persona, no la registres otra vez. Se le suma')}{' '}
+                    <span className="text-neutral-200 font-bold">{nombreDisciplina(disciplina)}</span>{' '}
+                    {t('con el equipo y las categorías que pongas aquí; su ficha de')}{' '}
+                    <span className="text-neutral-200 font-bold">{suOtraDisciplina(yaExiste)}</span>{' '}
+                    {t('no cambia.')}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <button
+                      type="button" onClick={sumarADisciplina} disabled={sumando}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition-colors disabled:opacity-40"
+                    >
+                      {sumando && <Loader2 size={14} className="animate-spin"/>}
+                      {t('AGREGAR A ESTA DISCIPLINA')}
+                    </button>
+                    <button
+                      type="button" onClick={() => setYaExiste(null)}
+                      className="px-4 py-2 rounded-lg border border-neutral-700 text-neutral-300 hover:text-white hover:border-neutral-500 font-bold text-xs transition-colors"
+                    >
+                      {t('Es otra persona')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           <div className="col-span-full flex items-center gap-4 border-t border-neutral-800 pt-4">
 
             <div className="w-20 h-20 rounded-lg bg-[#0a0a0a] border border-neutral-800 overflow-hidden flex items-center justify-center flex-shrink-0">
@@ -495,27 +622,33 @@ export default function PilotosModule() {
               {t('Corre en')}
             </label>
             <div className="flex flex-wrap gap-2">
-              {DISCIPLINAS_PILOTO.map(d => {
-                const activa = pilotForm.discipline.includes(d.valor)
-                return (
-                  <button
-                    key={d.valor} type="button"
-                    onClick={() => setPilotForm(f => ({
-                      ...f,
-                      discipline: activa
-                        ? f.discipline.filter(x => x !== d.valor)
-                        : [...f.discipline, d.valor],
-                    }))}
-                    className={`px-4 py-2 rounded-full border text-xs font-bold transition-colors ${
-                      activa
-                        ? 'border-red-600 bg-red-600/15 text-white'
-                        : 'border-neutral-800 bg-[#0a0a0a] text-neutral-500 hover:border-neutral-600 hover:text-neutral-300'
-                    }`}
-                  >
-                    {t(d.etiqueta)}
-                  </button>
-                )
-              })}
+              {/* Solo la disciplina que se esta viendo. Estando en drag no se
+                  puede marcar circuito: seria dar de alta a alguien en una
+                  lista distinta de la que se tiene delante, y al guardar
+                  desapareceria de esta. La otra se enseña apagada cuando el
+                  piloto ya corre en ella, para que se vea y no se le borre
+                  al editarlo desde aqui; se cambia desde esa disciplina. */}
+              {DISCIPLINAS_PILOTO
+                .filter(d => d.valor === disciplina || pilotForm.discipline.includes(d.valor))
+                .map(d => {
+                  const activa = pilotForm.discipline.includes(d.valor)
+                  const suya   = d.valor === disciplina
+                  return (
+                    <span
+                      key={d.valor}
+                      title={suya
+                        ? t('Es la disciplina que tienes abierta')
+                        : t('Ya corre aquí. Para cambiarlo, abre esa disciplina.')}
+                      className={`px-4 py-2 rounded-full border text-xs font-bold ${
+                        activa
+                          ? 'border-red-600 bg-red-600/15 text-white'
+                          : 'border-neutral-800 bg-[#0a0a0a] text-neutral-500'
+                      }${suya ? '' : ' opacity-60'}`}
+                    >
+                      {t(d.etiqueta)}
+                    </span>
+                  )
+                })}
             </div>
             {pilotForm.discipline.length === 0 && (
               // Sin ninguna marcada no saldría en ninguna lista, y quien lo
@@ -660,7 +793,8 @@ export default function PilotosModule() {
                 {puedeEscribir && (
                   <td className="p-4 text-right whitespace-nowrap">
                     <button onClick={() => openEditForm(piloto)} title={t('Editar piloto')} aria-label={t('Editar piloto')} className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-700 transition-colors"><Pencil size={15}/></button>
-                    <button onClick={() => setPorBorrar(piloto)} title={t('Eliminar piloto')} aria-label={t('Eliminar piloto')} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
+                    <button onClick={() => setPorBorrar(piloto)} title={enVariasDisciplinas(piloto) ? t('Quitar de esta disciplina') : t('Eliminar piloto')}
+                      aria-label={enVariasDisciplinas(piloto) ? t('Quitar de esta disciplina') : t('Eliminar piloto')} className="p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"><Trash2 size={15}/></button>
                   </td>
                 )}
               </tr>
@@ -680,8 +814,18 @@ export default function PilotosModule() {
 
       <ConfirmDialog
         abierto={Boolean(porBorrar)}
-        titulo={t('Eliminar piloto')}
-        mensaje={porBorrar ? `Se va a eliminar ${porBorrar.name} ${porBorrar.last_name}.` : ''}
+        titulo={enVariasDisciplinas(porBorrar) ? t('Quitar de esta disciplina')
+                                              : t('Eliminar piloto')}
+        mensaje={!porBorrar ? ''
+          : enVariasDisciplinas(porBorrar)
+            ? `${porBorrar.name} ${porBorrar.last_name} ${t('también corre en la otra disciplina: se quita solo de esta, con su equipo, sus categorías y sus carros de aquí.')}`
+            : `${t('Se va a eliminar')} ${porBorrar.name} ${porBorrar.last_name}.`}
+        etiquetaConfirmar={enVariasDisciplinas(porBorrar) ? t('QUITAR') : undefined}
+        // Quitar de una disciplina no es borrar a nadie: se le puede
+        // volver a sumar cuando haga falta.
+        aviso={enVariasDisciplinas(porBorrar)
+          ? t('Se le puede volver a agregar cuando haga falta.')
+          : undefined}
         onCancelar={() => setPorBorrar(null)}
         onConfirmar={confirmarBorrado}
       />

@@ -32,7 +32,7 @@
     justify-content:center;
     align-items:center;
 
-    background:var(--rcs-logo, rgba(0,0,0,.80));
+    background:#1d1d1d;
 
     border-left:10px solid #e10600;
     border-radius:10px 0 0 10px;
@@ -75,7 +75,7 @@
 
     padding:0 15px;
 
-    background:var(--rcs-panel, rgba(6,8,11,.72));
+    background:linear-gradient(90deg, #151515, #0b0b0b);
 
     border-radius:0 10px 10px 0;
 }

@@ -182,4 +182,10 @@ def guardar_logo(ident: str, contenido: bytes, nombre: str) -> str:
 
     imagen.convert("RGBA").save(CARPETA_LOGOS / f"{ident}.png", format="PNG")
 
+    # La version para fondo oscuro que usan los graficos, lista desde ya:
+    # asi el primer grafico con esta marca no espera a calcularla.
+    from src.services.logos_oscuros import asegurar
+
+    asegurar(CARPETA_LOGOS / f"{ident}.png")
+
     return _logo_de(ident)

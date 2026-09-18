@@ -1,6 +1,6 @@
 import { t } from '../../i18n'
 import { useRef, useState } from 'react'
-import { ArchiveRestore, DatabaseBackup, Download, Loader2, ShieldAlert, Upload } from 'lucide-react'
+import { ArchiveRestore, DatabaseBackup, Download, Loader2, ShieldAlert, Upload, X } from 'lucide-react'
 import { descargarRespaldo, restaurarRespaldo, revisarRespaldo } from '../../api/registro'
 import { useToast } from '../../context/ToastContext'
 import { useAuth } from '../../context/AuthContext'
@@ -182,7 +182,16 @@ export default function Respaldo() {
             <Cifras titulo={t('Datos')} datos={revision.colecciones} nombres={COLECCIONES}/>
             <Cifras titulo={t('Imágenes')} datos={revision.archivos} nombres={ARCHIVOS}/>
 
-            <div className="flex justify-end">
+            <div className="flex flex-wrap justify-end gap-3">
+              {/* Descarta el archivo elegido sin tocar nada: quien lo abrió
+                  solo para ver qué traía no tiene por qué recargar la página. */}
+              <button
+                type="button" onClick={() => { setArchivo(null); setRevision(null); setConfirmar(false) }}
+                disabled={restaurando}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:text-white hover:border-neutral-500 font-bold text-sm transition-colors disabled:opacity-40"
+              >
+                <X size={16}/> {t('CANCELAR')}
+              </button>
               <button
                 type="button" onClick={() => setConfirmar(true)} disabled={restaurando}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-sm transition-colors disabled:opacity-40"

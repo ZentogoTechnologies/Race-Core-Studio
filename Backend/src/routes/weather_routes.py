@@ -15,7 +15,9 @@ async def clima(
     Si el servicio no responde se devuelve el último dato conocido con
     `obsoleto: true`: al aire vale más un dato de hace un rato que un hueco
     """
-    datos = obtener_clima(forzar=forzar)
+    from src.services.settings_services import idioma_actual
+
+    datos = obtener_clima(forzar=forzar, idioma=await idioma_actual())
 
     # Solo se falla cuando no hay absolutamente nada que mostrar.
     if not datos.get("ok"):

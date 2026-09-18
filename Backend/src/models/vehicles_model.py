@@ -26,6 +26,9 @@ class Vehicle(Document):
     pilots: List[Link[Pilot]] = [] # Hasta 2 pilotos. Sin principal
     active_pilot_id: Optional[int] = None # Cuál de los dos va manejando ahora mismo.
                                           # MyLaps no lo distingue: manda los dos nombres pegados.
+    # Una sola, la suya: "13 seg", "600 cc". Las categorias abiertas
+    # -DragWar- no se guardan aqui; se corren por la regla de la
+    # categoria, sin tocar la ficha del carro.
     category_id: int
     sub_category_id: Optional[int] = None
 

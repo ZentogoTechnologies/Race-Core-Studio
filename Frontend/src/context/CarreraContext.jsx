@@ -39,6 +39,10 @@ export function CarreraProvider({ children }) {
     setCarrera({
       event_id: evento.event_id,
       nombre: evento.name,
+      // De qué disciplina es. Al cambiar de disciplina en el menú hay
+      // que soltar la carrera si era de la otra: un evento de drag no
+      // pinta nada en circuito.
+      disciplina: evento.discipline || null,
       start_date: evento.start_date,
       end_date: evento.end_date,
       // Ruta ya resuelta por el backend; el gráfico de Evento la pinta a

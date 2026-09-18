@@ -156,8 +156,20 @@ async def _buscar_vehiculo(dorsal: str, cat_id):
     if not dorsal or cat_id is None:
         return None
 
+    # En una categoria abierta -DragWar- corre toda la disciplina y ningun
+    # carro la lleva escrita en su ficha: ahi el dorsal se busca entre los
+    # carros de la disciplina entera, no entre los de esa categoria, que
+    # no son ninguno.
+    abierta = await Category.find_one({"category_id": cat_id, "base": True})
+    if abierta is None:
+        de_la_categoria = {"category_id": cat_id}
+    else:
+        hermanas = await Category.find(
+            Category.discipline == abierta.discipline).to_list()
+        de_la_categoria = {"category_id": {"$in": [c.category_id for c in hermanas]}}
+
     exacto = await Vehicle.find_one(
-        {"display_number": dorsal, "category_id": cat_id}
+        {"display_number": dorsal, **de_la_categoria}
     )
     if exacto is not None:
         return exacto
@@ -166,7 +178,7 @@ async def _buscar_vehiculo(dorsal: str, cat_id):
         return None
 
     candidatos = await Vehicle.find(
-        {"number": int(dorsal), "category_id": cat_id}
+        {"number": int(dorsal), **de_la_categoria}
     ).to_list()
 
     # Si el candidato ya declaró otro dorsal, no es este carro.
@@ -617,14 +629,16 @@ async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> di
             marca_logo = brand_logo_url(vehiculo.brand) if vehiculo.brand else None
 
             await vehiculo.fetch_all_links()
-            if vehiculo.pilots:
+            # Un piloto borrado deja el enlace sin resolver: se descarta.
+            suyos = [p for p in (vehiculo.pilots or []) if hasattr(p, "pilot_id")]
+            if suyos:
                 # MyLaps no dice cuál de los dos va manejando: manda los dos
                 # nombres pegados en el mismo campo. Manda el que se haya
                 # elegido en el panel; si no hay elección, el primero.
                 piloto = next(
-                    (p for p in vehiculo.pilots
+                    (p for p in suyos
                      if p.pilot_id == vehiculo.active_pilot_id),
-                    vehiculo.pilots[0],
+                    suyos[0],
                 )
                 nombre, apellido = piloto.name, piloto.last_name
                 pilot_id = piloto.pilot_id
@@ -755,7 +769,7 @@ async def carros_en_pista(ruta: str | None = None) -> list[dict]:
         pilotos = [{
             "pilot_id": p.pilot_id,
             "name": f"{p.name} {p.last_name}".strip(),
-        } for p in vehiculo.pilots]
+        } for p in (vehiculo.pilots or []) if hasattr(p, "pilot_id")]
 
         elegido = vehiculo.active_pilot_id
         if elegido is None and pilotos:
@@ -781,7 +795,8 @@ async def elegir_piloto(vehicle_id: int, pilot_id: int) -> dict:
         raise LookupError(f"No existe el vehículo {vehicle_id}")
 
     await vehiculo.fetch_all_links()
-    if pilot_id not in [p.pilot_id for p in vehiculo.pilots]:
+    if pilot_id not in [p.pilot_id for p in (vehiculo.pilots or [])
+                        if hasattr(p, "pilot_id")]:
         raise ValueError(
             f"El piloto {pilot_id} no está asignado al vehículo {vehicle_id}"
         )

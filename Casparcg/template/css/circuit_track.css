@@ -30,7 +30,7 @@
     display:flex;
     flex-direction:column;
 
-    background:var(--rcs-panel, rgba(6,8,11,.72));
+    background:#050505;
 
     border-radius:10px;
 
@@ -53,7 +53,7 @@
     display:flex;
     align-items:center;
 
-    background:rgba(0,0,0,.55);
+    background:linear-gradient(90deg, #151515, #0b0b0b);
 
     border-bottom:5px solid #ff0000;
 }
@@ -72,7 +72,7 @@
     justify-content:center;
     align-items:center;
 
-    background:var(--rcs-logo, rgba(0,0,0,.80));
+    background:#0d0d0d;
 
     border-left:6px solid #ff0000;
 }
@@ -138,7 +138,7 @@
 
     overflow:hidden;
 
-    background:var(--rcs-foto, rgba(0,0,0,.55));
+    background:#000;
 }
 
 .circuit-image{

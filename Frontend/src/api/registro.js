@@ -92,6 +92,22 @@ function recurso(ruta) {
 
 export const pilotosApi    = recurso('/pilots')
 
+// Una ficha es una persona, no una inscripción: el mismo corredor puede
+// correr en circuito y en drag sin duplicarse. Esta búsqueda es la única
+// que cruza disciplinas a propósito, para avisar antes de repetirlo.
+export const buscarPersona = (name, last_name) =>
+  pedir(`/pilots/persona${query({ name, last_name })}`)
+
+// Le suma una disciplina con su equipo y sus categorías. Lo que tenga en
+// la otra no se toca: son campeonatos distintos.
+export const agregarDisciplina = (pilotId, datos) =>
+  pedir(`/pilots/${pilotId}/disciplinas`, { method: 'POST', body: datos })
+
+// Deja de correr en esta, sin borrar a la persona ni su historial de la
+// otra.
+export const quitarDisciplina = (pilotId, disciplina) =>
+  pedir(`/pilots/${pilotId}/disciplinas/${disciplina}`, { method: 'DELETE' })
+
 // ─── Foto del piloto ──────────────────────────────────────────────
 // El archivo va al disco del backend y en la base queda solo su ruta.
 // Guardarlo dentro del documento obligaría a arrastrar la imagen en cada
