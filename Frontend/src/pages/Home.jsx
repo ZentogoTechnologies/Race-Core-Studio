@@ -24,7 +24,10 @@ function StatCard({ icon, title, count, cargando }) {
 export default function HomeModule() {
   const toast = useToast()
   const { disciplina, etiqueta } = useDisciplina()
-  const { puedeEscribir } = useAuth()
+  const { puedeEscribir, rol } = useAuth()
+  // Mismo criterio que el EXPORTAR de cada módulo: el estándar no se
+  // lleva la base.
+  const puedeExportar = rol !== 'standard'
   const [totales,  setTotales]  = useState({ p: 0, v: 0, c: 0, e: 0 })
   const [cargando, setCargando] = useState(true)
   const [exportando, setExportando] = useState(false)
@@ -165,14 +168,14 @@ export default function HomeModule() {
             </p>
           </div>
 
-          <button
+          {puedeExportar && <button
             onClick={exportarTodo}
             disabled={exportando}
             className="flex items-center gap-2 px-5 py-3 rounded-xl border border-green-600/40 bg-green-600/5 text-green-400 hover:bg-green-600/15 hover:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-bold text-sm whitespace-nowrap flex-shrink-0"
           >
             {exportando ? <Loader2 size={18} className="animate-spin"/> : <Download size={18} />}
             {t('EXPORTAR TODO')}
-          </button>
+          </button>}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 relative z-10">
@@ -183,13 +186,13 @@ export default function HomeModule() {
         </div>
       </div>
 
-      <div className="bg-[#141414] border border-neutral-800 rounded-xl px-6 py-4 flex items-center gap-3">
+      {puedeExportar && <div className="bg-[#141414] border border-neutral-800 rounded-xl px-6 py-4 flex items-center gap-3">
         <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
         <p className="text-neutral-400 text-sm">
           <span className="text-white font-semibold">{t('EXPORTAR TODO')}</span> {t('genera un único archivo')}{' '}
           <span className="text-green-400 font-semibold">.json</span> {t('con una sección por modulo: Eventos, Categorías, Pilotos y Vehículos.')}
         </p>
-      </div>
+      </div>}
 
       {/* Apagar el sistema entero es demasiado para un usuario estándar,
           que puede operar gráficos pero no escribir en la base. El backend
