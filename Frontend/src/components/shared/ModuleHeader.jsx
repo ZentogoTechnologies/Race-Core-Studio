@@ -2,6 +2,7 @@ import { t } from '../../i18n'
 import { useState } from 'react'
 import { Search, Plus, X, Download, Loader2 } from 'lucide-react'
 import { exportToJSON } from '../../utils/exportJSON'
+import { useAuth } from '../../context/AuthContext'
 
 export default function ModuleHeader({
   entityName,           // texto para el placeholder del buscador
@@ -22,6 +23,11 @@ export default function ModuleHeader({
   onExportError,
 }) {
   const [exportando, setExportando] = useState(false)
+
+  // El usuario estándar opera gráficos, no se lleva la base. Se decide
+  // aquí y no en cada pantalla: así un módulo nuevo no puede olvidarlo.
+  const { rol } = useAuth()
+  const puedeExportar = rol !== 'standard'
 
   const handleExport = async () => {
     setExportando(true)
@@ -55,14 +61,16 @@ export default function ModuleHeader({
       </div>
 
       <div className="flex gap-3 w-full sm:w-auto">
-        <button
-          onClick={handleExport}
-          disabled={exportando}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold text-sm whitespace-nowrap"
-        >
-          {exportando ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
-          {t('EXPORTAR')}
-        </button>
+        {puedeExportar && (
+          <button
+            onClick={handleExport}
+            disabled={exportando}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-neutral-700 text-neutral-300 hover:border-green-500 hover:text-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-bold text-sm whitespace-nowrap"
+          >
+            {exportando ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+            {t('EXPORTAR')}
+          </button>
+        )}
         {puedeCrear && (
           <button
             onClick={onFormToggle}
