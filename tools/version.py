@@ -23,6 +23,14 @@ CUATRO = tuple(int(n) for n in VERSION.split(".")[:3]) + (0,)
 
 RECURSOS = ("installer/version-info.txt", "launcher/version-info.txt")
 
+# Un literal más que no puede leer VERSION: lo escribe en cada archivo
+# que el cliente exporta, y ahí es donde importa. Un respaldo que dice
+# 1.0.0 cuando salió de la 1.1.0 manda a soporte a mirar el código que
+# no es.
+LITERALES = (
+    ("Frontend/src/utils/exportJSON.js", r"(softwareVersion:\s*')[\d.]+(')"),
+)
+
 
 def revisar(escribir: bool) -> list:
     problemas = []
@@ -35,6 +43,15 @@ def revisar(escribir: bool) -> list:
             datos["version"] = VERSION
             paquete.write_text(json.dumps(datos, indent=2, ensure_ascii=False) + "\n",
                                encoding="utf-8")
+
+    for ruta, patron in LITERALES:
+        archivo = RAIZ / ruta
+        texto = archivo.read_text(encoding="utf-8")
+        nuevo = re.sub(patron, rf"\g<1>{VERSION}\g<2>", texto)
+        if nuevo != texto:
+            problemas.append(f"{ruta}: no coincide con {VERSION}")
+            if escribir:
+                archivo.write_text(nuevo, encoding="utf-8")
 
     for ruta in RECURSOS:
         archivo = RAIZ / ruta
