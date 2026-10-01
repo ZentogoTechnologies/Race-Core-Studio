@@ -186,40 +186,59 @@ def mensajes_en_los_dos_idiomas(iss: Path) -> list:
     return problemas
 
 
-def llavero_con_claves(modulo: Path) -> list:
-    """El llavero de .rcslic no puede ir vacío en lo que se publica.
+def _valor(modulo: Path, nombre: str):
+    """El valor literal de una constante, leído con ast.
 
-    Sin ninguna clave pública dentro, el programa no puede comprobar
-    ninguna firma, así que rechaza TODAS las licencias —incluida la
-    buena— con «esta copia no lleva clave de verificación». Es decir:
-    un instalador que no sirve para instalar.
-
-    Compila igual y se publica igual, y solo se descubre cuando un
-    cliente pone su licencia delante. Así que se mira aquí.
-
-    Se lee con ast y no importando el módulo: importarlo arrastra
+    Con ast y no importando el módulo: importar rcslic arrastra
     cryptography, que no está en todas las máquinas.
     """
     if not modulo.is_file():
-        return []
+        return None
 
     for nodo in ast.walk(ast.parse(modulo.read_text(encoding="utf-8"))):
-        es_llavero = (
-            isinstance(nodo, ast.AnnAssign)
-            and getattr(nodo.target, "id", "") == "LLAVERO"
-        ) or (
-            isinstance(nodo, ast.Assign)
-            and any(getattr(d, "id", "") == "LLAVERO" for d in nodo.targets)
-        )
-        if es_llavero and isinstance(nodo.value, ast.Dict):
-            if not nodo.value.keys:
-                return [f"{modulo.relative_to(RAIZ)}:{nodo.lineno}: el llavero "
-                        f"LLAVERO está vacío, así que el programa rechazará "
-                        f"TODAS las licencias. Falta la clave pública de "
-                        f"Zentogo (solo la pública)"]
-            return []
+        destinos = []
+        if isinstance(nodo, ast.AnnAssign):
+            destinos = [nodo.target]
+        elif isinstance(nodo, ast.Assign):
+            destinos = nodo.targets
+        if any(getattr(d, "id", "") == nombre for d in destinos):
+            return nodo.value
 
-    return [f"{modulo.relative_to(RAIZ)}: no encuentro el llavero LLAVERO"]
+    return None
+
+
+def alguna_forma_de_validar(backend: Path) -> list:
+    """Tiene que haber al menos UNA manera de validar una licencia.
+
+    Son dos, y se complementan:
+
+        · el llavero de rcslic, que comprueba la firma sin red
+        · la ruta de activación, que pregunta al servidor
+
+    Manda el servidor. Pero si faltan las dos, el instalador pide el
+    archivo .rcslic, lo lee, y contesta «fallo de empaquetado, avise a
+    soporte» con la licencia buena delante: un instalador que no sirve
+    para instalar. Compila y se publica igual, y solo se descubre con un
+    cliente enfrente.
+
+    Que falte una sola no es fallo: sin llavero se activa contra el
+    servidor, y la firma la comprueba él.
+    """
+    llavero = _valor(backend / "rcslic.py", "LLAVERO")
+    ruta = _valor(backend / "activacion.py", "RUTA_ACTIVAR")
+
+    hay_llavero = isinstance(llavero, ast.Dict) and bool(llavero.keys)
+    hay_ruta = isinstance(ruta, ast.Constant) and bool(str(ruta.value).strip())
+
+    if hay_llavero or hay_ruta:
+        return []
+
+    return ["no hay ninguna forma de validar una licencia: LLAVERO está "
+            "vacío en Backend/rcslic.py y RUTA_ACTIVAR está vacía en "
+            "Backend/activacion.py. Con las dos vacías, el instalador "
+            "rechaza cualquier licencia. Hace falta una de las dos: la "
+            "clave pública de Zentogo, o la ruta de activación del "
+            "servidor"]
 
 
 def main() -> int:
@@ -238,7 +257,7 @@ def main() -> int:
         problemas += almohadillas_sueltas(iss)
         problemas += mensajes_en_los_dos_idiomas(iss)
 
-    problemas += llavero_con_claves(RAIZ / "Backend" / "rcslic.py")
+    problemas += alguna_forma_de_validar(RAIZ / "Backend")
 
     if problemas:
         for p in problemas:

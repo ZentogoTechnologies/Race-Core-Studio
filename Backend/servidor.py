@@ -56,7 +56,7 @@ def configurar_desde_argumentos() -> int | None:
     """--configurar deja el sistema listo en vez de arrancar el servidor.
 
     Lo llama el instalador justo después de copiar los archivos, con el
-    correo y el archivo de licencia que el cliente indicó en el asistente.
+    el archivo de licencia que el cliente indicó en el asistente.
     """
     if "--configurar" not in sys.argv:
         return None
@@ -65,7 +65,6 @@ def configurar_desde_argumentos() -> int | None:
 
     p = argparse.ArgumentParser(prog="race-core-backend", add_help=False)
     p.add_argument("--configurar", action="store_true")
-    p.add_argument("--correo", required=True)
     # El archivo .rcslic que Zentogo entregó al cliente. Sustituye a la
     # clave RCS1: lleva dentro el plan y la duración, firmados.
     p.add_argument("--licencia", required=True)
@@ -77,7 +76,7 @@ def configurar_desde_argumentos() -> int | None:
 
     from configurar import configurar
 
-    return configurar(args.correo, args.licencia, args.idioma)
+    return configurar(args.licencia, args.idioma)
 
 
 def main() -> int:

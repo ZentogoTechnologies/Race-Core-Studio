@@ -47,7 +47,7 @@ ocultos += collect_submodules("src")
 # RCS1 ni se emite nada en el equipo del cliente. Siguen en installer/ y
 # tools/ para el instalador viejo y para las herramientas, pero dentro
 # del .exe no los usa nadie.
-ocultos += ["configurar", "rcslic", "rutas", "config", "main"]
+ocultos += ["configurar", "rcslic", "activacion", "rutas", "config", "main"]
 
 datos = [
     # La versión, que config.py lee del disco al arrancar.

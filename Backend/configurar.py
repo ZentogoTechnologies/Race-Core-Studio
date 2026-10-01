@@ -5,27 +5,32 @@ repositorio y compilaba en el equipo del cliente. Ahora vive aquí, dentro
 del backend congelado, porque es el único que lleva encima lo que hace
 falta: el validador de licencias, el emisor y la huella del equipo.
 
-    race-core-backend.exe --configurar --correo … --licencia …\licencia.rcslic
+    race-core-backend.exe --configurar --licencia …\licencia.rcslic
 
-Hace cuatro cosas, en este orden:
+Hace cinco cosas, en este orden, y se para en la primera que falle:
 
-    1. Verifica el archivo de licencia. Si no vale, no se toca nada más.
-    2. Lo guarda en la carpeta de datos, para que el backend lo relea en
-       cada arranque.
-    3. Escribe el .env, con una firma de sesiones distinta en cada
+    1. Lee el .rcslic y comprueba su firma, si este equipo puede.
+    2. Lo activa contra el servidor de Zentogo. Quien decide es él.
+    3. Guarda el archivo en la carpeta de datos, para releerlo en cada
+       arranque.
+    4. Escribe el .env, con una firma de sesiones distinta en cada
        instalación.
-    4. Genera el token del asistente web.
+    5. Genera el token del asistente web.
 
-La licencia ya viene firmada por Zentogo, así que aquí no se emite nada:
-solo se comprueba. Antes había que emitirla en el equipo del cliente
-—la clave RCS1 era un simple sí o no— y eso exigía la clave privada de
-Zentogo, que no puede viajar con el producto. Ver Backend/rcslic.py.
+El paso 2 es el que manda, y necesita internet. El archivo dice qué se
+compró; el servidor dice si sigue vigente y si no se gastó ya en otra
+máquina, y lo ata a este equipo.
+
+Aquí no se emite ninguna licencia. Antes sí —la clave RCS1 era un simple
+sí o no y la licencia había que fabricarla en el equipo del cliente—, y
+eso exigía la clave privada de Zentogo, que no puede viajar con el
+producto. Ver Backend/rcslic.py y Backend/activacion.py.
 
 Se puede repetir sin miedo: renovar una licencia es volver a ejecutarlo.
 Lo que ya existe y sigue valiendo, se respeta.
 """
 
-import re
+import json
 import secrets
 from pathlib import Path
 
@@ -36,37 +41,29 @@ def _decir(texto: str = "") -> None:
     print(texto, flush=True)
 
 
-# ─── 1 · El correo ───────────────────────────────────────────
-
-# Solo la forma, y holgada a propósito. El correo es para avisar de
-# renovaciones y para que soporte sepa con quién habla; quien decide si
-# se puede instalar es la licencia. Una expresión estricta rechazaría
-# direcciones perfectamente válidas —las hay con + y con dominios de
-# cualquier largo— y eso dejaría a un cliente sin poder instalar lo que
-# ya pagó.
-FORMA_CORREO = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
-
-
-def comprobar_correo(correo: str) -> str | None:
-    """El correo normalizado, o None si no tiene forma de correo."""
-    correo = (correo or "").strip()
-    if not FORMA_CORREO.match(correo):
-        _decir(f"CORREO: «{correo}» no tiene forma de dirección de correo.")
-        return None
-    return correo
-
-
-# ─── 2 · La licencia ─────────────────────────────────────────
+# ─── 1 · La licencia ─────────────────────────────────────────
 
 def comprobar_licencia(ruta: str) -> "rcslic.Licencia | None":
-    """Verifica el archivo .rcslic. Sin esto no se sigue instalando."""
+    """Lee el archivo y comprueba su firma, si se puede comprobar aquí.
+
+    Esto NO decide si se instala: eso lo dice el servidor. Sirve para no
+    gastar una llamada de red en un archivo roto o retocado, y para dar
+    un error claro antes de depender de internet.
+
+    Cuando el programa no lleva clave pública, se lee sin verificar la
+    firma y se sigue: el servidor la comprobará él, que es quien manda.
+    """
     import rcslic
 
     try:
-        lic = rcslic.leer(ruta)
+        lic = rcslic.leer(ruta, exigir_firma=rcslic.hay_con_que_verificar())
     except rcslic.LicenciaInvalida as e:
         _decir(f"LICENCIA: {e}")
         return None
+
+    if not rcslic.hay_con_que_verificar():
+        _decir("  (la firma la comprobará el servidor: este equipo no "
+               "lleva clave pública)")
 
     _decir(f"Licencia {lic.codigo} · {lic.cliente} · plan {lic.plan_nombre}")
     if lic.es_demo:
@@ -90,6 +87,42 @@ def guardar_licencia(origen: str) -> None:
     destino = rutas.DATOS / f"licencia{__import__('rcslic').EXTENSION}"
     destino.write_bytes(Path(origen).read_bytes())
     _decir(f"Licencia guardada en {destino}")
+
+
+# ─── 2 · La activación ──────────────────────────────────────
+
+def activar_en_el_servidor(ruta: str, lic) -> bool:
+    """Pide al servidor que ate esta licencia a este equipo.
+
+    Es quien decide. El archivo dice qué se compró; el servidor dice si
+    sigue vigente y si no se gastó ya en otra máquina. Sin su sí, la
+    instalación no se da por buena.
+    """
+    import activacion
+    from config import settings
+    from src.services.fingerprint_services import huella_equipo
+
+    huella = huella_equipo()
+    _decir(f"Equipo: {huella[:24]}…")
+    _decir(f"Activando contra {lic.servidor} …")
+
+    r = activacion.activar(
+        sobre_crudo=Path(ruta).read_text(encoding="utf-8"),
+        lic=lic,
+        huella=huella,
+        version=settings.APP_VERSION,
+    )
+
+    if r.ok:
+        _decir("Licencia activada en este equipo.")
+        if r.datos:
+            (rutas.DATOS / "activacion.json").write_text(
+                json.dumps(r.datos, indent=2, ensure_ascii=False),
+                encoding="utf-8")
+        return True
+
+    _decir(f"ACTIVACIÓN: {r.error}")
+    return False
 
 
 # ─── 3 · La configuración ────────────────────────────────────
@@ -152,15 +185,15 @@ def token_del_asistente() -> str:
 
 # ─── Principal ───────────────────────────────────────────────
 
-def configurar(correo: str, licencia: str, idioma: str = "") -> int:
+def configurar(licencia: str, idioma: str = "") -> int:
     _decir(f"Race Core Studio · configurando en {rutas.DATOS}")
     rutas.preparar()
 
-    if comprobar_correo(correo) is None:
-        return 1
-
     lic = comprobar_licencia(licencia)
     if lic is None:
+        return 1
+
+    if not activar_en_el_servidor(licencia, lic):
         return 1
 
     guardar_licencia(licencia)

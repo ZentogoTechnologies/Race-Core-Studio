@@ -105,33 +105,15 @@ es.AbrirAsistente=Abrir el asistente de configuración
 en.AbrirAsistente=Open the setup wizard
 
 ; ── La pagina de la licencia ──
-es.LicenciaTitulo=Licencia del producto
-en.LicenciaTitulo=Product licence
-
-es.LicenciaCabecera=¿A quién avisamos de las renovaciones?
-en.LicenciaCabecera=Who should we notify about renewals?
-
-es.LicenciaNota=Este correo se usa para avisarle de los vencimientos y para que soporte sepa con quién habla. Quien decide el plan y la duración es el archivo de licencia, que se pide en la pantalla siguiente.
-en.LicenciaNota=This e-mail is used to warn you about expiry dates and so support knows who to talk to. The plan and duration come from the licence file, which is requested on the next screen.
-
-es.LicenciaCorreo=Correo de contacto:
-en.LicenciaCorreo=Contact e-mail:
-
-es.LicenciaFaltan=Hace falta un correo de contacto.
-en.LicenciaFaltan=A contact e-mail is required.
-
-es.LicenciaForma=Eso no tiene forma de dirección de correo.%nEjemplo:  nombre@autodromo.com
-en.LicenciaForma=That does not look like an e-mail address.%nExample:  name@racetrack.com
-
-; ── El archivo de licencia ──
-es.ArchivoTitulo=Archivo de licencia
-en.ArchivoTitulo=Licence file
+; ── El archivo de licencia: lo único que se pide ──
+es.ArchivoTitulo=Licencia del producto
+en.ArchivoTitulo=Product licence
 
 es.ArchivoCabecera=Indique el archivo de licencia que recibió de Zentogo Technologies.
 en.ArchivoCabecera=Select the licence file you received from Zentogo Technologies.
 
-es.ArchivoNota=Es un archivo con extensión .rcslic. Lleva dentro su plan y su duración, firmados por Zentogo, y se comprueba aquí mismo antes de copiar nada al equipo.
-en.ArchivoNota=It is a file with the .rcslic extension. It carries your plan and its duration, signed by Zentogo, and is checked right here before anything is copied to the computer.
+es.ArchivoNota=Es un archivo con extensión .rcslic. Lleva dentro su plan y su duración. Se activa contra el servidor de Zentogo, así que este equipo necesita conexión a internet durante la instalación.
+en.ArchivoNota=It is a file with the .rcslic extension. It carries your plan and its duration. It is activated against Zentogo's server, so this computer needs an internet connection during setup.
 
 es.ArchivoEtiqueta=Archivo de licencia:
 en.ArchivoEtiqueta=Licence file:
@@ -200,7 +182,7 @@ Filename: "{sys}\net.exe"; Parameters: "start ""{#Servicio}"""; \
 ; genera el token del asistente. Antes de arrancar nada: si la clave no
 ; vale, la instalación no debe darse por buena.
 Filename: "{app}\backend\race-core-backend.exe"; \
-    Parameters: "--configurar --correo ""{code:CorreoLicencia}"" --licencia ""{code:ArchivoLicencia}"" --idioma ""{code:IdiomaElegido}"""; \
+    Parameters: "--configurar --licencia ""{code:ArchivoLicencia}"" --idioma ""{code:IdiomaElegido}"""; \
     StatusMsg: "{cm:PasoLicencia}"; Flags: runhidden waituntilterminated
 
 Filename: "{app}\{#Ejecutable}"; Description: "{cm:AbrirAsistente}"; \
@@ -244,27 +226,15 @@ Type: filesandordirs; Name: "{app}\logs"
 
 [Code]
 var
-  PaginaCorreo:  TInputQueryWizardPage;
   PaginaArchivo: TInputFileWizardPage;
 
 procedure InitializeWizard;
 begin
-  // Dos paginas y no una, porque son dos cosas distintas de pedir y
-  // Inno trae una pagina hecha para cada una: la de texto no lleva boton
-  // de examinar, y la de archivos no lleva campos de texto. Hacer una
-  // sola a mano significa dibujar el dialogo de archivos por nuestra
-  // cuenta, y eso solo se puede probar compilando en Windows.
-  PaginaCorreo := CreateInputQueryPage(wpSelectDir,
-    ExpandConstant('{cm:LicenciaTitulo}'),
-    ExpandConstant('{cm:LicenciaCabecera}'),
-    ExpandConstant('{cm:LicenciaNota}'));
-
-  // Solo el correo. El nombre del autodromo, el logo, las cuentas y el
-  // resto se preguntan en la configuracion, desde el navegador:
-  // repetirlos aqui seria pedir dos veces lo mismo.
-  PaginaCorreo.Add(ExpandConstant('{cm:LicenciaCorreo}'), False);
-
-  PaginaArchivo := CreateInputFilePage(PaginaCorreo.ID,
+  // Una sola pantalla, y solo el archivo. Ni correo ni clave: el correo
+  // ya lo tiene Zentogo de la compra, y el plan y la duracion van dentro
+  // del .rcslic. El nombre del autodromo, el logo y las cuentas se
+  // preguntan en la configuracion, desde el navegador.
+  PaginaArchivo := CreateInputFilePage(wpSelectDir,
     ExpandConstant('{cm:ArchivoTitulo}'),
     ExpandConstant('{cm:ArchivoCabecera}'),
     ExpandConstant('{cm:ArchivoNota}'));
@@ -276,11 +246,6 @@ begin
   PaginaArchivo.Add(ExpandConstant('{cm:ArchivoEtiqueta}'),
                     ExpandConstant('{cm:ArchivoFiltro}'),
                     '.rcslic');
-end;
-
-function CorreoLicencia(Valor: String): String;
-begin
-  Result := Trim(PaginaCorreo.Values[0]);
 end;
 
 function ArchivoLicencia(Valor: String): String;
@@ -304,43 +269,13 @@ begin
   Result := ActiveLanguage;
 end;
 
-// Forma de correo, a ojo y holgada: una arroba con algo a cada lado y un
-// punto en el dominio. Nada mas estricto, que las direcciones validas son
-// mas raras de lo que parece y rechazar la de un cliente lo deja sin
-// poder instalar lo que ya pago. El backend la revisa igual.
-
-function PareceCorreo(Valor: String): Boolean;
-var
-  Arroba, Punto: Integer;
-begin
-  Arroba := Pos('@', Valor);
-  Punto  := LastDelimiter('.', Valor);
-  Result := (Arroba > 1) and (Punto > Arroba + 1) and (Length(Valor) - Punto >= 2)
-            and (Pos(' ', Valor) = 0);
-end;
-
 function NextButtonClick(PaginaActual: Integer): Boolean;
 var
-  Correo, Archivo: String;
+  Archivo: String;
 begin
   Result := True;
 
-  if PaginaActual = PaginaCorreo.ID then
-  begin
-    Correo := Trim(PaginaCorreo.Values[0]);
-    if Correo = '' then
-    begin
-      MsgBox(ExpandConstant('{cm:LicenciaFaltan}'), mbError, MB_OK);
-      Result := False;
-    end
-    else if not PareceCorreo(Correo) then
-    begin
-      MsgBox(ExpandConstant('{cm:LicenciaForma}'), mbError, MB_OK);
-      Result := False;
-    end;
-  end
-
-  else if PaginaActual = PaginaArchivo.ID then
+  if PaginaActual = PaginaArchivo.ID then
   begin
     // Aqui NO se valida la licencia: eso lo hace el backend, que lleva
     // la clave publica para comprobar la firma. Lo que se atajan son las

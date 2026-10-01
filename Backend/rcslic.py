@@ -196,11 +196,15 @@ def _comprobar_firma(sobre: dict, nombre: str) -> None:
             f"después de emitirse, o no lo emitió Zentogo.")
 
 
-def leer(ruta: Path | str) -> Licencia:
-    """La licencia del archivo, ya verificada. Lanza LicenciaInvalida.
+def leer(ruta: Path | str, exigir_firma: bool = True) -> Licencia:
+    """La licencia del archivo. Lanza LicenciaInvalida si no sirve.
 
     Se verifica la firma ANTES de mirar el contenido. Al revés, un archivo
     falso llegaría a decidir el plan y la duración por el camino.
+
+    `exigir_firma=False` lee sin comprobarla, y SOLO vale cuando hay otra
+    cosa que la comprueba —el servidor, al activar—. Lo que se devuelve
+    entonces no está verificado: no sirve para decidir nada por sí mismo.
     """
     ruta = Path(ruta)
 
@@ -210,7 +214,8 @@ def leer(ruta: Path | str) -> Licencia:
             f"(este es «{ruta.name}»).")
 
     sobre = _sobre(ruta)
-    _comprobar_firma(sobre, ruta.name)
+    if exigir_firma:
+        _comprobar_firma(sobre, ruta.name)
 
     try:
         datos = json.loads(sobre["contenido"])
