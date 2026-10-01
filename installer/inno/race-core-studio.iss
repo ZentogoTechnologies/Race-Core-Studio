@@ -108,23 +108,45 @@ en.AbrirAsistente=Open the setup wizard
 es.LicenciaTitulo=Licencia del producto
 en.LicenciaTitulo=Product licence
 
-es.LicenciaCabecera=Introduzca los datos que recibió de Zentogo Technologies.
-en.LicenciaCabecera=Enter the details you received from Zentogo Technologies.
+es.LicenciaCabecera=¿A quién avisamos de las renovaciones?
+en.LicenciaCabecera=Who should we notify about renewals?
 
-es.LicenciaNota=La licencia se comprueba antes de copiar nada, y quedará asociada a este equipo.
-en.LicenciaNota=The licence is checked before anything is copied, and will be tied to this computer.
+es.LicenciaNota=Este correo se usa para avisarle de los vencimientos y para que soporte sepa con quién habla. Quien decide el plan y la duración es el archivo de licencia, que se pide en la pantalla siguiente.
+en.LicenciaNota=This e-mail is used to warn you about expiry dates and so support knows who to talk to. The plan and duration come from the licence file, which is requested on the next screen.
 
-es.LicenciaCorreo=Correo de la licencia:
-en.LicenciaCorreo=Licence e-mail:
+es.LicenciaCorreo=Correo de contacto:
+en.LicenciaCorreo=Contact e-mail:
 
-es.LicenciaClave=Clave del producto:
-en.LicenciaClave=Product key:
+es.LicenciaFaltan=Hace falta un correo de contacto.
+en.LicenciaFaltan=A contact e-mail is required.
 
-es.LicenciaFaltan=Hacen falta el correo y la clave de la licencia.
-en.LicenciaFaltan=Both the licence e-mail and the product key are required.
+es.LicenciaForma=Eso no tiene forma de dirección de correo.%nEjemplo:  nombre@autodromo.com
+en.LicenciaForma=That does not look like an e-mail address.%nExample:  name@racetrack.com
 
-es.LicenciaForma=La clave empieza por RCS1- y lleva cinco bloques.%nEjemplo:  RCS1-XXXX-XXXX-XXXX-XXXX
-en.LicenciaForma=The key starts with RCS1- and has five blocks.%nExample:  RCS1-XXXX-XXXX-XXXX-XXXX
+; ── El archivo de licencia ──
+es.ArchivoTitulo=Archivo de licencia
+en.ArchivoTitulo=Licence file
+
+es.ArchivoCabecera=Indique el archivo de licencia que recibió de Zentogo Technologies.
+en.ArchivoCabecera=Select the licence file you received from Zentogo Technologies.
+
+es.ArchivoNota=Es un archivo con extensión .rcslic. Lleva dentro su plan y su duración, firmados por Zentogo, y se comprueba aquí mismo antes de copiar nada al equipo.
+en.ArchivoNota=It is a file with the .rcslic extension. It carries your plan and its duration, signed by Zentogo, and is checked right here before anything is copied to the computer.
+
+es.ArchivoEtiqueta=Archivo de licencia:
+en.ArchivoEtiqueta=Licence file:
+
+es.ArchivoFiltro=Licencia de Race Core Studio (*.rcslic)|*.rcslic
+en.ArchivoFiltro=Race Core Studio licence (*.rcslic)|*.rcslic
+
+es.ArchivoFalta=Hace falta indicar el archivo de licencia (.rcslic).
+en.ArchivoFalta=You must select the licence file (.rcslic).
+
+es.ArchivoExtension=El archivo de licencia tiene que terminar en .rcslic.%nEl que indicó es:  %1
+en.ArchivoExtension=The licence file must end in .rcslic.%nYou selected:  %1
+
+es.ArchivoNoExiste=No se encuentra ese archivo:%n%n%1%n%nCompruebe que sigue donde estaba.
+en.ArchivoNoExiste=That file cannot be found:%n%n%1%n%nCheck that it is still where it was.
 
 ; ── CasparCG ──
 es.CasparComprobando=Comprobando el servidor de gráficos...
@@ -178,7 +200,7 @@ Filename: "{sys}\net.exe"; Parameters: "start ""{#Servicio}"""; \
 ; genera el token del asistente. Antes de arrancar nada: si la clave no
 ; vale, la instalación no debe darse por buena.
 Filename: "{app}\backend\race-core-backend.exe"; \
-    Parameters: "--configurar --correo ""{code:CorreoLicencia}"" --clave ""{code:ClaveLicencia}"" --idioma ""{code:IdiomaElegido}"""; \
+    Parameters: "--configurar --correo ""{code:CorreoLicencia}"" --licencia ""{code:ArchivoLicencia}"" --idioma ""{code:IdiomaElegido}"""; \
     StatusMsg: "{cm:PasoLicencia}"; Flags: runhidden waituntilterminated
 
 Filename: "{app}\{#Ejecutable}"; Description: "{cm:AbrirAsistente}"; \
@@ -222,30 +244,48 @@ Type: filesandordirs; Name: "{app}\logs"
 
 [Code]
 var
-  PaginaLicencia: TInputQueryWizardPage;
+  PaginaCorreo:  TInputQueryWizardPage;
+  PaginaArchivo: TInputFileWizardPage;
 
 procedure InitializeWizard;
 begin
-  PaginaLicencia := CreateInputQueryPage(wpSelectDir,
+  // Dos paginas y no una, porque son dos cosas distintas de pedir y
+  // Inno trae una pagina hecha para cada una: la de texto no lleva boton
+  // de examinar, y la de archivos no lleva campos de texto. Hacer una
+  // sola a mano significa dibujar el dialogo de archivos por nuestra
+  // cuenta, y eso solo se puede probar compilando en Windows.
+  PaginaCorreo := CreateInputQueryPage(wpSelectDir,
     ExpandConstant('{cm:LicenciaTitulo}'),
     ExpandConstant('{cm:LicenciaCabecera}'),
     ExpandConstant('{cm:LicenciaNota}'));
 
-  // Solo esto. El nombre del autodromo, el logo, las cuentas y el resto
-  // se preguntan en la configuracion, desde el navegador: repetirlos
-  // aqui seria pedir dos veces lo mismo.
-  PaginaLicencia.Add(ExpandConstant('{cm:LicenciaCorreo}'), False);
-  PaginaLicencia.Add(ExpandConstant('{cm:LicenciaClave}'), False);
+  // Solo el correo. El nombre del autodromo, el logo, las cuentas y el
+  // resto se preguntan en la configuracion, desde el navegador:
+  // repetirlos aqui seria pedir dos veces lo mismo.
+  PaginaCorreo.Add(ExpandConstant('{cm:LicenciaCorreo}'), False);
+
+  PaginaArchivo := CreateInputFilePage(PaginaCorreo.ID,
+    ExpandConstant('{cm:ArchivoTitulo}'),
+    ExpandConstant('{cm:ArchivoCabecera}'),
+    ExpandConstant('{cm:ArchivoNota}'));
+
+  // El filtro deja ver solo los .rcslic al examinar, y la extension por
+  // defecto completa la que falte. Ninguna de las dos cosas impide
+  // teclear otra ruta a mano, asi que se comprueba igual al pasar de
+  // pagina: un filtro es una comodidad, no una validacion.
+  PaginaArchivo.Add(ExpandConstant('{cm:ArchivoEtiqueta}'),
+                    ExpandConstant('{cm:ArchivoFiltro}'),
+                    '.rcslic');
 end;
 
 function CorreoLicencia(Valor: String): String;
 begin
-  Result := Trim(PaginaLicencia.Values[0]);
+  Result := Trim(PaginaCorreo.Values[0]);
 end;
 
-function ClaveLicencia(Valor: String): String;
+function ArchivoLicencia(Valor: String): String;
 begin
-  Result := Trim(PaginaLicencia.Values[1]);
+  Result := Trim(PaginaArchivo.Values[0]);
 end;
 
 // ── El idioma elegido, para el producto ──────────────────────
@@ -264,23 +304,61 @@ begin
   Result := ActiveLanguage;
 end;
 
+// Forma de correo, a ojo y holgada: una arroba con algo a cada lado y un
+// punto en el dominio. Nada mas estricto, que las direcciones validas son
+// mas raras de lo que parece y rechazar la de un cliente lo deja sin
+// poder instalar lo que ya pago. El backend la revisa igual.
+
+function PareceCorreo(Valor: String): Boolean;
+var
+  Arroba, Punto: Integer;
+begin
+  Arroba := Pos('@', Valor);
+  Punto  := LastDelimiter('.', Valor);
+  Result := (Arroba > 1) and (Punto > Arroba + 1) and (Length(Valor) - Punto >= 2)
+            and (Pos(' ', Valor) = 0);
+end;
+
 function NextButtonClick(PaginaActual: Integer): Boolean;
+var
+  Correo, Archivo: String;
 begin
   Result := True;
 
-  if PaginaActual = PaginaLicencia.ID then
+  if PaginaActual = PaginaCorreo.ID then
   begin
-    if (Trim(PaginaLicencia.Values[0]) = '') or (Trim(PaginaLicencia.Values[1]) = '') then
+    Correo := Trim(PaginaCorreo.Values[0]);
+    if Correo = '' then
     begin
       MsgBox(ExpandConstant('{cm:LicenciaFaltan}'), mbError, MB_OK);
       Result := False;
     end
-    else if Pos('RCS1-', UpperCase(Trim(PaginaLicencia.Values[1]))) <> 1 then
+    else if not PareceCorreo(Correo) then
     begin
-      // Solo la forma. Si la clave es válida de verdad lo dice el
-      // backend al configurar, que es quien lleva el validador; aquí
-      // solo se atajan las erratas evidentes antes de copiar 250 MB.
       MsgBox(ExpandConstant('{cm:LicenciaForma}'), mbError, MB_OK);
+      Result := False;
+    end;
+  end
+
+  else if PaginaActual = PaginaArchivo.ID then
+  begin
+    // Aqui NO se valida la licencia: eso lo hace el backend, que lleva
+    // la clave publica para comprobar la firma. Lo que se atajan son las
+    // tres erratas que no hace falta descomprimir 250 MB para ver.
+    Archivo := Trim(PaginaArchivo.Values[0]);
+    if Archivo = '' then
+    begin
+      MsgBox(ExpandConstant('{cm:ArchivoFalta}'), mbError, MB_OK);
+      Result := False;
+    end
+    else if CompareText(ExtractFileExt(Archivo), '.rcslic') <> 0 then
+    begin
+      MsgBox(FmtMessage(CustomMessage('ArchivoExtension'), [Archivo]), mbError, MB_OK);
+      Result := False;
+    end
+    else if not FileExists(Archivo) then
+    begin
+      MsgBox(FmtMessage(CustomMessage('ArchivoNoExiste'), [Archivo]), mbError, MB_OK);
       Result := False;
     end;
   end;

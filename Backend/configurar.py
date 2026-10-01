@@ -5,21 +5,29 @@ repositorio y compilaba en el equipo del cliente. Ahora vive aquí, dentro
 del backend congelado, porque es el único que lleva encima lo que hace
 falta: el validador de licencias, el emisor y la huella del equipo.
 
-    race-core-backend.exe --configurar --correo … --clave …
+    race-core-backend.exe --configurar --correo … --licencia …\licencia.rcslic
 
 Hace cuatro cosas, en este orden:
 
-    1. Valida la licencia. Si no vale, no se toca nada más.
-    2. La emite atada a la huella de ESTE equipo.
+    1. Verifica el archivo de licencia. Si no vale, no se toca nada más.
+    2. Lo guarda en la carpeta de datos, para que el backend lo relea en
+       cada arranque.
     3. Escribe el .env, con una firma de sesiones distinta en cada
        instalación.
     4. Genera el token del asistente web.
+
+La licencia ya viene firmada por Zentogo, así que aquí no se emite nada:
+solo se comprueba. Antes había que emitirla en el equipo del cliente
+—la clave RCS1 era un simple sí o no— y eso exigía la clave privada de
+Zentogo, que no puede viajar con el producto. Ver Backend/rcslic.py.
 
 Se puede repetir sin miedo: renovar una licencia es volver a ejecutarlo.
 Lo que ya existe y sigue valiendo, se respeta.
 """
 
+import re
 import secrets
+from pathlib import Path
 
 import rutas
 
@@ -28,65 +36,60 @@ def _decir(texto: str = "") -> None:
     print(texto, flush=True)
 
 
-# ─── 1 y 2 · La licencia ─────────────────────────────────────
+# ─── 1 · El correo ───────────────────────────────────────────
 
-def comprobar_licencia(correo: str, clave: str) -> dict | None:
-    """Valida correo y clave. Sin esto no se sigue instalando."""
-    from licencia_local import validar
+# Solo la forma, y holgada a propósito. El correo es para avisar de
+# renovaciones y para que soporte sepa con quién habla; quien decide si
+# se puede instalar es la licencia. Una expresión estricta rechazaría
+# direcciones perfectamente válidas —las hay con + y con dominios de
+# cualquier largo— y eso dejaría a un cliente sin poder instalar lo que
+# ya pagó.
+FORMA_CORREO = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
 
-    resultado = validar(correo, clave)
-    if not resultado["ok"]:
-        _decir(f"LICENCIA: {resultado['error']}")
+
+def comprobar_correo(correo: str) -> str | None:
+    """El correo normalizado, o None si no tiene forma de correo."""
+    correo = (correo or "").strip()
+    if not FORMA_CORREO.match(correo):
+        _decir(f"CORREO: «{correo}» no tiene forma de dirección de correo.")
+        return None
+    return correo
+
+
+# ─── 2 · La licencia ─────────────────────────────────────────
+
+def comprobar_licencia(ruta: str) -> "rcslic.Licencia | None":
+    """Verifica el archivo .rcslic. Sin esto no se sigue instalando."""
+    import rcslic
+
+    try:
+        lic = rcslic.leer(ruta)
+    except rcslic.LicenciaInvalida as e:
+        _decir(f"LICENCIA: {e}")
         return None
 
-    _decir(f"Licencia válida para {resultado['correo']} · plan {resultado['plan']}")
-    return resultado
+    _decir(f"Licencia {lic.codigo} · {lic.cliente} · plan {lic.plan_nombre}")
+    if lic.es_demo:
+        _decir(f"  Demostración: {lic.horas_demo} horas de uso.")
+    elif lic.vence:
+        _decir(f"  Vence el {lic.vence.isoformat()}.")
+    else:
+        _decir("  Sin fecha de vencimiento.")
+    return lic
 
 
-def emitir_para_este_equipo(lic: dict, dias: int | None) -> bool:
-    """Ata la licencia a la huella de este equipo. Puede no poder.
+def guardar_licencia(origen: str) -> None:
+    """Copia el .rcslic a la carpeta de datos, tal cual.
 
-    Firmar exige la clave privada de Zentogo, y esa no viaja NUNCA con
-    el producto: quien la tenga puede fabricarse licencias perpetuas para
-    cualquier máquina. En su sitio irá el servidor de licencias, que
-    firma él y manda el token ya hecho.
-
-    Mientras ese servidor no exista, aquí solo se emite si alguien dejó
-    la clave a mano a propósito —un equipo de desarrollo—. En cualquier
-    otro sitio se sigue adelante sin licencia emitida, y se dice.
+    Byte por byte y no reescrito: lo que se verifica son los bytes
+    exactos del archivo, así que volver a serializarlo —otro orden de
+    claves, otros espacios— invalidaría la firma sin que nada estuviera
+    mal. Se copia donde el backend pueda releerlo en cada arranque, y
+    donde sobreviva a actualizar y a reinstalar.
     """
-    privada = rutas.DATOS / "claves" / "licencias-privada.pem"
-
-    if not privada.is_file():
-        _decir()
-        _decir("AVISO: no se emite licencia atada a este equipo.")
-        _decir("  Firmarla exige la clave privada de Zentogo, que no viaja")
-        _decir("  con el producto. La emitirá el servidor de licencias.")
-        _decir("  Hasta entonces el software queda sin exigir licencia.")
-        return False
-
-    from emitir import emitir
-    from src.services.fingerprint_services import huella_equipo
-
-    huella = huella_equipo()
-    _decir(f"Equipo: {huella[:24]}…")
-
-    token, datos = emitir(
-        privada_pem=privada.read_text(encoding="utf-8"),
-        producto="race-core-studio",
-        cliente=lic.get("cliente", "Autódromo"),
-        correo=lic["correo"],
-        equipo=huella,
-        dias=dias if dias is not None else lic["dias"],
-        plan=lic["plan"],
-        version_max="1.0.0",
-        gracia_dias=lic["gracia_dias"],
-        revalidar_dias=7,
-    )
-
-    (rutas.DATOS / "licencia.lic").write_text(token, encoding="utf-8")
-    _decir("Licencia emitida y atada a este equipo.")
-    return True
+    destino = rutas.DATOS / f"licencia{__import__('rcslic').EXTENSION}"
+    destino.write_bytes(Path(origen).read_bytes())
+    _decir(f"Licencia guardada en {destino}")
 
 
 # ─── 3 · La configuración ────────────────────────────────────
@@ -149,17 +152,31 @@ def token_del_asistente() -> str:
 
 # ─── Principal ───────────────────────────────────────────────
 
-def configurar(correo: str, clave: str, dias: int | None = None,
-               idioma: str = "") -> int:
+def configurar(correo: str, licencia: str, idioma: str = "") -> int:
     _decir(f"Race Core Studio · configurando en {rutas.DATOS}")
     rutas.preparar()
 
-    lic = comprobar_licencia(correo, clave)
+    if comprobar_correo(correo) is None:
+        return 1
+
+    lic = comprobar_licencia(licencia)
     if lic is None:
         return 1
 
-    emitida = emitir_para_este_equipo(lic, dias)
-    escribir_env(emitida, idioma)
+    guardar_licencia(licencia)
+
+    # LICENSE_REQUIRED se queda en falso a propósito, y no es un olvido.
+    #
+    # Quien decide si el software opera es license_services, y ese todavía
+    # lee el formato anterior: un token JWT en licencia.lic. Ponerlo en
+    # verdadero ahora dejaría al cliente con una licencia válida en la
+    # mano y el programa bloqueado, porque el que vigila la puerta no
+    # sabe leerla.
+    #
+    # Se pone en verdadero cuando license_services lea .rcslic. Hasta
+    # entonces, la licencia se verifica aquí —el instalador no deja
+    # instalar sin una buena— pero no bloquea después.
+    escribir_env(False, idioma)
     token_del_asistente()
 
     _decir("Listo.")

@@ -40,9 +40,14 @@ ocultos += ["onnxruntime", "onnxruntime.capi", "onnxruntime.capi._pybind_state"]
 # igualmente, pero se declaran para que no dependa del orden de análisis.
 ocultos += collect_submodules("src")
 
-# Se importan solo al usarlos —configurar, o emitir la licencia— así que
-# el analizador no llega a verlos desde servidor.py.
-ocultos += ["configurar", "licencia_local", "emitir", "rutas", "config", "main"]
+# Se importan solo al usarlos —al configurar, o al verificar la licencia—
+# así que el analizador no llega a verlos desde servidor.py.
+#
+# Fuera licencia_local y emitir: con el .rcslic ya no se valida una clave
+# RCS1 ni se emite nada en el equipo del cliente. Siguen en installer/ y
+# tools/ para el instalador viejo y para las herramientas, pero dentro
+# del .exe no los usa nadie.
+ocultos += ["configurar", "rcslic", "rutas", "config", "main"]
 
 datos = [
     # La versión, que config.py lee del disco al arrancar.
