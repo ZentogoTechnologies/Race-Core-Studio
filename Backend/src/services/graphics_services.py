@@ -46,6 +46,10 @@ LAYERS = {
     "pilot": 50,
     "misc": 60,
     "results": 70,
+    # La barra inferior se queda puesta mientras pasan los demás gráficos,
+    # así que necesita capa propia: compartiéndola con cualquier otro, ese
+    # otro la tumbaría al salir.
+    "barra": 75,
 }
 
 
@@ -122,6 +126,11 @@ TEMPLATES: dict[str, Template] = {
         # Capa propia: el cuadro ocupa la pantalla y no debe compartir capa
         # con nada, ni tumbar los misceláneos al salir.
         Template("resultados", "Cuadro de Resultados", "results", 70, "html/70_results", accepts_data=True),
+
+        # ── 1-75 BARRA INFERIOR ──
+        # La clasificación desfilando al pie de pantalla. Se queda puesta
+        # toda la carrera, por eso va en su propia capa.
+        Template("barra-inferior", "Barra Inferior", "barra", 75, "html/90_bottom_bar", accepts_data=True),
     ]
 }
 

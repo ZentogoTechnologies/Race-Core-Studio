@@ -202,6 +202,10 @@
 
 .rotulo{
 
+    /* 19px es el techo que admite el Safety Car. Con su dibujo del coche
+       -56px- mas la separacion, el rotulo "SAFETY CAR" llega justo al
+       borde de la caja; un punto mas y se corta, porque el panel recorta
+       lo que sobra. */
     font-size:19px;
 
     font-weight:900;
@@ -213,4 +217,13 @@
     color:#141414;
 
     white-space:nowrap;
+}
+
+/* La bandera blanca si puede ir mas grande: va sola en la caja, sin
+   dibujo al lado, y "1 LAP" son cinco caracteres. Es ademas el rotulo
+   que mas importa que se lea de un vistazo, porque avisa de la ultima
+   vuelta. */
+.bandera-panel.blanca .rotulo{
+
+    font-size:24px;
 }

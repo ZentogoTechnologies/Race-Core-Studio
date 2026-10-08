@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Barra Inferior</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/barra_inferior.css">
+    <script src="../js/idioma_activo.js"></script>
+    <script src="../js/i18n.js"></script>
+</head>
+<body>
+
+<div class="bi-barra" id="barra">
+
+    <!-- Fija a la izquierda mientras el resto desfila: quien sintoniza a
+         mitad de vuelta tiene que saber de qué tanda son los tiempos que
+         están pasando. -->
+    <div class="bi-cabecera">
+        <img class="bi-logo" src="../img/logo-cliente.png" alt="Logo del cliente">
+        <div class="bi-titulo">
+            <span class="bi-grupo" id="grupo">STREET LEGAL</span>
+            <span class="bi-heat"  id="heat">HEAT 1</span>
+        </div>
+    </div>
+
+    <div class="bi-ventana" id="ventana">
+        <div class="bi-cinta" id="cinta"></div>
+    </div>
+
+</div>
+
+<script src="../js/timing.js"></script>
+<script src="../js/barra.js"></script>
+<script>
+
+/* ==========================================================================
+   BARRA INFERIOR
+
+   La clasificación de la tanda corriéndose hacia la izquierda, en bucle.
+   Es el gráfico que puede quedarse puesto toda la carrera: no tapa la
+   pista y mantiene informado a quien acaba de sintonizar.
+
+   Todo el comportamiento vive en js/barra.js. Aquí solo se declara con
+   qué valores arranca.
+========================================================================== */
+
+
+function play(){
+
+    arrancarBarra({
+        /* Treinta entran de sobra: la cinta no tiene el alto limitado de
+           la torre, y una vuelta completa a la clasificación es
+           justamente de lo que se trata. */
+        limite: 30,
+
+        /* Píxeles por segundo. A 90 se lee un nombre cómodo al pasar. */
+        velocidad: 90,
+
+        /* Cada cuánto se refrescan los tiempos. No hace falta más: una
+           fila tarda más de un minuto en cruzar la pantalla. */
+        cada: 3000,
+
+        /* La mejor vuelta de cada uno. Con "last" sale la última y con
+           "leader" la diferencia contra el primero. */
+        tiempo: "best",
+
+        marca: true,
+    });
+}
+
+
+function stop(){
+
+    detenerBarra();
+}
+
+
+function update(data){
+
+    actualizarBarra(data);
+}
+
+
+/* Fuera de CasparCG (abriendo el html a mano) no hay play(), así que se
+   arranca solo para poder verlo en el navegador. */
+if (!window.__casparcg) {
+    play();
+}
+
+</script>
+
+</body>
+</html>

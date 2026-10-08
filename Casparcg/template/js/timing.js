@@ -15,6 +15,7 @@
 
        arrancarTiming({
            limite: 10,
+           clase: "STREET LEGAL B",   // opcional: solo esa clase
            alRecibir: (datos) => { ... pintar ... }
        });
 ========================================================================== */
@@ -42,8 +43,12 @@ function timingUltimo() {
 }
 
 
-async function _pedir(limite) {
-    const url = TIMING_API + "/timing/current?limit=" + limite;
+/* Una sola clase de la tanda, o todas si va vacio. Lo pone el panel con
+   un UPDATE y lo resuelve el backend: renumera desde el uno y vuelve a
+   medir las diferencias dentro de la clase. */
+async function _pedir(limite, clase) {
+    let url = TIMING_API + "/timing/current?limit=" + limite;
+    if (clase) url += "&clase=" + encodeURIComponent(clase);
 
     const r = await fetch(url, { cache: "no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
@@ -63,6 +68,7 @@ async function _pedir(limite) {
 function arrancarTiming(opciones) {
     const limite = opciones.limite || 10;
     const cada = opciones.cada || TIMING_INTERVALO_MS;
+    const clase = opciones.clase || null;
 
     detenerTiming();
 
@@ -72,7 +78,7 @@ function arrancarTiming(opciones) {
         if (!vivo) return;
 
         try {
-            const datos = await _pedir(limite);
+            const datos = await _pedir(limite, clase);
             _timingUltimo = datos;
             if (opciones.alRecibir) opciones.alRecibir(datos);
         } catch (e) {

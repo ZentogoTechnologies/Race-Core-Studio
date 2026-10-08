@@ -11,6 +11,7 @@ import {
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
   Wrench, Droplets, Ban, Table2, Lock, Repeat, Tag, Swords, Watch,
+  GalleryHorizontalEnd, Layers,
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
@@ -145,6 +146,14 @@ const RESULTADOS = [
   { id: 'resultados', label: 'Cuadro de Resultados', nombre: 'Cuadro de Resultados',
     detalle: 'Tabla completa de la tanda con tiempos', Icon: Table2,
     icon: 'text-violet-400', border: 'border-violet-500', bgActive: 'bg-violet-500/10', dot: 'bg-violet-400' },
+]
+
+// La clasificación desfilando al pie de pantalla. Capa propia (75): se
+// queda puesta mientras los demás gráficos entran y salen por encima.
+const BARRAS = [
+  { id: 'barra-inferior', label: 'Barra Inferior', nombre: 'Barra Inferior',
+    detalle: 'La clasificación pasando por abajo, en bucle', Icon: GalleryHorizontalEnd,
+    icon: 'text-sky-400', border: 'border-sky-500', bgActive: 'bg-sky-500/10', dot: 'bg-sky-400' },
 ]
 
 const TOTEMS = [
@@ -488,6 +497,7 @@ const SECCIONES = {
   fichas:      { titulo: 'Fichas',          grupo: 'pilot',      capa: 50, items: FICHAS },
   miscelaneos: { titulo: 'Misceláneos',     grupo: 'misc',       capa: 60, items: MISCELANEOS },
   resultados:  { titulo: 'Resultados',      grupo: 'results',    capa: 70, items: RESULTADOS },
+  barras:      { titulo: 'Barra Inferior',  grupo: 'barra',      capa: 75, items: BARRAS },
 }
 
 // ─── Control de la tanda ───────────────────────────────
@@ -764,6 +774,7 @@ const TABS = [
     secciones: [
       SECCIONES.banderas,
       SECCIONES.totems,
+      SECCIONES.barras,
       SECCIONES.resultados,
     ],
   },
@@ -851,6 +862,14 @@ export default function GraficosModule() {
   const [comparar,      setComparar]      = useState(null)   // dorsal
   const [enPista,       setEnPista]       = useState([])
   const [listaAbierta,  setListaAbierta]  = useState(false)
+
+  /* Las clases que corren la tanda —"STREET LEGAL A", "B", "C"— salen
+     del propio cronometraje, no del catálogo de categorías: en pista
+     corre lo que corre, y ofrecer una clase que hoy no está sería
+     ofrecer un gráfico vacío. `clase` en null son todas. */
+  const [clases,        setClases]        = useState([])
+  const [clase,         setClase]         = useState(null)
+  const [clasesAbierto, setClasesAbierto] = useState(false)
   const { carrera, omitida, hayCarrera, limpiar } = useCarrera()
 
   const [activeTab, setActiveTab] = useState('general')
@@ -981,8 +1000,10 @@ export default function GraficosModule() {
             nombre: `${p.name} ${p.last_name}`.trim(),
             mejor: p.best_time,
           })))
+
+          setClases(d.clases || [])
         })
-        .catch(() => { if (vivo) { setRapido(null); setEnPista([]) } })
+        .catch(() => { if (vivo) { setRapido(null); setEnPista([]); setClases([]) } })
 
     mirar()
     const id = setInterval(mirar, 8000)
@@ -1148,6 +1169,55 @@ export default function GraficosModule() {
       () => updateGraphic(totem, { data: { comparar: dorsal } }),
       () => setComparar(dorsal))
   }
+
+  /* Deja el tótem y la barra mostrando una sola clase de la tanda, o
+     todas si llega null. Va por UPDATE a los dos a la vez: están
+     mirando la misma carrera y verlos discrepar en pantalla sería
+     desconcertante.
+
+     El filtrado y la renumeración los hace el backend; aquí solo se
+     dice cuál. */
+  const elegirClase = (valor) => {
+    const siguiente = valor || null
+
+    setClasesAbierto(false)
+
+    const destinos = [alAire.totem, alAire.barra].filter(Boolean)
+    if (!destinos.length) return setClase(siguiente)
+
+    ejecutar('clase',
+      () => Promise.all(
+        destinos.map(id => updateGraphic(id, { data: { clase: siguiente || '' } }))),
+      () => {
+        setClase(siguiente)
+        // Las franjas abiertas hablan de pilotos que pueden no estar en
+        // la clase nueva; la plantilla las cierra y el panel lo refleja.
+        setComparar(null)
+        setListaAbierta(false)
+      })
+  }
+
+  /* Un gráfico que sale al aire nace con la tanda entera. Si ya había
+     una clase elegida, se le pone en cuanto aparece: si no, el tótem
+     diría una cosa y la barra otra. */
+  useEffect(() => {
+    if (!clase) return
+
+    const destinos = [alAire.totem, alAire.barra].filter(Boolean)
+    if (!destinos.length) return
+
+    destinos.forEach(id => {
+      updateGraphic(id, { data: { clase } }).catch(() => {})
+    })
+  }, [alAire.totem, alAire.barra])   // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Una clase que deja de correr —cambió la tanda— no puede quedarse
+     elegida: el gráfico se quedaría vacío sin que nadie entienda por
+     qué. Se vuelve a la tanda entera. */
+  useEffect(() => {
+    if (!clase || !clases.length) return
+    if (!clases.some(c => c.id === clase)) elegirClase(null)
+  }, [clases])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sacar un tótem de aire deja las dos franjas cerradas; si no, al volver
   // a ponerlo los botones dirían "abierta" y estarían cerradas.
@@ -1416,6 +1486,72 @@ export default function GraficosModule() {
                   {t('Limpiar')}
                 </button>
               </div>
+
+              {/* El selector de clase sale en Tótems y en la Barra: los
+                  dos muestran la misma clasificación y se filtran igual.
+                  Solo aparece cuando la tanda trae más de una clase; con
+                  una sola no hay nada que elegir. */}
+              {(seccion.grupo === 'totem' || seccion.grupo === 'barra') && clases.length > 1 && (
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setClasesAbierto(a => !a)}
+                      disabled={(!alAire.totem && !alAire.barra) || ocupado}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-[11px] uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                        clase
+                          ? 'border-sky-400 bg-sky-400/15 text-sky-300'
+                          : 'border-neutral-700 text-neutral-300 hover:border-sky-400 hover:text-sky-300'
+                      }`}
+                    >
+                      {pendiente === 'clase'
+                        ? <Loader2 size={13} className="animate-spin" />
+                        : <Layers size={13} />}
+                      {clase || t('Toda la tanda')}
+                    </button>
+
+                    {clasesAbierto && (
+                      <div className="absolute z-30 mt-2 w-64 bg-[#141414] border border-neutral-700 rounded-lg shadow-xl overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => elegirClase(null)}
+                          className={`w-full flex items-center justify-between gap-3 px-3 py-2 text-left hover:bg-neutral-800 transition-colors ${
+                            !clase ? 'bg-neutral-800/60' : ''
+                          }`}
+                        >
+                          <span className="text-sm text-neutral-200">{t('Toda la tanda')}</span>
+                          <span className="text-[11px] font-bold text-neutral-500 font-mono">
+                            {clases.reduce((n, c) => n + c.pilotos, 0)}
+                          </span>
+                        </button>
+
+                        {clases.map(c => (
+                          <button
+                            key={c.id} type="button"
+                            onClick={() => elegirClase(c.id)}
+                            className={`w-full flex items-center justify-between gap-3 px-3 py-2 text-left hover:bg-neutral-800 transition-colors border-t border-neutral-800 ${
+                              clase === c.id ? 'bg-neutral-800/60' : ''
+                            }`}
+                          >
+                            <span className="flex-1 min-w-0 text-sm text-neutral-200 truncate uppercase">
+                              {c.nombre}
+                            </span>
+                            <span className="text-[11px] font-bold text-sky-400 font-mono">
+                              {c.pilotos}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <span className="text-[11px] text-neutral-500">
+                    {clase
+                      ? t('Numerados desde el uno dentro de su clase')
+                      : t('La tanda completa, con las clases mezcladas')}
+                  </span>
+                </div>
+              )}
 
               {/* Vuelta rápida: solo en Tótems, que es donde se abre. La
                   franja se despliega bajo la fila de quien la tiene, así
