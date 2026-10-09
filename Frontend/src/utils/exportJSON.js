@@ -34,7 +34,7 @@ export function exportToJSON(data, fileName, columnMap = null) {
 export function exportAllToJSON({ eventos, categorias, pilotos, vehiculos }) {
   const payload = {
     exportDate:    new Date().toISOString(),
-    softwareVersion: '1.0.0',
+    softwareVersion: '1.1.0',
     data: {
       eventos,
       categorias,

@@ -167,7 +167,7 @@ class Settings(BaseSettings):
 
     # Servidor de licencias de Zentogo: activación, renovación y
     # manifiestos de versión.
-    LICENSE_SERVER_URL: str = "https://licencias.zentogo.com"
+    LICENSE_SERVER_URL: str = "https://rcs.zentogotech.com"
 
     # ── Instalación ──────────────────────────────────────────
     # Versión del producto. Fuente única: la reportan /setup/estado y el

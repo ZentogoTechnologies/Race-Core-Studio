@@ -11,7 +11,7 @@ name: Instalador con interfaz
 
 on:
   push:
-    branches: [test-production-1.0, main]
+    branches: [test-production-1.0, test-production-1.1, main]
     paths:
       - 'installer/**'
       - 'launcher/**'
@@ -368,12 +368,17 @@ jobs:
           name: rcs-setup
           path: dist/rcs-setup.exe
 
+      # Cada rama de pruebas publica en su propia release, para que
+      # compilar la 1.1 no pise la descarga de la 1.0.
       - name: Publicar la descarga
-        if: github.ref == 'refs/heads/test-production-1.0'
+        if: github.ref == 'refs/heads/test-production-1.0' || github.ref == 'refs/heads/test-production-1.1'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: instalador
-          name: Race Core Studio — instalador
+          tag_name: ${{ github.ref == 'refs/heads/test-production-1.1' && 'instalador-1.1' || 'instalador' }}
+          name: ${{ github.ref == 'refs/heads/test-production-1.1' && 'Race Core Studio 1.1 — instalador' || 'Race Core Studio — instalador' }}
+          # Sin esto la etiqueta nueva se crearía sobre la rama por
+          # defecto (main), no sobre el código que se compiló.
+          target_commitish: ${{ github.sha }}
           body: |
             **rcs-setup.exe** — instalador de Race Core Studio.
 

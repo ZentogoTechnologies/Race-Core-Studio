@@ -10,25 +10,22 @@ programa lleva la clave pública (ver rcslic.LLAVERO). No sustituye al
 servidor: sirve para no gastar una llamada de red en un archivo que está
 roto o retocado, y para dar un error claro sin depender de internet.
 
-    ⚠ LO QUE FALTA. RUTA_ACTIVAR está vacía: el contrato del servidor
-      —qué ruta, qué cuerpo, qué respuesta— lo define quien lo escribió, y
-      no está en este repositorio. Mientras esté vacía, activar() devuelve
-      «sin configurar» y el instalador se detiene diciéndolo, en vez de
-      inventarse una llamada contra una ruta que a lo mejor no existe.
-      Todo lo de abajo —reintentos, tiempos de espera, el cuerpo, los
-      errores— ya está escrito alrededor de ese hueco.
+El otro lado es public/api/activar.php en rcs-licencias (el panel de
+rcs.zentogotech.com). Contesta 200 con {"ok": true, …} si la activa, y
+4xx con {"ok": false, "motivo": …, "mensaje": …} si no: el «mensaje» va
+escrito para el cliente y es lo que se le enseña tal cual.
 """
 
 from __future__ import annotations
 
 import json
+import platform
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
 
 # La ruta de activación, relativa al «servidor» que trae la licencia.
-# Ver el aviso de arriba.
-RUTA_ACTIVAR = ""
+RUTA_ACTIVAR = "api/activar.php"
 
 PRODUCTO = "race-core-studio"
 
@@ -63,6 +60,9 @@ def _cuerpo(sobre_crudo: str, lic, huella: str, version: str) -> bytes:
         "version": version,
         "codigo": lic.codigo,
         "equipo": huella,
+        # Solo para el registro de check-ins del panel: ayuda a reconocer
+        # la máquina cuando la misma licencia llega desde dos sitios.
+        "sistema": platform.platform(terse=True)[:80],
         "licencia": sobre_crudo,
     }, ensure_ascii=False).encode("utf-8")
 

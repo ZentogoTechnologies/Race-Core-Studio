@@ -46,8 +46,8 @@ ArchitecturesAllowed=x64compatible
 WizardStyle=modern
 WizardSizePercent=120
 SetupIconFile=..\..\launcher\race-core-studio.ico
-WizardImageFile=marca-lateral.bmp
-WizardSmallImageFile=marca-cabecera.bmp
+WizardImageFile=marca-lateral.bmp,marca-lateral@2x.bmp
+WizardSmallImageFile=marca-cabecera.bmp,marca-cabecera@2x.bmp
 
 ; El idioma, lo primero de todo. Ver la nota de [Languages].
 ShowLanguageDialog=yes
