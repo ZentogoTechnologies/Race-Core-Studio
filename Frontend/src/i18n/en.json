@@ -753,5 +753,9 @@
   "No hay pilotos registrados en esta disciplina.": "There are no drivers registered in this discipline.",
   "Sin carro registrado": "No car registered",
   "pilotos marcados": "drivers selected",
-  "piloto": "driver"
+  "piloto": "driver",
+  "Categoría en pantalla": "Category on screen",
+  "Todas las categorías": "All categories",
+  "Numerados desde el uno dentro de su categoría": "Numbered from one within their category",
+  "La tanda completa, con las categorías mezcladas": "The whole heat, with the categories mixed"
 }

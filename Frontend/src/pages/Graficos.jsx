@@ -11,7 +11,7 @@ import {
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
   Wrench, Droplets, Ban, Table2, Lock, Repeat, Tag, Swords, Watch,
-  GalleryHorizontalEnd, Layers,
+  GalleryHorizontalEnd, Layers, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
@@ -213,6 +213,126 @@ const GRAFICOS = [...BACKGROUNDS, ...BANDERAS, ...MISCELANEOS, ...TOTEMS, ...FIC
 
 // Misma grilla en las tres secciones para que las columnas queden alineadas.
 const GRID = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3'
+
+// ─── Categoría en pantalla ─────────────────────────────────
+// Con qué categoría de la tanda sale la clasificación. Aparece debajo
+// de los tótems y debajo de la barra inferior: los dos gráficos enseñan
+// la misma tabla y se filtran igual, y da lo mismo cuál de los dos
+// controles se toque porque los dos mandan a los dos.
+//
+// Las categorías salen del cronometraje en vivo, no del catálogo: la que
+// no está en pista no se ofrece. Con una sola no hay nada que elegir y
+// quien lo llama no lo monta.
+//
+// Se puede tocar sin nada al aire: elegida antes, el gráfico ya sale
+// filtrado en vez de salir con la tanda entera y corregirse a la vista
+// de todos.
+//
+// El desplegable es estado suyo y no de la página. Son dos copias en
+// pantalla, y con un solo interruptor compartido abrir una abría la
+// otra.
+function SelectorCategoria({ clases, clase, onElegir, pendiente, ocupado }) {
+  const [abierto, setAbierto] = useState(false)
+
+  const total  = clases.reduce((n, c) => n + c.pilotos, 0)
+  const cuenta = clase ? (clases.find(c => c.id === clase)?.pilotos ?? '') : total
+
+  const elegir = (valor) => { setAbierto(false); onElegir(valor) }
+
+  // Una fila del desplegable. La marca ocupa su hueco siempre, puesta o
+  // no: sin él los nombres bailan de sitio al cambiar de categoría.
+  const Opcion = ({ activa, nombre, pilotos, onClick, primera }) => (
+    <button
+      type="button" onClick={onClick}
+      className={`w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-neutral-800 transition-colors ${
+        primera ? '' : 'border-t border-neutral-800'
+      } ${activa ? 'bg-sky-400/10' : ''}`}
+    >
+      <span className="w-4 shrink-0">
+        {activa && <Check size={14} className="text-sky-400" />}
+      </span>
+      <span className={`flex-1 min-w-0 text-[13px] uppercase tracking-wide truncate ${
+        activa ? 'text-sky-200' : 'text-neutral-200'
+      }`}>
+        {nombre}
+      </span>
+      <span className={`shrink-0 text-xs font-mono ${activa ? 'text-sky-400' : 'text-neutral-500'}`}>
+        {pilotos}
+      </span>
+    </button>
+  )
+
+  return (
+    <div className="mt-4">
+      <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 mb-1.5">
+        {t('Categoría en pantalla')}
+      </p>
+
+      {/* En la misma rejilla que los gráficos y ocupando una celda: así
+          mide lo que un botón de tótem en cualquier ancho de pantalla, sin
+          medidas fijas que se rompan al estrechar la ventana. */}
+      <div className={GRID}>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setAbierto(a => !a)}
+            disabled={ocupado}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 bg-[#141414] border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              abierto ? 'rounded-t-lg' : 'rounded-lg'
+            } ${
+              clase
+                ? 'border-sky-400 bg-sky-400/10'
+                : 'border-neutral-700 hover:border-sky-400'
+            }`}
+          >
+            {pendiente
+              ? <Loader2 size={16} className="animate-spin text-sky-400 shrink-0" />
+              : <Layers size={16} className={`shrink-0 ${clase ? 'text-sky-400' : 'text-neutral-500'}`} />}
+
+            <span className={`flex-1 min-w-0 text-left text-[13px] font-bold uppercase tracking-wide truncate ${
+              clase ? 'text-sky-200' : 'text-neutral-50'
+            }`}>
+              {clase || t('Todas las categorías')}
+            </span>
+
+            {/* Cuántos pilotos trae lo elegido: avisa de una categoría que
+                se quedó con dos coches antes de sacarla al aire. */}
+            <span className="shrink-0 text-xs font-mono text-neutral-500">{cuenta}</span>
+
+            {abierto
+              ? <ChevronUp   size={16} className="shrink-0 text-sky-400" />
+              : <ChevronDown size={16} className="shrink-0 text-neutral-400" />}
+          </button>
+
+          {/* Pegado al canto de la barra, sin separación: se lee como que
+              sale de ella y no como un cuadro flotando. */}
+          {abierto && (
+            <div className="absolute left-0 right-0 z-30 bg-[#141414] border border-t-0 border-sky-400 rounded-b-lg shadow-xl overflow-hidden">
+              <Opcion
+                primera activa={!clase}
+                nombre={t('Todas las categorías')} pilotos={total}
+                onClick={() => elegir(null)}
+              />
+              {clases.map(c => (
+                <Opcion
+                  key={c.id} activa={clase === c.id}
+                  nombre={c.nombre} pilotos={c.pilotos}
+                  onClick={() => elegir(c.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <p className="text-[11px] text-neutral-500 mt-2">
+        {clase
+          ? t('Numerados desde el uno dentro de su categoría')
+          : t('La tanda completa, con las categorías mezcladas')}
+      </p>
+    </div>
+  )
+}
 
 // ─── Botón de gráfico ─────────────────────────────────────────
 function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClick }) {
@@ -869,7 +989,6 @@ export default function GraficosModule() {
      ofrecer un gráfico vacío. `clase` en null son todas. */
   const [clases,        setClases]        = useState([])
   const [clase,         setClase]         = useState(null)
-  const [clasesAbierto, setClasesAbierto] = useState(false)
   const { carrera, omitida, hayCarrera, limpiar } = useCarrera()
 
   const [activeTab, setActiveTab] = useState('general')
@@ -1180,8 +1299,6 @@ export default function GraficosModule() {
   const elegirClase = (valor) => {
     const siguiente = valor || null
 
-    setClasesAbierto(false)
-
     const destinos = [alAire.totem, alAire.barra].filter(Boolean)
     if (!destinos.length) return setClase(siguiente)
 
@@ -1487,72 +1604,6 @@ export default function GraficosModule() {
                 </button>
               </div>
 
-              {/* El selector de clase sale en Tótems y en la Barra: los
-                  dos muestran la misma clasificación y se filtran igual.
-                  Solo aparece cuando la tanda trae más de una clase; con
-                  una sola no hay nada que elegir. */}
-              {(seccion.grupo === 'totem' || seccion.grupo === 'barra') && clases.length > 1 && (
-                <div className="flex items-center gap-3 mb-3 flex-wrap">
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setClasesAbierto(a => !a)}
-                      disabled={(!alAire.totem && !alAire.barra) || ocupado}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-bold text-[11px] uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
-                        clase
-                          ? 'border-sky-400 bg-sky-400/15 text-sky-300'
-                          : 'border-neutral-700 text-neutral-300 hover:border-sky-400 hover:text-sky-300'
-                      }`}
-                    >
-                      {pendiente === 'clase'
-                        ? <Loader2 size={13} className="animate-spin" />
-                        : <Layers size={13} />}
-                      {clase || t('Toda la tanda')}
-                    </button>
-
-                    {clasesAbierto && (
-                      <div className="absolute z-30 mt-2 w-64 bg-[#141414] border border-neutral-700 rounded-lg shadow-xl overflow-hidden">
-                        <button
-                          type="button"
-                          onClick={() => elegirClase(null)}
-                          className={`w-full flex items-center justify-between gap-3 px-3 py-2 text-left hover:bg-neutral-800 transition-colors ${
-                            !clase ? 'bg-neutral-800/60' : ''
-                          }`}
-                        >
-                          <span className="text-sm text-neutral-200">{t('Toda la tanda')}</span>
-                          <span className="text-[11px] font-bold text-neutral-500 font-mono">
-                            {clases.reduce((n, c) => n + c.pilotos, 0)}
-                          </span>
-                        </button>
-
-                        {clases.map(c => (
-                          <button
-                            key={c.id} type="button"
-                            onClick={() => elegirClase(c.id)}
-                            className={`w-full flex items-center justify-between gap-3 px-3 py-2 text-left hover:bg-neutral-800 transition-colors border-t border-neutral-800 ${
-                              clase === c.id ? 'bg-neutral-800/60' : ''
-                            }`}
-                          >
-                            <span className="flex-1 min-w-0 text-sm text-neutral-200 truncate uppercase">
-                              {c.nombre}
-                            </span>
-                            <span className="text-[11px] font-bold text-sky-400 font-mono">
-                              {c.pilotos}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <span className="text-[11px] text-neutral-500">
-                    {clase
-                      ? t('Numerados desde el uno dentro de su clase')
-                      : t('La tanda completa, con las clases mezcladas')}
-                  </span>
-                </div>
-              )}
-
               {/* Vuelta rápida: solo en Tótems, que es donde se abre. La
                   franja se despliega bajo la fila de quien la tiene, así
                   que sin ese piloto a la vista no hay dónde ponerla y el
@@ -1667,6 +1718,19 @@ export default function GraficosModule() {
                   />
                 ))}
               </div>
+
+              {/* El selector de categoría. Sale en los dos sitios porque
+                  los dos gráficos se filtran igual, y cada copia lleva su
+                  propio desplegable: abrir uno no abre el otro. */}
+              {(seccion.grupo === 'totem' || seccion.grupo === 'barra') && clases.length > 1 && (
+                <SelectorCategoria
+                  clases={clases}
+                  clase={clase}
+                  onElegir={elegirClase}
+                  pendiente={pendiente === 'clase'}
+                  ocupado={ocupado}
+                />
+              )}
             </div>
           )
         })}
