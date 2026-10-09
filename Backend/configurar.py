@@ -33,8 +33,15 @@ Lo que ya existe y sigue valiendo, se respeta.
 import json
 import secrets
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import rutas
+
+# Solo para la anotación de comprobar_licencia. En ejecución rcslic se
+# importa dentro de cada función, y sin esto pyflakes ve un nombre
+# indefinido y CI se niega a publicar.
+if TYPE_CHECKING:
+    import rcslic
 
 
 def _decir(texto: str = "") -> None:
