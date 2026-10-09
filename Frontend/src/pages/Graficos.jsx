@@ -11,6 +11,7 @@ import {
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
   Wrench, Droplets, Ban, Table2, Lock, Repeat, Tag, Swords, Watch,
+  GalleryHorizontalEnd, Layers, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
@@ -147,6 +148,14 @@ const RESULTADOS = [
     icon: 'text-violet-400', border: 'border-violet-500', bgActive: 'bg-violet-500/10', dot: 'bg-violet-400' },
 ]
 
+// La clasificación desfilando al pie de pantalla. Capa propia (75): se
+// queda puesta mientras los demás gráficos entran y salen por encima.
+const BARRAS = [
+  { id: 'barra-inferior', label: 'Barra Inferior', nombre: 'Barra Inferior',
+    detalle: 'La clasificación pasando por abajo, en bucle', Icon: GalleryHorizontalEnd,
+    icon: 'text-sky-400', border: 'border-sky-500', bgActive: 'bg-sky-500/10', dot: 'bg-sky-400' },
+]
+
 const TOTEMS = [
   { id: 'totem-completo',  label: 'Tótem Completo',  nombre: 'Tótem Nombre Completo',
     detalle: 'Clasificación con el nombre completo',                  Icon: ListOrdered, ...ROJO },
@@ -204,6 +213,126 @@ const GRAFICOS = [...BACKGROUNDS, ...BANDERAS, ...MISCELANEOS, ...TOTEMS, ...FIC
 
 // Misma grilla en las tres secciones para que las columnas queden alineadas.
 const GRID = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3'
+
+// ─── Categoría en pantalla ─────────────────────────────────
+// Con qué categoría de la tanda sale la clasificación. Aparece debajo
+// de los tótems y debajo de la barra inferior: los dos gráficos enseñan
+// la misma tabla y se filtran igual, y da lo mismo cuál de los dos
+// controles se toque porque los dos mandan a los dos.
+//
+// Las categorías salen del cronometraje en vivo, no del catálogo: la que
+// no está en pista no se ofrece. Con una sola no hay nada que elegir y
+// quien lo llama no lo monta.
+//
+// Se puede tocar sin nada al aire: elegida antes, el gráfico ya sale
+// filtrado en vez de salir con la tanda entera y corregirse a la vista
+// de todos.
+//
+// El desplegable es estado suyo y no de la página. Son dos copias en
+// pantalla, y con un solo interruptor compartido abrir una abría la
+// otra.
+function SelectorCategoria({ clases, clase, onElegir, pendiente, ocupado }) {
+  const [abierto, setAbierto] = useState(false)
+
+  const total  = clases.reduce((n, c) => n + c.pilotos, 0)
+  const cuenta = clase ? (clases.find(c => c.id === clase)?.pilotos ?? '') : total
+
+  const elegir = (valor) => { setAbierto(false); onElegir(valor) }
+
+  // Una fila del desplegable. La marca ocupa su hueco siempre, puesta o
+  // no: sin él los nombres bailan de sitio al cambiar de categoría.
+  const Opcion = ({ activa, nombre, pilotos, onClick, primera }) => (
+    <button
+      type="button" onClick={onClick}
+      className={`w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-neutral-800 transition-colors ${
+        primera ? '' : 'border-t border-neutral-800'
+      } ${activa ? 'bg-sky-400/10' : ''}`}
+    >
+      <span className="w-4 shrink-0">
+        {activa && <Check size={14} className="text-sky-400" />}
+      </span>
+      <span className={`flex-1 min-w-0 text-[13px] uppercase tracking-wide truncate ${
+        activa ? 'text-sky-200' : 'text-neutral-200'
+      }`}>
+        {nombre}
+      </span>
+      <span className={`shrink-0 text-xs font-mono ${activa ? 'text-sky-400' : 'text-neutral-500'}`}>
+        {pilotos}
+      </span>
+    </button>
+  )
+
+  return (
+    <div className="mt-4">
+      <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-500 mb-1.5">
+        {t('Categoría en pantalla')}
+      </p>
+
+      {/* En la misma rejilla que los gráficos y ocupando una celda: así
+          mide lo que un botón de tótem en cualquier ancho de pantalla, sin
+          medidas fijas que se rompan al estrechar la ventana. */}
+      <div className={GRID}>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setAbierto(a => !a)}
+            disabled={ocupado}
+            className={`w-full flex items-center gap-2.5 px-3 py-2.5 bg-[#141414] border transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              abierto ? 'rounded-t-lg' : 'rounded-lg'
+            } ${
+              clase
+                ? 'border-sky-400 bg-sky-400/10'
+                : 'border-neutral-700 hover:border-sky-400'
+            }`}
+          >
+            {pendiente
+              ? <Loader2 size={16} className="animate-spin text-sky-400 shrink-0" />
+              : <Layers size={16} className={`shrink-0 ${clase ? 'text-sky-400' : 'text-neutral-500'}`} />}
+
+            <span className={`flex-1 min-w-0 text-left text-[13px] font-bold uppercase tracking-wide truncate ${
+              clase ? 'text-sky-200' : 'text-neutral-50'
+            }`}>
+              {clase || t('Todas las categorías')}
+            </span>
+
+            {/* Cuántos pilotos trae lo elegido: avisa de una categoría que
+                se quedó con dos coches antes de sacarla al aire. */}
+            <span className="shrink-0 text-xs font-mono text-neutral-500">{cuenta}</span>
+
+            {abierto
+              ? <ChevronUp   size={16} className="shrink-0 text-sky-400" />
+              : <ChevronDown size={16} className="shrink-0 text-neutral-400" />}
+          </button>
+
+          {/* Pegado al canto de la barra, sin separación: se lee como que
+              sale de ella y no como un cuadro flotando. */}
+          {abierto && (
+            <div className="absolute left-0 right-0 z-30 bg-[#141414] border border-t-0 border-sky-400 rounded-b-lg shadow-xl overflow-hidden">
+              <Opcion
+                primera activa={!clase}
+                nombre={t('Todas las categorías')} pilotos={total}
+                onClick={() => elegir(null)}
+              />
+              {clases.map(c => (
+                <Opcion
+                  key={c.id} activa={clase === c.id}
+                  nombre={c.nombre} pilotos={c.pilotos}
+                  onClick={() => elegir(c.id)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <p className="text-[11px] text-neutral-500 mt-2">
+        {clase
+          ? t('Numerados desde el uno dentro de su categoría')
+          : t('La tanda completa, con las categorías mezcladas')}
+      </p>
+    </div>
+  )
+}
 
 // ─── Botón de gráfico ─────────────────────────────────────────
 function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClick }) {
@@ -488,6 +617,7 @@ const SECCIONES = {
   fichas:      { titulo: 'Fichas',          grupo: 'pilot',      capa: 50, items: FICHAS },
   miscelaneos: { titulo: 'Misceláneos',     grupo: 'misc',       capa: 60, items: MISCELANEOS },
   resultados:  { titulo: 'Resultados',      grupo: 'results',    capa: 70, items: RESULTADOS },
+  barras:      { titulo: 'Barra Inferior',  grupo: 'barra',      capa: 75, items: BARRAS },
 }
 
 // ─── Control de la tanda ───────────────────────────────
@@ -764,6 +894,7 @@ const TABS = [
     secciones: [
       SECCIONES.banderas,
       SECCIONES.totems,
+      SECCIONES.barras,
       SECCIONES.resultados,
     ],
   },
@@ -851,6 +982,13 @@ export default function GraficosModule() {
   const [comparar,      setComparar]      = useState(null)   // dorsal
   const [enPista,       setEnPista]       = useState([])
   const [listaAbierta,  setListaAbierta]  = useState(false)
+
+  /* Las clases que corren la tanda —"STREET LEGAL A", "B", "C"— salen
+     del propio cronometraje, no del catálogo de categorías: en pista
+     corre lo que corre, y ofrecer una clase que hoy no está sería
+     ofrecer un gráfico vacío. `clase` en null son todas. */
+  const [clases,        setClases]        = useState([])
+  const [clase,         setClase]         = useState(null)
   const { carrera, omitida, hayCarrera, limpiar } = useCarrera()
 
   const [activeTab, setActiveTab] = useState('general')
@@ -981,8 +1119,10 @@ export default function GraficosModule() {
             nombre: `${p.name} ${p.last_name}`.trim(),
             mejor: p.best_time,
           })))
+
+          setClases(d.clases || [])
         })
-        .catch(() => { if (vivo) { setRapido(null); setEnPista([]) } })
+        .catch(() => { if (vivo) { setRapido(null); setEnPista([]); setClases([]) } })
 
     mirar()
     const id = setInterval(mirar, 8000)
@@ -1148,6 +1288,53 @@ export default function GraficosModule() {
       () => updateGraphic(totem, { data: { comparar: dorsal } }),
       () => setComparar(dorsal))
   }
+
+  /* Deja el tótem y la barra mostrando una sola clase de la tanda, o
+     todas si llega null. Va por UPDATE a los dos a la vez: están
+     mirando la misma carrera y verlos discrepar en pantalla sería
+     desconcertante.
+
+     El filtrado y la renumeración los hace el backend; aquí solo se
+     dice cuál. */
+  const elegirClase = (valor) => {
+    const siguiente = valor || null
+
+    const destinos = [alAire.totem, alAire.barra].filter(Boolean)
+    if (!destinos.length) return setClase(siguiente)
+
+    ejecutar('clase',
+      () => Promise.all(
+        destinos.map(id => updateGraphic(id, { data: { clase: siguiente || '' } }))),
+      () => {
+        setClase(siguiente)
+        // Las franjas abiertas hablan de pilotos que pueden no estar en
+        // la clase nueva; la plantilla las cierra y el panel lo refleja.
+        setComparar(null)
+        setListaAbierta(false)
+      })
+  }
+
+  /* Un gráfico que sale al aire nace con la tanda entera. Si ya había
+     una clase elegida, se le pone en cuanto aparece: si no, el tótem
+     diría una cosa y la barra otra. */
+  useEffect(() => {
+    if (!clase) return
+
+    const destinos = [alAire.totem, alAire.barra].filter(Boolean)
+    if (!destinos.length) return
+
+    destinos.forEach(id => {
+      updateGraphic(id, { data: { clase } }).catch(() => {})
+    })
+  }, [alAire.totem, alAire.barra])   // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Una clase que deja de correr —cambió la tanda— no puede quedarse
+     elegida: el gráfico se quedaría vacío sin que nadie entienda por
+     qué. Se vuelve a la tanda entera. */
+  useEffect(() => {
+    if (!clase || !clases.length) return
+    if (!clases.some(c => c.id === clase)) elegirClase(null)
+  }, [clases])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sacar un tótem de aire deja las dos franjas cerradas; si no, al volver
   // a ponerlo los botones dirían "abierta" y estarían cerradas.
@@ -1531,6 +1718,19 @@ export default function GraficosModule() {
                   />
                 ))}
               </div>
+
+              {/* El selector de categoría. Sale en los dos sitios porque
+                  los dos gráficos se filtran igual, y cada copia lleva su
+                  propio desplegable: abrir uno no abre el otro. */}
+              {(seccion.grupo === 'totem' || seccion.grupo === 'barra') && clases.length > 1 && (
+                <SelectorCategoria
+                  clases={clases}
+                  clase={clase}
+                  onElegir={elegirClase}
+                  pendiente={pendiente === 'clase'}
+                  ocupado={ocupado}
+                />
+              )}
             </div>
           )
         })}

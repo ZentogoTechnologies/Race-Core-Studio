@@ -52,6 +52,11 @@ let torreConfig = {
     // Dorsal de un segundo piloto del que también se abre su franja, en
     // verde. Sirve para comparar dos tiempos en pantalla a la vez.
     comparar: null,
+
+    /* Una sola clase de la tanda —"STREET LEGAL B"— en vez de la tanda
+       entera. Vacío son todas, que es como nace. El filtrado y la
+       renumeración los hace el backend; aquí solo se le pide. */
+    clase: null,
 };
 
 let torreCuerpo = null;
@@ -649,7 +654,11 @@ function arrancarTorre(opciones){
     /* Sin logo la fila cambia de reparto, y eso lo decide el CSS. */
     if (!torreConfig.marca) torreElemento.classList.add("sin-marca");
 
-    arrancarTiming({ limite: torreConfig.limite, alRecibir: torrePintar });
+    arrancarTiming({
+        limite: torreConfig.limite,
+        clase: torreConfig.clase,
+        alRecibir: torrePintar,
+    });
 
     /* La entrada empieza al salir al aire y no al llegar los datos: el
        logo y la cabecera no dependen del cronometraje, y hacerlos esperar
@@ -769,7 +778,32 @@ function actualizarTorre(data){
         if (d.limite) {
             torreConfig.limite = parseInt(d.limite, 10) || torreConfig.limite;
             torreFirma = null;          // fuerza el repintado
-            arrancarTiming({ limite: torreConfig.limite, alRecibir: torrePintar });
+            arrancarTiming({
+                limite: torreConfig.limite,
+                clase: torreConfig.clase,
+                alRecibir: torrePintar,
+            });
+        }
+
+        /* Cambiar de clase con el totem al aire. Llega "" o null para
+           volver a la tanda entera. Se vuelve a pedir al backend porque
+           es el que renumera y recalcula las diferencias; filtrar aqui
+           dejaria los puestos de la tanda y las diferencias contra un
+           lider que no esta en pantalla. */
+        if (d.clase !== undefined) {
+            torreConfig.clase = d.clase || null;
+
+            /* Las franjas abiertas hablan de pilotos que pueden no estar
+               en la clase nueva. Se cierran al cambiar. */
+            torreConfig.comparar = null;
+            torreEsconderCrono();
+
+            torreFirma = null;
+            arrancarTiming({
+                limite: torreConfig.limite,
+                clase: torreConfig.clase,
+                alRecibir: torrePintar,
+            });
         }
     } catch (e) {
         /* Un UPDATE con basura no puede tumbar el gráfico al aire. */

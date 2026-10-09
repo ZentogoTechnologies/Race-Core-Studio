@@ -62,6 +62,11 @@ OPERADOR = [Depends(usuario_actual)]
 @timing.get("/current", tags=["Timing"])
 async def current(
     limit: int = Query(10, ge=1, le=50, description="Cuántas posiciones devolver"),
+    clase: str | None = Query(
+        None,
+        description="Deja solo una clase de la tanda, renumerada desde el uno "
+                    "(por ejemplo 'STREET LEGAL B'). Sin valor, la tanda entera.",
+    ),
 ):
     """
     Clasificación en vivo desde el current.xml de MyLaps.
@@ -71,7 +76,7 @@ async def current(
     carrera se quedaría congelado.
     """
     try:
-        datos = await obtener_clasificacion(limite=limit)
+        datos = await obtener_clasificacion(limite=limit, clase=clase)
 
     except FileNotFoundError:
         raise HTTPException(

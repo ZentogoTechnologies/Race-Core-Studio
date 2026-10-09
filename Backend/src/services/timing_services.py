@@ -571,37 +571,172 @@ def _reencuadrar_diferencias(standings: list[dict]) -> None:
             anterior = actual
 
 
-async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> dict:
+def _clases_presentes(standings: list[dict]) -> list[dict]:
+    """Las clases que de verdad vienen en la tanda, por orden de carrera.
+
+    Se sacan de las filas y no del catálogo de categorías: en pista
+    corre lo que corre, y ofrecer en el panel una clase que hoy no está
+    en pista sería ofrecer un tótem vacío.
+    """
+    vistas: dict[str, dict] = {}
+
+    for fila in standings:
+        clave = fila.get("class") or ""
+        if not clave:
+            continue
+        if clave not in vistas:
+            vistas[clave] = {
+                "id": clave,
+                "nombre": fila.get("class_name") or clave,
+                "pilotos": 0,
+            }
+        vistas[clave]["pilotos"] += 1
+
+    # El orden es el de aparición, que al venir ordenadas por posición
+    # deja primero la clase del que va liderando la tanda.
+    return list(vistas.values())
+
+
+def _mejor_vuelta_de(standings: list[dict]) -> str:
+    """El dorsal de la vuelta más rápida de esas filas.
+
+    Hace falta al mirar una sola clase: la vuelta rápida de la tanda
+    suele ser de otra, y dejar el recuadro morado señalando a alguien
+    que no está en pantalla no dice nada.
+    """
+    mejor_dorsal, mejor_valor = "", None
+
+    for fila in standings:
+        segundos = _segundos((fila.get("best_time") or "").strip())
+        if segundos is None:
+            continue
+        if mejor_valor is None or segundos < mejor_valor:
+            mejor_dorsal, mejor_valor = fila["number"], segundos
+
+    return mejor_dorsal
+
+
+def _diferencias_de_clase(filas: list[dict]) -> None:
+    """Arregla la columna de diferencias cuando la clase entera va doblada.
+
+    Visto en la Street Legal C de un Heat 3: las siete iban una vuelta por
+    debajo del líder de la tanda, así que MyLaps le ponía "1 Lap" a todas.
+    Al mirar solo esa clase, el que la lidera salía con "1 Lap" contra sí
+    mismo, como si fuera una vuelta por detrás de él mismo.
+
+    `_reencuadrar_diferencias` no puede con este caso: su referencia es el
+    primero, y de un doblado no sabe cuántos segundos son. Aquí se le
+    borra la diferencia al primero —él manda en su clase— y a los demás
+    se les reconstruye sumando los intervalos entre ellos, que sí vienen
+    en segundos y son los de esta misma lista.
+    """
+    if not filas:
+        return
+
+    primero = (filas[0].get("leader") or "").strip()
+    if primero and _segundos(primero) is not None:
+        return  # la referencia era buena; no hay nada que arreglar
+
+    filas[0]["leader"] = ""
+    filas[0]["interval"] = ""
+
+    acumulado = 0.0
+    for fila in filas[1:]:
+        hueco = _segundos((fila.get("interval") or "").strip())
+        if hueco is None:
+            # Un intervalo que tampoco se entiende corta la cadena: de
+            # aquí para abajo se deja lo que mandara MyLaps antes que
+            # inventar una diferencia.
+            return
+        acumulado += hueco
+        fila["leader"] = _como_tiempo(acumulado)
+
+
+def _recortar(datos: dict, limite: int, clase: str | None) -> dict:
+    """Deja la clasificación como la pide quien pregunta.
+
+    La caché guarda la tanda entera y sin tocar; aquí se saca la vista
+    que toca. Las filas se copian antes de cambiarles nada: la misma
+    tanda cacheada la piden a la vez el tótem general y el de una clase,
+    y si se mutaran se pisarían las diferencias entre ellos.
+    """
+    filas = datos["standings"]
+
+    if clase:
+        buscada = _normalizar(clase)
+        filas = [f for f in filas if _normalizar(f.get("class") or "") == buscada]
+
+    filas = [dict(f) for f in filas]
+
+    if clase:
+        # Dentro de su clase manda el puesto en clase. MyLaps ya lo trae
+        # calculado; si faltara, se renumera por el orden que traen.
+        for i, fila in enumerate(filas, start=1):
+            fila["position"] = fila.get("position_in_class") or i
+        filas.sort(key=lambda f: f["position"])
+
+        # Las diferencias vuelven a medirse contra el primero de la
+        # clase, que es de quien habla la cabecera.
+        _reencuadrar_diferencias(filas)
+        _diferencias_de_clase(filas)
+
+        dorsal_rapido = _mejor_vuelta_de(filas)
+        for fila in filas:
+            fila["is_best_lap"] = bool(dorsal_rapido) and fila["number"] == dorsal_rapido
+
+    salida = {**datos, "standings": filas[:limite], "limite": limite}
+
+    if clase and filas:
+        # La cabecera pasa a decir la clase: si el tótem enseña nueve
+        # carros numerados del uno al nueve, poner encima el nombre de la
+        # tanda entera confunde más que ayuda.
+        salida["class"] = filas[0].get("class") or clase
+        salida["group_name"] = filas[0].get("class_name") or clase
+    elif clase:
+        salida["class"] = clase
+
+    return salida
+
+
+async def obtener_clasificacion(
+    limite: int = 10,
+    ruta: str | None = None,
+    clase: str | None = None,
+) -> dict:
     """
     Clasificación lista para las plantillas, con los nombres de la base.
 
     `limite` recorta a los primeros N por posición, que es lo que cabe en
-    el tótem.
+    el tótem. `clase` deja solo una de las clases que corren la tanda
+    —"STREET LEGAL B"— renumerada desde el uno y con las diferencias
+    medidas dentro de ella.
     """
     ahora = time.time()
     cacheado = _cache["datos"]
 
     if cacheado and ahora - _cache["momento"] < settings.TIMING_CACHE_SECONDS:
-        if cacheado["limite"] >= limite:
-            # El reloj se recalcula siempre: la caché es para no releer el
-            # archivo de red, no para congelar la cuenta atrás.
-            reloj = reloj_estado()
-            manual = _reloj["manual"]
-            tiempo = (reloj["texto"] if manual
-                      else cacheado["race_time"] or cacheado["time_to_go"])
-            return {**cacheado,
-                    "standings": cacheado["standings"][:limite],
-                    "time": tiempo,
-                    "time_label": reloj["etiqueta"],
-                    "timer": reloj}
+        # El reloj se recalcula siempre: la caché es para no releer el
+        # archivo de red, no para congelar la cuenta atrás.
+        reloj = reloj_estado()
+        manual = _reloj["manual"]
+        tiempo = (reloj["texto"] if manual
+                  else cacheado["race_time"] or cacheado["time_to_go"])
+        return {**_recortar(cacheado, limite, clase),
+                "time": tiempo,
+                "time_label": reloj["etiqueta"],
+                "timer": reloj}
 
     crudo = leer_xml(ruta)
     labels = crudo["labels"]
 
+    # Todas, sin recortar. El recorte se hace al final, después de
+    # filtrar por clase: en una tanda con tres clases, los ocho de la
+    # Street Legal C pueden estar todos más allá del puesto 20, y
+    # cortando aquí no quedaría ninguno que mostrar.
     filas = sorted(
         crudo["filas"],
         key=lambda f: int(f.get("position") or 9999),
-    )[:limite]
+    )
 
     categorias = await _mapa_categorias()
     cat_tanda = _resolver_categoria(labels.get("groupname", ""), categorias)
@@ -645,8 +780,16 @@ async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> di
         if not apellido:
             nombre, apellido = _del_xml(f.get("fullname") or f.get("firstname") or "")
 
+        # La clase tal como la escribe MyLaps —"STREET LEGAL A"— y el
+        # puesto dentro de ella, que MyLaps ya calcula. En una tanda de
+        # una sola clase los dos valores coinciden con los generales.
+        clase_cruda = (f.get("class") or "").strip()
+
         standings.append({
             "position": int(f.get("position") or 0),
+            "class": clase_cruda,
+            "class_name": _sin_prefijo(clase_cruda),
+            "position_in_class": int(f.get("positioninclass") or 0),
             "number": numero,
             "pilot_id": pilot_id,
             "name": nombre,
@@ -721,12 +864,18 @@ async def obtener_clasificacion(limite: int = 10, ruta: str | None = None) -> di
         "best_lap_by": labels.get("bestlapby", ""),
         "best_lap_time": labels.get("bestlaptime", ""),
         "standings": standings,
-        "limite": limite,
+        # Qué clases corren la tanda. El panel las ofrece para el tótem
+        # por categoría, y la plantilla las ignora.
+        "clases": _clases_presentes(standings),
+        "limite": len(standings),
     }
 
+    # Se cachea la tanda entera y sin recortar: así el mismo archivo
+    # sirve para el tótem general y para el de cada clase sin volver a
+    # leer la red ni a cruzar los dorsales contra la base.
     _cache["datos"] = datos
     _cache["momento"] = ahora
-    return datos
+    return _recortar(datos, limite, clase)
 
 
 async def carros_en_pista(ruta: str | None = None) -> list[dict]:

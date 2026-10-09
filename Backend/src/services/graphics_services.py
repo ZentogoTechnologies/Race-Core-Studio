@@ -48,6 +48,10 @@ LAYERS = {
     "pilot": 50,
     "misc": 60,
     "results": 70,
+    # La barra inferior se queda puesta mientras pasan los demás gráficos,
+    # así que necesita capa propia: compartiéndola con cualquier otro, ese
+    # otro la tumbaría al salir.
+    "barra": 75,
 }
 
 
@@ -124,6 +128,11 @@ TEMPLATES: dict[str, Template] = {
         # Capa propia: el cuadro ocupa la pantalla y no debe compartir capa
         # con nada, ni tumbar los misceláneos al salir.
         Template("resultados", "Cuadro de Resultados", "results", 70, "html/70_results", accepts_data=True),
+
+        # ── 1-75 BARRA INFERIOR ──
+        # La clasificación desfilando al pie de pantalla. Se queda puesta
+        # toda la carrera, por eso va en su propia capa.
+        Template("barra-inferior", "Barra Inferior", "barra", 75, "html/90_bottom_bar", accepts_data=True),
     ]
 }
 
@@ -187,7 +196,11 @@ def _buscar(carpeta: Path, nombre: str) -> Path | None:
     return None
 
 
-def pilot_photo_url(pilot_id: int, photo: str | None = None) -> str:
+def pilot_photo_url(
+    pilot_id: int,
+    photo: str | None = None,
+    reserva: bool = True,
+) -> str:
     """
     Foto del piloto.
 
@@ -195,6 +208,12 @@ def pilot_photo_url(pilot_id: int, photo: str | None = None) -> str:
     public/ y permite cualquier nombre de archivo. Si está vacío se busca
     <pilot_id>.<ext> en cualquier subcarpeta de pilotos/, así la
     organización por categorías es libre.
+
+    Con `reserva=False` no se devuelve la silueta: sale cadena vacía y es
+    la plantilla la que decide qué poner en el hueco. Lo usa la grilla,
+    que a la silueta le baja la opacidad; si la mandara el backend, el
+    piloto registrado sin foto saldría a plena tinta y el que no se pudo
+    emparejar difuminado, uno al lado del otro.
     """
     if photo:
         archivo = PUBLIC_DIR / photo.lstrip("/")
@@ -209,8 +228,11 @@ def pilot_photo_url(pilot_id: int, photo: str | None = None) -> str:
                 return _url(hallado)
 
     # Transparente: mejor un hueco vacío que la foto del piloto anterior.
-    reserva = _buscar(raiz, "_sin-foto")
-    return _url(reserva) if reserva else ""
+    if not reserva:
+        return ""
+
+    silueta = _buscar(raiz, "_sin-foto")
+    return _url(silueta) if silueta else ""
 
 
 def event_image_url(archivo: str | None) -> str:
@@ -505,7 +527,7 @@ async def build_grid_payload(limite: int = 30, event_id: int | None = None) -> d
             # tiempo de clasificación con el que se ganó el sitio. Se
             # mandan en el mismo payload porque las dos salen de la misma
             # tanda y no compensa un armador aparte para dos campos.
-            "photo": (pilot_photo_url(fila["pilot_id"])
+            "photo": (pilot_photo_url(fila["pilot_id"], reserva=False)
                       if fila.get("pilot_id") else ""),
             "best_time": fila.get("best_time", ""),
         }

@@ -66,5 +66,8 @@ window.TEXTOS = {
         "ganador": "Ganador",
         "ronda": "Ronda",
         "dragwar": "Drag War"
+    },
+    "barra": {
+        "sin_datos": "Esperando cronometraje"
     }
 };

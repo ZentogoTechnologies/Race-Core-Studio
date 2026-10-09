@@ -1,0 +1,240 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   BARRA INFERIOR
+
+   Franja al pie de pantalla con la clasificación de la tanda corriéndose
+   hacia la izquierda, sin parar. Es el gráfico que puede quedarse puesto
+   toda la carrera: no tapa la pista, y quien sintoniza tarde ve en qué
+   va la cosa sin esperar a que saquen el tótem.
+
+   Fondo translúcido por el mismo motivo que la torre: el video va en otra
+   capa de CasparCG, así que backdrop-filter no tiene nada que desenfocar.
+   Lo único que funciona es bajar el alfa y dejar que la carrera asome.
+========================================================================== */
+
+:root{
+    --bi-alto:       72px;
+    --bi-panel:      rgba(6, 8, 11, .80);
+    --bi-cabecera:   rgba(0, 0, 0, .88);
+    --bi-separador:  rgba(255, 255, 255, .12);
+
+    --bi-acento:     #D50000;
+    --bi-oro:        #E8BE03;
+    --bi-morado:     #B72DFF;
+    --bi-tenue:      rgba(255, 255, 255, .62);
+}
+
+
+/* ===================================
+   CONTENEDOR
+=================================== */
+
+.bi-barra{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:1;
+
+    height:var(--bi-alto);
+    display:flex;
+    align-items:stretch;
+
+    background:var(--bi-panel);
+    border-top:2px solid var(--bi-acento);
+
+    /* Entra deslizándose desde abajo. La transición vive aquí y no en una
+       animación para poder sacarla por el mismo camino al quitarla. */
+    transform:translateY(100%);
+    transition:transform .45s cubic-bezier(.22, .61, .36, 1);
+}
+
+.bi-barra.visible{
+    transform:translateY(0);
+}
+
+
+/* ===================================
+   CABECERA FIJA
+
+   Se queda quieta a la izquierda mientras el resto desfila. Sin ella,
+   quien llega a mitad de la vuelta no sabe de qué tanda son los tiempos
+   que están pasando.
+=================================== */
+
+.bi-cabecera{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:0 20px 0 18px;
+
+    background:var(--bi-cabecera);
+
+    /* Por encima de las filas: la cinta pasa por debajo y se corta aquí
+       en seco, sin asomar por el canto. */
+    position:relative;
+    z-index:2;
+}
+
+.bi-logo{
+    height:44px;
+    width:auto;
+    display:block;
+}
+
+.bi-titulo{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    line-height:1;
+}
+
+.bi-grupo{
+    font-size:21px;
+    font-weight:900;
+    font-style:italic;
+    letter-spacing:.01em;
+    color:#fff;
+    white-space:nowrap;
+    text-transform:uppercase;
+}
+
+.bi-heat{
+    margin-top:4px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.16em;
+    color:var(--bi-tenue);
+    white-space:nowrap;
+    text-transform:uppercase;
+}
+
+
+/* ===================================
+   LA CINTA QUE DESFILA
+=================================== */
+
+.bi-ventana{
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+}
+
+.bi-cinta{
+    display:flex;
+    align-items:center;
+    flex-shrink:0;
+
+    /* Sin will-change a proposito. La cinta mide veinte mil pixeles de
+       ancho, y pedirle al navegador que la promueva a su propia capa le
+       hace reservar una textura enorme por cada vez que se rehace.
+       Animar el transform ya se compone aparte sin necesidad de la
+       pista, asi que lo unico que aportaba era memoria reservada de mas
+       en un grafico pensado para quedarse puesto horas. */
+}
+
+.bi-grupo-filas{
+    display:flex;
+    align-items:center;
+    flex-shrink:0;
+}
+
+
+/* ===================================
+   CADA PILOTO
+=================================== */
+
+.bi-piloto{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 22px;
+    height:var(--bi-alto);
+    flex-shrink:0;
+
+    border-right:1px solid var(--bi-separador);
+}
+
+.bi-pos{
+    min-width:30px;
+    text-align:center;
+    font-size:24px;
+    font-weight:900;
+    font-style:italic;
+    color:#fff;
+    line-height:1;
+}
+
+.bi-piloto.lider .bi-pos{
+    color:var(--bi-oro);
+}
+
+.bi-marca{
+    width:30px;
+    height:30px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.bi-marca img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+}
+
+.bi-dorsal{
+    min-width:40px;
+    padding:3px 7px;
+    text-align:center;
+    font-size:17px;
+    font-weight:900;
+    color:#fff;
+    background:rgba(255, 255, 255, .13);
+    border-radius:3px;
+    line-height:1.1;
+}
+
+.bi-nombre{
+    font-size:22px;
+    font-weight:700;
+    color:#fff;
+    white-space:nowrap;
+    text-transform:uppercase;
+    letter-spacing:.01em;
+}
+
+.bi-tiempo{
+    font-size:20px;
+    font-weight:700;
+    color:var(--bi-tenue);
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+}
+
+/* La vuelta rápida en morado, el mismo código que la torre. Es el único
+   sitio donde se usa ese color, aquí y allá. */
+.bi-piloto.rapida .bi-tiempo{
+    color:var(--bi-morado);
+    font-weight:900;
+}
+
+
+/* ===================================
+   MENSAJE SIN DATOS
+=================================== */
+
+.bi-vacio{
+    padding:0 28px;
+    font-size:19px;
+    font-weight:600;
+    color:var(--bi-tenue);
+    white-space:nowrap;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
