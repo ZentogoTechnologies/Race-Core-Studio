@@ -284,6 +284,16 @@ export const guardarRedes = (redes) =>
   pedir('/settings/redes', { method: 'PUT', body: redes })
 
 
+// ─── Licencia ─────────────────────────────────────────────────────
+// El estado sale de leer el .rcslic en el propio equipo, sin red. Cargar
+// uno nuevo sí pasa por el servidor de Zentogo: el backend lo activa
+// antes de sustituir el que había.
+
+export const estadoLicencia = () => pedir('/license/estado')
+
+export const cargarLicencia = (archivo) => subirArchivo('/license/rcslic', archivo)
+
+
 // ─── Respaldo ─────────────────────────────────────────────────────
 // Todo el sistema en un .rcs-backup. La descarga no pasa por `pedir`
 // porque lo que vuelve es un archivo, no JSON.

@@ -6,6 +6,7 @@ import {
   Shield, Flag, Zap, Repeat, SlidersHorizontal,
 } from 'lucide-react'
 import NavItem from '../components/layout/NavItem'
+import AvisoLicencia from '../components/layout/AvisoLicencia'
 import { VERSION } from '../version'
 import { useAuth } from '../context/AuthContext'
 import { useDisciplina } from '../context/DisciplinaContext'
@@ -138,6 +139,7 @@ export default function MainLayout() {
         <header className="h-16 border-b border-neutral-800/50 flex items-center px-8 z-10 bg-[#0a0a0a]/80 backdrop-blur-sm">
           <h2 className="text-xl font-bold uppercase tracking-wider text-neutral-200">{t(titulo)}</h2>
         </header>
+        <AvisoLicencia />
         <div className="flex-1 overflow-auto p-8 z-10">
           <Outlet />
         </div>

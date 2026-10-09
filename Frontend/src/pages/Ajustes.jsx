@@ -2,7 +2,7 @@ import { t } from '../i18n'
 import { useEffect, useRef, useState } from 'react'
 import {
   Loader2, CheckCircle2, AlertCircle, FolderSearch, Save, FlaskConical,
-  Upload, X, ImageIcon, Plug, Radio, Sliders, Languages, Type, Share2, DatabaseBackup,
+  Upload, X, ImageIcon, Plug, Radio, Sliders, Languages, Type, Share2, DatabaseBackup, KeyRound,
 } from 'lucide-react'
 import {
   elegirFuente, guardarRutaXml, leerAjustes, listarFuentes, probarRutaXml,
@@ -15,6 +15,7 @@ import { useIdioma } from '../context/IdiomaContext'
 import ExploradorXml from '../components/settings/ExploradorXml'
 import RedesSociales from '../components/settings/RedesSociales'
 import Respaldo from '../components/settings/Respaldo'
+import Licencia from '../components/settings/Licencia'
 
 
 // ─── Pestañas ─────────────────────────────────────────────────
@@ -24,6 +25,7 @@ const PESTANAS = [
   { id: 'imagenes',   nombre: 'Imágenes',   Icon: ImageIcon },
   { id: 'redes',      nombre: 'Redes sociales', Icon: Share2 },
   { id: 'respaldo',   nombre: 'Respaldo',   Icon: DatabaseBackup },
+  { id: 'licencia',   nombre: 'Licencia',   Icon: KeyRound },
 ]
 
 // ─── Generales ────────────────────────────────────────────────
@@ -166,7 +168,11 @@ function Generales() {
 export default function AjustesModule() {
   const toast = useToast()
 
-  const [pestana,   setPestana]   = useState('generales')
+  // ?pestana=licencia: el aviso de licencia de arriba trae hasta aquí.
+  const [pestana,   setPestana]   = useState(() => {
+    const pedida = new URLSearchParams(window.location.search).get('pestana')
+    return PESTANAS.some(p => p.id === pedida) ? pedida : 'generales'
+  })
   const [cargando,  setCargando]  = useState(true)
   const [ruta,      setRuta]      = useState('')
   const [aplicada,  setAplicada]  = useState('')
@@ -571,6 +577,7 @@ export default function AjustesModule() {
         {pestana === 'redes' && <RedesSociales />}
 
         {pestana === 'respaldo' && <Respaldo />}
+        {pestana === 'licencia' && <Licencia />}
 
       </div>
 

@@ -10,11 +10,14 @@ qué antes de tocarla:
   · `/estado` y `/equipo` piden sesión: llevan nombre, correo y plan del
     cliente, que no tienen por qué ser públicos.
 
-  · `/activar` es del dueño. Cambiar la licencia de un equipo es una
-    decisión de negocio, no de operación.
+  · `/rcslic` y `/activar` son del dueño. Cambiar la licencia de un
+    equipo es una decisión de negocio, no de operación. `/rcslic` es la
+    de ahora (el archivo de rcs.zentogotech.com); `/activar` sigue para
+    los equipos que se instalaron con el token antiguo.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.concurrency import run_in_threadpool
 
 from src.models.users_model import User
 from src.schemas.license_schemas import (
@@ -51,6 +54,25 @@ async def equipo(_: User = Depends(usuario_actual)):
     que la reasigne cuando el cliente cambia de computadora.
     """
     return Equipo(huella=huella_equipo(), producto=lic.PRODUCTO)
+
+
+@license.post("/rcslic", response_model=EstadoLicencia, tags=["License"])
+async def cargar_rcslic(archivo: UploadFile = File(...), _: User = Depends(solo_owner)):
+    """Carga un .rcslic nuevo: la renovación, sin reinstalar.
+
+    Lo activa contra el servidor de Zentogo, así que necesita internet.
+    Si no hay conexión o el servidor lo rechaza, la licencia que había se
+    queda como estaba y se contesta 400 con el motivo.
+    """
+    contenido = await archivo.read()
+    try:
+        # La llamada al servidor tarda hasta 40 s si la red no responde;
+        # fuera del bucle de eventos para no congelar el resto del panel.
+        resultado = await run_in_threadpool(lic.instalar_rcslic, contenido, archivo.filename or "")
+    except lic.RenovacionFallida as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    return EstadoLicencia(**resultado.resumen())
 
 
 @license.post("/activar", response_model=EstadoLicencia, tags=["License"])

@@ -9,6 +9,7 @@ class EstadoLicencia(BaseModel):
     estado: str
     opera: bool
     mensaje: str
+    codigo: Optional[str] = None
     cliente: Optional[str] = None
     correo: Optional[str] = None
     producto: Optional[str] = None

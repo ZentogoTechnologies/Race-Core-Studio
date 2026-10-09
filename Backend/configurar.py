@@ -26,11 +26,11 @@ sí o no y la licencia había que fabricarla en el equipo del cliente—, y
 eso exigía la clave privada de Zentogo, que no puede viajar con el
 producto. Ver Backend/rcslic.py y Backend/activacion.py.
 
-Se puede repetir sin miedo: renovar una licencia es volver a ejecutarlo.
+Se puede repetir sin miedo. Para renovar ya no hace falta: el .rcslic
+nuevo se carga desde Ajustes → Licencia.
 Lo que ya existe y sigue valiendo, se respeta.
 """
 
-import json
 import secrets
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -122,10 +122,9 @@ def activar_en_el_servidor(ruta: str, lic) -> bool:
 
     if r.ok:
         _decir("Licencia activada en este equipo.")
-        if r.datos:
-            (rutas.DATOS / "activacion.json").write_text(
-                json.dumps(r.datos, indent=2, ensure_ascii=False),
-                encoding="utf-8")
+        # Con la huella al lado: el backend la compara en cada arranque.
+        from src.services.license_services import guardar_activacion
+        guardar_activacion(r.datos, huella)
         return True
 
     _decir(f"ACTIVACIÓN: {r.error}")
@@ -205,18 +204,9 @@ def configurar(licencia: str, idioma: str = "") -> int:
 
     guardar_licencia(licencia)
 
-    # LICENSE_REQUIRED se queda en falso a propósito, y no es un olvido.
-    #
-    # Quien decide si el software opera es license_services, y ese todavía
-    # lee el formato anterior: un token JWT en licencia.lic. Ponerlo en
-    # verdadero ahora dejaría al cliente con una licencia válida en la
-    # mano y el programa bloqueado, porque el que vigila la puerta no
-    # sabe leerla.
-    #
-    # Se pone en verdadero cuando license_services lea .rcslic. Hasta
-    # entonces, la licencia se verifica aquí —el instalador no deja
-    # instalar sin una buena— pero no bloquea después.
-    escribir_env(False, idioma)
+    # Desde aquí la licencia manda: license_services lee el .rcslic en
+    # cada arranque y, pasada la gracia, bloquea los gráficos.
+    escribir_env(True, idioma)
     token_del_asistente()
 
     _decir("Listo.")

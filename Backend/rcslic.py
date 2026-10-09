@@ -28,10 +28,10 @@ para verificar, y dos serializadores que ordenen las claves distinto o
 pongan otros espacios producen bytes distintos y la firma dejaría de
 cuadrar sin que nada estuviera mal.
 
-    ⚠ LO QUE FALTA. El llavero de abajo está VACÍO: la clave pública de
-      «zentogo-2026» vive donde se emiten las licencias y hay que
-      traerla. Sin ella no se puede verificar ninguna firma, y este
-      módulo rechaza todo diciendo exactamente eso. Ver `LLAVERO`.
+La clave pública NO viaja dentro del archivo, y no debe: si el archivo
+trajera la suya, cualquiera se fabricaría un par de claves, firmaría una
+licencia a su gusto y metería su pública al lado. El archivo solo dice
+en «llave» cuál de las que trae el programa hay que usar. Ver `LLAVERO`.
 """
 
 from __future__ import annotations
@@ -61,8 +61,15 @@ FORMATO_CONTENIDO = 1
 #
 # Aquí va SOLO la pública. La privada no entra en este repositorio ni
 # viaja en el instalador bajo ninguna circunstancia.
+#
+# «zentogo-2026» es la que muestra la página Llaves del panel de
+# rcs.zentogotech.com (allí en base64 crudo: M6nMiy1L…NmSQ=).
 LLAVERO: dict[str, str] = {
-    # "zentogo-2026": "-----BEGIN PUBLIC KEY-----\n…\n-----END PUBLIC KEY-----",
+    "zentogo-2026": (
+        "-----BEGIN PUBLIC KEY-----\n"
+        "MCowBQYDK2VwAyEAM6nMiy1Ljogc6kzXhsowkXEDtP3Y4A0gWM90P2gNmSQ=\n"
+        "-----END PUBLIC KEY-----\n"
+    ),
 }
 
 
