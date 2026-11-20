@@ -1,0 +1,166 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   RÓTULO MÚLTIPLE
+
+   Lo mismo que el rótulo libre pero con sitio para cuatro: una mesa de
+   comentaristas, el podio, los tres primeros de una categoría.
+
+   Se escriben hasta cuatro y salen los que tengan datos. No se reservan
+   huecos vacíos: con dos rellenos, el panel mide lo de dos. Un hueco
+   reservado y vacío se lee como un fallo, no como un sitio libre.
+
+   Comparte el lenguaje visual del narrador —logo a la izquierda con su
+   filo rojo, panel oscuro a la derecha— pero no su hoja: allí el panel
+   tiene alto fijo porque siempre lleva lo mismo, y aquí tiene que crecer
+   con lo que se escriba.
+========================================================================== */
+
+:root{
+    --rm-fila:   74px;   /* lo que ocupa cada persona */
+    --rm-aire:   22px;   /* respiro arriba y abajo del bloque */
+    --rm-rojo:   #e10600;
+}
+
+
+/* ===================================
+   CONTENEDOR
+=================================== */
+
+.rm-rotulo{
+    position:absolute;
+
+    left:50%;
+    bottom:var(--rcs-pie);
+
+    /* La posición de partida y el centrado los pone animaciones.css,
+       igual que en las demás cartas. */
+
+    display:flex;
+    align-items:stretch;
+}
+
+
+/* ===================================
+   LOGO
+
+   Se estira al alto del panel en vez de medir 150 fijos: con cuatro
+   filas el panel pasa de 300, y un logo de alto fijo dejaría un escalón
+   a su lado.
+=================================== */
+
+.rm-logo{
+    position:relative;
+    z-index:2;
+
+    width:170px;
+    flex-shrink:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:#1d1d1d;
+
+    border-left:10px solid var(--rm-rojo);
+    border-radius:10px 0 0 10px;
+}
+
+.rm-logo img{
+    max-width:140px;
+    max-height:120px;
+    object-fit:contain;
+}
+
+
+/* ===================================
+   EL PANEL
+
+   Arranca cerrado y se despliega desde el logo, como las demás. El alto
+   lo decide cuántas filas haya, y eso lo pone la plantilla en --rm-alto
+   al pintar: una medida calculada y no `auto` porque la animación de
+   apertura necesita un número al que llegar.
+=================================== */
+
+.rm-panel{
+    --panel-w:820px;
+
+    width:0;
+    height:var(--rm-alto, 150px);
+
+    overflow:hidden;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    padding:0 28px;
+
+    background:linear-gradient(90deg, #151515, #0b0b0b);
+
+    border-radius:0 10px 10px 0;
+}
+
+/* El texto no asoma mientras el panel se abre: va centrado, y a medio
+   abrir se verían rebanadas sueltas de las letras. Mismo trato que en el
+   narrador, por el mismo motivo. */
+.rm-panel > *{
+    opacity:0;
+}
+
+.rm-panel.abierto > *{
+    opacity:1;
+    transition:opacity .22s ease;
+}
+
+
+/* ===================================
+   CADA PERSONA
+=================================== */
+
+.rm-fila{
+    height:var(--rm-fila);
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    /* Alineado a la izquierda y no centrado: con varias filas, cada una
+       centrada por su cuenta deja los nombres en zigzag y cuesta leer
+       la lista de un vistazo. */
+    text-align:left;
+}
+
+/* Una raya tenue entre personas. Solo entre medias: debajo de la última
+   quedaría flotando contra el canto del panel. */
+.rm-fila + .rm-fila{
+    border-top:1px solid rgba(255,255,255,.10);
+}
+
+.rm-nombre{
+    font-size:30px;
+    font-weight:900;
+    line-height:1.1;
+
+    color:#ffffff;
+
+    text-transform:uppercase;
+
+    text-shadow:2px 2px 0 rgba(0,0,0,.5);
+
+    white-space:nowrap;
+}
+
+.rm-cargo{
+    font-size:19px;
+    font-weight:700;
+    line-height:1.2;
+
+    letter-spacing:1px;
+
+    color:var(--rm-rojo);
+
+    text-transform:uppercase;
+
+    white-space:nowrap;
+}

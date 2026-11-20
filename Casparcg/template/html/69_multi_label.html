@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Rótulo Múltiple</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/tipografia.css">
+    <link rel="stylesheet" href="../css/tipografia_activa.css">
+    <link rel="stylesheet" href="../css/animaciones.css">
+    <link rel="stylesheet" href="../css/rotulo_multiple.css">
+    <script src="../js/idioma_activo.js"></script>
+    <script src="../js/i18n.js"></script>
+    <script src="../js/entrada.js"></script>
+</head>
+
+<body>
+
+<div class="rm-rotulo" id="rotulo">
+
+    <div class="rm-logo">
+        <img id="logo" src="../img/logo-cliente.png" alt="">
+    </div>
+
+    <!-- Vacío: lo llena update() con las filas que traigan datos. -->
+    <div class="rm-panel" id="panel"></div>
+
+</div>
+
+<script>
+
+/* ==========================================================================
+   RÓTULO MÚLTIPLE
+
+   Hasta cuatro personas a la vez, y salen las que tengan datos. Con dos
+   rellenas, el panel mide lo de dos: un hueco reservado y vacío se lee
+   como un fallo, no como un sitio libre.
+
+   Recibe {"filas":[{"name":"…","role":"…"}, …]}. Lo que llegue sin
+   nombre se descarta aquí y no en el panel, para que un UPDATE a mano
+   —o uno que venga con una fila de más— no abra un hueco en blanco al
+   aire.
+========================================================================== */
+
+var ALTO_FILA = 74;
+var AIRE      = 22;
+var MAXIMO    = 4;
+
+var panelAbierto = false;
+
+
+function escapar(texto){
+    return String(texto == null ? "" : texto)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+
+function pintar(filas){
+
+    var panel = document.getElementById("panel");
+
+    var utiles = (filas || [])
+        .filter(function (f){ return f && String(f.name || "").trim() !== ""; })
+        .slice(0, MAXIMO);
+
+    panel.innerHTML = utiles.map(function (f){
+        return '<div class="rm-fila">'
+             +   '<div class="rm-nombre">' + escapar(f.name) + '</div>'
+             +   (String(f.role || "").trim()
+                    ? '<div class="rm-cargo">' + escapar(f.role) + '</div>'
+                    : '')
+             + '</div>';
+    }).join("");
+
+    /* El alto se calcula y no se deja en `auto` porque la animación de
+       apertura necesita un número al que llegar. Con una sola fila se
+       mantiene el alto de las demás cartas, para que el rótulo no salga
+       enano al lado del logo. */
+    var alto = Math.max(150, utiles.length * ALTO_FILA + AIRE * 2);
+    panel.style.setProperty("--rm-alto", alto + "px");
+
+    // Si ya estaba abierto —un UPDATE con el gráfico al aire— el texto
+    // nuevo tiene que verse sin esperar a otra apertura.
+    if (panelAbierto) panel.classList.add("abierto");
+}
+
+
+function play(){
+
+    entradaCuandoListo(document.body, function (){
+
+        var rotulo = document.getElementById("rotulo");
+        var panel  = document.getElementById("panel");
+
+        rotulo.style.animation = "slideUp .5s ease forwards";
+
+        /* El panel espera a que el conjunto termine de subir: abriéndose
+           a la vez, el texto sale volando en diagonal en vez de
+           desplegarse desde el logo. */
+        setTimeout(function (){
+            panel.style.animation = "expandPanel .6s ease forwards";
+
+            // Y el texto cuando ya está abierto, o se ven rebanadas de
+            // las letras mientras el panel crece.
+            setTimeout(function (){
+                panelAbierto = true;
+                panel.classList.add("abierto");
+            }, 600);
+        }, 500);
+    });
+}
+
+
+function stop(){
+
+    var rotulo = document.getElementById("rotulo");
+    var panel  = document.getElementById("panel");
+
+    panelAbierto = false;
+    panel.classList.remove("abierto");
+    panel.style.animation = "collapsePanel .5s ease forwards";
+
+    setTimeout(function (){
+        rotulo.style.animation = "slideDown .5s ease forwards";
+    }, 500);
+}
+
+
+function update(data){
+
+    /* CasparCG 2.5 entrega el payload como texto JSON, no como objeto. */
+    try {
+        var d = typeof data === "string" ? JSON.parse(data) : (data || {});
+
+        if (d.logo !== undefined) document.getElementById("logo").src = d.logo;
+        if (d.filas !== undefined) pintar(d.filas);
+
+    } catch (e) { /* un UPDATE con basura no puede tumbar el gráfico */ }
+}
+
+
+/* Fuera de CasparCG (abriendo el html a mano) no hay play(), así que se
+   arranca solo para poder verlo en el navegador. */
+if (!window.__casparcg) {
+    pintar([
+        { name: "Ricardo Reyes",  role: "Director de carrera" },
+        { name: "Tulio Tribiño",  role: "Narrador" },
+    ]);
+    play();
+}
+
+</script>
+
+</body>
+</html>

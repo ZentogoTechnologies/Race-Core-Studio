@@ -119,6 +119,10 @@
                    vez de desplegarse desde el logo. */
                 setTimeout(() => {
                     panel.style.animation = "expandPanel .6s ease forwards";
+
+                    /* Y el texto, cuando el panel ya esta abierto: antes
+                       se veian rebanadas de las letras mientras crecia. */
+                    setTimeout(() => panel.classList.add("abierto"), 600);
                 }, 500);
             });
         }
@@ -128,6 +132,9 @@
             const widget = document.getElementById("narrator");
             const panel  = document.querySelector(".narrator-info");
 
+            /* El texto se va primero, que si no se ve encogerse con el
+               panel y vuelve a verse a rebanadas, ahora al reves. */
+            panel.classList.remove("abierto");
             panel.style.animation = "collapsePanel .5s ease forwards";
 
             setTimeout(() => {
