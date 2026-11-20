@@ -14,6 +14,25 @@
     --rcs-panel: rgba(6, 8, 11, .72);   /* el panel de datos */
     --rcs-logo:  rgba(0, 0, 0, .80);    /* el recuadro del logo */
     --rcs-foto:  rgba(0, 0, 0, .55);    /* detras de fotos y dibujos */
+
+    /* A que altura se apoya todo lo que va abajo.
+ 
+       La barra inferior ocupa los 72 pixeles del pie de pantalla y se
+       queda puesta buena parte de la carrera, asi que los rotulos que
+       se anclaban a 40 del borde le caian justo encima. Se levantan por
+       encima de ella, que es lo que hace la television: la cinta manda
+       en el pie y los rotulos viven por arriba.
+ 
+       Se sube siempre, este la barra o no. Hacerlo depender de lo que
+       haya al aire obligaria a avisar a cada plantilla cuando la barra
+       entra y sale, y un rotulo a media animacion no puede dar un salto
+       de setenta pixeles en pantalla. Sin la barra, lo que queda es un
+       margen inferior mas generoso, que no desentona.
+ 
+       Es una variable y no un numero repetido en seis hojas: si la
+       barra cambia de alto, esto se ajusta en un sitio. */
+    --rcs-barra: 72px;
+    --rcs-pie:   calc(40px + var(--rcs-barra) + 16px);
 }
 
 
@@ -50,7 +69,7 @@ body{
 {
     position:absolute;
     left:50%;
-    bottom:40px;
+    bottom:var(--rcs-pie);
     z-index:1;
 
     display:flex;

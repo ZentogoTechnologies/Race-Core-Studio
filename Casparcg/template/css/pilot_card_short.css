@@ -7,7 +7,7 @@
     position:absolute;
 
     left:50%;
-    bottom:40px;
+    bottom:var(--rcs-pie);
 
     /* La posicion de partida y el centrado los pone animaciones.css. */
 

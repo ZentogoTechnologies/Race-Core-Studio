@@ -32,10 +32,21 @@
 
     position:absolute;
 
-    top:44px;
-    left:50%;
+    /* Arrimado a la izquierda y no centrado, para dejar libre la esquina
+       superior derecha: ahi va la mosca de patrocinadores, que empieza
+       en el pixel 1486 y no se puede quitar —son los que pagan—.
 
-    transform:translateX(-50%);
+       Con 1420 de ancho, el canto derecho queda en 1464 y le deja 22 de
+       aire. El hueco que sobra a la derecha no molesta: el totem, que
+       era lo unico que vivia ahi, ahora se aparta solo cuando este
+       cuadro sale.
+
+       Se corre en vez de bajarlo. Bajarlo tambien resolvia el choque,
+       pero obligaba a recortar tres pixeles por fila para que los veinte
+       pilotos siguieran entrando, y eso es informacion mas apretada a
+       cambio de nada. */
+    top:44px;
+    left:44px;
 
     width:1420px;
 

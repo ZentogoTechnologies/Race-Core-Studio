@@ -8,7 +8,7 @@
     position:absolute;
 
     left:50%;
-    bottom:40px;
+    bottom:var(--rcs-pie);
 
     /* La posicion de partida y el centrado los pone animaciones.css. */
 
@@ -78,6 +78,25 @@
     background:linear-gradient(90deg, #151515, #0b0b0b);
 
     border-radius:0 10px 10px 0;
+}
+
+
+/* El texto no asoma mientras el panel se abre.
+
+   El panel crece de 0 a 750 y recorta lo que sobra, pero el texto va
+   centrado: con el panel a medio abrir se veian rebanadas sueltas del
+   nombre y del cargo —media letra aqui, media alla— desfilando hasta
+   que terminaba. Desde lejos parecia un fallo de la emision.
+
+   Se queda invisible hasta que el panel esta abierto, y entonces
+   aparece. La clase la pone la plantilla al terminar la animacion. */
+.narrator-info > *{
+    opacity:0;
+}
+
+.narrator-info.abierto > *{
+    opacity:1;
+    transition:opacity .22s ease;
 }
 
 
