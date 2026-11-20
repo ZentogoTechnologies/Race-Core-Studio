@@ -1,0 +1,136 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   PATROCINADORES
+
+   La mosca de la esquina superior derecha: el logo del autódromo quemado
+   a la izquierda y los de los patrocinadores rotando a su derecha,
+   separados por una raya vertical.
+
+   Es el gráfico que más tiempo va a estar puesto —el evento entero—, así
+   que todo aquí está pensado para no acumular coste. La rotación no
+   rehace nada: los logos se montan una vez al arrancar, se quedan
+   apilados en el mismo hueco y lo único que cambia es su opacidad.
+========================================================================== */
+
+:root{
+    --pa-margen:     28px;
+
+    /* En fila, no apiladas. El ancho lo deciden las dos piezas y no una
+       medida fija: un logo apaisado y otro cuadrado necesitan huecos
+       distintos, y clavar el ancho obligaria a encoger el que no cuadre.
+
+       Las medidas son casi el doble que las de la primera version. A la
+       escala de una pantalla de 1920 aquello se leia como un sello; el
+       patrocinador paga por que se le vea. */
+    --pa-logo-alto:  74px;
+    --pa-logo-ancho: 118px;
+    --pa-marca-alto: 78px;
+    --pa-marca-ancho:230px;
+    --pa-panel:      rgba(6, 8, 11, .78);
+    --pa-separador:  rgba(255, 255, 255, .14);
+    --pa-fundido:    .6s;
+}
+
+
+.pa-caja{
+    position:absolute;
+    top:var(--pa-margen);
+    right:var(--pa-margen);
+    z-index:1;
+
+    padding:16px 20px;
+
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:18px;
+
+    background:var(--pa-panel);
+    border-radius:10px;
+
+    /* Entra y sale por el mismo camino, deslizándose desde el canto
+       derecho. En transición y no en animación para poder sacarla
+       quitando la clase, sin tener que declarar la contraria. */
+    transform:translateX(calc(100% + var(--pa-margen)));
+    opacity:0;
+    transition:transform .5s cubic-bezier(.22, .61, .36, 1), opacity .4s ease;
+}
+
+.pa-caja.visible{
+    transform:translateX(0);
+    opacity:1;
+}
+
+
+/* ===================================
+   EL LOGO DEL AUTÓDROMO
+
+   Quemado a la izquierda y fijo: no entra en la rotación. Es el mismo
+   archivo que usan los otros gráficos, así que cambiarlo en Ajustes lo
+   cambia aquí también.
+=================================== */
+
+.pa-logo{
+    width:var(--pa-logo-ancho);
+    max-height:var(--pa-logo-alto);
+    object-fit:contain;
+    flex-shrink:0;
+    display:block;
+}
+
+/* La raya separadora, ahora en vertical. Sale solo cuando hay
+   patrocinadores al lado: sin ellos quedaría colgando sin separar nada.
+
+   Va en el canto del logo y no como elemento aparte: así mide
+   exactamente lo que mide el logo, sin tener que darle un alto a mano
+   que se quede corto o largo cuando cambie el de otro cliente. */
+.pa-caja.con-rotacion .pa-logo{
+    padding-right:18px;
+    border-right:1px solid var(--pa-separador);
+}
+
+
+/* ===================================
+   LA ROTACIÓN
+
+   Todos los logos ocupan el mismo hueco, uno encima de otro. La medida
+   la fija el contenedor y no el logo de turno: dejándola al contenido,
+   la caja daría un salto cada vez que entrara uno más alto o más ancho,
+   y con cuarenta y cinco en rotación sería un baile constante.
+=================================== */
+
+.pa-rotacion{
+    position:relative;
+    flex-shrink:0;
+    width:var(--pa-marca-ancho);
+    height:var(--pa-marca-alto);
+}
+
+/* Sin patrocinadores no ocupa sitio, o la caja saldría con un hueco
+   vacío a la derecha del logo. */
+.pa-caja:not(.con-rotacion) .pa-rotacion{
+    display:none;
+}
+
+.pa-marca{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    opacity:0;
+    transition:opacity var(--pa-fundido) ease;
+}
+
+.pa-marca.activa{
+    opacity:1;
+}
+
+.pa-marca img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+}

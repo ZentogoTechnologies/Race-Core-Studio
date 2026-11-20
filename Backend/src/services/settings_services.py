@@ -122,6 +122,169 @@ async def redes_actuales() -> dict:
     return {red: (guardadas.get(red) or "") for red in REDES}
 
 
+# ── Patrocinadores ────────────────────────────────────────────────
+#
+# Los logos que rotan en la esquina durante el evento. Van en public/,
+# que es donde vive lo que sube el cliente y lo unico que sobrevive a
+# una actualizacion; las plantillas los piden por HTTP igual que las
+# fotos de los pilotos.
+#
+# El orden se guarda en la base y no se deduce de la carpeta: quien paga
+# mas sale primero, y el disco no sabe de eso.
+
+CARPETA_PATROCINADORES = rutas.PUBLICO / "patrocinadores"
+
+# Cuanto dura cada uno si nadie lo cambia. Seis segundos dan tiempo a
+# leer una marca sin que la esquina se vuelva un parpadeo.
+SEGUNDOS_POR_DEFECTO = 6
+
+
+def _nombre_libre(nombre: str, extension: str = ".png") -> str:
+    """Un nombre de archivo que no pise a otro ni salga de la carpeta."""
+    base = Path(nombre or "patrocinador").name
+    limpio = "".join(c for c in Path(base).stem if c.isalnum() or c in "-_ ").strip()
+    limpio = (limpio or "patrocinador")[:48]
+
+    candidato, n = f"{limpio}{extension}", 2
+    while (CARPETA_PATROCINADORES / candidato).exists():
+        candidato = f"{limpio}-{n}{extension}"
+        n += 1
+    return candidato
+
+
+def _es_vector(contenido: bytes, nombre: str) -> bool:
+    """Si lo que subieron es un SVG.
+
+    Se mira el contenido y no solo la extension: un logo descargado puede
+    llegar llamandose .png siendo un svg, y al reves. Basta con los
+    primeros bytes, donde esta la etiqueta de apertura o la cabecera xml.
+    """
+    if Path(nombre or "").suffix.lower() == ".svg":
+        return True
+    cabeza = contenido[:512].lstrip().lower()
+    return cabeza.startswith(b"<svg") or (cabeza.startswith(b"<?xml") and b"<svg" in contenido[:2048].lower())
+
+
+async def patrocinadores_actuales() -> list[str]:
+    """Los archivos en su orden, saltando los que ya no estan.
+
+    Se cruza la lista guardada con lo que hay en el disco porque las dos
+    pueden separarse: alguien borra un archivo a mano y la lista se
+    quedaria pidiendo una imagen que no existe, y la rotacion ensenaria
+    un hueco.
+    """
+    doc = await Ajustes.find_one({})
+    guardados = (doc.patrocinadores if doc else None) or []
+
+    CARPETA_PATROCINADORES.mkdir(parents=True, exist_ok=True)
+    en_disco = {a.name for a in CARPETA_PATROCINADORES.iterdir() if a.is_file()}
+
+    ordenados = [n for n in guardados if n in en_disco]
+
+    # Y al reves: un archivo que aparecio sin pasar por aqui se anade al
+    # final en vez de quedarse invisible para siempre.
+    ordenados += sorted(en_disco - set(ordenados))
+    return ordenados
+
+
+async def segundos_patrocinadores() -> int:
+    doc = await Ajustes.find_one({})
+    valor = (doc.patrocinadores_segundos if doc else None) or SEGUNDOS_POR_DEFECTO
+    return max(2, min(60, int(valor)))
+
+
+def url_patrocinador(nombre: str) -> str:
+    """Con su version, para que al reemplazar un logo salga el nuevo."""
+    archivo = CARPETA_PATROCINADORES / nombre
+    if not archivo.is_file():
+        return ""
+    return f"/public/patrocinadores/{nombre}?v={int(archivo.stat().st_mtime)}"
+
+
+async def _guardar_lista(nombres: list[str]) -> None:
+    doc = await Ajustes.find_one({})
+    if doc is None:
+        doc = Ajustes(patrocinadores=nombres)
+        await doc.insert()
+    else:
+        doc.patrocinadores = nombres
+        await doc.save()
+
+
+async def anadir_patrocinador(contenido: bytes, nombre: str) -> list[str]:
+    """Guarda un logo nuevo al final de la rotacion.
+
+    A PNG con transparencia por el mismo motivo que el logo del
+    autodromo: va sobre la imagen de la carrera, y un JPG llegaria con
+    su fondo blanco recortado en un rectangulo.
+    """
+    from fastapi import HTTPException
+    from PIL import Image, UnidentifiedImageError
+
+    if not contenido:
+        raise HTTPException(400, "El archivo llego vacio")
+
+    CARPETA_PATROCINADORES.mkdir(parents=True, exist_ok=True)
+
+    # El vector se guarda tal cual: no hay nada que convertir, y pasarlo
+    # a PNG seria perder justo lo que lo hace util en un logo, que escala
+    # sin despeinarse.
+    if _es_vector(contenido, nombre):
+        archivo = _nombre_libre(nombre, ".svg")
+        (CARPETA_PATROCINADORES / archivo).write_bytes(contenido)
+        await _guardar_lista(await patrocinadores_actuales())
+        return await patrocinadores_actuales()
+
+    try:
+        imagen = Image.open(io.BytesIO(contenido))
+        imagen.load()
+    except (UnidentifiedImageError, OSError) as e:
+        raise HTTPException(400, f"'{nombre}' no se pudo leer como imagen ({e})")
+
+    CARPETA_PATROCINADORES.mkdir(parents=True, exist_ok=True)
+    archivo = _nombre_libre(nombre)
+    imagen.convert("RGBA").save(CARPETA_PATROCINADORES / archivo, format="PNG")
+
+    await _guardar_lista(await patrocinadores_actuales())
+    return await patrocinadores_actuales()
+
+
+async def quitar_patrocinador(nombre: str) -> list[str]:
+    from fastapi import HTTPException
+
+    # El nombre llega de fuera: sin esto, un "../../logo-cliente.png"
+    # borraria algo que no es suyo.
+    archivo = CARPETA_PATROCINADORES / Path(nombre).name
+    if not archivo.is_file():
+        raise HTTPException(404, "Ese patrocinador no esta")
+
+    archivo.unlink()
+    await _guardar_lista([n for n in await patrocinadores_actuales() if n != archivo.name])
+    return await patrocinadores_actuales()
+
+
+async def ordenar_patrocinadores(nombres: list[str]) -> list[str]:
+    """Fija el orden. Lo que no venga en la lista se queda al final."""
+    existentes = await patrocinadores_actuales()
+    pedidos = [n for n in nombres if n in existentes]
+    await _guardar_lista(pedidos + [n for n in existentes if n not in pedidos])
+    return await patrocinadores_actuales()
+
+
+async def guardar_segundos_patrocinadores(segundos: int) -> int:
+    valor = max(2, min(60, int(segundos)))
+
+    doc = await Ajustes.find_one({})
+    if doc is None:
+        doc = Ajustes(patrocinadores_segundos=valor)
+        await doc.insert()
+    else:
+        doc.patrocinadores_segundos = valor
+        await doc.save()
+
+    return valor
+
+
 async def guardar_redes(datos: dict) -> dict:
     """Guarda las tres cuentas. Vacía quiere decir que esa red no sale."""
     limpias = {red: str(datos.get(red) or "").strip()[:80] for red in REDES}

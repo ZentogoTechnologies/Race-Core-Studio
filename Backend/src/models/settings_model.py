@@ -35,5 +35,14 @@ class Ajustes(Document):
     # transmisión. Claves: instagram, youtube, website.
     redes: Optional[dict] = None
 
+    # Los logos de los patrocinadores, por nombre de archivo y en el
+    # orden en que rotan. Se guarda la lista y no se lee la carpeta
+    # porque el orden es una decision del cliente —quien paga mas sale
+    # primero— y el disco no sabe de eso.
+    patrocinadores: Optional[list] = None
+
+    # Cuanto dura cada uno en pantalla, en segundos.
+    patrocinadores_segundos: Optional[int] = None
+
     class Settings:
         name = "ajustes"

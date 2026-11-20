@@ -27,6 +27,7 @@ from src.routes.timing_routes import timing
 from src.routes.users_routes import users
 from src.routes.login_routes import login
 from src.routes.system_routes import system
+from src.routes.sponsors_routes import patrocinadores
 from src.routes.events_routes import events
 from src.routes.settings_routes import ajustes
 from src.routes.weather_routes import weather
@@ -267,6 +268,26 @@ app.mount(
     name="banderas",
 )
 
+# Las mismas plantillas que carga CasparCG, servidas por HTTP para la
+# vista previa del panel.
+#
+# Es el montaje que hace posible previsualizar. CasparCG las abre desde
+# file://, cuyo origen es "null"; el panel las mete en un iframe y
+# necesita hablarles —llamar a su play() y a su update()— para
+# alimentarlas igual que las alimenta CasparCG. Y un navegador solo deja
+# tocar el interior de un iframe si viene del mismo origen. Sirviendolas
+# desde aqui, que es tambien quien sirve el panel, el origen es el mismo
+# y la vista previa ejecuta el gráfico de verdad, no una imitación.
+#
+# Sin Cache-Control pasaria lo de siempre: se arregla una plantilla y el
+# navegador sigue enseñando la de antes. EstaticosFrescos obliga a
+# preguntar, igual que con las fotos.
+app.mount(
+    "/plantillas",
+    EstaticosFrescos(directory=rutas.PLANTILLAS),
+    name="plantillas",
+)
+
 # Todo lo que toca la base o manda al aire exige un JWT válido. La
 # dependencia se declara aquí y no dentro de cada router para que la
 # política de acceso se lea de un vistazo en un solo lugar.
@@ -311,6 +332,11 @@ app.include_router(weather, prefix="/api/v1/weather", tags=["Weather"], dependen
 # timing_routes.py, al lado de las rutas. Lo mismo aplica a /public, que
 # sirve las fotos con <img>, y un <img> tampoco manda Authorization.
 app.include_router(timing, prefix="/api/v1/timing", tags=["Timing"])
+
+# Patrocinadores: abierto por lo mismo que timing. Lo consulta el grafico
+# de la esquina desde dentro de CasparCG, que no puede mandar cabeceras, y
+# lo que devuelve son logos que /public ya sirve abiertos.
+app.include_router(patrocinadores, prefix="/api/v1/sponsors", tags=["Sponsors"])
 
 
 # ======================================================================

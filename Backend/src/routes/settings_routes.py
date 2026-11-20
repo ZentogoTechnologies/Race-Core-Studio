@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -11,6 +12,9 @@ from src.services.settings_services import (
     explorar, marcar_logo_cliente, restaurar_logo_fabrica, revisar_ruta,
     ruta_timing,
     url_logo_cliente, xml_detectados,
+    anadir_patrocinador, guardar_segundos_patrocinadores, ordenar_patrocinadores,
+    patrocinadores_actuales, quitar_patrocinador, segundos_patrocinadores,
+    url_patrocinador,
 )
 from src.services.tracks_services import ruta_plantilla, trazados_service
 
@@ -200,6 +204,80 @@ async def subir_logo_cliente(archivo: UploadFile = File(...)):
     await marcar_logo_cliente(archivo.filename or "logo")
 
     return {"ok": True, "client_logo_url": url_logo_cliente()}
+
+
+class OrdenPatrocinadores(BaseModel):
+    nombres: list[str]
+
+
+class RitmoPatrocinadores(BaseModel):
+    segundos: int
+
+
+async def _patrocinadores() -> dict:
+    nombres = await patrocinadores_actuales()
+    return {
+        "patrocinadores": [
+            {"nombre": n, "url": url_patrocinador(n)} for n in nombres
+        ],
+        "segundos": await segundos_patrocinadores(),
+    }
+
+
+@ajustes.get("/patrocinadores", tags=["Settings"])
+async def listar_patrocinadores():
+    """Los logos que rotan en la esquina, en su orden."""
+    return await _patrocinadores()
+
+
+@ajustes.post("/patrocinadores", tags=["Settings"], dependencies=[Depends(puede_escribir)])
+async def subir_patrocinador(archivos: list[UploadFile] = File(...)):
+    """Anade uno o varios logos al final de la rotacion.
+
+    Acepta una lista porque los patrocinadores de un evento llegan
+    juntos, en una carpeta, y subirlos de uno en uno son veinte clics.
+
+    Lo que no sea una imagen se salta en vez de cortar la subida: una
+    carpeta del escritorio trae su Thumbs.db y sus .DS_Store, y que un
+    archivo oculto tire abajo las otras diecinueve seria absurdo. Al
+    final se dice cuantos entraron y cuantos no.
+    """
+    entraron, rechazados = 0, []
+
+    for archivo in archivos:
+        try:
+            await anadir_patrocinador(await archivo.read(), archivo.filename or "")
+            entraron += 1
+        except HTTPException:
+            rechazados.append(Path(archivo.filename or "sin nombre").name)
+
+    # Solo si no entro ninguno es un fallo: con una carpeta entera,
+    # haber colado dieciocho de veinte es un exito con avisos.
+    if not entraron:
+        raise HTTPException(400, "Ninguno de esos archivos es una imagen que pueda leer")
+
+    return {**await _patrocinadores(), "anadidos": entraron, "rechazados": rechazados}
+
+
+@ajustes.delete("/patrocinadores/{nombre}", tags=["Settings"], dependencies=[Depends(puede_escribir)])
+async def borrar_patrocinador(nombre: str):
+    """Quita un logo de la rotacion y del disco."""
+    await quitar_patrocinador(nombre)
+    return await _patrocinadores()
+
+
+@ajustes.put("/patrocinadores/orden", tags=["Settings"], dependencies=[Depends(puede_escribir)])
+async def reordenar_patrocinadores(datos: OrdenPatrocinadores):
+    """Fija en que orden salen."""
+    await ordenar_patrocinadores(datos.nombres)
+    return await _patrocinadores()
+
+
+@ajustes.put("/patrocinadores/ritmo", tags=["Settings"], dependencies=[Depends(puede_escribir)])
+async def cambiar_ritmo_patrocinadores(datos: RitmoPatrocinadores):
+    """Cuantos segundos dura cada uno en pantalla."""
+    await guardar_segundos_patrocinadores(datos.segundos)
+    return await _patrocinadores()
 
 
 @ajustes.delete("/logo", tags=["Settings"], dependencies=[Depends(puede_escribir)])

@@ -10,6 +10,7 @@ import {
 } from '../api/registro'
 import { reconectarCasparcg } from '../api/graphics'
 import Trazados from '../components/settings/Trazados'
+import Patrocinadores from '../components/settings/Patrocinadores'
 import { useToast } from '../context/ToastContext'
 import { useIdioma } from '../context/IdiomaContext'
 import ExploradorXml from '../components/settings/ExploradorXml'
@@ -569,6 +570,11 @@ export default function AjustesModule() {
           </div>
         </div>
       </div>
+
+      {/* Debajo del logo del autodromo a proposito: salen juntos en la
+          misma esquina, y verlos juntos aqui es lo que hace evidente que
+          se configuran juntos. */}
+      <Patrocinadores />
 
       <Trazados />
           </>

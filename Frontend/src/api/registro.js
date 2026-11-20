@@ -275,6 +275,34 @@ export const quitarLogoCliente = () =>
 export const urlLogoCliente = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
 
 
+// ─── Patrocinadores ────────────────────────────────────
+// Los logos que rotan en la esquina durante el evento, junto al del
+// autódromo. El orden importa y lo decide quien vende el patrocinio, así
+// que se guarda; no se deduce de la carpeta.
+//
+// Las cuatro devuelven la lista entera ya ordenada, para que la pantalla
+// no tenga que recomponerla por su cuenta y pueda quedar desincronizada.
+
+export const leerPatrocinadores = () => pedir('/settings/patrocinadores')
+
+// Uno o varios. La carpeta entera va en una sola peticion y no en una
+// por archivo: veinte peticiones en paralelo con sus veinte escrituras
+// a la base dejarian el orden a suerte del que llegue antes.
+export const subirPatrocinadores = (archivos) =>
+  subirArchivos('/settings/patrocinadores', archivos)
+
+export const quitarPatrocinador = (nombre) =>
+  pedir(`/settings/patrocinadores/${encodeURIComponent(nombre)}`, { method: 'DELETE' })
+
+export const ordenarPatrocinadores = (nombres) =>
+  pedir('/settings/patrocinadores/orden', { method: 'PUT', body: { nombres } })
+
+export const ritmoPatrocinadores = (segundos) =>
+  pedir('/settings/patrocinadores/ritmo', { method: 'PUT', body: { segundos } })
+
+export const urlPatrocinador = (ruta) => (ruta ? `${ORIGEN}${ruta}` : null)
+
+
 // ─── Redes sociales ───────────────────────────────────────────────
 // Las cuentas del gráfico de redes. Guardadas, el botón las saca solas.
 
@@ -378,6 +406,36 @@ export const imagenTrazadoPorRuta = (id, ruta) =>
 // La subida no pasa por `pedir`: con FormData el navegador tiene que poner
 // él mismo el Content-Type, porque lleva el boundary que separa las partes.
 // Fijarlo a application/json dejaría el cuerpo ilegible para el servidor.
+async function subirArchivos(ruta, archivos) {
+  const cuerpo = new FormData()
+  // Mismo nombre de campo repetido: es como se manda una lista en
+  // multipart, y es lo que FastAPI lee como list[UploadFile].
+  for (const a of archivos) cuerpo.append('archivos', a)
+
+  let response
+  try {
+    response = await fetch(`${BASE}${ruta}`, {
+      method: 'POST',
+      headers: { ...cabeceraAuth() },
+      body: cuerpo,
+    })
+  } catch {
+    throw new ApiError('No se pudo contactar al backend', 0)
+  }
+
+  if (response.status === 401) {
+    avisarSesionExpirada()
+    throw new ApiError('La sesión expiró, vuelve a iniciar sesión', 401)
+  }
+
+  const payload = await response.json().catch(() => null)
+
+  if (!response.ok) throw new ApiError(leerDetalle(payload, response.status), response.status)
+
+  return payload
+}
+
+
 async function subirArchivo(ruta, archivo) {
   const cuerpo = new FormData()
   cuerpo.append('archivo', archivo)
