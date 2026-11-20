@@ -5,6 +5,7 @@ from config import settings
 from src.schemas.graphics_schemas import (
     ClearRequest,
     GraphicResponse,
+    DesarmarRequest,
     PlayRequest,
     StateResponse,
     TemplateResponse,
@@ -203,7 +204,8 @@ async def _payload(template, pilot_id: Optional[int], data: Optional[dict],
     return payload
 
 
-async def _run(coro, graphic_id: str = None, layer: int = None) -> GraphicResponse:
+async def _run(coro, graphic_id: str = None, layer: int = None,
+               data: Optional[dict] = None, path: str = None) -> GraphicResponse:
     """
     Ejecuta un comando traduciendo los fallos de CasparCG a HTTP.
 
@@ -231,6 +233,8 @@ async def _run(coro, graphic_id: str = None, layer: int = None) -> GraphicRespon
         code=result["code"],
         status=result["status"],
         on_air=service.on_air(),
+        data=data,
+        path=path,
     )
 
 
@@ -258,6 +262,9 @@ async def get_state():
         port=casparcg.port,
         channel=settings.CASPARCG_CHANNEL,
         on_air=service.on_air(),
+        al_aire=service.al_aire_detallado(),
+        armado=service.armado(),
+        previo=service.previo_detallado(),
     )
 
 
@@ -277,6 +284,66 @@ async def reconnect():
 
 
 # ── Comandos ──────────────────────────────────────────────────
+
+@graphics.post("/armar", tags=["Graphics"], response_model=StateResponse)
+async def armar(request: PlayRequest):
+    """
+    Deja un grafico esperando turno, sin mandarlo a CasparCG.
+
+    Es /preview que ademas se acuerda. La diferencia importa desde que
+    hay dos pantallas: /preview devolvia los datos a quien preguntaba y
+    ahi se acababa, asi que lo armado solo existia en ese navegador. Un
+    monitor colgado en otro sitio no tenia forma de enterarse.
+
+    Devuelve el estado entero y no un «ok» porque quien arma quiere
+    repintar sus botones en el acto, sin esperar al siguiente sondeo.
+    """
+    template = _resolve(request.graphic_id)
+
+    data = await _payload(template, request.pilot_id, request.data,
+                          request.category_id, request.event_id,
+                          request.pilot_id_2)
+
+    if data and not template.accepts_data:
+        raise HTTPException(
+            status_code=400,
+            detail=f"La plantilla '{template.graphic_id}' no recibe datos",
+        )
+
+    service.armar(template, data, {
+        "pilot_id": request.pilot_id,
+        "pilot_id_2": request.pilot_id_2,
+        "category_id": request.category_id,
+        "event_id": request.event_id,
+        "data": request.data,
+    })
+
+    return await get_state()
+
+
+@graphics.post("/armar/retirada", tags=["Graphics"], response_model=StateResponse)
+async def armar_retirada(request: DesarmarRequest):
+    """Arma el apagado de una capa, para poder previsualizar un quite."""
+    if request.group not in LAYERS:
+        raise HTTPException(404, f"Grupo '{request.group}' no existe")
+
+    service.armar_retirada(request.group)
+    return await get_state()
+
+
+@graphics.post("/desarmar", tags=["Graphics"], response_model=StateResponse)
+async def desarmar(request: DesarmarRequest):
+    """Ese grupo deja de esperar turno."""
+    service.desarmar(request.group)
+    return await get_state()
+
+
+@graphics.post("/descartar", tags=["Graphics"], response_model=StateResponse)
+async def descartar():
+    """Se olvida todo lo armado, sin tocar lo que esta al aire."""
+    service.descartar()
+    return await get_state()
+
 
 @graphics.post("/play", tags=["Graphics"], response_model=GraphicResponse)
 async def play_graphic(request: PlayRequest):
@@ -302,6 +369,8 @@ async def play_graphic(request: PlayRequest):
         service.play(template, data),
         graphic_id=template.graphic_id,
         layer=template.layer,
+        data=data,
+        path=template.path,
     )
 
 
@@ -327,6 +396,8 @@ async def update_graphic(request: UpdateRequest):
         service.update(template, data),
         graphic_id=template.graphic_id,
         layer=template.layer,
+        data=data,
+        path=template.path,
     )
 
 

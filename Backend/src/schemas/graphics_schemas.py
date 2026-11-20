@@ -52,6 +52,12 @@ class UpdateRequest(BaseModel):
         return self
 
 
+class DesarmarRequest(BaseModel):
+    """Qué grupo deja de esperar turno."""
+
+    group: str
+
+
 class ClearRequest(BaseModel):
     """
     Saca de aire una capa. Se puede indicar por gráfico o por grupo;
@@ -92,6 +98,14 @@ class GraphicResponse(BaseModel):
 
     on_air: dict[str, str] = Field(default_factory=dict, description="Gráfico al aire por grupo")
 
+    # Lo que acaba de recibir la plantilla, para el monitor de aire del
+    # panel. Viaja de vuelta en la misma respuesta y no en una peticion
+    # aparte: pedirlo otra vez volveria a resolver el clima contra su
+    # servicio externo y a releer el cronometraje, y ademas podria
+    # devolver algo distinto de lo que de verdad salio.
+    data: Optional[dict] = None
+    path: Optional[str] = None
+
 
 class StateResponse(BaseModel):
     connected: bool
@@ -99,3 +113,17 @@ class StateResponse(BaseModel):
     port: int
     channel: int
     on_air: dict[str, str] = Field(default_factory=dict)
+
+    # Lo mismo con la ruta de la plantilla y los datos de cada capa, de
+    # atras hacia delante. Con esto cualquier navegador reconstruye la
+    # composicion que esta saliendo, sin haber sido el que la mando.
+    al_aire: list[dict] = Field(default_factory=list)
+
+    # Lo que espera turno, por grupo, para que el panel pinte sus botones
+    # en ambar. Un valor nulo quiere decir que esa capa se apaga.
+    armado: dict[str, dict | None] = Field(default_factory=dict)
+
+    # Y la composicion que saldria si se mandara ahora: el aire con lo
+    # armado encima. La calcula el backend para que el panel y el monitor
+    # no puedan discrepar sobre lo mismo.
+    previo: list[dict] = Field(default_factory=list)

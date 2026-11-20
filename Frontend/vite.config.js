@@ -26,6 +26,13 @@ export default defineConfig({
       '/api':    { target: BACKEND, changeOrigin: true },
       '/public': { target: BACKEND, changeOrigin: true },
       '/media':  { target: BACKEND, changeOrigin: true },
+
+      // Las plantillas de la vista previa. Tienen que entrar por el
+      // proxy y no apuntando al 8080 a pelo: el panel les habla dentro
+      // del iframe, y un navegador solo lo permite si vienen del mismo
+      // origen. Sin esta línea la vista previa funciona compilada y se
+      // queda en blanco en desarrollo.
+      '/plantillas': { target: BACKEND, changeOrigin: true },
     },
   },
 })

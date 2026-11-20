@@ -17,6 +17,7 @@ import CategoriasModule from './pages/Categorias'
 import PilotosModule from './pages/Pilotos'
 import VehiculosModule from './pages/Vehiculos'
 import GraficosModule from './pages/Graficos'
+import PrevioModule from './pages/Previo'
 import UsuariosModule from './pages/Usuarios'
 import AjustesModule from './pages/Ajustes'
 
@@ -47,6 +48,17 @@ export default function App() {
                   pantalla de disciplina saluda por nombre, y filtrar la
                   base no tiene sentido antes de saber quién entra. */}
               <Route element={<ProtectedRoute />}>
+
+                {/* Los dos monitores que se cuelgan en pantallas aparte,
+                    uno por dirección: lo que se pone en una pared son dos
+                    pantallas, no una partida en dos.
+                    Dentro de la sesión, porque lee el estado de la
+                    emisión, pero fuera del armazón del panel: no lleva
+                    barra lateral ni pregunta disciplina. Enseña lo que
+                    haya al aire, sea de circuito o de drag. */}
+                <Route path="previo" element={<PrevioModule bus="previo" />} />
+                <Route path="aire"   element={<PrevioModule bus="aire" />} />
+
                 <Route element={<DisciplinaGate />}>
                   <Route element={<MainLayout />}>
                     <Route index             element={<HomeModule />} />

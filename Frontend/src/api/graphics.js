@@ -84,6 +84,38 @@ export const playGraphic = (graphicId, { pilotId, pilotId2, categoryId, eventId,
     },
   })
 
+// ─── Lo armado ────────────────────────────────────────────
+// Lo que espera turno vive en el backend, no en esta pestaña. Quien
+// opera lo hace desde un iPad y mira el resultado en otro monitor;
+// mientras lo armado vivía en la memoria del navegador que armaba,
+// ninguna otra pantalla podía enterarse.
+//
+// Las cuatro devuelven el estado entero para repintar en el acto, sin
+// esperar al siguiente sondeo.
+
+export const armarGraphic = (graphicId, { pilotId, pilotId2, categoryId, eventId, data } = {}) =>
+  request('/armar', {
+    method: 'POST',
+    body: {
+      graphic_id: graphicId,
+      pilot_id: pilotId ?? null,
+      pilot_id_2: pilotId2 ?? null,
+      category_id: categoryId ?? null,
+      event_id: eventId ?? null,
+      data: data ?? null,
+    },
+  })
+
+// Arma el apagado de una capa, para poder previsualizar un quite.
+export const armarRetirada = (group) =>
+  request('/armar/retirada', { method: 'POST', body: { group } })
+
+export const desarmarGrupo = (group) =>
+  request('/desarmar', { method: 'POST', body: { group } })
+
+export const descartarArmado = () =>
+  request('/descartar', { method: 'POST' })
+
 // Refresca los datos de un gráfico ya al aire (CG UPDATE).
 export const updateGraphic = (graphicId, { pilotId, pilotId2, categoryId, eventId, data } = {}) =>
   request('/update', {

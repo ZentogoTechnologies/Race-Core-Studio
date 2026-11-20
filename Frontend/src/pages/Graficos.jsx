@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import SelectorCarrera from '../components/graphics/SelectorCarrera'
 import SelectorPiloto, { CLASE_CAMPO } from '../components/graphics/SelectorPiloto'
 import FormularioDuelo from '../components/graphics/FormularioDuelo'
+import VistaPrevia from '../components/graphics/VistaPrevia'
 import { useCarrera } from '../context/CarreraContext'
 import { useDisciplina } from '../context/DisciplinaContext'
 import {
@@ -11,10 +12,11 @@ import {
   Radio, PowerOff, Search, Eye, EyeOff, Loader2, Eraser, AlertTriangle, X, MessageSquare,
   Users, RefreshCw, Play, Pause, RotateCcw, Timer, Plus, Minus, Check,
   Wrench, Droplets, Ban, Table2, Lock, Repeat, Tag, Swords, Watch,
-  GalleryHorizontalEnd, Layers, ChevronDown, ChevronUp,
+  GalleryHorizontalEnd, Layers, ChevronDown, ChevronUp, Megaphone, PenLine,
 } from 'lucide-react'
 import {
   playGraphic, updateGraphic, clearGroup, clearAll, getState, getPilots, getCategories,
+  armarGraphic, armarRetirada, desarmarGrupo, descartarArmado,
   getClasificacion,
   getLineup, setDriver, getTimer, startTimer, pauseTimer, resetTimer,
   configTimer, lapTimer,
@@ -137,6 +139,15 @@ const MISCELANEOS = [
     detalle: 'Identificación del comentarista', Icon: MessageSquare, ...ROJO },
   { id: 'reportero', label: 'Reportero', nombre: 'Reportero',
     detalle: 'Identificación del reportero', Icon: Radio, ...ROJO },
+  // El mismo arte que los tres de arriba pero sin rótulo fijo: el título
+  // y el nombre los escribe quien opera. Para lo que no cabe en los
+  // otros tres y no compensa volver un botón propio cada vez.
+  { id: 'rotulo-libre', label: 'Rótulo Libre', nombre: 'Rótulo Libre',
+    detalle: 'Título y nombre escritos al momento', Icon: PenLine, ...ROJO },
+  // El mismo con sitio para cuatro. Salen los que se rellenen: dejar
+  // huecos vacíos reservados se lee como un fallo, no como un sitio libre.
+  { id: 'rotulo-multiple', label: 'Rótulo Múltiple', nombre: 'Rótulo Múltiple',
+    detalle: 'Hasta cuatro personas a la vez', Icon: Users, ...ROJO },
 ]
 
 // ─── Tótems: la clasificación en vivo ─────────────────────────
@@ -154,6 +165,16 @@ const BARRAS = [
   { id: 'barra-inferior', label: 'Barra Inferior', nombre: 'Barra Inferior',
     detalle: 'La clasificación pasando por abajo, en bucle', Icon: GalleryHorizontalEnd,
     icon: 'text-sky-400', border: 'border-sky-500', bgActive: 'bg-sky-500/10', dot: 'bg-sky-400' },
+]
+
+// El logo del autodromo con los patrocinadores rotando en la esquina.
+// Capa propia (80) y por encima de la barra: se queda puesto el evento
+// entero, y sacar cualquier otro grafico no puede tumbarlo. Una mosca de
+// esquina sigue ahi aunque entre el cuadro de resultados.
+const PATROCINIO = [
+  { id: 'patrocinadores', label: 'Patrocinadores', nombre: 'Patrocinadores',
+    detalle: 'Logo del autódromo y patrocinadores rotando', Icon: Megaphone,
+    icon: 'text-lime-400', border: 'border-lime-500', bgActive: 'bg-lime-500/10', dot: 'bg-lime-400' },
 ]
 
 const TOTEMS = [
@@ -212,6 +233,18 @@ const GRAFICOS = [...BACKGROUNDS, ...BANDERAS, ...MISCELANEOS, ...TOTEMS, ...FIC
                   ...GRILLAS, ...DRAGWAR, ...COMPETENCIA]
 
 // Misma grilla en las tres secciones para que las columnas queden alineadas.
+// ─── Grupos que no comparten pantalla ─────────────────────────
+// El tótem y el cuadro de resultados ocupan el mismo sitio y se tapan a
+// medias: el tótem asoma por la izquierda, cortado. Sacar uno retira el
+// otro, en los dos sentidos.
+//
+// No se resuelve juntándolos en una capa, que seria la forma corta. Entre
+// la 20 del tótem y la 70 del cuadro viven las banderas, la grilla, la
+// ficha de piloto y los misceláneos; compartiendo capa, el cuadro dejaría
+// de ir por delante de todos esos o el tótem pasaría a taparlos. Lo que
+// se excluye es esta pareja, no su relación con el resto.
+const RIVALES = { totem: 'results', results: 'totem' }
+
 const GRID = 'grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3'
 
 // ─── Categoría en pantalla ─────────────────────────────────
@@ -335,7 +368,11 @@ function SelectorCategoria({ clases, clase, onElegir, pendiente, ocupado }) {
 }
 
 // ─── Botón de gráfico ─────────────────────────────────────────
-function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClick }) {
+// `isActive` es rojo y significa al aire, siempre. `isArmed` es ambar y
+// significa que espera en el previo. Es la unica regla que hay que
+// recordar para no mandar algo sin querer, y por eso ningun otro estado
+// usa el rojo.
+function GraphicButton({ item, isActive, isArmed, isEditing, isPending, bloqueado, onClick }) {
   const { Icon, label, detalle } = item
   return (
     <button
@@ -348,6 +385,8 @@ function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClic
       className={`relative w-full flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200 disabled:cursor-not-allowed ${
         isActive
           ? `${item.border} ${item.bgActive} text-white`
+          : isArmed
+          ? 'border-amber-400 bg-amber-400/10 text-white'
           : isEditing
             ? 'border-neutral-500 bg-neutral-900 text-white'
             : 'border-neutral-800 bg-[#0a0a0a] text-neutral-300 hover:border-neutral-600 hover:bg-neutral-900'
@@ -355,11 +394,17 @@ function GraphicButton({ item, isActive, isEditing, isPending, bloqueado, onClic
     >
       {isPending
         ? <Loader2 size={20} className={`flex-shrink-0 animate-spin ${item.icon}`} />
-        : <Icon size={20} className={`flex-shrink-0 ${item.icon}`} />}
+        : <Icon size={20} className={`flex-shrink-0 ${isArmed && !isActive ? 'text-amber-400' : item.icon}`} />}
       <span className="font-semibold text-sm truncate">{t(label)}</span>
       {/* Fuera del flujo: el ancho del botón no cambia al activarse */}
       {isActive && (
         <span className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ${item.dot} animate-pulse`} />
+      )}
+      {/* Puede estar rojo y ambar a la vez: al aire uno, armado otro en
+          la misma capa. Esa es justamente la situacion de previo y
+          programa, y se ve de un vistazo. */}
+      {isArmed && (
+        <span className="absolute bottom-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400" />
       )}
     </button>
   )
@@ -378,12 +423,15 @@ const REQUIERE_DATOS = {
   'dragwar':        'duelo-drag',
   'competencia':    'duelo-drag',
   'categoria':      'categoria',  // se elige cuál de las del evento
+  // Como el de narrador, mas el titulo: aqui no lo pone la plantilla.
+  'rotulo-libre':   'rotulo',
+  'rotulo-multiple': 'rotulos',
 }
 
 // ─── Formulario en línea ──────────────────────────────────────
 function FormularioPersonal({
   item, tipo, pilotosRegistrados, categorias,
-  narrador, setNarrador, pilotoId, setPilotoId,
+  narrador, setNarrador, rotulos, setRotulos, pilotoId, setPilotoId,
   categoriaFicha, setCategoriaFicha,
   pilotoRival, setPilotoRival,
   categoriaCarta, setCategoriaCarta, carrera,
@@ -413,7 +461,13 @@ function FormularioPersonal({
     pilotoElegido.categorias.length > 1 &&
     categoriaFicha === null
 
-  const listo = tipo === 'narrador'
+  // El rótulo libre pide las dos cosas: sin título es un comentarista
+  // sin decir de qué, y sin nombre no identifica a nadie.
+  const listo = tipo === 'rotulos'
+    ? rotulos.some(r => r.nombre.trim() !== '')
+    : tipo === 'rotulo'
+    ? narrador.titulo.trim() !== '' && narrador.nombre.trim() !== ''
+    : tipo === 'narrador'
     ? narrador.nombre.trim() !== ''
     : tipo === 'categoria'
       ? categoriaCarta !== null
@@ -514,6 +568,66 @@ function FormularioPersonal({
             onElegir={p => setPilotoRival(p.id)}
             onQuitar={() => setPilotoRival(null)}
           />
+        </div>
+      ) : tipo === 'rotulos' ? (
+        <div className="space-y-3">
+          {rotulos.map((fila, i) => (
+            <div key={i} className="grid grid-cols-1 md:grid-cols-[2rem_1fr_1fr] gap-3 items-end">
+              <span className="hidden md:block text-xs font-mono text-neutral-600 pb-2.5">{i + 1}</span>
+              <div>
+                {/* El rótulo de la columna solo en la primera: repetido
+                    cuatro veces es ruido, y las cuatro filas se leen
+                    como una tabla. */}
+                {i === 0 && (
+                  <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Título')}</label>
+                )}
+                <input
+                  type="text" value={fila.titulo} className={inputClass}
+                  placeholder={i === 0 ? t('DIRECTOR DE CARRERA') : ''}
+                  onChange={e => setRotulos(prev => prev.map((f, n) =>
+                    n === i ? { ...f, titulo: e.target.value } : f))}
+                />
+              </div>
+              <div>
+                {i === 0 && (
+                  <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Nombre')}</label>
+                )}
+                <input
+                  type="text" value={fila.nombre} className={inputClass}
+                  onChange={e => setRotulos(prev => prev.map((f, n) =>
+                    n === i ? { ...f, nombre: e.target.value } : f))}
+                />
+              </div>
+            </div>
+          ))}
+          <p className="text-[11px] text-neutral-500">
+            {t('Salen solo las filas con nombre. Las vacías no ocupan sitio.')}
+          </p>
+        </div>
+      ) : tipo === 'rotulo' ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Título')}</label>
+            <input
+              type="text" value={narrador.titulo} className={inputClass}
+              placeholder={t('DIRECTOR DE CARRERA')}
+              onChange={e => setNarrador({ ...narrador, titulo: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Nombre')}</label>
+            <input
+              type="text" value={narrador.nombre} className={inputClass}
+              onChange={e => setNarrador({ ...narrador, nombre: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="block text-neutral-400 text-xs mb-1 uppercase">{t('Equipo / Canal')}</label>
+            <input
+              type="text" value={narrador.equipo} className={inputClass}
+              onChange={e => setNarrador({ ...narrador, equipo: e.target.value })}
+            />
+          </div>
         </div>
       ) : tipo === 'narrador' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -618,6 +732,7 @@ const SECCIONES = {
   miscelaneos: { titulo: 'Misceláneos',     grupo: 'misc',       capa: 60, items: MISCELANEOS },
   resultados:  { titulo: 'Resultados',      grupo: 'results',    capa: 70, items: RESULTADOS },
   barras:      { titulo: 'Barra Inferior',  grupo: 'barra',      capa: 75, items: BARRAS },
+  patrocinio:  { titulo: 'Patrocinadores',  grupo: 'patrocinio', capa: 80, items: PATROCINIO },
 }
 
 // ─── Control de la tanda ───────────────────────────────
@@ -883,6 +998,9 @@ const TABS = [
     titulo: 'General',
     secciones: [
       SECCIONES.fondos,
+      // Aqui y no en Circuito: se pone una vez al empezar la jornada y
+      // se queda puesto. No es algo que se opere tanda a tanda.
+      SECCIONES.patrocinio,
       SECCIONES.miscelaneos,
     ],
   },
@@ -968,6 +1086,30 @@ export default function GraficosModule() {
 
   const [alAire,    setAlAire]    = useState({})
 
+  /* ── Vista previa ──────────────────────────────────────────
+     `modo` decide que significa pulsar un grafico: en directo sale al
+     aire, en previo se arma. Es un interruptor y no dos botones por
+     tarjeta porque una bandera roja no puede costar dos pulsaciones.
+
+     `pintado` guarda lo ultimo que recibio cada capa, para que el
+     monitor de aire pueda reconstruir en el navegador lo mismo que
+     esta saliendo. `armado` es lo que espera: un grafico, o null para
+     decir «esta capa se apaga al mandar». */
+  const [modo,    setModo]    = useState('directo')
+
+  /* La composicion que saldria si se mandara ahora lo armado. La calcula
+     el backend —es el aire con los cambios encima, y la regla de que el
+     totem y el cuadro no comparten pantalla— para que esta caja y el
+     monitor colgado en otra pantalla no puedan discrepar. */
+  const [previo,  setPrevio]  = useState([])
+
+  /* Lo que se retiro para dejar sitio, y quien lo retiro. Sin esto el
+     grafico desplazado se perdia: se le hacia CLEAR y al quitar el que
+     entro no quedaba nada que devolver a pantalla. */
+  const [desplazado, setDesplazado] = useState({})
+  const [pintado, setPintado] = useState({})
+  const [armado,  setArmado]  = useState({})
+
   // Vuelta rápida: si el desplegable está abierto y quién la tiene. El
   // piloto se consulta al cronometraje porque la franja solo puede
   // abrirse bajo su fila, y a veces no está entre los que se ven.
@@ -995,7 +1137,13 @@ export default function GraficosModule() {
 
   // Formulario de datos: qué botón lo tiene abierto y sus valores.
   const [formAbierto, setFormAbierto] = useState(null)
-  const [narrador,    setNarrador]    = useState({ nombre: '', equipo: '' })
+  const [narrador,    setNarrador]    = useState({ nombre: '', equipo: '', titulo: '' })
+
+  /* Las cuatro del rótulo múltiple. Se guardan las cuatro aunque salgan
+     menos: quien opera escribe dos, saca el gráfico, y luego añade la
+     tercera sin tener que reescribir las anteriores. */
+  const [rotulos, setRotulos] = useState(
+    [0, 1, 2, 3].map(() => ({ titulo: '', nombre: '' })))
   const [pilotoId,    setPilotoId]    = useState(null)
 
   // Desde qué categoría se grafica al piloto. Solo se pregunta cuando
@@ -1047,11 +1195,31 @@ export default function GraficosModule() {
   // estaba graficando (o se recargó la página) los botones aparecen
   // encendidos en vez de mentir diciendo que no hay nada.
   // El backend ya devuelve on_air indexado por grupo, así que entra tal cual.
+  /* Se pregunta en vez de recordar. Dos veces por segundo, el mismo
+     ritmo al que las plantillas consultan el cronometraje.
+
+     Antes bastaba una lectura al entrar, porque el unico que cambiaba
+     las cosas era este navegador. Desde que se puede armar desde un
+     iPad y mirar desde el PC, esta pestaña tiene que enterarse de lo
+     que hizo la otra. */
   useEffect(() => {
-    getState()
-      .then(estado => setAlAire(estado?.on_air || {}))
-      .catch(() => {})  // sin backend se arranca en blanco, sin molestar
-  }, [])
+    let vivo = true
+    let reloj = null
+
+    const mirar = async () => {
+      try {
+        const estado = await getState()
+        if (!vivo) return
+        setAlAire(estado?.on_air || {})
+        anotarEstado(estado)
+      } catch { /* sin backend se sigue con lo ultimo, sin molestar */ }
+
+      if (vivo) reloj = setTimeout(mirar, 500)
+    }
+
+    mirar()
+    return () => { vivo = false; if (reloj) clearTimeout(reloj) }
+  }, [])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Los pilotos vienen del registro: el botón solo manda el pilot_id y el
   // backend arma los datos que recibirá la plantilla.
@@ -1177,8 +1345,11 @@ export default function GraficosModule() {
     setPendiente(id)
     setError(null)
     try {
-      await accion()
-      alConfirmar()
+      // El resultado llega al confirmador: play y update devuelven lo
+      // que recibio la plantilla, y el monitor de aire lo necesita para
+      // pintar lo mismo que salio.
+      const resultado = await accion()
+      alConfirmar(resultado)
     } catch (e) {
       setError(e.message)
     } finally {
@@ -1188,6 +1359,108 @@ export default function GraficosModule() {
 
   const marcar = (grupo, id) => setAlAire(prev => ({ ...prev, [grupo]: id }))
 
+  /* Lo que contesta el servidor sobre lo armado. Las rutas de armar
+     devuelven el estado entero justamente para esto: repintar sin
+     esperar medio segundo al sondeo. */
+  const anotarEstado = (estado) => {
+    if (!estado) return
+    setArmado(estado.armado || {})
+    setPrevio(estado.previo || [])
+  }
+
+  /* Lo que acaba de recibir una capa, para el monitor.
+
+     Los datos se acumulan en vez de reemplazarse porque un UPDATE manda
+     solo el campo que cambia —{clase:"B"}, {crono:true}—, igual que al
+     aire, donde la plantilla los va sumando a lo que ya tenia. Quedarse
+     solo con el ultimo dejaria el monitor sin lo anterior en cuanto
+     tuviera que remontarse. */
+  const anotar = (grupo, r, extra) => {
+    if (!r?.path) return
+    setPintado(prev => ({
+      ...prev,
+      [grupo]: {
+        graphic_id: r.graphic_id,
+        layer: r.layer,
+        path: r.path,
+        data: { ...(prev[grupo]?.graphic_id === r.graphic_id ? prev[grupo]?.data : null), ...(r.data || {}) },
+        // Con que se saco: hace falta para poder reponerlo tal cual si
+        // algo lo desplaza. Los UPDATE no lo traen y no deben pisarlo.
+        extra: extra !== undefined ? extra : prev[grupo]?.extra,
+      },
+    }))
+  }
+
+  const olvidar = (grupo) => setPintado(prev => {
+    const { [grupo]: _fuera, ...resto } = prev
+    return resto
+  })
+
+  /* ── Quien aparta a quien ──────────────────────────────────
+
+     Apartar no es quitar. El grafico desplazado se guarda con lo que
+     hacia falta para volver a sacarlo igual, y vuelve solo en cuanto se
+     va el que ocupo su sitio.
+
+     Antes se le hacia CLEAR y ahi acababa: quitabas el cuadro de
+     resultados y la pantalla se quedaba vacia, con el totem perdido. */
+  const apartar = (grupo, por) => {
+    setDesplazado(prev => ({
+      ...prev,
+      [grupo]: {
+        graphic_id: alAire[grupo],
+        extra: pintado[grupo]?.extra,
+        por,
+        // Como estaba pintado, para que el previo pueda enseñarlo
+        // volviendo sin tener que pedirselo otra vez al backend.
+        pintura: pintado[grupo],
+      },
+    }))
+    marcar(grupo, null); olvidar(grupo)
+  }
+
+  const soltar = (grupo) => setDesplazado(prev => {
+    const { [grupo]: _fuera, ...resto } = prev
+    return resto
+  })
+
+  // Que habia apartado este grupo, si es que apartó algo.
+  const apartadoPor = (grupo) =>
+    Object.entries(desplazado).find(([, d]) => d.por === grupo) || null
+
+  /* Saca de aire un grupo y repone lo que ese grupo hubiera apartado.
+     Lo usan el boton del grafico y el de Limpiar de la seccion, que
+     tienen que comportarse igual. */
+  const quitarYreponer = (idPendiente, grupo) => {
+    const vuelve = apartadoPor(grupo)
+
+    return ejecutar(idPendiente,
+      async () => {
+        await clearGroup(grupo)
+        // Despues del CLEAR, no a la vez: son capas distintas, pero asi
+        // el orden en pantalla es el que se espera ver.
+        return vuelve ? playGraphic(vuelve[1].graphic_id, vuelve[1].extra) : null
+      },
+      (r) => {
+        marcar(grupo, null); olvidar(grupo)
+        if (!vuelve) return
+
+        const [suyo, lo] = vuelve
+        marcar(suyo, lo.graphic_id)
+        anotar(suyo, r, lo.extra)
+        soltar(suyo)
+      })
+  }
+
+  /* Toda actualizacion pasa por aqui para quedar anotada. Sin esto el
+     monitor se quedaria en la version que salio al aire y no reflejaria
+     un cambio de categoria ni la franja de la vuelta rapida. */
+  const mandarUpdate = async (id, extra) => {
+    const r = await updateGraphic(id, extra)
+    anotar(GRUPO_DE[id], r)
+    return r
+  }
+
   // Saca un gráfico al aire, o lo quita si ya estaba.
   //
   // No hace falta limpiar antes de cambiar dentro de la misma capa: un
@@ -1195,11 +1468,110 @@ export default function GraficosModule() {
   // grupo tiene su propia capa, tocar una nunca afecta a las otras.
   const alternar = (id, extra) => {
     const grupo = GRUPO_DE[id]
+    const quitando = alAire[grupo] === id
 
-    if (alAire[grupo] === id) {
-      return ejecutar(id, () => clearGroup(grupo), () => marcar(grupo, null))
+    // En previo nada viaja a CasparCG: se arma y espera.
+    if (modo === 'previo') return armar(id, grupo, extra, quitando)
+
+    if (quitando) return quitarYreponer(id, grupo)
+
+    // El rival se retira antes de sacar el nuevo, no después: al revés
+    // habría un instante con los dos encima, que es lo que se quiere
+    // evitar.
+    const rival = RIVALES[grupo]
+    const retirar = rival && alAire[rival] ? rival : null
+
+    return ejecutar(id,
+      async () => {
+        if (retirar) await clearGroup(retirar)
+        return playGraphic(id, extra)
+      },
+      (r) => {
+        if (retirar) apartar(retirar, grupo)
+        marcar(grupo, id); anotar(grupo, r, extra)
+        // Sacar algo en esta capa cancela que estuviera esperando turno:
+        // ya hay otra cosa puesta y reponer la vieja seria pisarla.
+        soltar(grupo)
+      })
+  }
+
+  /* ── Armar, descartar y mandar ─────────────────────────────
+
+     Armar es pedirle al backend los mismos datos que mandaria al aire
+     y quedarselos. Se usa su armador y no uno propio del panel a
+     proposito: si el panel compusiera los datos por su cuenta, lo
+     previsualizado y lo emitido podrian discrepar, y entonces mirar
+     antes no probaria nada.
+
+     Un grafico que ya esta al aire se arma «en negativo»: queda
+     apuntado como null, que significa que esa capa se apaga al mandar.
+     Asi quitar tambien se previsualiza. */
+  const armar = (id, grupo, extra, quitando) => {
+    // Pulsar lo ya armado lo desarma: es la vuelta atras natural.
+    const yaArmado = armado[grupo]
+    if (yaArmado?.graphic_id === id || (quitando && yaArmado === null)) {
+      return ejecutar(id, () => desarmarGrupo(grupo), anotarEstado)
     }
-    return ejecutar(id, () => playGraphic(id, extra), () => marcar(grupo, id))
+
+    // Todo esto va al servidor y no a esta pestaña: el monitor colgado
+    // en otra pantalla tiene que ver lo mismo, y quien opera puede estar
+    // en un iPad. La respuesta trae el estado entero, así que los
+    // botones se repintan sin esperar al sondeo.
+    if (quitando) return ejecutar(id, () => armarRetirada(grupo), anotarEstado)
+
+    return ejecutar(id, () => armarGraphic(id, extra), anotarEstado)
+  }
+
+  const descartar = () => ejecutar('descartar', descartarArmado, anotarEstado)
+
+  /* Todo lo armado se aplica de una vez, que es lo que se vio en el
+     monitor. De uno en uno se veria una composicion intermedia que
+     nadie previsualizo. */
+  /* El `extra` vuelve del servidor con los nombres del API. Mandarlo es
+     repetir la misma peticion que se previsualizo, asi que hay que
+     devolverlo a la forma que entiende el cliente. */
+  const comoPeticion = (extra) => ({
+    pilotId:    extra?.pilot_id ?? null,
+    pilotId2:   extra?.pilot_id_2 ?? null,
+    categoryId: extra?.category_id ?? null,
+    eventId:    extra?.event_id ?? null,
+    data:       extra?.data ?? null,
+  })
+
+  const mandarAlAire = () => {
+    const entradas = Object.entries(armado)
+    if (!entradas.length) return
+
+    // Los rivales de lo que se va a sacar, si estan al aire y no se
+    // estan armando ellos mismos.
+    const retirar = [...new Set(entradas
+      .filter(([, lo]) => lo !== null)
+      .map(([grupo]) => RIVALES[grupo])
+      .filter(r => r && alAire[r] && !(r in armado)))]
+
+    return ejecutar('al-aire',
+      async () => {
+        // Primero se retiran, despues entra lo nuevo: al reves habria un
+        // instante con los dos encima.
+        await Promise.all(retirar.map(clearGroup))
+        return Promise.all(entradas.map(([grupo, lo]) =>
+          lo === null ? clearGroup(grupo) : playGraphic(lo.graphic_id, comoPeticion(lo.extra))))
+      },
+      (resultados) => {
+        // Se apartan, no se pierden: vuelven en cuanto se quite el que
+        // les ocupo el sitio, igual que en directo.
+        retirar.forEach(grupo => apartar(grupo, RIVALES[grupo]))
+
+        entradas.forEach(([grupo, lo], i) => {
+          if (lo === null) { marcar(grupo, null); olvidar(grupo); return }
+          marcar(grupo, lo.graphic_id)
+          anotar(grupo, resultados[i], lo.extra)
+          soltar(grupo)
+        })
+        /* No se vacia aqui: el backend suelta lo armado de cada capa
+           al sacar algo en ella, y el sondeo lo refleja. Vaciarlo
+           tambien aqui seria una segunda version de la verdad. */
+      })
   }
 
   // Limpia solo esa capa: CLEAR 1-<capa>. Las demás siguen al aire.
@@ -1226,7 +1598,7 @@ export default function GraficosModule() {
   }, [disciplina, carrera, limpiar])
 
   const limpiarGrupo = (grupo) =>
-    ejecutar(`limpiar-${grupo}`, () => clearGroup(grupo), () => marcar(grupo, null))
+    quitarYreponer(`limpiar-${grupo}`, grupo)
 
   // Los gráficos con formulario mandan sus datos al sacarlos al aire.
   const datosDelForm = (item) => {
@@ -1241,6 +1613,22 @@ export default function GraficosModule() {
     if (tipo === 'narrador') {
       return { data: { name: narrador.nombre, text: narrador.equipo } }
     }
+    // El rótulo libre manda además el título, que en los otros tres lo
+    // trae escrito la plantilla.
+    if (tipo === 'rotulo') {
+      return { data: { role: narrador.titulo, name: narrador.nombre, text: narrador.equipo } }
+    }
+    // Se filtra aquí y no en la plantilla: lo que no tiene nombre no es
+    // una persona, y mandarlo abriría un hueco en blanco al aire.
+    if (tipo === 'rotulos') {
+      return {
+        data: {
+          filas: rotulos
+            .filter(r => r.nombre.trim() !== '')
+            .map(r => ({ name: r.nombre.trim(), role: r.titulo.trim() })),
+        },
+      }
+    }
     return undefined
   }
 
@@ -1254,7 +1642,7 @@ export default function GraficosModule() {
     const abrir = !mejorVuelta
 
     ejecutar('mejor-vuelta',
-      () => updateGraphic(totem, { data: { mejor_vuelta: abrir } }),
+      () => mandarUpdate(totem, { data: { mejor_vuelta: abrir } }),
       () => setMejorVuelta(abrir))
   }
 
@@ -1272,7 +1660,7 @@ export default function GraficosModule() {
     const encender = !cronoRapida
 
     ejecutar('crono-rapida',
-      () => updateGraphic(totem, { data: { crono: encender } }),
+      () => mandarUpdate(totem, { data: { crono: encender } }),
       () => setCronoRapida(encender))
   }
 
@@ -1285,7 +1673,7 @@ export default function GraficosModule() {
     setListaAbierta(false)
 
     ejecutar('comparar',
-      () => updateGraphic(totem, { data: { comparar: dorsal } }),
+      () => mandarUpdate(totem, { data: { comparar: dorsal } }),
       () => setComparar(dorsal))
   }
 
@@ -1304,7 +1692,7 @@ export default function GraficosModule() {
 
     ejecutar('clase',
       () => Promise.all(
-        destinos.map(id => updateGraphic(id, { data: { clase: siguiente || '' } }))),
+        destinos.map(id => mandarUpdate(id, { data: { clase: siguiente || '' } }))),
       () => {
         setClase(siguiente)
         // Las franjas abiertas hablan de pilotos que pueden no estar en
@@ -1324,7 +1712,7 @@ export default function GraficosModule() {
     if (!destinos.length) return
 
     destinos.forEach(id => {
-      updateGraphic(id, { data: { clase } }).catch(() => {})
+      mandarUpdate(id, { data: { clase } }).catch(() => {})
     })
   }, [alAire.totem, alAire.barra])   // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1352,6 +1740,13 @@ export default function GraficosModule() {
     ejecutar('sacar-todo', clearAll, () => {
       setAlAire({})
       setFormAbierto(null)
+      // El monitor se vacia con el canal; lo armado sobrevive, que es
+      // justo para lo que sirve: dejar preparada la vuelta.
+      setPintado({})
+      /* Y se olvidan los apartados. «Sacar todo de aire» quiere decir
+         que no quede nada, no que lo apartado reaparezca en cuanto se
+         toque el siguiente boton. */
+      setDesplazado({})
     })
 
   // Los gráficos con datos abren su formulario; el resto sale al aire directo.
@@ -1406,7 +1801,7 @@ export default function GraficosModule() {
       const abrir = columnaTotem === cual ? null : cual
 
       return ejecutar(item.id,
-        () => updateGraphic(totem, { data: { columna: abrir } }),
+        () => mandarUpdate(totem, { data: { columna: abrir } }),
         () => setColumnaTotem(abrir))
     }
 
@@ -1414,6 +1809,21 @@ export default function GraficosModule() {
   }
 
   const itemDelForm = formAbierto ? GRAFICOS.find(i => i.id === formAbierto) : null
+
+  /* Lo que pinta cada monitor, de la capa de atras a la de delante.
+     El previo es el aire con lo armado encima: un grafico suelto no
+     contesta la pregunta que se hace uno mirando, que es si choca con
+     lo que ya esta puesto. */
+  const capasAire = useMemo(
+    () => Object.values(pintado).sort((a, b) => a.layer - b.layer),
+    [pintado])
+
+  /* El previo lo compone el backend y llega en `previo`: el aire con lo
+     armado encima, ya con la regla de que el totem y el cuadro no
+     comparten pantalla. Se calculaba aqui, pero desde que la misma
+     composicion se pinta tambien en un monitor aparte, tenerla escrita
+     dos veces era pedir que acabaran discrepando. */
+  const capasPrevio = previo
 
   const tabActual = TABS.find(tab => tab.id === activeTab) || TABS[0]
 
@@ -1533,6 +1943,24 @@ export default function GraficosModule() {
           </button>
         </div>
       )}
+
+      {/* ── Vista previa ──
+          Va aqui y no en una pestaña por dos razones: las capas son
+          globales —no pertenecen a Carrera ni a DragWar—, y hay que ver
+          el monitor y los botones a la vez. Ademas la barra de estado de
+          arriba ya dice con palabras lo que hay al aire; esto lo dice en
+          pixeles, asi que son la misma informacion y van juntas. */}
+      <VistaPrevia
+        modo={modo}
+        onModo={(m) => { setModo(m); if (m === 'directo') setArmado({}) }}
+        capasAire={capasAire}
+        capasPrevio={capasPrevio}
+        armados={Object.keys(armado).length}
+        onAlAire={mandarAlAire}
+        onDescartar={descartar}
+        ocupado={ocupado}
+        pendiente={pendiente === 'al-aire'}
+      />
 
       {/* ── Pestañas por categoría ── */}
       <div>
@@ -1711,6 +2139,7 @@ export default function GraficosModule() {
                     key={item.id}
                     item={item}
                     isActive={estaAlAire(item)}
+                    isArmed={armado[GRUPO_DE[item.id]]?.graphic_id === item.id}
                     isEditing={formAbierto === item.id}
                     isPending={pendiente === item.id}
                     bloqueado={ocupado || sinTotem(item)}
@@ -1780,7 +2209,7 @@ export default function GraficosModule() {
               // puesto. Recargarlo lo haría entrar otra vez desde abajo.
               if (estaAlAire(itemDelForm)) {
                 return ejecutar(itemDelForm.id,
-                  () => updateGraphic(itemDelForm.id, datos),
+                  () => mandarUpdate(itemDelForm.id, datos),
                   () => {})
               }
               return alternar(itemDelForm.id, datos)
@@ -1798,6 +2227,7 @@ export default function GraficosModule() {
             pilotosRegistrados={pilotosRegistrados}
             categorias={categorias}
             narrador={narrador}   setNarrador={setNarrador}
+            rotulos={rotulos}     setRotulos={setRotulos}
             pilotoId={pilotoId}   setPilotoId={setPilotoId}
             categoriaFicha={categoriaFicha} setCategoriaFicha={setCategoriaFicha}
             pilotoRival={pilotoRival} setPilotoRival={setPilotoRival}
@@ -1809,7 +2239,7 @@ export default function GraficosModule() {
               // Si ya está al aire, refresca los datos sin recargarlo.
               if (estaAlAire(itemDelForm)) {
                 return ejecutar(itemDelForm.id,
-                  () => updateGraphic(itemDelForm.id, datosDelForm(itemDelForm)),
+                  () => mandarUpdate(itemDelForm.id, datosDelForm(itemDelForm)),
                   () => {})
               }
               return alternar(itemDelForm.id, datosDelForm(itemDelForm))

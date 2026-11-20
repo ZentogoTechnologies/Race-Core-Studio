@@ -52,6 +52,11 @@ LAYERS = {
     # así que necesita capa propia: compartiéndola con cualquier otro, ese
     # otro la tumbaría al salir.
     "barra": 75,
+    # El patrocinio se queda puesto todo el evento y no puede caerse
+    # porque alguien saque el clima. Por encima de la barra: una mosca de
+    # esquina sigue ahi aunque entre el cuadro de resultados, que es lo
+    # que se hace en television.
+    "patrocinio": 80,
 }
 
 
@@ -123,6 +128,16 @@ TEMPLATES: dict[str, Template] = {
         Template("clima",       "Clima",        "misc", 60, "html/65_weather",      accepts_data=True),
         Template("comentarista", "Comentarista", "misc", 60, "html/66_comentarist", accepts_data=True),
         Template("reportero",    "Reportero",    "misc", 60, "html/67_reporter",    accepts_data=True),
+        # El mismo arte que los tres de arriba, pero sin rotulo fijo: lo
+        # escribe quien opera, igual que el nombre. Para lo que no cabe
+        # en narrador, comentarista ni reportero —un invitado, el
+        # director de carrera, un patrocinador que habla— y que no
+        # compensa convertir en un boton propio cada vez.
+        Template("rotulo-libre", "Rótulo Libre", "misc", 60, "html/68_free_label", accepts_data=True),
+        # El mismo, con sitio para cuatro: una mesa de comentaristas, el
+        # podio, los tres primeros de una categoria. Salen los que
+        # tengan datos; los huecos sin rellenar no se reservan.
+        Template("rotulo-multiple", "Rótulo Múltiple", "misc", 60, "html/69_multi_label", accepts_data=True),
 
         # ── 1-70 RESULTADOS ──
         # Capa propia: el cuadro ocupa la pantalla y no debe compartir capa
@@ -133,6 +148,13 @@ TEMPLATES: dict[str, Template] = {
         # La clasificación desfilando al pie de pantalla. Se queda puesta
         # toda la carrera, por eso va en su propia capa.
         Template("barra-inferior", "Barra Inferior", "barra", 75, "html/90_bottom_bar", accepts_data=True),
+
+        # ── 1-80 PATROCINADORES ──
+        # El logo del autodromo con los patrocinadores rotando al lado.
+        # No recibe la lista al salir al aire: la pide el solo y la vuelve
+        # a pedir cada pocos segundos, asi un logo subido a mitad de
+        # evento entra en la rotacion sin bajar el grafico.
+        Template("patrocinadores", "Patrocinadores", "patrocinio", 80, "html/95_sponsors", accepts_data=True),
     ]
 }
 
@@ -167,7 +189,10 @@ def serialize_data(data: dict) -> str:
 PUBLIC_DIR = rutas.PUBLICO
 
 # Formatos que CEF (el navegador de CasparCG) sabe pintar.
-EXTENSIONES = (".png", ".jpg", ".jpeg", ".webp", ".avif")
+# El orden manda: _buscar devuelve la primera que exista, asi que el svg
+# va primero. Si alguien subio el logo en vector y quedo ademas un png
+# viejo del mismo numero, interesa el vector.
+EXTENSIONES = (".svg", ".png", ".jpg", ".jpeg", ".webp", ".avif")
 
 
 def _slug(value: str) -> str:
@@ -262,6 +287,29 @@ def category_logo_url(archivo: str | None) -> str:
 
     ruta = PUBLIC_DIR / "categorias" / archivo
     return _url(ruta) if ruta.is_file() else ""
+
+
+def category_logo_por_id(category_id: int | None, archivo: str | None = None) -> str:
+    """
+    Logo de la categoria, buscandolo tambien por su numero.
+
+    Igual que con las fotos de pilotos: vale el campo guardado, y si esta
+    vacio se busca categorias/<id>.<ext>. Hace falta porque las dos cosas
+    se separan con facilidad —hay categorias con su archivo puesto en la
+    carpeta y el campo en nulo, que por el camino del campo no se veian
+    nunca— y porque asi copiar un logo a mano basta para que salga.
+    """
+    if archivo:
+        ruta = PUBLIC_DIR / "categorias" / archivo
+        if ruta.is_file():
+            return _url(ruta)
+
+    if category_id:
+        hallado = _buscar(PUBLIC_DIR / "categorias", str(category_id))
+        if hallado:
+            return _url(hallado)
+
+    return ""
 
 
 def equipo_de(pilot, disciplina: str | None) -> str:
@@ -419,13 +467,45 @@ async def build_pilot_payload(
     )
 
 
+# ── Grupos que no comparten pantalla ──────────────────────────
+#
+# El totem y el cuadro de resultados ocupan el mismo sitio y se tapaban a
+# medias. Sacar uno retira el otro, en los dos sentidos.
+#
+# La regla vive aqui y no en el panel desde que hay dos pantallas: el
+# monitor tiene que componer el previo igual que lo compone el panel, y
+# con una copia en cada lado acabarian discrepando. Una capa compartida
+# no servia: entre la 20 y la 70 estan las banderas, la grilla, la ficha
+# y los miscelaneos, y juntandolas el cuadro dejaria de ir por delante de
+# todos esos.
+RIVALES = {"totem": "results", "results": "totem"}
+
+
 # ── Servicio ──────────────────────────────────────────────────
 
 class GraphicsService:
     def __init__(self):
         self.channel = settings.CASPARCG_CHANNEL
-        # Qué gráfico quedó al aire en cada capa: {layer: graphic_id}
-        self._on_air: dict[int, str] = {}
+        # Qué quedó al aire en cada capa, y con qué datos:
+        #   {layer: {"graphic_id": …, "path": …, "data": {…}}}
+        #
+        # Antes solo guardaba el id. Los datos los recordaba el panel,
+        # en la memoria del navegador que mandó el gráfico, y eso valía
+        # mientras hubiera un solo panel. Con el operador en un iPad y
+        # un monitor aparte hacen falta aquí: es estado de la emisión,
+        # no de una pestaña, y quien pregunte tiene que recibir lo mismo.
+        self._on_air: dict[int, dict] = {}
+
+        # Lo armado esperando turno: {group: entrada | None}.
+        #
+        #   entrada  = el grafico que saldria, con sus datos
+        #   None     = esa capa se apaga al mandar
+        #
+        # Aqui y no en el panel porque quien opera lo hace desde un iPad
+        # y mira el resultado en otro monitor. Mientras vivia en la
+        # memoria del navegador que armaba, ninguna otra pantalla podia
+        # enterarse de lo que habia preparado.
+        self._armado: dict[str, dict | None] = {}
 
     # ── Consultas ─────────────────────────────────────────────
 
@@ -441,10 +521,104 @@ class GraphicsService:
     def on_air(self) -> dict[str, str]:
         """Lo que está al aire, indexado por grupo, para que lo lea el frontend."""
         return {
-            TEMPLATES[gid].group: gid
-            for gid in self._on_air.values()
-            if gid in TEMPLATES
+            TEMPLATES[puesto["graphic_id"]].group: puesto["graphic_id"]
+            for puesto in self._on_air.values()
+            if puesto["graphic_id"] in TEMPLATES
         }
+
+    def al_aire_detallado(self) -> list[dict]:
+        """Lo mismo, pero con lo que hace falta para volver a pintarlo.
+
+        De la capa de atrás a la de delante, que es el orden en que se
+        apilan. Lo usa el monitor del panel y la pantalla de previo: con
+        la ruta de la plantilla y los datos, cualquier navegador
+        reconstruye la misma composición que está saliendo.
+        """
+        salida = []
+        for layer in sorted(self._on_air):
+            puesto = self._on_air[layer]
+            plantilla = TEMPLATES.get(puesto["graphic_id"])
+            if plantilla is None:
+                continue
+            salida.append({
+                "group": plantilla.group,
+                "graphic_id": puesto["graphic_id"],
+                "layer": layer,
+                "path": puesto["path"],
+                "data": puesto.get("data") or None,
+            })
+        return salida
+
+    # ── Lo armado ─────────────────────────────────────────────
+
+    def armar(self, template: Template, data: dict | None, extra: dict | None) -> None:
+        """Deja un grafico esperando turno, sin mandarlo."""
+        self._armado[template.group] = {
+            "graphic_id": template.graphic_id,
+            "layer": template.layer,
+            "path": template.path,
+            "data": dict(data) if data else {},
+            # Con que se pidio: al mandarlo hay que repetir la misma
+            # peticion que se previsualizo, o saldria otra cosa.
+            "extra": dict(extra) if extra else {},
+        }
+
+    def armar_retirada(self, group: str) -> None:
+        """Arma el apagado de una capa, para poder previsualizar un quite."""
+        self._armado[group] = None
+
+    def desarmar(self, group: str) -> None:
+        self._armado.pop(group, None)
+
+    def descartar(self) -> None:
+        self._armado.clear()
+
+    def armado(self) -> dict:
+        """Lo armado por grupo, tal cual, para quien tenga que mandarlo.
+
+        Va con su `extra` —de que piloto, de que evento— porque mandarlo
+        es repetir la misma peticion que se previsualizo. Sin eso, un
+        evento armado saldria al aire sin su event_id y con otro
+        contenido del que se vio en el monitor.
+        """
+        return {
+            grupo: (dict(lo) if lo else None)
+            for grupo, lo in self._armado.items()
+        }
+
+    def previo_detallado(self) -> list[dict]:
+        """La composicion que saldria si se mandara ahora lo armado.
+
+        Es el aire con los cambios encima, no los cambios sueltos: la
+        pregunta que se contesta mirando un previo es si lo nuevo choca
+        con lo que ya esta puesto.
+
+        Se calcula aqui y no en cada pantalla para que el panel y el
+        monitor no puedan discrepar sobre lo mismo.
+        """
+        mezcla = {c["group"]: c for c in self.al_aire_detallado()}
+
+        for grupo, lo in self._armado.items():
+            if lo is None:
+                mezcla.pop(grupo, None)
+                continue
+
+            mezcla[grupo] = {
+                "group": grupo,
+                "graphic_id": lo["graphic_id"],
+                "layer": lo["layer"],
+                "path": lo["path"],
+                "data": lo.get("data") or None,
+            }
+
+            # Armar uno retira al otro tambien en el previo: si no,
+            # ensenaria los dos encima, una composicion que al mandarla
+            # no puede llegar a existir.
+            rival = RIVALES.get(grupo)
+            if rival and rival not in self._armado:
+                mezcla.pop(rival, None)
+
+        return sorted(mezcla.values(), key=lambda c: c["layer"])
 
     def _target(self, layer: int) -> str:
         return f"{self.channel}-{layer}"
@@ -465,8 +639,17 @@ class GraphicsService:
 
         result = await casparcg.send(command)
 
-        # Una capa solo sostiene un gráfico: el nuevo reemplaza al anterior.
-        self._on_air[template.layer] = template.graphic_id
+        # Una capa solo sostiene un gráfico: el nuevo reemplaza al anterior,
+        # y con él se van los datos del que estaba.
+        self._on_air[template.layer] = {
+            "graphic_id": template.graphic_id,
+            "path": template.path,
+            "data": dict(data) if data else {},
+        }
+
+        # Y deja de esperar turno lo que hubiera armado en esta capa: ya
+        # hay algo puesto, y reponer lo viejo seria pisarlo.
+        self._armado.pop(template.group, None)
 
         return result
 
@@ -476,12 +659,28 @@ class GraphicsService:
             f"CG {self._target(template.layer)} UPDATE 1 "
             f"{quote(serialize_data(data))}"
         )
-        return await casparcg.send(command)
+        result = await casparcg.send(command)
+
+        # Se acumulan, no se reemplazan: un UPDATE manda solo el campo
+        # que cambia —{"clase":"B"}, {"crono":true}— igual que al aire,
+        # donde la plantilla los va sumando a lo que ya tenía. Quedarse
+        # con el último dejaría al monitor sin lo anterior.
+        puesto = self._on_air.get(template.layer)
+        if puesto and puesto["graphic_id"] == template.graphic_id and data:
+            puesto["data"] = {**(puesto.get("data") or {}), **data}
+
+        return result
 
     async def clear_layer(self, layer: int) -> dict:
         """CLEAR <canal>-<capa> — saca de aire todo lo que haya en esa capa."""
         result = await casparcg.send(f"CLEAR {self._target(layer)}")
         self._on_air.pop(layer, None)
+
+        # Igual al apagar: lo que esperaba en esa capa ya no espera nada.
+        for grupo, capa in LAYERS.items():
+            if capa == layer:
+                self._armado.pop(grupo, None)
+
         return result
 
     async def clear_all(self) -> dict:
