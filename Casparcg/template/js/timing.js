@@ -20,12 +20,29 @@
        });
 ========================================================================== */
 
-var TIMING_API = "http://127.0.0.1:8080/api/v1";
+/* La direccion del backend.
+
+   Dentro de CasparCG la plantilla se abre desde file://, que no tiene
+   origen del que colgarse, asi que ahi hace falta escribirla entera.
+
+   Pero la misma plantilla corre tambien dentro de la vista previa del
+   panel, servida por HTTP desde el propio backend. Alli esa direccion
+   fija es justo la equivocada: si el panel se abre desde otra maquina o
+   a traves del tunel, 127.0.0.1 es el ordenador de quien mira, no el
+   servidor, y el navegador ademas bloquea una peticion http desde una
+   pagina https. El grafico salia con su cabecera y sin una sola fila.
+
+   Por eso, servida por HTTP se le pregunta a quien la sirvio. */
+var TIMING_API = (location.protocol === "file:")
+    ? "http://127.0.0.1:8080/api/v1"
+    : location.origin + "/api/v1";
 
 /* Cada cuanto se le pregunta al backend. El reloj de carrera avanza por
    segundos, asi que medio segundo va sobrado y no satura nada: el backend
    cachea la lectura del archivo de red. */
 var TIMING_INTERVALO_MS = 500;
+
+
 
 var _timingTimer = null;
 var _timingUltimo = null;
@@ -53,7 +70,9 @@ async function _pedir(limite, clase) {
     const r = await fetch(url, { cache: "no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
 
-    return r.json();
+    // Aqui y no en cada sitio donde se pinta una imagen: es el unico
+    // punto por el que entra todo lo que manda el backend.
+    return reorientar(await r.json());
 }
 
 

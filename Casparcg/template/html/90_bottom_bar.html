@@ -16,7 +16,10 @@
          mitad de vuelta tiene que saber de qué tanda son los tiempos que
          están pasando. -->
     <div class="bi-cabecera">
-        <img class="bi-logo" src="../img/logo-cliente.png" alt="Logo del cliente">
+        <!-- Arranca con el del autodromo y lo reemplaza el de la categoria
+             en cuanto llega el cronometraje. De reserva queda este: una
+             categoria sin logo ensena el del autodromo antes que un hueco. -->
+        <img class="bi-logo" id="bi-logo" src="../img/logo-cliente.png" alt="">
         <div class="bi-titulo">
             <span class="bi-grupo" id="grupo">STREET LEGAL</span>
             <span class="bi-heat"  id="heat">HEAT 1</span>
@@ -29,6 +32,7 @@
 
 </div>
 
+<script src="../js/origen.js"></script>
 <script src="../js/timing.js"></script>
 <script src="../js/barra.js"></script>
 <script>

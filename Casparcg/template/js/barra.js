@@ -204,6 +204,21 @@ function barraPintarCabecera(datos){
     if (barraCabecera.heat) {
         barraCabecera.heat.textContent = datos.heat || datos.run_name || "";
     }
+
+    /* El logo de la categoria que corre, no el del autodromo: ese ya sale
+       en el totem y en la mosca de la esquina, y una tercera vez no decia
+       nada nuevo.
+
+       Solo se toca si cambio. Reasignar el mismo src en cada vuelta del
+       cronometraje —dos veces por segundo— hace que el navegador la
+       vuelva a resolver, y es un grafico que se queda puesto horas.
+
+       Si la categoria no tiene logo se deja el que trae el html, que es
+       el del autodromo: mejor eso que un hueco. */
+    if (barraCabecera.logo && datos.group_logo
+        && barraCabecera.logo.getAttribute("src") !== datos.group_logo) {
+        barraCabecera.logo.src = datos.group_logo;
+    }
 }
 
 
@@ -324,6 +339,7 @@ function arrancarBarra(opciones){
 
     barraCabecera.grupo = document.getElementById("grupo");
     barraCabecera.heat  = document.getElementById("heat");
+    barraCabecera.logo  = document.getElementById("bi-logo");
 
     arrancarTiming({
         limite: barraConfig.limite,
@@ -332,14 +348,18 @@ function arrancarBarra(opciones){
         alRecibir: barraPintar,
     });
 
-    /* Un cuadro de margen antes de subirla: si se añade la clase en el
-       mismo turno en que se pinta, el navegador no llega a ver el estado
-       de partida y la barra aparece de golpe en vez de deslizarse. */
-    requestAnimationFrame(function (){
-        requestAnimationFrame(function (){
-            barraElemento.classList.add("visible");
-        });
-    });
+    /* El navegador tiene que ver el estado de partida antes de que
+       cambie la clase, o la barra aparece de golpe en vez de
+       deslizarse. Leer offsetWidth le obliga a calcularlo ahi mismo.
+
+       Antes iban dos requestAnimationFrame encadenados. Funcionan al
+       aire, pero rAF solo dispara si la pagina se esta pintando, y
+       dentro de la vista previa del panel —en una pestaña de fondo, o
+       con la ventana tapada— no se llamaba nunca: la barra se quedaba
+       fuera de pantalla sin que nada lo delatara. El reflow forzado no
+       depende de que se pinte. */
+    void barraElemento.offsetWidth;
+    barraElemento.classList.add("visible");
 }
 
 

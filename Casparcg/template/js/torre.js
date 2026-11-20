@@ -587,14 +587,15 @@ function torrePintarFilas(standings){
     const comparando = Boolean(torreConfig.comparar);
 
     if (torreAnimarComparar) {
-        /* Dos fotogramas y no uno: con uno solo el navegador puede juntar
-           el pintado y el cambio de clase en el mismo reflow, y la
-           transición vuelve a perderse. */
+        /* El reflow forzado separa el pintado del cambio de clase, que
+           es lo que necesita la transicion para verse. Iban dos
+           requestAnimationFrame, pero rAF solo dispara si la pagina se
+           esta pintando y en la vista previa del panel puede no
+           hacerlo: la franja se quedaba sin abrir. */
         torreAnimarComparar = false;
         torreElemento.classList.remove("comparando");
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            torreElemento.classList.toggle("comparando", comparando);
-        }));
+        void torreElemento.offsetWidth;
+        torreElemento.classList.toggle("comparando", comparando);
     } else {
         /* Repintado de rutina —entró un piloto nuevo, cambió el orden—:
            se repone tal cual estaba. Animarla aquí la cerraría y la
