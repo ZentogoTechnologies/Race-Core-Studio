@@ -369,7 +369,7 @@ jobs:
           path: dist/rcs-setup.exe
 
       - name: Publicar la descarga
-        if: github.ref == 'refs/heads/test-production-1.0'
+        if: github.ref == 'refs/heads/test-production-1.2'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: instalador
