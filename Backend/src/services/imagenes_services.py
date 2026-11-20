@@ -18,7 +18,16 @@ from pathlib import Path
 
 from fastapi import HTTPException
 
-EXTENSIONES = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
+EXTENSIONES = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".svg"}
+
+# El SVG no es una imagen de puntos: ni se abre con Pillow ni se le puede
+# quitar el fondo ni generar una version oscura. Se guarda y se sirve tal
+# cual, que es lo que hace falta para un logotipo —escala sin perder
+# nitidez—, y las operaciones que lo tocarian avisan en vez de reventar.
+#
+# Como <img> no ejecuta el script que pueda traer dentro un SVG, servirlo
+# asi no abre nada: ni las plantillas ni el panel lo meten de otra forma.
+VECTORIALES = {".svg"}
 
 # Ni un trazado ni un retrato llegan a esto; el tope está para que un
 # fichero equivocado no llene el disco.

@@ -156,6 +156,13 @@ def asegurar(original: Path) -> Path | None:
     if not original.is_file() or original.name.startswith("_"):
         return None
 
+    # De un vector no se hace version oscura: Pillow no lo abre. Se
+    # devuelve None, que es lo que ya se hace cuando no se puede, y quien
+    # llama sirve el original. Un SVG suele traer su propia
+    # transparencia, asi que sobre fondo oscuro se ve bien igual.
+    if original.suffix.lower() == ".svg":
+        return None
+
     destino = ruta_oscura(original)
     try:
         if destino.is_file() and destino.stat().st_mtime >= original.stat().st_mtime:

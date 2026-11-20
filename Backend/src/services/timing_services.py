@@ -21,7 +21,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from config import settings
-from src.services.graphics_services import brand_logo_url
+from src.services.graphics_services import brand_logo_url, category_logo_por_id
 from src.models.categories_model import Category
 from src.models.vehicles_model import Vehicle
 
@@ -849,6 +849,11 @@ async def obtener_clasificacion(
         # MyLaps antepone el numero de grupo ("5 - STREET LEGAL"); para
         # pintarlo en el totem interesa solo el nombre.
         "group_name": _sin_prefijo(labels.get("groupname", "")),
+        # El logo de la categoria que se esta corriendo. Lo usa la barra
+        # inferior, que ensena el de la categoria y no el del autodromo:
+        # el del autodromo ya sale en el totem y en la mosca de la
+        # esquina, y repetirlo una tercera vez no decia nada nuevo.
+        "group_logo": category_logo_por_id(cat_tanda),
         "time": mostrar,
         "time_label": reloj["etiqueta"],
         "timer": reloj,

@@ -268,6 +268,15 @@ class CategoryService:
         if not actual.is_file():
             raise HTTPException(400, "El archivo del logo no está en el disco")
 
+        # Un SVG no tiene puntos que recortar, y además casi siempre viene
+        # ya con el fondo transparente. Se avisa en claro en vez de dejar
+        # que Pillow reviente intentando abrirlo.
+        if actual.suffix.lower() == ".svg":
+            raise HTTPException(
+                422,
+                "Este logo es un SVG: no tiene fondo que quitar. "
+                "Si lo trae dibujado, hay que quitarlo en el programa de diseño.")
+
         from src.services.recorte_services import quitar_fondo_plano
 
         try:
