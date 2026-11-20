@@ -1,0 +1,416 @@
+# Construye el instalador de verdad: rcs-setup.exe con interfaz de Inno
+# Setup y todo el producto ya compilado dentro.
+#
+# La diferencia con el flujo viejo es dónde se compila. Antes el .exe era
+# un guion que clonaba el repositorio en la máquina del cliente y
+# compilaba allí: veinte minutos, una terminal y una carpeta con el
+# proyecto entero. Aquí se compila en esta máquina, y el cliente recibe
+# el resultado.
+
+name: Instalador con interfaz
+
+on:
+  push:
+    branches: [test-production-1.0, test-production-1.1, main]
+    paths:
+      - 'installer/**'
+      - 'launcher/**'
+      - 'Backend/**'
+      - 'Frontend/**'
+      - 'Casparcg/template/**'
+      - 'VERSION'
+      - '.github/workflows/instalador-inno.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  # La de MongoDB que se empaqueta. Fijada a propósito: que la versión de
+  # la base de datos cambie sola entre dos compilaciones es justo lo que
+  # no se quiere en un producto que se instala en sitios sin soporte.
+  MONGO_VERSION: 7.0.14
+
+jobs:
+  construir:
+    runs-on: windows-latest
+
+    steps:
+      - name: Traer el código
+        uses: actions/checkout@v4
+        with:
+          # Con LFS: aquí sí hacen falta los binarios de CasparCG, que
+          # viajan dentro del paquete.
+          lfs: true
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Comprobar que la versión cuadra en todas partes
+        run: python tools/version.py
+
+      - name: Revisar lo que no ve el compilador
+        run: |
+          python tools/revisar.py
+          pip install pyflakes
+
+          # Los archivos se listan con Get-ChildItem y no con comodines:
+          # PowerShell no los expande para un programa externo, se los
+          # pasa tal cual, y pyflakes contesta «Invalid argument».
+          $archivos = Get-ChildItem -Recurse -Filter *.py -Path launcher,Backend,installer |
+            Where-Object { $_.FullName -notmatch '\\(venv|tests|__pycache__|build|dist)\\' } |
+            ForEach-Object { $_.FullName }
+
+          Write-Host "Revisando $($archivos.Count) archivos"
+          $salida = & python -m pyflakes $archivos 2>&1
+
+          # pyflakes sale con 1 en cuanto dice algo, incluidos los avisos
+          # que aquí no importan. Manda lo que queda tras filtrarlos, no
+          # su código de salida.
+          $global:LASTEXITCODE = 0
+
+          # Se listan los que SI importan, no los que no. Al reves
+          # —ignorando una lista de avisos cosmeticos— cualquier aviso
+          # nuevo que pyflakes aprenda a dar tumba la compilacion, y la
+          # descarga se queda congelada en la version anterior sin que
+          # nadie lo note. Paso dos veces seguidas.
+          #
+          # Estos son los que revientan al ejecutar, que es lo unico que
+          # justifica no publicar:
+          $graves = $salida | Where-Object {
+            $_ -match 'undefined name|referenced before assignment|invalid syntax|redefinition of unused .* from line'
+          }
+          if ($graves) {
+            $graves | ForEach-Object { Write-Host $_ }
+            throw "Revisa lo de arriba antes de publicar"
+          }
+          Write-Host "Sin nombres indefinidos."
+
+      - name: Dependencias del backend
+        run: |
+          python -m pip install --upgrade pip
+          # Sin rembg: son 200 MB de onnxruntime para recortar fondos de
+          # fotos, y se importa solo al usarlo.
+          Get-Content Backend/requirements.txt |
+            Where-Object { $_ -notmatch '^\s*(#|$)' -and $_ -notmatch 'rembg' } |
+            Set-Content requisitos-sin-rembg.txt
+          pip install -r requisitos-sin-rembg.txt
+          pip install pyinstaller
+
+      - name: Compilar el panel
+        working-directory: Frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Congelar el backend
+        run: pyinstaller Backend/backend.spec --noconfirm --clean --distpath dist-backend
+
+      - name: Congelar el lanzador
+        run: |
+          # --windowed y no --console: es lo que hacia aparecer la
+          # ventana negra. Ahora abre su panel.
+          pyinstaller --onefile --windowed --clean --noconfirm --noupx `
+            --name race-core-studio `
+            --icon launcher/race-core-studio.ico `
+            --version-file launcher/version-info.txt `
+            --hidden-import pymongo `
+            --hidden-import panel `
+            --hidden-import textos `
+            --paths launcher `
+            --add-data "VERSION;." `
+            --distpath dist-launcher `
+            launcher/race_core_studio.py
+
+      - name: Comprobar el panel del lanzador
+        run: |
+          # Se importa con el tkinter de verdad, sin abrir ventana. Es lo
+          # que atrapa un nombre mal escrito o un tkinter que no entro en
+          # el .exe: un panel roto solo se veria al ejecutarlo, y para
+          # entonces ya esta en el equipo del cliente.
+          python -c "import sys; sys.path.insert(0,'launcher'); import tkinter, panel; print('panel:', len(panel.ESTADOS), 'estados')"
+
+          # Y los dos idiomas enteros. Un texto que falta no revienta
+          # nada: el cliente ve «est_error» donde deberia poner NOT
+          # RESPONDING, o un boton sin etiqueta. Solo se ve abriendo el
+          # programa, y en el idioma que no es el nuestro.
+          python tools/revisar_idiomas.py
+          if ($LASTEXITCODE -ne 0) { throw "El panel no esta completo en los dos idiomas" }
+
+      - name: Bajar MongoDB
+        run: |
+          $url = "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-$env:MONGO_VERSION.zip"
+          Write-Host "Bajando $url"
+          Invoke-WebRequest -Uri $url -OutFile mongo.zip
+          Expand-Archive mongo.zip -DestinationPath mongo-tmp
+
+      - name: Armar el paquete
+        run: |
+          New-Item -ItemType Directory -Force -Path payload | Out-Null
+
+          # El programa
+          # Carpeta y no archivo suelto: PyInstaller reparte ahi las
+          # bibliotecas, y asi el backend no tiene que descomprimirse
+          # entero en cada arranque.
+          Copy-Item dist-backend/race-core-backend payload/backend -Recurse
+          Copy-Item dist-launcher/race-core-studio.exe  payload/
+          Copy-Item VERSION                             payload/
+
+          # El panel ya compilado
+          Copy-Item Frontend/dist payload/panel -Recurse
+
+          # CasparCG
+          Copy-Item Casparcg payload/casparcg -Recurse
+
+          # Sus rutas, resueltas aqui y no en el equipo del cliente.
+          #
+          # El config del repositorio las declara relativas —media/, log/,
+          # data/, template/— porque alli CasparCG vive en la carpeta del
+          # proyecto, donde se puede escribir. Instalado en «Archivos de
+          # programa» no puede, y se niega a arrancar:
+          #
+          #     Failed to create directory media/ (Acceso denegado)
+          #
+          # Se dejan apuntando a ProgramData, que es fijo en Windows y no
+          # depende de donde el cliente decida instalar. Hacerlo aqui y no
+          # con codigo Pascal en el instalador quita una pieza que solo se
+          # podia probar instalando.
+          $datos = 'C:\ProgramData\Race Core Studio'
+          $cfg = 'payload/casparcg/casparcg.config'
+          $texto = Get-Content $cfg -Raw
+
+          $texto = $texto.Replace('<media-path>media/</media-path>',
+                                  "<media-path>$datos\casparcg\media\</media-path>")
+          $texto = $texto.Replace('<log-path disable="false">log/</log-path>',
+                                  "<log-path disable=""false"">$datos\casparcg\log\</log-path>")
+          $texto = $texto.Replace('<data-path>data/</data-path>',
+                                  "<data-path>$datos\casparcg\data\</data-path>")
+          $texto = $texto.Replace('<template-path>template/</template-path>',
+                                  "<template-path>$datos\plantillas\</template-path>")
+
+          # CEF —el navegador con el que CasparCG pinta los graficos—
+          # guarda su cache junto al ejecutable si no se le dice otra
+          # cosa. El config trae la opcion documentada pero fuera de la
+          # configuracion activa, o sea sin efecto.
+          $html = "    <html>`r`n        <cache-path>$datos\casparcg\cef-cache\</cache-path>`r`n    </html>`r`n</configuration>"
+          $texto = $texto.Replace('</configuration>', $html)
+
+          Set-Content $cfg -Value $texto -NoNewline
+
+          Write-Host "`n=== Rutas de CasparCG ==="
+          Select-String -Path $cfg -Pattern '-path' | ForEach-Object { $_.Line.Trim() }
+
+          # Que no quede ninguna relativa sin resolver.
+          $sueltas = Select-String -Path $cfg -Pattern '<(media|log|data|template)-path[^>]*>(media|log|data|template)/<'
+          if ($sueltas) { throw "Quedaron rutas relativas en casparcg.config" }
+
+          # MongoDB: solo lo que hace falta para servir. Las herramientas
+          # de línea de órdenes y Compass no pintan nada en un autódromo.
+          New-Item -ItemType Directory -Force -Path payload/mongodb/bin | Out-Null
+          $origen = (Get-ChildItem mongo-tmp -Directory | Select-Object -First 1).FullName
+          Copy-Item "$origen/bin/mongod.exe" payload/mongodb/bin/
+          if (Test-Path "$origen/bin/mongod.cfg") {
+            Copy-Item "$origen/bin/mongod.cfg" payload/mongodb/bin/
+          }
+
+          Write-Host "`n=== El paquete ==="
+          if (-not (Test-Path payload/backend/race-core-backend.exe)) {
+            throw "Falta el backend en el paquete"
+          }
+          Get-ChildItem payload | Format-Table Name, Length
+          "{0:N0} MB en total" -f ((Get-ChildItem payload -Recurse |
+            Measure-Object Length -Sum).Sum / 1MB)
+
+      - name: Arrancar el sistema entero y comprobar que sirve
+        run: |
+          # Esto es lo que faltaba. Antes solo se miraba que el ejecutable
+          # no muriera nada mas empezar, sin MongoDB detras, asi que nunca
+          # llegaba a servir y cualquier fallo posterior salia por primera
+          # vez en el equipo del cliente.
+          #
+          # Ahora se levanta el MongoDB que va en el paquete, se arranca
+          # el backend contra el, y se le piden paginas de verdad.
+
+          function Esperar-Puerto($puerto, $segundos) {
+            $fin = (Get-Date).AddSeconds($segundos)
+            while ((Get-Date) -lt $fin) {
+              try {
+                $c = New-Object System.Net.Sockets.TcpClient
+                $c.Connect('127.0.0.1', $puerto)
+                $c.Close()
+                return $true
+              } catch { Start-Sleep -Milliseconds 500 }
+            }
+            return $false
+          }
+
+          New-Item -ItemType Directory -Force -Path prueba\db, prueba\datos | Out-Null
+
+          Write-Host "Arrancando MongoDB..."
+          $mongo = Start-Process payload\mongodb\bin\mongod.exe -PassThru -WindowStyle Hidden `
+            -ArgumentList '--dbpath', "$PWD\prueba\db", '--port', '27017'
+          if (-not (Esperar-Puerto 27017 90)) { throw "MongoDB no llego a escuchar" }
+          Write-Host "  MongoDB en marcha"
+
+          # El backend imprime algun emoji al conectar. Con la salida
+          # redirigida, la pagina de codigos de Windows no sabe escribirlo
+          # y el arranque muere antes de servir nada.
+          $env:PYTHONIOENCODING = 'utf-8'
+          $env:RCS_DATOS = "$PWD\prueba\datos"
+
+          Write-Host "Arrancando el backend..."
+          $bk = Start-Process payload\backend\race-core-backend.exe -PassThru -WindowStyle Hidden `
+            -RedirectStandardOutput prueba\backend.log -RedirectStandardError prueba\backend.err
+
+          if (-not (Esperar-Puerto 8080 150)) {
+            Write-Host "--- backend.log ---"
+            Get-Content prueba\backend.log -EA SilentlyContinue
+            Write-Host "--- backend.err ---"
+            Get-Content prueba\backend.err -EA SilentlyContinue
+            throw "El backend no llego a servir en el 8080"
+          }
+          Write-Host "  Backend escuchando"
+
+          $fallos = @()
+          foreach ($ruta in '/', '/docs', '/api/v1/setup/estado') {
+            try {
+              $r = Invoke-WebRequest "http://127.0.0.1:8080$ruta" -UseBasicParsing -TimeoutSec 30
+              Write-Host "  $ruta -> $($r.StatusCode)"
+              if ($r.StatusCode -ne 200) { $fallos += "$ruta devolvio $($r.StatusCode)" }
+            } catch {
+              $fallos += "$ruta fallo: $_"
+            }
+          }
+
+          # Que sirva el PANEL y no solo el API. Cuando el backend no
+          # encuentra el panel arranca igual, sirviendo solo /docs, y
+          # desde fuera parece que todo va bien.
+          try {
+            $inicio = Invoke-WebRequest "http://127.0.0.1:8080/" -UseBasicParsing -TimeoutSec 30
+            if ($inicio.Content -notmatch 'Race Core Studio') {
+              $fallos += "La portada no es el panel; el backend no lo encontro"
+            } else {
+              Write-Host "  El panel se sirve"
+            }
+          } catch { $fallos += "No se pudo pedir la portada: $_" }
+
+          # El token del asistente, de punta a punta. El backend lo
+          # escribe y el lanzador lo busca, pero se congelan por separado
+          # y cada uno calcula la carpeta por su cuenta. Cuando dejaron de
+          # coincidir, el backend lo dejaba dentro de Archivos de programa
+          # y el cliente se quedaba en «Falta el token de instalacion» sin
+          # nada que pudiera hacer. Aqui se deja un token donde el lanzador
+          # miraria y se pide una ruta que lo exige.
+          #
+          # ASCII y no utf8: Windows PowerShell mete una marca BOM al
+          # principio del archivo y el token dejaria de coincidir por un
+          # caracter invisible.
+          $tk = 'token-de-prueba-de-ci'
+          Set-Content -Path "$env:RCS_DATOS\instalacion.token" -Value $tk -NoNewline -Encoding ascii
+          try {
+            $r = Invoke-WebRequest "http://127.0.0.1:8080/api/v1/setup/red" -UseBasicParsing `
+                   -TimeoutSec 30 -Headers @{ 'X-Setup-Token' = $tk }
+            if ($r.StatusCode -ne 200) {
+              $fallos += "La ruta del asistente devolvio $($r.StatusCode) con el token puesto"
+            } else {
+              Write-Host "  El backend lee el token donde el lanzador lo busca"
+            }
+          } catch {
+            $fallos += "El backend no encontro el token en la carpeta de datos: $_"
+          }
+
+          Write-Host "--- salida del backend ---"
+          Get-Content prueba\backend.log -EA SilentlyContinue | Select-Object -Last 20
+
+          Stop-Process -Id $bk.Id -Force -EA SilentlyContinue
+          Stop-Process -Id $mongo.Id -Force -EA SilentlyContinue
+
+          if ($fallos) {
+            $fallos | ForEach-Object { Write-Host "  FALLO: $_" }
+            throw "El sistema no sirve correctamente"
+          }
+          Write-Host "El sistema arranca y sirve."
+
+      - name: Comprobar que el instalador no apunta al vacío
+        run: |
+          # Ahora que el paquete existe, se comprueba que cada archivo
+          # que el instalador ejecuta esté de verdad dentro. Inno no lo
+          # sabe —no puede saber qué habrá en {app} cuando alguien
+          # instale— y el fallo sale en el equipo del cliente, a mitad
+          # de la instalación y con 250 MB ya copiados.
+          python tools/revisar.py
+
+      - name: Instalar Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Compilar el instalador
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\inno\race-core-studio.iss
+          Get-ChildItem dist
+
+      - name: Huella
+        id: huella
+        run: |
+          $h = (Get-FileHash dist/rcs-setup.exe -Algorithm SHA256).Hash.ToLower()
+          "sha256=$h" >> $env:GITHUB_OUTPUT
+          Write-Host "SHA-256: $h"
+
+      - name: Guardar el instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: rcs-setup
+          path: dist/rcs-setup.exe
+
+      # La descarga de «instalador» es ahora la 1.2, y se publica desde
+      # test-production-1.2. Esta rama sigue compilando (queda el
+      # artefacto en Actions) pero ya no publica: pisaría a la 1.2.
+      - name: Publicar la descarga
+        if: github.ref == 'refs/heads/test-production-1.2'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: instalador
+          name: Race Core Studio — instalador
+          body: |
+            **rcs-setup.exe** — instalador de Race Core Studio.
+
+            Asistente con interfaz. Instala el programa ya compilado:
+            no descarga código ni compila nada en el equipo.
+
+            Incluye CasparCG y MongoDB. No hacen falta Python, Node ni
+            Git.
+
+            Los datos del autódromo se guardan en
+            `C:\ProgramData\Race Core Studio`, aparte del programa, para
+            que actualizar o reinstalar no los toque.
+
+            ### Antivirus
+
+            El ejecutable **no va firmado** todavía: Windows lo marcará
+            como «editor desconocido» y Defender puede llegar a borrarlo
+            con `Trojan:Win32/Wacatac.B!ml`. El sufijo `!ml` significa
+            que no coincide con ningún malware conocido — es el modelo
+            heurístico puntuando un binario sin firma. Se arregla de
+            verdad con un certificado Authenticode.
+
+            Se compila en un runner limpio de GitHub desde el código de
+            este repositorio, y su huella es comprobable:
+
+            ```
+            SHA-256  ${{ steps.huella.outputs.sha256 }}
+            ```
+
+            ```powershell
+            Get-FileHash rcs-setup.exe -Algorithm SHA256
+            ```
+
+            Compilado desde `${{ github.sha }}`.
+          files: dist/rcs-setup.exe
+          prerelease: true
+          make_latest: false
