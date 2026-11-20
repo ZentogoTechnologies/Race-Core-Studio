@@ -11,7 +11,7 @@ name: Instalador con interfaz
 
 on:
   push:
-    branches: [test-production-1.0, test-production-1.1, main]
+    branches: [test-production-1.0, test-production-1.1, test-production-1.2, main]
     paths:
       - 'installer/**'
       - 'launcher/**'
@@ -368,11 +368,11 @@ jobs:
           name: rcs-setup
           path: dist/rcs-setup.exe
 
-      # La descarga de «instalador» es la 1.1. La 1.0 sigue compilando
+      # La descarga de «instalador» es la 1.2. Las anteriores siguen compilando
       # (queda el artefacto en Actions) pero ya no publica: las dos en la
       # misma etiqueta se pisarían según cuál terminara la última.
       - name: Publicar la descarga
-        if: github.ref == 'refs/heads/test-production-1.1'
+        if: github.ref == 'refs/heads/test-production-1.2'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: instalador
